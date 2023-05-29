@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:rehnaa/Screens/splash.dart';
-import 'Screens/login_page.dart';
+import 'package:rehnaa/frontend/Screens/splash.dart';
+import 'frontend/Screens/login_page.dart';
 
 void main() {
   runApp(MyApp());
