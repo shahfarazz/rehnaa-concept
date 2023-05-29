@@ -1,7 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:rehnaa/Screens/login_page.dart';
+import 'package:rehnaa/frontend/Screens/login_page.dart';
 
 class SignUpPage extends StatefulWidget {
   @override
