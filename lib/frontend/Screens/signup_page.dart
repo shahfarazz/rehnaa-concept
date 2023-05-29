@@ -32,45 +32,45 @@ class _SignUpPageState extends State<SignUpPage> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               buildTitle("Welcome to Rehnaa"),
-              SizedBox(height: 21.0),
+              SizedBox(height: MediaQuery.of(context).size.height * 0.03),
               buildSubtitle("Sign Up"),
-              SizedBox(height: 21.0),
+              SizedBox(height: MediaQuery.of(context).size.height * 0.04),
               buildInputField("First Name", onChanged: (value) {
                 setState(() {
                   firstName = value;
                 });
-              }),
-              SizedBox(height: 21.0),
+              }, context: context),
+              SizedBox(height: MediaQuery.of(context).size.height * 0.02),
               buildInputField("Last Name", onChanged: (value) {
                 setState(() {
                   lastName = value;
                 });
-              }),
-              SizedBox(height: 21.0),
+              }, context: context),
+              SizedBox(height: MediaQuery.of(context).size.height * 0.02),
               buildInputField("Email ID/Phone Number", onChanged: (value) {
                 setState(() {
                   emailOrPhone = value;
                 });
-              }),
-              SizedBox(height: 21.0),
+              }, context: context),
+              SizedBox(height: MediaQuery.of(context).size.height * 0.02),
               buildPasswordInputField("Password", onChanged: (value) {
                 setState(() {
                   password = value;
                 });
-              }),
-              SizedBox(height: 21.0),
+              }, context: context),
+              SizedBox(height: MediaQuery.of(context).size.height * 0.02),
               buildPasswordInputField("Re-enter Password", onChanged: (value) {
                 setState(() {
                   confirmPassword = value;
                 });
-              }),
-              SizedBox(height: 21.0),
+              }, context: context),
+              SizedBox(height: MediaQuery.of(context).size.height * 0.02),
               buildOptionSelector(),
-              SizedBox(height: 21.0),
+              SizedBox(height: MediaQuery.of(context).size.height * 0.02),
               buildCreateButton(),
-              SizedBox(height: 21.0),
+              SizedBox(height: MediaQuery.of(context).size.height * 0.02),
               buildSignInText(),
-              SizedBox(height: 5.0), // Adjusted to avoid bottom overflow
+              SizedBox(height: 50.0), // Adjusted to avoid bottom overflow
             ],
           ),
         ),
@@ -82,11 +82,10 @@ class _SignUpPageState extends State<SignUpPage> {
     return Text(
       text,
       textAlign: TextAlign.center,
-      style: TextStyle(
+      style: GoogleFonts.montserrat(
         color: Color(0xff33907c),
-        fontSize: 24,
-        fontFamily: "Montserrat",
-        fontWeight: FontWeight.w500,
+        fontSize: 22,
+        fontWeight: FontWeight.bold,
       ),
     );
   }
@@ -94,23 +93,33 @@ class _SignUpPageState extends State<SignUpPage> {
   Widget buildSubtitle(String text) {
     return Text(
       text,
-      style: TextStyle(
+      style: GoogleFonts.montserrat(
         color: Color(0xff33907c),
-        fontSize: 16,
+        fontSize: 18,
       ),
     );
   }
 
-  Widget buildInputField(String label, {required Function(String) onChanged}) {
+  Widget buildInputField(String label,
+      {required Function(String) onChanged, required BuildContext context}) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
+
     return TextField(
       onChanged: onChanged,
-      style: TextStyle(
+      style: GoogleFonts.montserrat(
         color: Color(0xff33907c),
+        fontSize: 18,
       ),
       decoration: InputDecoration(
+        contentPadding: EdgeInsets.symmetric(
+            vertical: screenHeight * 0.01,
+            horizontal:
+                screenWidth * 0.02), // Adjust these values to fit your needs
         labelText: label,
-        labelStyle: TextStyle(
+        labelStyle: GoogleFonts.montserrat(
           color: Color(0xff33907c),
+          fontSize: 18,
         ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(24),
@@ -131,17 +140,26 @@ class _SignUpPageState extends State<SignUpPage> {
   }
 
   Widget buildPasswordInputField(String label,
-      {required Function(String) onChanged}) {
+      {required Function(String) onChanged, required BuildContext context}) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
+
     return TextField(
       onChanged: onChanged,
       obscureText: true,
-      style: TextStyle(
+      style: GoogleFonts.montserrat(
         color: Color(0xff33907c),
+        fontSize: 18,
       ),
       decoration: InputDecoration(
+        contentPadding: EdgeInsets.symmetric(
+            vertical: screenHeight * 0.01,
+            horizontal:
+                screenWidth * 0.02), // Adjust these values to fit your needs
         labelText: label,
-        labelStyle: TextStyle(
+        labelStyle: GoogleFonts.montserrat(
           color: Color(0xff33907c),
+          fontSize: 18,
         ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(24),
@@ -198,7 +216,7 @@ class _SignUpPageState extends State<SignUpPage> {
         child: Center(
           child: Text(
             text,
-            style: TextStyle(
+            style: GoogleFonts.montserrat(
               color: selectedOption == text ? Colors.white : Color(0xff33907c),
               fontSize: 16,
             ),
@@ -232,11 +250,9 @@ class _SignUpPageState extends State<SignUpPage> {
         child: Center(
           child: Text(
             "Create",
-            style: TextStyle(
-              color: Color(0xff13b58c),
-              fontSize: 16,
-              fontFamily: "Montserrat",
-              fontWeight: FontWeight.w500,
+            style: GoogleFonts.montserrat(
+              color: Color(0xff33907c),
+              fontSize: 18,
             ),
           ),
         ),
@@ -256,7 +272,11 @@ class _SignUpPageState extends State<SignUpPage> {
         children: <TextSpan>[
           TextSpan(
             text: 'Sign in',
-            style: const TextStyle(fontWeight: FontWeight.bold),
+            style: GoogleFonts.montserrat(
+              color: Color(0xff33907c),
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
             recognizer: TapGestureRecognizer()
               ..onTap = () {
                 Navigator.push(

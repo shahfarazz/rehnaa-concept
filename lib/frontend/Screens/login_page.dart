@@ -16,14 +16,15 @@ class LoginPage extends StatelessWidget {
             children: [
               SizedBox(height: MediaQuery.of(context).size.height * 0.1),
               Image.asset('assets/mainlogo.png',
-                  height: MediaQuery.of(context).size.width * 0.3),
+                  height: MediaQuery.of(context).size.width * 0.4),
               SizedBox(height: MediaQuery.of(context).size.height * 0.05),
               Text(
-                'Login to your account',
+                'Login',
                 textAlign: TextAlign.center,
                 style: GoogleFonts.montserrat(
                   color: Color(0xff33907c),
-                  fontSize: 16,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
               SizedBox(height: MediaQuery.of(context).size.height * 0.05),
@@ -33,8 +34,9 @@ class LoginPage extends StatelessWidget {
                 ),
                 decoration: InputDecoration(
                   labelText: 'Email/Mobile Number',
-                  labelStyle: TextStyle(
-                    color: Color(0xff33907c), // Sets the color of the label
+                  labelStyle: GoogleFonts.montserrat(
+                    color: Color(0xff33907c),
+                    fontSize: 18,
                   ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(24),
@@ -50,7 +52,7 @@ class LoginPage extends StatelessWidget {
                   ),
                 ),
               ),
-              SizedBox(height: MediaQuery.of(context).size.height * 0.05),
+              SizedBox(height: MediaQuery.of(context).size.height * 0.02),
               TextField(
                 obscureText: true,
                 style: TextStyle(
@@ -58,8 +60,9 @@ class LoginPage extends StatelessWidget {
                 ),
                 decoration: InputDecoration(
                   labelText: 'Password',
-                  labelStyle: TextStyle(
-                    color: Color(0xff33907c), // Sets the color of the label
+                  labelStyle: GoogleFonts.montserrat(
+                    color: Color(0xff33907c),
+                    fontSize: 18,
                   ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(24),
@@ -80,15 +83,18 @@ class LoginPage extends StatelessWidget {
                 onPressed: () {
                   // handle user login
                 },
-                child: Text(
-                  'Login',
-                  style: GoogleFonts.montserrat(),
-                ),
                 style: ElevatedButton.styleFrom(
                   primary: Colors.white,
                   onPrimary: Color(0xff13b58c),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(24),
+                  ),
+                ),
+                child: Text(
+                  'Login',
+                  style: GoogleFonts.montserrat(
+                    color: Color(0xff33907c),
+                    fontSize: 18,
                   ),
                 ),
               ),
@@ -115,9 +121,11 @@ class LoginPage extends StatelessWidget {
                   children: <TextSpan>[
                     TextSpan(
                       text: 'Sign Up',
-                      style: const TextStyle(
-                          // decoration: TextDecoration.underline,
-                          fontWeight: FontWeight.w900),
+                      style: GoogleFonts.montserrat(
+                        color: Color(0xff33907c),
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
                       recognizer: TapGestureRecognizer()
                         ..onTap = () {
                           Navigator.push(
