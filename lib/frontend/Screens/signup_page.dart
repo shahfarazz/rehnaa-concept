@@ -15,6 +15,7 @@ class _SignUpPageState extends State<SignUpPage> {
   String password = '';
   String confirmPassword = '';
   String selectedOption = '';
+  bool showPassword = false; // Added showPassword state
 
   @override
   Widget build(BuildContext context) {
@@ -139,23 +140,26 @@ class _SignUpPageState extends State<SignUpPage> {
     );
   }
 
-  Widget buildPasswordInputField(String label,
-      {required Function(String) onChanged, required BuildContext context}) {
+  Widget buildPasswordInputField(
+    String label, {
+    required Function(String) onChanged,
+    required BuildContext context,
+  }) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
 
     return TextField(
       onChanged: onChanged,
-      obscureText: true,
+      obscureText: !showPassword, // Toggle obscureText based on showPassword
       style: GoogleFonts.montserrat(
         color: Color(0xff33907c),
         fontSize: 18,
       ),
       decoration: InputDecoration(
         contentPadding: EdgeInsets.symmetric(
-            vertical: screenHeight * 0.01,
-            horizontal:
-                screenWidth * 0.02), // Adjust these values to fit your needs
+          vertical: screenHeight * 0.01,
+          horizontal: screenWidth * 0.02,
+        ),
         labelText: label,
         labelStyle: GoogleFonts.montserrat(
           color: Color(0xff33907c),
@@ -175,6 +179,17 @@ class _SignUpPageState extends State<SignUpPage> {
         ),
         filled: true,
         fillColor: Colors.white,
+        suffixIcon: IconButton(
+          onPressed: () {
+            setState(() {
+              showPassword = !showPassword; // Toggle showPassword state
+            });
+          },
+          icon: Icon(
+            showPassword ? Icons.visibility : Icons.visibility_off,
+            color: Color(0xff33907c),
+          ),
+        ),
       ),
     );
   }
@@ -210,7 +225,18 @@ class _SignUpPageState extends State<SignUpPage> {
         height: 40,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
-          color: selectedOption == text ? Color(0xff33907c) : Colors.white,
+          gradient: selectedOption == text
+              ? LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Color(0xff0FA697),
+                    Color(0xff45BF7A),
+                    Color(0xff0DF205),
+                  ],
+                )
+              : null,
+          color: selectedOption == text ? null : Colors.white,
           border: Border.all(color: Color(0xff33907c), width: 1),
         ),
         child: Center(
@@ -227,32 +253,41 @@ class _SignUpPageState extends State<SignUpPage> {
   }
 
   Widget buildCreateButton() {
-    return ElevatedButton(
-      onPressed: () {
-        // Call your Firebase sign up function here with the input values
-        print('First Name: $firstName');
-        print('Last Name: $lastName');
-        print('Email/Phone: $emailOrPhone');
-        print('Password: $password');
-        print('Confirm Password: $confirmPassword');
-        print('Selected Option: $selectedOption');
-      },
-      style: ElevatedButton.styleFrom(
-        primary: Colors.white,
-        onPrimary: Color(0xff13b58c),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(24),
+    return Container(
+      width: MediaQuery.of(context).size.width,
+      height: 48,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(24),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Color(0xff0FA697),
+            Color(0xff45BF7A),
+            Color(0xff0DF205),
+          ],
         ),
       ),
-      child: Container(
-        width: MediaQuery.of(context).size.width,
-        height: 48,
-        child: Center(
-          child: Text(
-            "Create",
-            style: GoogleFonts.montserrat(
-              color: Color(0xff33907c),
-              fontSize: 18,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(24),
+          onTap: () {
+            // Call your Firebase sign up function here with the input values
+            print('First Name: $firstName');
+            print('Last Name: $lastName');
+            print('Email/Phone: $emailOrPhone');
+            print('Password: $password');
+            print('Confirm Password: $confirmPassword');
+            print('Selected Option: $selectedOption');
+          },
+          child: Center(
+            child: Text(
+              "Create",
+              style: GoogleFonts.montserrat(
+                color: Colors.white,
+                fontSize: 18,
+              ),
             ),
           ),
         ),
@@ -264,7 +299,7 @@ class _SignUpPageState extends State<SignUpPage> {
     return RichText(
       textAlign: TextAlign.center,
       text: TextSpan(
-        text: "Have an account? ",
+        text: "Already have an account? ",
         style: GoogleFonts.montserrat(
           color: Color(0xff33907c),
           fontSize: 18,
