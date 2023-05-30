@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -19,12 +21,16 @@ class _SignUpPageState extends State<SignUpPage> {
   String password = '';
   String confirmPassword = '';
   String selectedOption = '';
-  bool showPassword = false; // Added showPassword state
+  // String smsCode = '';
+  bool showPassword = false;
+  bool showConfirmPassword = false;
+  bool isLoading = false; // New state variable
   String? firstNameError;
   String? lastNameError;
   String? emailOrPhoneError;
   String? passwordError;
   String? confirmPasswordError;
+  String? verificationId; // Define a state to hold the verificationId
 
   bool isEmail(String input) {
     final regex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
@@ -34,7 +40,6 @@ class _SignUpPageState extends State<SignUpPage> {
   Future<void> signUpWithEmailAndPassword() async {
     String? formError = _validateForm();
     if (formError != null) {
-      // There was a validation error, show a toast and return early
       Fluttertoast.showToast(
         msg: formError,
         toastLength: Toast.LENGTH_SHORT,
@@ -45,19 +50,45 @@ class _SignUpPageState extends State<SignUpPage> {
       return;
     }
     try {
+      setState(() {
+        isLoading = true; // Set isLoading to false after email is verified
+      }); // Set isLoading to true before starting the sign-up process
       UserCredential userCredential =
           await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: emailOrPhone,
         password: password,
       );
-      // Success
-      print('User registered: ${userCredential.user?.uid}');
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => DashboardPage()),
+      // Send verification email
+      await userCredential.user!.sendEmailVerification();
+      print(
+          'User registered. Verification email sent: ${userCredential.user?.uid}');
+      Fluttertoast.showToast(
+        msg: 'Verification email has been sent. Please check your inbox.',
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.green,
+        textColor: Colors.white,
       );
+
+      // Poll Firebase every 2 seconds to check if the email has been verified.
+      Timer.periodic(Duration(seconds: 2), (timer) async {
+        await FirebaseAuth.instance.currentUser!.reload();
+        if (FirebaseAuth.instance.currentUser!.emailVerified) {
+          timer.cancel();
+          setState(() {
+            isLoading = false; // Set isLoading to false after email is verified
+          });
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => DashboardPage()),
+          );
+        }
+      });
     } catch (e) {
       // Error
+      setState(() {
+        isLoading = false; // Set isLoading to false if sign-up fails
+      });
       print('Sign up failed: $e');
       Fluttertoast.showToast(
         msg: 'Sign up failed: $e',
@@ -72,7 +103,6 @@ class _SignUpPageState extends State<SignUpPage> {
   Future<void> signUpWithPhoneNumber() async {
     String? formError = _validateForm();
     if (formError != null) {
-      // There was a validation error, show a toast and return early
       Fluttertoast.showToast(
         msg: formError,
         toastLength: Toast.LENGTH_SHORT,
@@ -82,9 +112,127 @@ class _SignUpPageState extends State<SignUpPage> {
       );
       return;
     }
-    // Dummy implementation for now
-    print('Sign up with phone number');
-    // Navigate to the next screen
+
+    String phoneNumber = emailOrPhone.replaceFirst(RegExp('^0'), '+92');
+
+    // Start the sign-in process
+    codeSent(String verificationId, int? forceResendingToken) async {
+      this.verificationId = verificationId;
+      // Show a dialog to enter the SMS code
+      String smsCode = '';
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) {
+          return AlertDialog(
+            title: Text('Enter SMS Code'),
+            content: TextField(
+              onChanged: (value) {
+                // Update value of SMS code
+                smsCode = value;
+              },
+            ),
+            actions: [
+              TextButton(
+                child: Text('Verify'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  verifyPhoneNumberWithSms(smsCode);
+                },
+              ),
+            ],
+          );
+        },
+      );
+    }
+
+    codeAutoRetrievalTimeout(String verificationId) {
+      this.verificationId = verificationId;
+    }
+
+    verificationCompleted(PhoneAuthCredential phoneAuthCredential) async {
+      await FirebaseAuth.instance.signInWithCredential(phoneAuthCredential);
+      print(
+          'Phone number automatically verified and user signed in: ${FirebaseAuth.instance.currentUser!.uid}');
+      Fluttertoast.showToast(
+        msg: 'Phone number automatically verified and user signed in.',
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.green,
+        textColor: Colors.white,
+      );
+    }
+
+    verificationFailed(FirebaseAuthException authException) {
+      print(
+          'Phone number verification failed. Code: ${authException.code}. Message: ${authException.message}');
+      Fluttertoast.showToast(
+        msg: 'Phone number verification failed.',
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+      );
+    }
+
+    try {
+      await FirebaseAuth.instance.verifyPhoneNumber(
+        phoneNumber: phoneNumber, // phone number to verify
+        timeout: const Duration(seconds: 60), // timeout duration
+        verificationCompleted: verificationCompleted,
+        verificationFailed: verificationFailed,
+        codeSent: codeSent,
+        codeAutoRetrievalTimeout: codeAutoRetrievalTimeout,
+      );
+    } catch (e) {
+      print('Failed to Verify Phone Number: $e');
+      Fluttertoast.showToast(
+        msg: 'Failed to Verify Phone Number.',
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+      );
+    }
+  }
+
+// This function would be called when the user submits the SMS code
+  Future<void> verifyPhoneNumberWithSms(String smsCode) async {
+    // Create a PhoneCredential with the code
+    PhoneAuthCredential phoneAuthCredential = PhoneAuthProvider.credential(
+      verificationId: verificationId!,
+      smsCode: smsCode,
+    );
+
+    // Sign in the user with the credential
+    try {
+      await FirebaseAuth.instance.signInWithCredential(phoneAuthCredential);
+      print(
+          'Phone number successfully verified and user signed in: ${FirebaseAuth.instance.currentUser!.uid}');
+      Fluttertoast.showToast(
+        msg: 'Phone number successfully verified and user signed in.',
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.green,
+        textColor: Colors.white,
+      );
+
+      // Continue with the rest of your logic
+      // Navigate to the DashboardPage, for example
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => DashboardPage()),
+      );
+    } catch (e) {
+      print('Failed to verify SMS code: $e');
+      Fluttertoast.showToast(
+        msg: 'Failed to verify SMS code.',
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+      );
+    }
   }
 
   @override
@@ -124,23 +272,46 @@ class _SignUpPageState extends State<SignUpPage> {
                 });
               }, context: context),
               SizedBox(height: MediaQuery.of(context).size.height * 0.02),
-              buildPasswordInputField("Password", onChanged: (value) {
-                setState(() {
-                  password = value;
-                });
-              }, context: context),
+              buildPasswordInputField(
+                "Password",
+                onChanged: (value) {
+                  setState(() {
+                    password = value;
+                  });
+                },
+                context: context,
+                showPassword: showPassword,
+                onToggle: () {
+                  setState(() {
+                    showPassword = !showPassword; // Toggle showPassword state
+                  });
+                },
+              ),
               SizedBox(height: MediaQuery.of(context).size.height * 0.02),
-              buildPasswordInputField("Re-enter Password", onChanged: (value) {
-                setState(() {
-                  confirmPassword = value;
-                });
-              }, context: context),
+              buildPasswordInputField(
+                "Re-enter Password",
+                onChanged: (value) {
+                  setState(() {
+                    confirmPassword = value;
+                  });
+                },
+                context: context,
+                showPassword: showConfirmPassword,
+                onToggle: () {
+                  setState(() {
+                    showConfirmPassword =
+                        !showConfirmPassword; // Toggle showConfirmPassword state
+                  });
+                },
+              ),
               SizedBox(height: MediaQuery.of(context).size.height * 0.02),
               buildOptionSelector(),
               SizedBox(height: MediaQuery.of(context).size.height * 0.02),
               buildCreateButton(),
               SizedBox(height: MediaQuery.of(context).size.height * 0.02),
               buildSignInText(),
+              if (isLoading) // Show loading icon if isLoading is true
+                CircularProgressIndicator(), // Replace with your preferred loading widget
               SizedBox(height: 50.0), // Adjusted to avoid bottom overflow
             ],
           ),
@@ -150,14 +321,21 @@ class _SignUpPageState extends State<SignUpPage> {
   }
 
   String? _validateForm() {
+    // Regex to check for whitespace
+    final noSpaces = RegExp(r'^\S*$');
+
     // First name validation
     if (firstName.isEmpty) {
       return 'First name cannot be empty';
+    } else if (!noSpaces.hasMatch(firstName)) {
+      return 'First name cannot contain spaces';
     }
 
     // Last name validation
     if (lastName.isEmpty) {
       return 'Last name cannot be empty';
+    } else if (!noSpaces.hasMatch(lastName)) {
+      return 'Last name cannot contain spaces';
     }
 
     // Email/Phone validation
@@ -274,6 +452,8 @@ class _SignUpPageState extends State<SignUpPage> {
     required Function(String) onChanged,
     String? errorText, // Added this line
     required BuildContext context,
+    required bool showPassword,
+    required Function() onToggle,
   }) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
@@ -311,11 +491,7 @@ class _SignUpPageState extends State<SignUpPage> {
         filled: true,
         fillColor: Colors.white,
         suffixIcon: IconButton(
-          onPressed: () {
-            setState(() {
-              showPassword = !showPassword; // Toggle showPassword state
-            });
-          },
+          onPressed: onToggle,
           icon: Icon(
             showPassword ? Icons.visibility : Icons.visibility_off,
             color: Color(0xff33907c),
@@ -404,12 +580,25 @@ class _SignUpPageState extends State<SignUpPage> {
         child: InkWell(
           borderRadius: BorderRadius.circular(24),
           onTap: () {
-            if (isEmail(emailOrPhone)) {
-              // Sign up with email and password
-              signUpWithEmailAndPassword();
+            // Check if an option has been selected
+            if (selectedOption == '') {
+              // No option selected. Show a toast message.
+              Fluttertoast.showToast(
+                  msg: "Please select Landlord or Tenant",
+                  toastLength: Toast.LENGTH_SHORT,
+                  gravity: ToastGravity.BOTTOM,
+                  timeInSecForIosWeb: 1,
+                  backgroundColor: Colors.red,
+                  textColor: Colors.white,
+                  fontSize: 16.0);
             } else {
-              // Sign up with phone number
-              signUpWithPhoneNumber();
+              if (isEmail(emailOrPhone)) {
+                // Sign up with email and password
+                signUpWithEmailAndPassword();
+              } else {
+                // Sign up with phone number
+                signUpWithPhoneNumber();
+              }
             }
           },
           child: Center(
