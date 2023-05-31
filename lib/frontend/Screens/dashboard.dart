@@ -1,9 +1,8 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:rehnaa/frontend/Screens/login_page.dart';
+import 'package:rehnaa/frontend/helper/Dashboard_pages/dashboard_content.dart';
+
+import '../helper/Dashboard_pages/landlord_tenants.dart';
 
 class DashboardPage extends StatefulWidget {
   @override
@@ -12,29 +11,47 @@ class DashboardPage extends StatefulWidget {
 
 class _DashboardPageState extends State<DashboardPage> {
   int _currentIndex = 0;
-  final List<String> _pages = [
-    "Home Page",
-    "Tenant Page",
-    "Property Page",
-    "Rent History Page",
-    "Profile Page",
-  ];
+  final _pageController = PageController();
 
   void onTabTapped(int index) {
-    setState(() {
-      _currentIndex = index;
-    });
+    _pageController.animateToPage(
+      index,
+      duration: Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+    );
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
     return Scaffold(
-        appBar: _appBar(size),
-        body: _mainContent(size),
-        bottomNavigationBar: _bottomNavigationBar());
+      appBar: _appBar(size),
+      body: PageView(
+        controller: _pageController,
+        onPageChanged: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+        },
+        children: <Widget>[
+          DashboardContent(),
+          LandlordTenantsPage(),
+          // PropertyPage(),
+          // RentHistoryPage(),
+          // ProfilePage(),
+        ],
+      ),
+      bottomNavigationBar: _bottomNavigationBar(),
+    );
   }
 
+  // Your other methods go here (e.g., _appBar, _bottomNavigationBar)
   PreferredSizeWidget? _appBar(Size size) {
     return AppBar(
       // Set the height of the AppBar.
@@ -150,116 +167,6 @@ class _DashboardPageState extends State<DashboardPage> {
           ),
         ),
       ),
-    );
-  }
-
-  Widget _mainContent(Size size) {
-    return Column(
-      children: <Widget>[
-        Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Text(
-            'Welcome Aristotle!',
-            style: GoogleFonts.montserrat(
-              fontSize: 18,
-              color: Colors.black,
-            ),
-          ),
-        ),
-        Center(
-          child: Container(
-            width: size.width * 0.8,
-            height: size.height * 0.4, // Adjust the height as needed
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.withOpacity(0.4),
-                  spreadRadius: 2,
-                  blurRadius: 8,
-                  offset: Offset(0, 4), // changes position of shadow
-                ),
-              ],
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(20),
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.9),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        Text(
-                          'Available Balance',
-                          style: GoogleFonts.montserrat(
-                            fontSize: size.width * 0.05,
-                            fontWeight: FontWeight.w400,
-                            color: const Color.fromARGB(150, 0, 0, 0),
-                          ),
-                        ),
-                        Text(
-                          'PKR 90,000',
-                          style: GoogleFonts.montserrat(
-                            fontSize: size.width * 0.07,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.green,
-                          ),
-                        ),
-                        SizedBox(height: size.height * 0.05),
-                        Container(
-                          width:
-                              size.width * 0.6, // Increase the width as needed
-                          height: size.height * 0.06,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(20),
-                            gradient: const LinearGradient(
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                              colors: [
-                                Color(0xff0FA697),
-                                Color(0xff45BF7A),
-                                Color(0xff0DF205),
-                              ],
-                            ),
-                          ),
-                          child: Material(
-                            color: Colors.transparent,
-                            child: InkWell(
-                              borderRadius: BorderRadius.circular(20),
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => LoginPage(),
-                                  ),
-                                );
-                              },
-                              child: Center(
-                                child: Text(
-                                  "Withdraw",
-                                  style: GoogleFonts.montserrat(
-                                    color: Colors.white,
-                                    fontSize: 18,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-      ],
     );
   }
 
