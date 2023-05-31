@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -147,9 +148,9 @@ class LoginPage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               SizedBox(height: MediaQuery.of(context).size.height * 0.1),
-              Image.asset('assets/mainpagelogo.png',
-                  height: MediaQuery.of(context).size.width * 0.55),
-              SizedBox(height: MediaQuery.of(context).size.height * 0.03),
+              Image.asset('assets/mainlogo.png',
+                  height: MediaQuery.of(context).size.width * 0.4),
+              SizedBox(height: MediaQuery.of(context).size.height * 0.05),
               Text(
                 'Login',
                 textAlign: TextAlign.center,
@@ -275,7 +276,7 @@ class LoginPage extends StatelessWidget {
                   ),
                 ),
               ),
-              SizedBox(height: MediaQuery.of(context).size.height * 0.03),
+              SizedBox(height: MediaQuery.of(context).size.height * 0.05),
               TextButton(
                 onPressed: () {},
                 child: Text(
@@ -286,7 +287,7 @@ class LoginPage extends StatelessWidget {
                   ),
                 ),
               ),
-              SizedBox(height: MediaQuery.of(context).size.height * 0.03),
+              SizedBox(height: MediaQuery.of(context).size.height * 0.05),
               RichText(
                 textAlign: TextAlign.center,
                 text: TextSpan(
