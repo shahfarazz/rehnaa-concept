@@ -62,44 +62,42 @@ class _ForgetPasswordPageState extends State<ForgetPasswordPage> {
     final double screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      backgroundColor: Color(0xFF33907C),
       body: SafeArea(
-        child: Container(
-          width: screenWidth,
-          height: screenHeight,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Image.asset(
-                'assets/mainlogo.png',
-                height: screenWidth * 0.4,
-              ),
-              SizedBox(height: screenHeight * 0.03),
-              Text(
-                "Forget Password",
-                style: TextStyle(
-                  fontFamily: 'Montserrat',
-                  fontSize: screenWidth * 0.06,
-                  color: Colors.white,
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                SizedBox(height: screenHeight * 0.1),
+                Image.asset(
+                  'assets/mainlogo.png',
+                  height: screenWidth * 0.4,
                 ),
-              ),
-              SizedBox(height: screenHeight * 0.15),
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      _buildForgetPasswordDescription(),
-                      SizedBox(height: screenHeight * 0.02),
-                      _buildForgetPasswordTextField(),
-                      SizedBox(height: screenHeight * 0.03),
-                      _buildLoginLink(context),
-                      SizedBox(height: screenHeight * 0.02),
-                      _buildNextButton(),
-                    ],
+                SizedBox(height: screenHeight * 0.05),
+                Text(
+                  "Reset Password",
+                  style: TextStyle(
+                    fontFamily: 'Montserrat',
+                    fontSize: screenWidth * 0.06,
+                    color: Color(0xFF33907C),
                   ),
+                  textAlign: TextAlign.center,
                 ),
-              ),
-            ],
+                SizedBox(height: screenHeight * 0.05),
+                _buildForgetPasswordDescription(),
+                SizedBox(height: screenHeight * 0.02),
+                _buildForgetPasswordTextField(),
+                SizedBox(height: screenHeight * 0.05),
+                _buildNextButton(),
+                SizedBox(height: screenHeight * 0.05),
+                Center(
+                    child: _buildLoginLink(
+                        context)), // Wrap _buildLoginLink with Center widget
+                SizedBox(height: screenHeight * 0.05),
+              ],
+            ),
           ),
         ),
       ),
@@ -114,7 +112,7 @@ class _ForgetPasswordPageState extends State<ForgetPasswordPage> {
           style: TextStyle(
             fontFamily: 'Montserrat',
             fontSize: 16,
-            color: Colors.white,
+            color: Color(0xFF33907C),
           ),
         ),
       ],
@@ -128,7 +126,7 @@ class _ForgetPasswordPageState extends State<ForgetPasswordPage> {
       decoration: BoxDecoration(
         color: Colors.transparent,
         border: Border.all(
-          color: Colors.white,
+          color: Color(0xFF33907C),
         ),
         borderRadius: BorderRadius.circular(24),
       ),
@@ -137,13 +135,13 @@ class _ForgetPasswordPageState extends State<ForgetPasswordPage> {
         child: TextField(
           controller: _emailOrPhoneController,
           style: TextStyle(
-            color: Colors.white,
+            color: Colors.black,
           ),
           decoration: InputDecoration(
             border: InputBorder.none,
-            hintText: 'Email/Password',
+            hintText: 'Email/Phone Number',
             hintStyle: TextStyle(
-              color: Colors.white.withOpacity(0.5),
+              color: Colors.grey,
             ),
           ),
         ),
@@ -167,7 +165,7 @@ class _ForgetPasswordPageState extends State<ForgetPasswordPage> {
               style: TextStyle(
                 fontFamily: 'Montserrat',
                 fontSize: 18,
-                color: Colors.white,
+                color: Color(0xFF33907C),
               ),
             ),
             TextSpan(
@@ -175,7 +173,7 @@ class _ForgetPasswordPageState extends State<ForgetPasswordPage> {
               style: TextStyle(
                 fontFamily: 'Montserrat',
                 fontSize: 18,
-                color: Colors.white,
+                color: Color(0xFF33907C),
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -190,20 +188,31 @@ class _ForgetPasswordPageState extends State<ForgetPasswordPage> {
       width: 311,
       height: 48,
       decoration: BoxDecoration(
-        color: Colors.white,
         borderRadius: BorderRadius.circular(24),
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Color(0xff0FA697),
+            Color(0xff45BF7A),
+            Color(0xff0DF205),
+          ],
+        ),
       ),
-      child: TextButton(
-        onPressed: () {
+      child: InkWell(
+        borderRadius: BorderRadius.circular(24),
+        onTap: () {
           print('Next button pressed');
           handleForgetPassword(_emailOrPhoneController.text);
         },
-        child: Text(
-          "Next",
-          style: TextStyle(
-            fontFamily: 'Montserrat',
-            fontSize: 16,
-            color: Color(0xFF33907C),
+        child: Center(
+          child: Text(
+            "Next",
+            style: TextStyle(
+              fontFamily: 'Montserrat',
+              fontSize: 16,
+              color: Colors.white,
+            ),
           ),
         ),
       ),
