@@ -5,11 +5,12 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:rehnaa/frontend/Screens/signup_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'dashboard.dart';
-import 'package:firebase_auth_platform_interface/firebase_auth_platform_interface.dart';
 
 class LoginPage extends StatelessWidget {
   final TextEditingController _emailOrPhoneController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+
+  LoginPage({super.key});
 
   void _showToast(String message, Color color) {
     Fluttertoast.showToast(
@@ -65,21 +66,21 @@ class LoginPage extends StatelessWidget {
           context: context,
           barrierDismissible: false,
           builder: (context) {
-            TextEditingController _smsController = TextEditingController();
+            TextEditingController smsController = TextEditingController();
             return AlertDialog(
-              title: Text('Enter SMS Code'),
+              title: const Text('Enter SMS Code'),
               content: TextField(
-                controller: _smsController,
+                controller: smsController,
                 keyboardType: TextInputType.number,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'SMS Code',
                 ),
               ),
               actions: [
                 TextButton(
-                  child: Text('Verify'),
+                  child: const Text('Verify'),
                   onPressed: () async {
-                    String smsCode = _smsController.text.trim();
+                    String smsCode = smsController.text.trim();
                     try {
                       PhoneAuthCredential credential =
                           PhoneAuthProvider.credential(
@@ -153,7 +154,7 @@ class LoginPage extends StatelessWidget {
                 'Login',
                 textAlign: TextAlign.center,
                 style: GoogleFonts.montserrat(
-                  color: Color(0xff33907c),
+                  color: const Color(0xff33907c),
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
@@ -161,26 +162,29 @@ class LoginPage extends StatelessWidget {
               SizedBox(height: MediaQuery.of(context).size.height * 0.05),
               TextField(
                 controller: _emailOrPhoneController,
-                style: TextStyle(
+                style: const TextStyle(
                   color: Color(0xff33907c), // Sets the color of the text
                 ),
                 decoration: InputDecoration(
                   labelText: 'Email/Mobile Number',
                   labelStyle: GoogleFonts.montserrat(
-                    color: Color(0xff33907c),
+                    color: const Color(0xff33907c),
                     fontSize: 18,
                   ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(24),
-                    borderSide: BorderSide(color: Color(0xff33907c), width: 1),
+                    borderSide:
+                        const BorderSide(color: Color(0xff33907c), width: 1),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(24),
-                    borderSide: BorderSide(color: Color(0xff33907c), width: 2),
+                    borderSide:
+                        const BorderSide(color: Color(0xff33907c), width: 2),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(24),
-                    borderSide: BorderSide(color: Color(0xff33907c), width: 1),
+                    borderSide:
+                        const BorderSide(color: Color(0xff33907c), width: 1),
                   ),
                 ),
               ),
@@ -188,26 +192,29 @@ class LoginPage extends StatelessWidget {
               TextField(
                 controller: _passwordController,
                 obscureText: true,
-                style: TextStyle(
+                style: const TextStyle(
                   color: Color(0xff33907c), // Sets the color of the text
                 ),
                 decoration: InputDecoration(
                   labelText: 'Password',
                   labelStyle: GoogleFonts.montserrat(
-                    color: Color(0xff33907c),
+                    color: const Color(0xff33907c),
                     fontSize: 18,
                   ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(24),
-                    borderSide: BorderSide(color: Color(0xff33907c), width: 1),
+                    borderSide:
+                        const BorderSide(color: Color(0xff33907c), width: 1),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(24),
-                    borderSide: BorderSide(color: Color(0xff33907c), width: 2),
+                    borderSide:
+                        const BorderSide(color: Color(0xff33907c), width: 2),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(24),
-                    borderSide: BorderSide(color: Color(0xff33907c), width: 1),
+                    borderSide:
+                        const BorderSide(color: Color(0xff33907c), width: 1),
                   ),
                 ),
               ),
@@ -215,7 +222,7 @@ class LoginPage extends StatelessWidget {
               Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(24),
-                  gradient: LinearGradient(
+                  gradient: const LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
@@ -254,8 +261,8 @@ class LoginPage extends StatelessWidget {
                       }
                     },
                     child: Padding(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 12),
                       child: Text(
                         'Login',
                         textAlign: TextAlign.center,
@@ -274,7 +281,7 @@ class LoginPage extends StatelessWidget {
                 child: Text(
                   'Forgot your password?',
                   style: GoogleFonts.montserrat(
-                    color: Color(0xff33907c),
+                    color: const Color(0xff33907c),
                     fontSize: 18,
                   ),
                 ),
@@ -285,14 +292,14 @@ class LoginPage extends StatelessWidget {
                 text: TextSpan(
                   text: "Don't have an account? ",
                   style: GoogleFonts.montserrat(
-                    color: Color(0xff33907c),
+                    color: const Color(0xff33907c),
                     fontSize: 18,
                   ),
                   children: <TextSpan>[
                     TextSpan(
                       text: 'Sign Up',
                       style: GoogleFonts.montserrat(
-                        color: Color(0xff33907c),
+                        color: const Color(0xff33907c),
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
@@ -301,7 +308,7 @@ class LoginPage extends StatelessWidget {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => SignUpPage(),
+                              builder: (context) => const SignUpPage(),
                             ),
                           );
                         },

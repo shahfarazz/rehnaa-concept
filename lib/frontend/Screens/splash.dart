@@ -4,6 +4,8 @@ import 'login_page.dart'; // Import your login page
 import 'dashboard.dart'; // Import your main dashboard page
 
 class SplashScreen extends StatefulWidget {
+  const SplashScreen({super.key});
+
   @override
   _SplashScreenState createState() => _SplashScreenState();
 }
@@ -12,7 +14,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance!.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       checkUserLoginStatus();
     });
   }
@@ -20,7 +22,7 @@ class _SplashScreenState extends State<SplashScreen> {
   Future<void> checkUserLoginStatus() async {
     User? user = FirebaseAuth.instance.currentUser;
 
-    await Future.delayed(Duration(seconds: 2));
+    await Future.delayed(const Duration(seconds: 2));
 
     if (user != null) {
       // If the user is logged in, navigate to the main page.
@@ -39,7 +41,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
+      body: SizedBox(
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height,
         child: Column(
