@@ -1,11 +1,12 @@
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:rehnaa/frontend/Screens/login_page.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 import 'dashboard.dart';
+import 'login_page.dart';
 
 class SignUpPage extends StatefulWidget {
   @override
@@ -19,12 +20,15 @@ class _SignUpPageState extends State<SignUpPage> {
   String password = '';
   String confirmPassword = '';
   String selectedOption = '';
-  bool showPassword = false; // Added showPassword state
+  bool showPassword = false;
+  bool showConfirmPassword = false;
+  bool isLoading = false;
   String? firstNameError;
   String? lastNameError;
   String? emailOrPhoneError;
   String? passwordError;
   String? confirmPasswordError;
+  String? verificationId;
 
   bool isEmail(String input) {
     final regex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
@@ -34,57 +38,115 @@ class _SignUpPageState extends State<SignUpPage> {
   Future<void> signUpWithEmailAndPassword() async {
     String? formError = _validateForm();
     if (formError != null) {
-      // There was a validation error, show a toast and return early
-      Fluttertoast.showToast(
-        msg: formError,
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
-        backgroundColor: Colors.red,
-        textColor: Colors.white,
-      );
+      _showToast(formError, Colors.red);
       return;
     }
     try {
+      setState(() => isLoading = true);
       UserCredential userCredential =
           await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: emailOrPhone,
         password: password,
       );
-      // Success
-      print('User registered: ${userCredential.user?.uid}');
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => DashboardPage()),
+      await userCredential.user!.sendEmailVerification();
+      _showToast(
+        'Verification email has been sent. Please check your inbox.',
+        Colors.green,
       );
+      Timer.periodic(Duration(seconds: 2), (timer) async {
+        await FirebaseAuth.instance.currentUser!.reload();
+        if (FirebaseAuth.instance.currentUser!.emailVerified) {
+          timer.cancel();
+          setState(() => isLoading = false);
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => DashboardPage()),
+          );
+        }
+      });
     } catch (e) {
-      // Error
-      print('Sign up failed: $e');
-      Fluttertoast.showToast(
-        msg: 'Sign up failed: $e',
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
-        backgroundColor: Colors.red,
-        textColor: Colors.white,
-      );
+      setState(() => isLoading = false);
+      _showToast('Sign up failed: $e', Colors.red);
     }
   }
 
   Future<void> signUpWithPhoneNumber() async {
     String? formError = _validateForm();
     if (formError != null) {
-      // There was a validation error, show a toast and return early
-      Fluttertoast.showToast(
-        msg: formError,
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
-        backgroundColor: Colors.red,
-        textColor: Colors.white,
-      );
+      _showToast(formError, Colors.red);
       return;
     }
-    // Dummy implementation for now
-    print('Sign up with phone number');
-    // Navigate to the next screen
+    String phoneNumber = emailOrPhone.replaceFirst(RegExp('^0'), '+92');
+
+    codeSent(String verificationId, int? forceResendingToken) async {
+      this.verificationId = verificationId;
+      String smsCode = '';
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => AlertDialog(
+          title: Text('Enter SMS Code'),
+          content: TextField(
+            onChanged: (value) => smsCode = value,
+          ),
+          actions: [
+            TextButton(
+              child: Text('Verify'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                verifyPhoneNumberWithSms(smsCode);
+              },
+            ),
+          ],
+        ),
+      );
+    }
+
+    codeAutoRetrievalTimeout(String verificationId) {
+      this.verificationId = verificationId;
+    }
+
+    verificationCompleted(PhoneAuthCredential phoneAuthCredential) async {
+      await FirebaseAuth.instance.signInWithCredential(phoneAuthCredential);
+      _showToast('Phone number automatically verified and user signed in.',
+          Colors.green);
+    }
+
+    verificationFailed(FirebaseAuthException authException) {
+      _showToast('Phone number verification failed.', Colors.red);
+    }
+
+    try {
+      await FirebaseAuth.instance.verifyPhoneNumber(
+        phoneNumber: phoneNumber,
+        timeout: const Duration(seconds: 60),
+        verificationCompleted: verificationCompleted,
+        verificationFailed: verificationFailed,
+        codeSent: codeSent,
+        codeAutoRetrievalTimeout: codeAutoRetrievalTimeout,
+      );
+    } catch (e) {
+      _showToast('Failed to Verify Phone Number.', Colors.red);
+    }
+  }
+
+  Future<void> verifyPhoneNumberWithSms(String smsCode) async {
+    PhoneAuthCredential phoneAuthCredential = PhoneAuthProvider.credential(
+      verificationId: verificationId!,
+      smsCode: smsCode,
+    );
+
+    try {
+      await FirebaseAuth.instance.signInWithCredential(phoneAuthCredential);
+      _showToast('Phone number successfully verified and user signed in.',
+          Colors.green);
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => DashboardPage()),
+      );
+    } catch (e) {
+      _showToast('Failed to verify SMS code.', Colors.red);
+    }
   }
 
   @override
@@ -93,11 +155,7 @@ class _SignUpPageState extends State<SignUpPage> {
       resizeToAvoidBottomInset: false,
       body: SingleChildScrollView(
         child: Container(
-          width: MediaQuery.of(context).size.width,
-          height: MediaQuery.of(context).size.height,
-          color: Colors.white,
-          padding: const EdgeInsets.fromLTRB(
-              16.0, 40.0, 16.0, 40.0), // Adjusted padding
+          padding: EdgeInsets.fromLTRB(16.0, 40.0, 16.0, 40.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.end,
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -106,42 +164,38 @@ class _SignUpPageState extends State<SignUpPage> {
               SizedBox(height: MediaQuery.of(context).size.height * 0.03),
               buildSubtitle("Sign Up"),
               SizedBox(height: MediaQuery.of(context).size.height * 0.04),
-              buildInputField("First Name", onChanged: (value) {
-                setState(() {
-                  firstName = value;
-                });
-              }, context: context),
+              buildInputField("First Name",
+                  onChanged: (value) => firstName = value),
               SizedBox(height: MediaQuery.of(context).size.height * 0.02),
-              buildInputField("Last Name", onChanged: (value) {
-                setState(() {
-                  lastName = value;
-                });
-              }, errorText: firstNameError, context: context),
+              buildInputField("Last Name",
+                  onChanged: (value) => lastName = value,
+                  errorText: firstNameError),
               SizedBox(height: MediaQuery.of(context).size.height * 0.02),
-              buildInputField("Email ID/Phone Number", onChanged: (value) {
-                setState(() {
-                  emailOrPhone = value;
-                });
-              }, context: context),
+              buildInputField("Email ID/Phone Number",
+                  onChanged: (value) => emailOrPhone = value),
               SizedBox(height: MediaQuery.of(context).size.height * 0.02),
-              buildPasswordInputField("Password", onChanged: (value) {
-                setState(() {
-                  password = value;
-                });
-              }, context: context),
+              buildPasswordInputField(
+                "Password",
+                onChanged: (value) => password = value,
+                showPassword: showPassword,
+                onToggle: () => setState(() => showPassword = !showPassword),
+              ),
               SizedBox(height: MediaQuery.of(context).size.height * 0.02),
-              buildPasswordInputField("Re-enter Password", onChanged: (value) {
-                setState(() {
-                  confirmPassword = value;
-                });
-              }, context: context),
+              buildPasswordInputField(
+                "Re-enter Password",
+                onChanged: (value) => confirmPassword = value,
+                showPassword: showConfirmPassword,
+                onToggle: () =>
+                    setState(() => showConfirmPassword = !showConfirmPassword),
+              ),
               SizedBox(height: MediaQuery.of(context).size.height * 0.02),
               buildOptionSelector(),
               SizedBox(height: MediaQuery.of(context).size.height * 0.02),
               buildCreateButton(),
               SizedBox(height: MediaQuery.of(context).size.height * 0.02),
               buildSignInText(),
-              SizedBox(height: 50.0), // Adjusted to avoid bottom overflow
+              if (isLoading) CircularProgressIndicator(),
+              SizedBox(height: 50.0),
             ],
           ),
         ),
@@ -150,46 +204,30 @@ class _SignUpPageState extends State<SignUpPage> {
   }
 
   String? _validateForm() {
-    // First name validation
-    if (firstName.isEmpty) {
-      return 'First name cannot be empty';
-    }
+    final noSpaces = RegExp(r'^\S*$');
 
-    // Last name validation
-    if (lastName.isEmpty) {
-      return 'Last name cannot be empty';
-    }
+    if (firstName.isEmpty) return 'First name cannot be empty';
+    if (!noSpaces.hasMatch(firstName))
+      return 'First name cannot contain spaces';
 
-    // Email/Phone validation
-    if (emailOrPhone.isEmpty) {
-      return 'Email/Phone cannot be empty';
-    }
+    if (lastName.isEmpty) return 'Last name cannot be empty';
+    if (!noSpaces.hasMatch(lastName)) return 'Last name cannot contain spaces';
 
-    // Check if it's a phone number
+    if (emailOrPhone.isEmpty) return 'Email/Phone cannot be empty';
     if (!isEmail(emailOrPhone)) {
-      // Pakistani phone number validation
-      final regex =
-          RegExp(r'^03\d{9}$'); // Starts with '03' and is 11 digits long
-      if (!regex.hasMatch(emailOrPhone)) {
+      final regex = RegExp(r'^03\d{9}$');
+      if (!regex.hasMatch(emailOrPhone))
         return 'Enter a valid Pakistani phone number';
-      }
     }
 
-    // Password validation
-    if (password.isEmpty) {
-      return 'Password cannot be empty';
-    }
-    if (password.length < 8) {
+    if (password.isEmpty) return 'Password cannot be empty';
+    if (password.length < 8)
       return 'Password must be at least 8 characters long';
-    }
-
-    // Password complexity checks
     bool passwordHasUpper = password.contains(RegExp(r'[A-Z]'));
     bool passwordHasLower = password.contains(RegExp(r'[a-z]'));
     bool passwordHasDigit = password.contains(RegExp(r'[0-9]'));
     bool passwordHasSpecialCharacter =
         password.contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]'));
-
     if (!(passwordHasUpper &&
         passwordHasLower &&
         passwordHasDigit &&
@@ -197,19 +235,26 @@ class _SignUpPageState extends State<SignUpPage> {
       return 'Password must contain at least 1 uppercase, 1 lowercase, 1 digit, and 1 special character';
     }
 
-    // Confirm password validation
-    if (password != confirmPassword) {
-      return 'Passwords do not match';
-    }
+    if (password != confirmPassword) return 'Passwords do not match';
 
-    return null; // If all validations pass, return null
+    return null;
+  }
+
+  void _showToast(String message, Color backgroundColor) {
+    Fluttertoast.showToast(
+      msg: message,
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.BOTTOM,
+      backgroundColor: backgroundColor,
+      textColor: Colors.white,
+    );
   }
 
   Widget buildTitle(String text) {
     return Text(
       text,
       textAlign: TextAlign.center,
-      style: GoogleFonts.montserrat(
+      style: TextStyle(
         color: Color(0xff33907c),
         fontSize: 22,
         fontWeight: FontWeight.bold,
@@ -220,7 +265,7 @@ class _SignUpPageState extends State<SignUpPage> {
   Widget buildSubtitle(String text) {
     return Text(
       text,
-      style: GoogleFonts.montserrat(
+      style: TextStyle(
         color: Color(0xff33907c),
         fontSize: 18,
       ),
@@ -228,26 +273,17 @@ class _SignUpPageState extends State<SignUpPage> {
   }
 
   Widget buildInputField(String label,
-      {required Function(String) onChanged,
-      String? errorText,
-      required BuildContext context}) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    double screenHeight = MediaQuery.of(context).size.height;
-
+      {required Function(String) onChanged, String? errorText}) {
     return TextField(
       onChanged: onChanged,
-      style: GoogleFonts.montserrat(
+      style: TextStyle(
         color: Color(0xff33907c),
         fontSize: 18,
       ),
       decoration: InputDecoration(
-        errorText: errorText, // Added this line
-        contentPadding: EdgeInsets.symmetric(
-            vertical: screenHeight * 0.01,
-            horizontal:
-                screenWidth * 0.02), // Adjust these values to fit your needs
+        errorText: errorText,
         labelText: label,
-        labelStyle: GoogleFonts.montserrat(
+        labelStyle: TextStyle(
           color: Color(0xff33907c),
           fontSize: 18,
         ),
@@ -272,27 +308,20 @@ class _SignUpPageState extends State<SignUpPage> {
   Widget buildPasswordInputField(
     String label, {
     required Function(String) onChanged,
-    String? errorText, // Added this line
-    required BuildContext context,
+    required bool showPassword,
+    required Function() onToggle,
   }) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    double screenHeight = MediaQuery.of(context).size.height;
-
     return TextField(
       onChanged: onChanged,
-      obscureText: !showPassword, // Toggle obscureText based on showPassword
-      style: GoogleFonts.montserrat(
+      obscureText: !showPassword,
+      style: TextStyle(
         color: Color(0xff33907c),
         fontSize: 18,
       ),
       decoration: InputDecoration(
-        errorText: errorText,
-        contentPadding: EdgeInsets.symmetric(
-          vertical: screenHeight * 0.01,
-          horizontal: screenWidth * 0.02,
-        ),
+        contentPadding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
         labelText: label,
-        labelStyle: GoogleFonts.montserrat(
+        labelStyle: TextStyle(
           color: Color(0xff33907c),
           fontSize: 18,
         ),
@@ -311,11 +340,7 @@ class _SignUpPageState extends State<SignUpPage> {
         filled: true,
         fillColor: Colors.white,
         suffixIcon: IconButton(
-          onPressed: () {
-            setState(() {
-              showPassword = !showPassword; // Toggle showPassword state
-            });
-          },
+          onPressed: onToggle,
           icon: Icon(
             showPassword ? Icons.visibility : Icons.visibility_off,
             color: Color(0xff33907c),
@@ -326,31 +351,25 @@ class _SignUpPageState extends State<SignUpPage> {
   }
 
   Widget buildOptionSelector() {
-    return Center(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(height: 8.0),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center, // Center-align the row
-            children: [
-              buildOptionButton("Landlord"),
-              SizedBox(width: 16.0),
-              buildOptionButton("Tenant"),
-            ],
-          ),
-        ],
-      ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(height: 8.0),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            buildOptionButton("Landlord"),
+            SizedBox(width: 16.0),
+            buildOptionButton("Tenant"),
+          ],
+        ),
+      ],
     );
   }
 
   Widget buildOptionButton(String text) {
     return InkWell(
-      onTap: () {
-        setState(() {
-          selectedOption = text;
-        });
-      },
+      onTap: () => setState(() => selectedOption = text),
       child: Container(
         width: 100,
         height: 40,
@@ -373,7 +392,7 @@ class _SignUpPageState extends State<SignUpPage> {
         child: Center(
           child: Text(
             text,
-            style: GoogleFonts.montserrat(
+            style: TextStyle(
               color: selectedOption == text ? Colors.white : Color(0xff33907c),
               fontSize: 16,
             ),
@@ -404,18 +423,20 @@ class _SignUpPageState extends State<SignUpPage> {
         child: InkWell(
           borderRadius: BorderRadius.circular(24),
           onTap: () {
-            if (isEmail(emailOrPhone)) {
-              // Sign up with email and password
-              signUpWithEmailAndPassword();
+            if (selectedOption == '') {
+              _showToast("Please select Landlord or Tenant", Colors.red);
             } else {
-              // Sign up with phone number
-              signUpWithPhoneNumber();
+              if (isEmail(emailOrPhone)) {
+                signUpWithEmailAndPassword();
+              } else {
+                signUpWithPhoneNumber();
+              }
             }
           },
           child: Center(
             child: Text(
               "Create",
-              style: GoogleFonts.montserrat(
+              style: TextStyle(
                 color: Colors.white,
                 fontSize: 18,
               ),
@@ -431,14 +452,14 @@ class _SignUpPageState extends State<SignUpPage> {
       textAlign: TextAlign.center,
       text: TextSpan(
         text: "Already have an account? ",
-        style: GoogleFonts.montserrat(
+        style: TextStyle(
           color: Color(0xff33907c),
           fontSize: 18,
         ),
         children: <TextSpan>[
           TextSpan(
             text: 'Sign in',
-            style: GoogleFonts.montserrat(
+            style: TextStyle(
               color: Color(0xff33907c),
               fontSize: 18,
               fontWeight: FontWeight.bold,
@@ -451,7 +472,6 @@ class _SignUpPageState extends State<SignUpPage> {
                     builder: (context) => LoginPage(),
                   ),
                 );
-                // Navigate to LoginPage
               },
           ),
         ],
