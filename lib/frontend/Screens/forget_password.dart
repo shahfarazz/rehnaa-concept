@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'login_page.dart'; // Import your login page
+
 
 class ForgetPasswordPage extends StatelessWidget {
   @override
@@ -77,42 +79,62 @@ class ForgetPasswordPage extends StatelessWidget {
 
               SizedBox(height: 80),
               GestureDetector(
-                onTap: () {
-                  // Handle social network login click here
-                  print('Login clicked');
+              onTap: () {
+                // Handle Login text click here
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => LoginPage()), // Replace LoginPage with your actual login page widget
+                );
+              },
+              child: RichText(
+                text: TextSpan(
+                  children: [
+                    TextSpan(
+                      text: 'Already know credentials?  ',
+                      style: TextStyle(
+                        fontFamily: 'Montserrat',
+                        fontSize: 18,
+                        color: Colors.white,
+                      ),
+                    ),
+                    TextSpan(
+                      text: 'Login',
+                      style: TextStyle(
+                        fontFamily: 'Montserrat',
+                        fontSize: 18,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        decoration: TextDecoration.underline,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            SizedBox(height: 20),
+            Container(
+              width: 311,
+              height: 48,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(24),
+              ),
+              child: TextButton(
+                onPressed: () {
+                  // Handle Next button click here
+                  print('Next button clicked');
                 },
                 child: Text(
-                  "Already know credentials?  Login",
+                  "Next",
                   style: TextStyle(
                     fontFamily: 'Montserrat',
-                    fontSize: 18,
-                    color: Colors.white,
+                    fontSize: 16,
+                    color: Color(0xFF33907C),
                   ),
                 ),
               ),
-              SizedBox(height: 20),
-              Container(
-                width: 311,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(24),
-                ),
-                child: TextButton(
-                  onPressed: () {
-                    // Handle Next button click here
-                    print('Next button clicked');
-                  },
-                  child: Text(
-                    "Next",
-                    style: TextStyle(
-                      fontFamily: 'Montserrat',
-                      fontSize: 16,
-                      color: Color(0xFF33907C),
-                    ),
-                  ),
-                ),
-              ),
+            ),
+
             ],
           ),
         ),
