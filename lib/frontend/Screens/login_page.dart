@@ -1,9 +1,46 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:rehnaa/frontend/Screens/signup_page.dart';
+import 'package:rehnaa/frontend/Screens/dashboard.dart';
 
 class LoginPage extends StatelessWidget {
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+
+  bool _validateEmail(String email) {
+    final RegExp regex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
+    return regex.hasMatch(email);
+  }
+
+  Future<void> _login(BuildContext context) async {
+    if (!_validateEmail(emailController.text)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Invalid email format.')),
+      );
+      return;
+    }
+
+    try {
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: emailController.text,
+        password: passwordController.text,
+      );
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => DashboardPage(),
+        ),
+      );
+    } on FirebaseAuthException catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(e.message ?? 'An error occurred')),
+    );
+
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -15,9 +52,9 @@ class LoginPage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               SizedBox(height: MediaQuery.of(context).size.height * 0.1),
-              Image.asset('assets/mainpagelogo.png',
-                  height: MediaQuery.of(context).size.width * 0.55),
-              SizedBox(height: MediaQuery.of(context).size.height * 0.03),
+              Image.asset('assets/mainlogo.png',
+                  height: MediaQuery.of(context).size.width * 0.4),
+              SizedBox(height: MediaQuery.of(context).size.height * 0.05),
               Text(
                 'Login',
                 textAlign: TextAlign.center,
@@ -29,8 +66,9 @@ class LoginPage extends StatelessWidget {
               ),
               SizedBox(height: MediaQuery.of(context).size.height * 0.05),
               TextField(
+                controller: emailController,
                 style: TextStyle(
-                  color: Color(0xff33907c), // Sets the color of the text
+                  color: Color(0xff33907c),
                 ),
                 decoration: InputDecoration(
                   labelText: 'Email/Mobile Number',
@@ -54,9 +92,10 @@ class LoginPage extends StatelessWidget {
               ),
               SizedBox(height: MediaQuery.of(context).size.height * 0.02),
               TextField(
+                controller: passwordController,
                 obscureText: true,
                 style: TextStyle(
-                  color: Color(0xff33907c), // Sets the color of the text
+                  color: Color(0xff33907c),
                 ),
                 decoration: InputDecoration(
                   labelText: 'Password',
@@ -70,7 +109,9 @@ class LoginPage extends StatelessWidget {
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(24),
-                    borderSide: BorderSide(color: Color(0xff33907c), width: 2),
+                    borderSide: BorderSide
+(
+                        color: Color(0xff33907c), width: 2),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(24),
@@ -79,42 +120,24 @@ class LoginPage extends StatelessWidget {
                 ),
               ),
               SizedBox(height: MediaQuery.of(context).size.height * 0.05),
-              Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(24),
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      Color(0xff0FA697),
-                      Color(0xff45BF7A),
-                      Color(0xff0DF205),
-                    ],
+              ElevatedButton(
+                onPressed: () => _login(context),
+                style: ElevatedButton.styleFrom(
+                  primary: Colors.white,
+                  onPrimary: Color(0xff13b58c),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(24),
                   ),
                 ),
-                child: Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(24),
-                    onTap: () {
-                      // handle user login
-                    },
-                    child: Padding(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                      child: Text(
-                        'Login',
-                        textAlign: TextAlign.center,
-                        style: GoogleFonts.montserrat(
-                          color: Colors.white,
-                          fontSize: 18,
-                        ),
-                      ),
-                    ),
+                child: Text(
+                  'Login',
+                  style: GoogleFonts.montserrat(
+                    color: Color(0xff33907c),
+                    fontSize: 18,
                   ),
                 ),
               ),
-              SizedBox(height: MediaQuery.of(context).size.height * 0.03),
+              SizedBox(height: MediaQuery.of(context).size.height * 0.05),
               TextButton(
                 onPressed: () {},
                 child: Text(
@@ -125,7 +148,7 @@ class LoginPage extends StatelessWidget {
                   ),
                 ),
               ),
-              SizedBox(height: MediaQuery.of(context).size.height * 0.03),
+              SizedBox(height: MediaQuery.of(context).size.height * 0.05),
               RichText(
                 textAlign: TextAlign.center,
                 text: TextSpan(
