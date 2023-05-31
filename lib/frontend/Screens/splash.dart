@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'login_page.dart'; // Import your login page
 import 'dashboard.dart'; // Import your main dashboard page
 
@@ -11,24 +12,24 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    checkUserLoginStatus();
+    WidgetsBinding.instance!.addPostFrameCallback((_) {
+      checkUserLoginStatus();
+    });
   }
 
   Future<void> checkUserLoginStatus() async {
-    // Here you'll perform your check with Firebase Auth in the future.
-    // For now, we simulate a delay with Future.delayed.
+    User? user = FirebaseAuth.instance.currentUser;
+
     await Future.delayed(Duration(seconds: 2));
 
-    // Replace this with your actual condition
-    bool isLoggedIn = false;
-
-    if (isLoggedIn) {
+    if (user != null) {
       // If the user is logged in, navigate to the main page.
       Navigator.of(context).pushReplacement(MaterialPageRoute(
         builder: (context) => DashboardPage(),
       ));
     } else {
       // If the user is not logged in, navigate to the login page.
+      print('User is not logged in');
       Navigator.of(context).pushReplacement(MaterialPageRoute(
         builder: (context) => LoginPage(),
       ));
@@ -48,11 +49,12 @@ class _SplashScreenState extends State<SplashScreen> {
             Expanded(
               child: Center(
                 child: Image.asset(
-                    'assets/splashlogo.png'), // replace this with your actual asset path
+                  'assets/splashlogo.png',
+                ), // replace this with your actual asset path
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 20.0),
+            const Padding(
+              padding: EdgeInsets.only(bottom: 20.0),
               child: Text(
                 "@ 2022, Rehnaa",
                 textAlign: TextAlign.center,

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "898179680592",
+    "project_id": "rehnaa-cd479",
+    "storage_bucket": "rehnaa-cd479.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:898179680592:android:5c4b221c7a150cf5184455",
+        "android_client_info": {
+          "package_name": "com.example.rehnaa"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC7LmgHJ7dar5aKFIX41TxIhz1G0u7XocU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
