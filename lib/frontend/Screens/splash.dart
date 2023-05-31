@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:rehnaa/frontend/Screens/forget_password.dart';
 import 'login_page.dart'; // Import your login page
 import 'dashboard.dart'; // Import your main dashboard page
 
@@ -34,7 +35,7 @@ class _SplashScreenState extends State<SplashScreen> {
       // If the user is not logged in, navigate to the login page.
       print('User is not logged in');
       Navigator.of(context).pushReplacement(MaterialPageRoute(
-        builder: (context) => LoginPage(),
+        builder: (context) => ForgetPasswordPage(),
       ));
     }
   }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'login_page.dart'; // Import your login page
 
 class ForgetPasswordPage extends StatelessWidget {
   const ForgetPasswordPage({super.key});
@@ -79,15 +80,36 @@ class ForgetPasswordPage extends StatelessWidget {
               const SizedBox(height: 80),
               GestureDetector(
                 onTap: () {
-                  // Handle social network login click here
-                  print('Login clicked');
+                  // Handle Login text click here
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            LoginPage()), // Replace LoginPage with your actual login page widget
+                  );
                 },
-                child: const Text(
-                  "Already know credentials?  Login",
-                  style: TextStyle(
-                    fontFamily: 'Montserrat',
-                    fontSize: 18,
-                    color: Colors.white,
+                child: RichText(
+                  text: TextSpan(
+                    children: [
+                      TextSpan(
+                        text: 'Already know credentials?  ',
+                        style: TextStyle(
+                          fontFamily: 'Montserrat',
+                          fontSize: 18,
+                          color: Colors.white,
+                        ),
+                      ),
+                      TextSpan(
+                        text: 'Login',
+                        style: TextStyle(
+                          fontFamily: 'Montserrat',
+                          fontSize: 18,
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          decoration: TextDecoration.underline,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
