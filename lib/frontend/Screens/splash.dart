@@ -4,7 +4,6 @@ import 'package:rehnaa/frontend/Screens/forget_password.dart';
 import 'login_page.dart'; // Import your login page
 import 'dashboard.dart'; // Import your main dashboard page
 
-
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
@@ -35,7 +34,7 @@ class _SplashScreenState extends State<SplashScreen> {
       // If the user is not logged in, navigate to the login page.
       print('User is not logged in');
       Navigator.of(context).pushReplacement(MaterialPageRoute(
-        builder: (context) => ForgetPasswordPage(),
+        builder: (context) => LoginPage(),
       ));
     }
   }
