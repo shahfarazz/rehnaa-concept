@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class ForgetPasswordPage extends StatelessWidget {
+  const ForgetPasswordPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     final Size screenSize = MediaQuery.of(context).size;
@@ -20,7 +22,7 @@ class ForgetPasswordPage extends StatelessWidget {
               Text(
                 "Forget Password",
                 style: TextStyle(
-                  fontFamily: 'Montserrat', 
+                  fontFamily: 'Montserrat',
                   fontSize: 28,
                   color: Colors.white,
                 ),
@@ -48,40 +50,39 @@ class ForgetPasswordPage extends StatelessWidget {
               ),
               SizedBox(height: 30),
               Container(
-              width: 311,
-              height: 48,
-              decoration: BoxDecoration(
-                color: Colors.transparent,
-                border: Border.all(
-                  color: Colors.white,
-                ),
-                borderRadius: BorderRadius.circular(24),
-              ),
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16), // Add horizontal padding
-                child: TextField(
-                  style: TextStyle(
+                width: 311,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: Colors.transparent,
+                  border: Border.all(
                     color: Colors.white,
                   ),
-                  decoration: InputDecoration(
-                    border: InputBorder.none,
-                    hintText: 'Email/Password',
-                    hintStyle: TextStyle(
-                      color: Colors.white.withOpacity(0.5),
+                  borderRadius: BorderRadius.circular(24),
+                ),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                      horizontal: 16), // Add horizontal padding
+                  child: TextField(
+                    style: TextStyle(
+                      color: Colors.white,
+                    ),
+                    decoration: InputDecoration(
+                      border: InputBorder.none,
+                      hintText: 'Email/Password',
+                      hintStyle: TextStyle(
+                        color: Colors.white.withOpacity(0.5),
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-
-
-              SizedBox(height: 80),
+              const SizedBox(height: 80),
               GestureDetector(
                 onTap: () {
                   // Handle social network login click here
                   print('Login clicked');
                 },
-                child: Text(
+                child: const Text(
                   "Already know credentials?  Login",
                   style: TextStyle(
                     fontFamily: 'Montserrat',

@@ -401,7 +401,7 @@ class _SignUpPageState extends State<SignUpPage> {
             style: TextStyle(
               color: selectedOption == text
                   ? Colors.white
-                  : const Color(0xff33907c),
+                  : Color.fromARGB(255, 225, 241, 238),
               fontSize: 16,
             ),
           ),

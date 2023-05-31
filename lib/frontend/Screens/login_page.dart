@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:rehnaa/frontend/Screens/signup_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'dashboard.dart';
+import 'forget_password.dart';
 
 class LoginPage extends StatelessWidget {
   final TextEditingController _emailOrPhoneController = TextEditingController();
@@ -278,7 +279,13 @@ class LoginPage extends StatelessWidget {
               ),
               SizedBox(height: MediaQuery.of(context).size.height * 0.05),
               TextButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const ForgetPasswordPage()),
+                  );
+                },
                 child: Text(
                   'Forgot your password?',
                   style: GoogleFonts.montserrat(
