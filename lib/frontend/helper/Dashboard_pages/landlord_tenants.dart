@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
+import 'landlordtenantinfo.dart';
+
 class LandlordTenantsPage extends StatefulWidget {
   @override
   _LandlordTenantsPageState createState() => _LandlordTenantsPageState();
@@ -47,83 +49,93 @@ class _LandlordTenantsPageState extends State<LandlordTenantsPage> {
   }
 
   Widget _buildTenantCard(Tenant tenant) {
-    return Card(
-      elevation: 4.0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20.0),
-      ),
-      child: Container(
-        decoration: BoxDecoration(
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => LandlordTenantInfoPage(tenant: tenant),
+          ),
+        );
+      },
+      child: Card(
+        elevation: 4.0,
+        shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20.0),
-          color: Colors.white,
         ),
-        padding: EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Row(
-              children: [
-                Text(
-                  'Tenant Name: ',
-                  style: GoogleFonts.montserrat(
-                    fontSize: 16.0,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black,
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20.0),
+            color: Colors.white,
+          ),
+          padding: EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Row(
+                children: [
+                  Text(
+                    'Tenant Name: ',
+                    style: GoogleFonts.montserrat(
+                      fontSize: 16.0,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black,
+                    ),
                   ),
-                ),
-                Text(
-                  tenant.name,
-                  style: GoogleFonts.montserrat(
-                    fontSize: 16.0,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xff33907c),
+                  Text(
+                    tenant.name,
+                    style: GoogleFonts.montserrat(
+                      fontSize: 16.0,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xff33907c),
+                    ),
                   ),
-                ),
-              ],
-            ),
-            SizedBox(height: 10.0),
-            Row(
-              children: [
-                Text(
-                  'Rating:',
-                  style: GoogleFonts.montserrat(
-                    fontSize: 14.0,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
+                ],
+              ),
+              SizedBox(height: 10.0),
+              Row(
+                children: [
+                  Text(
+                    'Rating:',
+                    style: GoogleFonts.montserrat(
+                      fontSize: 14.0,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
                   ),
-                ),
-                Text(
-                  ' ${tenant.rating}',
-                  style: GoogleFonts.montserrat(
-                    fontSize: 14.0,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xff33907c),
+                  Text(
+                    ' ${tenant.rating}',
+                    style: GoogleFonts.montserrat(
+                      fontSize: 14.0,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xff33907c),
+                    ),
                   ),
-                ),
-              ],
-            ),
-            SizedBox(height: 10.0),
-            Row(
-              children: [
-                Text(
-                  'Monthly Rent:',
-                  style: GoogleFonts.montserrat(
-                    fontSize: 14.0,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
+                ],
+              ),
+              SizedBox(height: 10.0),
+              Row(
+                children: [
+                  Text(
+                    'Monthly Rent:',
+                    style: GoogleFonts.montserrat(
+                      fontSize: 14.0,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
                   ),
-                ),
-                Text(
-                  ' ${tenant.rent}',
-                  style: GoogleFonts.montserrat(
-                    fontSize: 14.0,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xff33907c),
+                  Text(
+                    ' ${tenant.rent}',
+                    style: GoogleFonts.montserrat(
+                      fontSize: 14.0,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xff33907c),
+                    ),
                   ),
-                ),
-              ],
-            )
-          ],
+                ],
+              )
+            ],
+          ),
         ),
       ),
     );
