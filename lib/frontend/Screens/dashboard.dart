@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:rehnaa/frontend/Screens/login_page.dart';
 import 'package:rehnaa/frontend/helper/Dashboard_pages/dashboard_content.dart';
 
+import '../helper/Dashboard_pages/landlord_property.dart';
 import '../helper/Dashboard_pages/landlord_tenants.dart';
 
 class DashboardPage extends StatefulWidget {
@@ -42,7 +43,7 @@ class _DashboardPageState extends State<DashboardPage> {
         children: <Widget>[
           DashboardContent(),
           LandlordTenantsPage(),
-          // PropertyPage(),
+          PropertyPage(),
           // RentHistoryPage(),
           // ProfilePage(),
         ],
