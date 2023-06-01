@@ -9,6 +9,8 @@ import 'dashboard.dart';
 import 'login_page.dart';
 
 class SignUpPage extends StatefulWidget {
+  const SignUpPage({super.key});
+
   @override
   _SignUpPageState createState() => _SignUpPageState();
 }
@@ -53,7 +55,7 @@ class _SignUpPageState extends State<SignUpPage> {
         'Verification email has been sent. Please check your inbox.',
         Colors.green,
       );
-      Timer.periodic(Duration(seconds: 2), (timer) async {
+      Timer.periodic(const Duration(seconds: 2), (timer) async {
         await FirebaseAuth.instance.currentUser!.reload();
         if (FirebaseAuth.instance.currentUser!.emailVerified) {
           timer.cancel();
@@ -85,13 +87,13 @@ class _SignUpPageState extends State<SignUpPage> {
         context: context,
         barrierDismissible: false,
         builder: (context) => AlertDialog(
-          title: Text('Enter SMS Code'),
+          title: const Text('Enter SMS Code'),
           content: TextField(
             onChanged: (value) => smsCode = value,
           ),
           actions: [
             TextButton(
-              child: Text('Verify'),
+              child: const Text('Verify'),
               onPressed: () {
                 Navigator.of(context).pop();
                 verifyPhoneNumberWithSms(smsCode);
@@ -155,7 +157,7 @@ class _SignUpPageState extends State<SignUpPage> {
       resizeToAvoidBottomInset: false,
       body: SingleChildScrollView(
         child: Container(
-          padding: EdgeInsets.fromLTRB(16.0, 40.0, 16.0, 40.0),
+          padding: const EdgeInsets.fromLTRB(16.0, 40.0, 16.0, 40.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.end,
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -194,8 +196,8 @@ class _SignUpPageState extends State<SignUpPage> {
               buildCreateButton(),
               SizedBox(height: MediaQuery.of(context).size.height * 0.02),
               buildSignInText(),
-              if (isLoading) CircularProgressIndicator(),
-              SizedBox(height: 50.0),
+              if (isLoading) const CircularProgressIndicator(),
+              const SizedBox(height: 50.0),
             ],
           ),
         ),
@@ -207,8 +209,9 @@ class _SignUpPageState extends State<SignUpPage> {
     final noSpaces = RegExp(r'^\S*$');
 
     if (firstName.isEmpty) return 'First name cannot be empty';
-    if (!noSpaces.hasMatch(firstName))
+    if (!noSpaces.hasMatch(firstName)) {
       return 'First name cannot contain spaces';
+    }
 
     if (lastName.isEmpty) return 'Last name cannot be empty';
     if (!noSpaces.hasMatch(lastName)) return 'Last name cannot contain spaces';
@@ -216,13 +219,15 @@ class _SignUpPageState extends State<SignUpPage> {
     if (emailOrPhone.isEmpty) return 'Email/Phone cannot be empty';
     if (!isEmail(emailOrPhone)) {
       final regex = RegExp(r'^03\d{9}$');
-      if (!regex.hasMatch(emailOrPhone))
+      if (!regex.hasMatch(emailOrPhone)) {
         return 'Enter a valid Pakistani phone number';
+      }
     }
 
     if (password.isEmpty) return 'Password cannot be empty';
-    if (password.length < 8)
+    if (password.length < 8) {
       return 'Password must be at least 8 characters long';
+    }
     bool passwordHasUpper = password.contains(RegExp(r'[A-Z]'));
     bool passwordHasLower = password.contains(RegExp(r'[a-z]'));
     bool passwordHasDigit = password.contains(RegExp(r'[0-9]'));
@@ -254,7 +259,7 @@ class _SignUpPageState extends State<SignUpPage> {
     return Text(
       text,
       textAlign: TextAlign.center,
-      style: TextStyle(
+      style: const TextStyle(
         color: Color(0xff33907c),
         fontSize: 22,
         fontWeight: FontWeight.bold,
@@ -265,7 +270,7 @@ class _SignUpPageState extends State<SignUpPage> {
   Widget buildSubtitle(String text) {
     return Text(
       text,
-      style: TextStyle(
+      style: const TextStyle(
         color: Color(0xff33907c),
         fontSize: 18,
       ),
@@ -276,28 +281,28 @@ class _SignUpPageState extends State<SignUpPage> {
       {required Function(String) onChanged, String? errorText}) {
     return TextField(
       onChanged: onChanged,
-      style: TextStyle(
+      style: const TextStyle(
         color: Color(0xff33907c),
         fontSize: 18,
       ),
       decoration: InputDecoration(
         errorText: errorText,
         labelText: label,
-        labelStyle: TextStyle(
+        labelStyle: const TextStyle(
           color: Color(0xff33907c),
           fontSize: 18,
         ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(24),
-          borderSide: BorderSide(color: Color(0xff33907c), width: 1),
+          borderSide: const BorderSide(color: Color(0xff33907c), width: 1),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(24),
-          borderSide: BorderSide(color: Color(0xff33907c), width: 2),
+          borderSide: const BorderSide(color: Color(0xff33907c), width: 2),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(24),
-          borderSide: BorderSide(color: Color(0xff33907c), width: 1),
+          borderSide: const BorderSide(color: Color(0xff33907c), width: 1),
         ),
         filled: true,
         fillColor: Colors.white,
@@ -314,28 +319,29 @@ class _SignUpPageState extends State<SignUpPage> {
     return TextField(
       onChanged: onChanged,
       obscureText: !showPassword,
-      style: TextStyle(
+      style: const TextStyle(
         color: Color(0xff33907c),
         fontSize: 18,
       ),
       decoration: InputDecoration(
-        contentPadding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
+        contentPadding:
+            const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
         labelText: label,
-        labelStyle: TextStyle(
+        labelStyle: const TextStyle(
           color: Color(0xff33907c),
           fontSize: 18,
         ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(24),
-          borderSide: BorderSide(color: Color(0xff33907c), width: 1),
+          borderSide: const BorderSide(color: Color(0xff33907c), width: 1),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(24),
-          borderSide: BorderSide(color: Color(0xff33907c), width: 2),
+          borderSide: const BorderSide(color: Color(0xff33907c), width: 2),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(24),
-          borderSide: BorderSide(color: Color(0xff33907c), width: 1),
+          borderSide: const BorderSide(color: Color(0xff33907c), width: 1),
         ),
         filled: true,
         fillColor: Colors.white,
@@ -343,7 +349,7 @@ class _SignUpPageState extends State<SignUpPage> {
           onPressed: onToggle,
           icon: Icon(
             showPassword ? Icons.visibility : Icons.visibility_off,
-            color: Color(0xff33907c),
+            color: const Color(0xff33907c),
           ),
         ),
       ),
@@ -354,12 +360,12 @@ class _SignUpPageState extends State<SignUpPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SizedBox(height: 8.0),
+        const SizedBox(height: 8.0),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             buildOptionButton("Landlord"),
-            SizedBox(width: 16.0),
+            const SizedBox(width: 16.0),
             buildOptionButton("Tenant"),
           ],
         ),
@@ -376,7 +382,7 @@ class _SignUpPageState extends State<SignUpPage> {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
           gradient: selectedOption == text
-              ? LinearGradient(
+              ? const LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
@@ -387,13 +393,15 @@ class _SignUpPageState extends State<SignUpPage> {
                 )
               : null,
           color: selectedOption == text ? null : Colors.white,
-          border: Border.all(color: Color(0xff33907c), width: 1),
+          border: Border.all(color: const Color(0xff33907c), width: 1),
         ),
         child: Center(
           child: Text(
             text,
             style: TextStyle(
-              color: selectedOption == text ? Colors.white : Color(0xff33907c),
+              color: selectedOption == text
+                  ? Colors.white
+                  : const Color(0xff33907c),
               fontSize: 16,
             ),
           ),
@@ -408,7 +416,7 @@ class _SignUpPageState extends State<SignUpPage> {
       height: 48,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(24),
-        gradient: LinearGradient(
+        gradient: const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
@@ -433,7 +441,7 @@ class _SignUpPageState extends State<SignUpPage> {
               }
             }
           },
-          child: Center(
+          child: const Center(
             child: Text(
               "Create",
               style: TextStyle(
@@ -452,14 +460,14 @@ class _SignUpPageState extends State<SignUpPage> {
       textAlign: TextAlign.center,
       text: TextSpan(
         text: "Already have an account? ",
-        style: TextStyle(
+        style: const TextStyle(
           color: Color(0xff33907c),
           fontSize: 18,
         ),
         children: <TextSpan>[
           TextSpan(
             text: 'Sign in',
-            style: TextStyle(
+            style: const TextStyle(
               color: Color(0xff33907c),
               fontSize: 18,
               fontWeight: FontWeight.bold,
