@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
@@ -14,11 +16,21 @@ class _LandlordTenantsPageState extends State<LandlordTenantsPage> {
   List<Tenant> _tenants = [];
   int _currentPage = 0;
   int _pageSize = 3; // Number of tenants to show per page
+  Completer<void> _loadTenantsCompleter =
+      Completer<void>(); // Completer for canceling the Future.delayed() call
 
   @override
   void initState() {
     super.initState();
     _loadTenants();
+  }
+
+  @override
+  void dispose() {
+    _loadTenantsCompleter
+        .complete(); // Complete the Completer to cancel the Future.delayed() call
+    _pageController.dispose(); // Dispose the PageController
+    super.dispose();
   }
 
   Future<void> _loadTenants() async {
@@ -35,17 +47,21 @@ class _LandlordTenantsPageState extends State<LandlordTenantsPage> {
       Tenant(name: 'Laura Adams', rating: 4.6, rent: 1700),
     ];
 
-    setState(() {
-      _tenants = fetchedTenants;
-    });
+    if (mounted) {
+      setState(() {
+        _tenants = fetchedTenants;
+      });
+    }
   }
 
   void _goToPage(int page) {
-    _pageController.animateToPage(
-      page,
-      duration: Duration(milliseconds: 500),
-      curve: Curves.easeInOut,
-    );
+    if (mounted) {
+      _pageController.animateToPage(
+        page,
+        duration: Duration(milliseconds: 500),
+        curve: Curves.easeInOut,
+      );
+    }
   }
 
   Widget _buildTenantCard(Tenant tenant) {
