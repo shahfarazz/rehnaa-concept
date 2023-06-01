@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
+import 'package:rehnaa/frontend/Screens/property_listing.dart';
 import 'backend/services/authentication_service.dart';
 import 'frontend/Screens/splash.dart';
+import 'frontend/Screens/property.dart';
+
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,7 +29,9 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        home: const SplashScreen(),
+        // home: const SplashScreen(),
+        home: PropertyPage(),
+
       ),
     );
   }
