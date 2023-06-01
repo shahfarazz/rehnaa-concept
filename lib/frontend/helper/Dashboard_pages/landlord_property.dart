@@ -12,7 +12,7 @@ class _PropertyPageState extends State<PropertyPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      backgroundColor: Color.fromARGB(255, 255, 255, 255),
       body: Column(
         children: [
           Expanded(
@@ -72,7 +72,7 @@ class _PropertyPageState extends State<PropertyPage> {
                   left: 20,
                   child: Container(
                     decoration: BoxDecoration(
-                      color: Color.fromRGBO(253, 249, 249, 1),
+                      color: Color(0xFF33907C),
                       borderRadius: BorderRadius.circular(30),
                     ),
                     child: IconButton(
@@ -80,7 +80,7 @@ class _PropertyPageState extends State<PropertyPage> {
                         // Handle back button press
                       },
                       icon: Icon(Icons.arrow_back),
-                      color:  Color(0xFF33907C),
+                      color:  Colors.white,
                     ),
                   ),
                 ),
@@ -90,7 +90,7 @@ class _PropertyPageState extends State<PropertyPage> {
           Expanded(
             flex: 6,
             child: SizedBox(
-              width: double.infinity,
+              width: 385,
               child: Container(
                 padding: EdgeInsets.all(16),
                 decoration: BoxDecoration(
@@ -128,51 +128,110 @@ class _PropertyPageState extends State<PropertyPage> {
                     ),
                   ),
                   SizedBox(height: 15),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                        children: [
-                          Icon(
-                            Icons.king_bed_outlined,
-                            color: Color(0xFF33907C),
+                  Expanded(
+              child: Stack(
+                children: [
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    physics: AlwaysScrollableScrollPhysics(),
+                    child: Row(
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 20),
+                          child: Column(
+                            children: [
+                              Icon(
+                                Icons.king_bed_outlined,
+                                color: Color(0xFF33907C),
+                              ),
+                              SizedBox(height: 8),
+                              Text('1 Bed'),
+                            ],
                           ),
-                          SizedBox(height: 8),
-                          Text('1 Bed'),
-                        ],
-                      ),
-                      Column(
-                        children: [
-                          Icon(
-                            Icons.bathtub_outlined,
-                            color: Color(0xFF33907C),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 20),
+                          child: Column(
+                            children: [
+                              Icon(
+                                Icons.bathtub_outlined,
+                                color: Color(0xFF33907C),
+                              ),
+                              SizedBox(height: 8),
+                              Text('1 Bath'),
+                            ],
                           ),
-                          SizedBox(height: 8),
-                          Text('1 Bath'),
-                        ],
-                      ),
-                      Column(
-                        children: [
-                          Icon(
-                            Icons.landscape_outlined,
-                            color: Color(0xFF33907C),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 20),
+                          child: Column(
+                            children: [
+                              Icon(
+                                Icons.landscape_outlined,
+                                color: Color(0xFF33907C),
+                              ),
+                              SizedBox(height: 8),
+                              Text('1 Garden'),
+                            ],
                           ),
-                          SizedBox(height: 8),
-                          Text('1 Garden'),
-                        ],
-                      ),
-                      Column(
-                        children: [
-                          Icon(
-                            Icons.weekend_outlined,
-                            color: Color(0xFF33907C),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 20),
+                          child: Column(
+                            children: [
+                              Icon(
+                                Icons.weekend_outlined,
+                                color: Color(0xFF33907C),
+                              ),
+                              SizedBox(height: 8),
+                              Text('1 Living'),
+                            ],
                           ),
-                          SizedBox(height: 8),
-                          Text('1 Living'),
-                        ],
-                      ),
-                    ],
+                        ),
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 20),
+                          child: Column(
+                            children: [
+                              Icon(
+                                Icons.house_outlined,
+                                color: Color(0xFF33907C),
+                              ),
+                              SizedBox(height: 8),
+                              Text('1 Floor'),
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 20),
+                          child: Column(
+                            children: [
+                              Icon(
+                                Icons.directions_car_outlined,
+                                color: Color(0xFF33907C),
+                              ),
+                              SizedBox(height: 8),
+                              Text('1 Carspace'),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
+                  Positioned(
+                    right: -6,
+                    top: 0,
+                    bottom: 50,
+                    child: Icon(
+                      Icons.arrow_forward_ios,
+                      color: Color(0xFF33907C).withOpacity(0.3),
+                      size: 20,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+
                     SizedBox(height: 30),
                     Text(
                       'Owner Details',
