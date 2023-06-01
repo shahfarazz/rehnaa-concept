@@ -48,7 +48,8 @@ class _PropertyPageState extends State<PropertyPage> {
                     padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
                       color: Colors.black.withOpacity(0.3),
-                      borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+                      borderRadius:
+                          BorderRadius.vertical(top: Radius.circular(16)),
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -80,7 +81,7 @@ class _PropertyPageState extends State<PropertyPage> {
                         // Handle back button press
                       },
                       icon: Icon(Icons.arrow_back),
-                      color:  Color(0xFF33907C),
+                      color: Color(0xFF33907C),
                     ),
                   ),
                 ),
@@ -107,72 +108,72 @@ class _PropertyPageState extends State<PropertyPage> {
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                 children: [
-                  Text(
-                    'Property Information',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
+                  children: [
+                    Text(
+                      'Property Information',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                  SizedBox(height: 8),
-                  Text(
-                    'Property details go here...',
-                  ),
-                  SizedBox(height: 65),
-                  Text(
-                    'Specifications',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
+                    SizedBox(height: 8),
+                    Text(
+                      'Property details go here...',
                     ),
-                  ),
-                  SizedBox(height: 15),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                        children: [
-                          Icon(
-                            Icons.king_bed_outlined,
-                            color: Color(0xFF33907C),
-                          ),
-                          SizedBox(height: 8),
-                          Text('1 Bed'),
-                        ],
+                    SizedBox(height: 65),
+                    Text(
+                      'Specifications',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
                       ),
-                      Column(
-                        children: [
-                          Icon(
-                            Icons.bathtub_outlined,
-                            color: Color(0xFF33907C),
-                          ),
-                          SizedBox(height: 8),
-                          Text('1 Bath'),
-                        ],
-                      ),
-                      Column(
-                        children: [
-                          Icon(
-                            Icons.landscape_outlined,
-                            color: Color(0xFF33907C),
-                          ),
-                          SizedBox(height: 8),
-                          Text('1 Garden'),
-                        ],
-                      ),
-                      Column(
-                        children: [
-                          Icon(
-                            Icons.weekend_outlined,
-                            color: Color(0xFF33907C),
-                          ),
-                          SizedBox(height: 8),
-                          Text('1 Living'),
-                        ],
-                      ),
-                    ],
-                  ),
+                    ),
+                    SizedBox(height: 15),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Column(
+                          children: [
+                            Icon(
+                              Icons.king_bed_outlined,
+                              color: Color(0xFF33907C),
+                            ),
+                            SizedBox(height: 8),
+                            Text('1 Bed'),
+                          ],
+                        ),
+                        Column(
+                          children: [
+                            Icon(
+                              Icons.bathtub_outlined,
+                              color: Color(0xFF33907C),
+                            ),
+                            SizedBox(height: 8),
+                            Text('1 Bath'),
+                          ],
+                        ),
+                        Column(
+                          children: [
+                            Icon(
+                              Icons.landscape_outlined,
+                              color: Color(0xFF33907C),
+                            ),
+                            SizedBox(height: 8),
+                            Text('1 Garden'),
+                          ],
+                        ),
+                        Column(
+                          children: [
+                            Icon(
+                              Icons.weekend_outlined,
+                              color: Color(0xFF33907C),
+                            ),
+                            SizedBox(height: 8),
+                            Text('1 Living'),
+                          ],
+                        ),
+                      ],
+                    ),
                     SizedBox(height: 30),
                     Text(
                       'Owner Details',
@@ -228,9 +229,6 @@ class _PropertyPageState extends State<PropertyPage> {
                       ],
                     ),
                   ],
-
-
-
                 ),
               ),
             ),
