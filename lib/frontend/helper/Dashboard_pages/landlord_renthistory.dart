@@ -127,7 +127,7 @@ class _LandlordRentHistoryPageState extends State<LandlordRentHistoryPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                monthWidget, // Display the month widget
+                // monthWidget, // Display the month widget
                 Row(
                   children: [
                     Image.asset(
@@ -285,7 +285,7 @@ class _LandlordRentHistoryPageState extends State<LandlordRentHistoryPage> {
                   ),
                 ),
                 SizedBox(height: size.height * 0.02),
-                // _buildLatestMonthWidget(),
+                _buildLatestMonthWidget(),
               ],
             ),
           ),
