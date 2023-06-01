@@ -19,54 +19,55 @@ class _PropertyPageState extends State<PropertyPage> {
             flex: 8,
             child: Stack(
               children: [
-                Positioned.fill(
-                  child: CarouselSlider(
-                    options: CarouselOptions(
-                      height: double.infinity,
-                      viewportFraction: 1.0,
-                      onPageChanged: (index, reason) {
-                        setState(() {
-                          currentIndex = index;
-                        });
-                      },
-                    ),
-                    items: [
-                      Image.asset(
-                        'assets/image1.jpg',
-                        fit: BoxFit.cover,
-                      ),
-                      Image.asset(
-                        'assets/image2.jpg',
-                        fit: BoxFit.cover,
-                      ),
-                    ],
-                  ),
+              Positioned.fill(
+            child: CarouselSlider(
+              options: CarouselOptions(
+                height: double.infinity,
+                viewportFraction: 1.0,
+                onPageChanged: (index, reason) {
+                  setState(() {
+                    currentIndex = index;
+                  });
+                },
+              ),
+              items: [
+                Image.asset(
+                  'assets/image1.jpg',
+                  fit: BoxFit.cover,
                 ),
-                Align(
-                  alignment: Alignment.bottomCenter,
-                  child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.3),
-                      borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          'Image ${currentIndex + 1} of 2',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                        SizedBox(width: 8),
-                        Icon(
-                          Icons.arrow_forward_ios,
-                          color: Colors.white,
-                          size: 16,
-                        ),
-                      ],
-                    ),
-                  ),
+                Image.asset(
+                  'assets/image2.jpg',
+                  fit: BoxFit.cover,
                 ),
+              ],
+            ),
+          ),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 0, vertical: 3),
+              decoration: BoxDecoration(
+                color: Colors.black.withOpacity(0.3),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  for (int i = 0; i < 2; i++)
+                    Container(
+                      margin: EdgeInsets.symmetric(horizontal: 4),
+                      width: 8,
+                      height: 8,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: currentIndex == i ? Colors.white : Colors.grey,
+                      ),
+                    ),
+                  
+                ],
+              ),
+            ),
+          ),
                 Positioned(
                   top: 20,
                   left: 20,
@@ -287,9 +288,6 @@ class _PropertyPageState extends State<PropertyPage> {
                       ],
                     ),
                   ],
-
-
-
                 ),
               ),
             ),
