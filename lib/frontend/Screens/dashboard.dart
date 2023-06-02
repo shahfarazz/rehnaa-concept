@@ -61,7 +61,7 @@ class _DashboardPageState extends State<DashboardPage> {
       // Set the height of the AppBar.
       toolbarHeight: 70,
       leading: Padding(
-        padding: EdgeInsets.only(top: 15.0), // Move the menu icon a bit up
+        padding: EdgeInsets.only(top: 8.0), // Move the menu icon a bit up
         child: IconButton(
           iconSize: 30.0, // Increase size of the menu icon
           icon: Icon(Icons.menu),
