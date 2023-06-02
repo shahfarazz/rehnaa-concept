@@ -17,19 +17,27 @@ class DashboardContent extends StatelessWidget {
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
 
+    print('UID: $uid');
+
     return FutureBuilder<DocumentSnapshot>(
       future: FirebaseFirestore.instance
-          .collection('landlords')
-          .doc('YOUR_DOCUMENT_ID')
+          .collection('Landlords')
+          .doc(uid)
           .get(), // Replace 'YOUR_DOCUMENT_ID' with the actual document ID
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           // Show a loading indicator while waiting for the data
-          return CircularProgressIndicator();
+          return Center(
+            child: CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
+            ),
+          );
+          ;
         } else if (snapshot.hasError) {
           // Handle any error that occurred while fetching the data
           return Text('Error: ${snapshot.error}');
         } else if (snapshot.hasData) {
+          print(snapshot.data!.data());
           // Extract the data from the snapshot
           Map<String, dynamic> data =
               snapshot.data!.data() as Map<String, dynamic>;
