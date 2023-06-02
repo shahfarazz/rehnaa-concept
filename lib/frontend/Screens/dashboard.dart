@@ -66,7 +66,7 @@ class _DashboardPageState extends State<DashboardPage> {
           iconSize: 30.0, // Increase size of the menu icon
           icon: Icon(Icons.menu),
           onPressed: () {
-            // TODO: Implement sidebar handling here
+            // TODO: Implement sidebar handling hered
           },
         ),
       ),
