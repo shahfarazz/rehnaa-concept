@@ -48,7 +48,8 @@ class AuthenticationService extends ChangeNotifier {
             "Phone number automatically verified and user signed in: ${_auth.currentUser?.uid}");
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => DashboardPage()),
+          MaterialPageRoute(
+              builder: (context) => DashboardPage(uid: _auth.currentUser!.uid)),
         );
       },
       verificationFailed: (FirebaseAuthException e) {
@@ -91,7 +92,8 @@ class AuthenticationService extends ChangeNotifier {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => DashboardPage()),
+                            builder: (context) =>
+                                DashboardPage(uid: _auth.currentUser!.uid)),
                       );
                     } catch (e) {
                       showToast(
@@ -120,15 +122,20 @@ class AuthenticationService extends ChangeNotifier {
   Future<void> signInWithEmailAndPassword(
       String email, String password, BuildContext context) async {
     try {
+      print('Signing in with Email and Password...');
       await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
+      print('Signed in with Email and Password.');
       // Notify listeners to update
       notifyListeners();
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => DashboardPage()),
+        MaterialPageRoute(
+            builder: (context) => DashboardPage(
+                  uid: _auth.currentUser!.uid,
+                )),
       );
     } catch (e) {
       showToast('Failed to sign in with email and password.', Colors.red);

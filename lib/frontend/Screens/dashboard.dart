@@ -8,6 +8,10 @@ import '../helper/Dashboard_pages/landlord_tenants.dart';
 import '../helper/landlordproperties.dart';
 
 class DashboardPage extends StatefulWidget {
+  final String uid; // UID of the landlord
+
+  DashboardPage({required this.uid});
+
   @override
   _DashboardPageState createState() => _DashboardPageState();
 }
@@ -43,7 +47,9 @@ class _DashboardPageState extends State<DashboardPage> {
           });
         },
         children: <Widget>[
-          DashboardContent(),
+          DashboardContent(
+            uid: widget.uid,
+          ),
           LandlordTenantsPage(),
           LandlordPropertiesPage(),
           LandlordRentHistoryPage(),
@@ -72,8 +78,8 @@ class _DashboardPageState extends State<DashboardPage> {
       ),
       title: Padding(
         padding: EdgeInsets.only(
-            top: 2.0,
-            ),// You can adjust this value to align vertically
+          top: 2.0,
+        ), // You can adjust this value to align vertically
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[

@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:rehnaa/backend/models/landlordmodel.dart';
+import 'package:rehnaa/backend/models/tenantsmodel.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 import 'landlordtenantinfo.dart';
@@ -15,7 +17,7 @@ class _LandlordTenantsPageState extends State<LandlordTenantsPage> {
   PageController _pageController = PageController(initialPage: 0);
   List<Tenant> _tenants = [];
   int _currentPage = 0;
-  int _pageSize = 3; // Number of tenants to show per page
+  int _pageSize = 4; // Number of tenants to show per page
   Completer<void> _loadTenantsCompleter =
       Completer<void>(); // Completer for canceling the Future.delayed() call
 
@@ -39,12 +41,59 @@ class _LandlordTenantsPageState extends State<LandlordTenantsPage> {
 
     // Replace this with your Firebase logic to fetch tenants
     List<Tenant> fetchedTenants = [
-      Tenant(name: 'John Doe', rating: 4.5, rent: 1500),
-      Tenant(name: 'Jane Smith', rating: 4.2, rent: 1200),
-      Tenant(name: 'Michael Johnson', rating: 4.8, rent: 1800),
-      Tenant(name: 'Emily Thompson', rating: 4.7, rent: 1600),
-      Tenant(name: 'Robert Davis', rating: 4.4, rent: 1400),
-      Tenant(name: 'Laura Adams', rating: 4.6, rent: 1700),
+      Tenant(
+        firstName: 'John',
+        lastName: 'Doe',
+        description: 'Lorem ipsum dolor sit amet',
+        rating: 4.5,
+        rent: 1500,
+        creditPoints: 100,
+        propertyDetails: 'Lorem ipsum dolor sit amet',
+        cnicNumber: '1234567890',
+        contactNumber: '9876543210',
+        tasdeeqVerification: true,
+        familyMembers: 3,
+        // landlord: Landlord(balance: 10000, firstName: 'John', lastName: 'Doe'),
+      ),
+      Tenant(
+        firstName: 'Jane',
+        lastName: 'Smith',
+        description: 'Lorem ipsum dolor sit amet',
+        rating: 4.2,
+        rent: 1200,
+        creditPoints: 80,
+        propertyDetails: 'Lorem ipsum dolor sit amet',
+        cnicNumber: '0987654321',
+        contactNumber: '1234567890',
+        tasdeeqVerification: false,
+        familyMembers: 2,
+      ),
+      Tenant(
+        firstName: 'Michael',
+        lastName: 'Johnson',
+        description: 'Lorem ipsum dolor sit amet',
+        rating: 4.8,
+        rent: 1800,
+        creditPoints: 90,
+        propertyDetails: 'Lorem ipsum dolor sit amet',
+        cnicNumber: '5678901234',
+        contactNumber: '4567890123',
+        tasdeeqVerification: true,
+        familyMembers: 2,
+      ),
+      Tenant(
+        firstName: 'Emily',
+        lastName: 'Thompson',
+        description: 'Lorem ipsum dolor sit amet',
+        rating: 4.7,
+        rent: 1600,
+        creditPoints: 95,
+        propertyDetails: 'Lorem ipsum dolor sit amet',
+        cnicNumber: '4321098765',
+        contactNumber: '3210987654',
+        tasdeeqVerification: false,
+        familyMembers: 1,
+      ),
     ];
 
     if (mounted) {
@@ -58,7 +107,7 @@ class _LandlordTenantsPageState extends State<LandlordTenantsPage> {
     if (mounted) {
       _pageController.animateToPage(
         page,
-        duration: Duration(milliseconds: 500),
+        duration: const Duration(milliseconds: 500),
         curve: Curves.easeInOut,
       );
     }
@@ -99,7 +148,7 @@ class _LandlordTenantsPageState extends State<LandlordTenantsPage> {
                     ),
                   ),
                   Text(
-                    tenant.name,
+                    '${tenant.firstName} ${tenant.lastName}',
                     style: GoogleFonts.montserrat(
                       fontSize: 16.0,
                       fontWeight: FontWeight.bold,
@@ -173,6 +222,7 @@ class _LandlordTenantsPageState extends State<LandlordTenantsPage> {
     return Scaffold(
       body: Column(
         children: [
+          SizedBox(height: size.height * 0.03),
           Container(
             padding: EdgeInsets.symmetric(vertical: 16.0),
             alignment: Alignment.center,
@@ -199,7 +249,7 @@ class _LandlordTenantsPageState extends State<LandlordTenantsPage> {
           ),
           SmoothPageIndicator(
             controller: _pageController,
-            count: pageCount,
+            count: pageCount.isFinite && pageCount > 0 ? pageCount.toInt() : 0,
             effect: WormEffect(
               dotColor: Colors.grey,
               activeDotColor: Color(0xff33907c),
@@ -213,12 +263,4 @@ class _LandlordTenantsPageState extends State<LandlordTenantsPage> {
       ),
     );
   }
-}
-
-class Tenant {
-  final String name;
-  final double rating;
-  final int rent;
-
-  Tenant({required this.name, required this.rating, required this.rent});
 }

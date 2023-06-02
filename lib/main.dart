@@ -1,13 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
-import 'package:rehnaa/frontend/helper/Dashboard_pages/landlord_tenants.dart';
-import 'package:rehnaa/frontend/helper/Dashboard_pages/landlord_propertyinfo.dart';
-import 'package:rehnaa/frontend/helper/Dashboard_pages/landlord_profile.dart';
-
-import 'package:rehnaa/frontend/screens/dashboard.dart';
-
-
 import 'backend/services/authentication_service.dart';
 import 'frontend/Screens/splash.dart';
 
@@ -32,9 +25,7 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        // home: const SplashScreen(),
-        home: DashboardPage(),
-
+        home: const SplashScreen(),
       ),
     );
   }

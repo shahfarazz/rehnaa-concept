@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../../Screens/dashboard.dart';
-import '../landlordproperties.dart';
+import '../../../backend/models/propertymodel.dart';
 
 class PropertyPage extends StatefulWidget {
   final Property property;
@@ -20,30 +19,31 @@ class _PropertyPageState extends State<PropertyPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromARGB(255, 255, 255, 255),
-      body: Column(
-        children: [
-          Expanded(
-            flex: 5,
-            child: PropertyCarousel(
-              currentIndex: currentIndex,
-              onPageChanged: (index) {
-                setState(() {
-                  currentIndex = index;
-                });
-              },
-              imagePaths: [
-                widget.property.imagePath,
+        backgroundColor: Color.fromARGB(255, 255, 255, 255),
+        body: Stack(
+          children: [
+            Column(
+              children: [
+                Expanded(
+                  flex: 5,
+                  child: PropertyCarousel(
+                    currentIndex: currentIndex,
+                    onPageChanged: (index) {
+                      setState(() {
+                        currentIndex = index;
+                      });
+                    },
+                    imagePaths: widget.property.imagePath,
+                  ),
+                ),
+                Expanded(
+                  flex: 5,
+                  child: PropertyDetails(property: widget.property),
+                ),
               ],
             ),
-          ),
-          Expanded(
-            flex: 5,
-            child: PropertyDetails(property: widget.property),
-          ),
-        ],
-      ),
-    );
+          ],
+        ));
   }
 }
 

@@ -28,7 +28,7 @@ class _SplashScreenState extends State<SplashScreen> {
     if (user != null) {
       // If the user is logged in, navigate to the main page.
       Navigator.of(context).pushReplacement(MaterialPageRoute(
-        builder: (context) => DashboardPage(),
+        builder: (context) => DashboardPage(uid: user.uid),
       ));
     } else {
       // If the user is not logged in, navigate to the login page.

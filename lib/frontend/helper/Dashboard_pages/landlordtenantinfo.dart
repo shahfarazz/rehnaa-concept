@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:rehnaa/backend/models/tenantsmodel.dart';
 
 import 'landlord_tenants.dart';
 
@@ -40,11 +41,13 @@ class LandlordTenantInfoPage extends StatelessWidget {
                 CircleAvatar(
                   radius: size.width * 0.2,
                   backgroundColor: Colors.white,
-                  backgroundImage: AssetImage('assets/userimage.png'),
+                  backgroundImage: AssetImage(
+                    tenant.pathToImage ?? 'assets/defaulticon.png',
+                  ),
                 ),
                 SizedBox(height: 20.0),
                 Text(
-                  tenant.name,
+                  '${tenant.firstName} ${tenant.lastName}',
                   style: GoogleFonts.montserrat(
                     fontSize: 20.0,
                     fontWeight: FontWeight.bold,
@@ -54,7 +57,7 @@ class LandlordTenantInfoPage extends StatelessWidget {
                 SizedBox(height: 10.0),
                 Center(
                   child: Text(
-                    'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+                    tenant.description,
                     textAlign: TextAlign.center,
                     style: GoogleFonts.montserrat(
                       fontSize: 16.0,
@@ -84,7 +87,7 @@ class LandlordTenantInfoPage extends StatelessWidget {
                           widthFactor: 0.8,
                           child: WhiteBox(
                             label: 'Property Details',
-                            value: 'Dummy Property Details',
+                            value: tenant.propertyDetails,
                           ),
                         ),
                       ),
@@ -94,7 +97,7 @@ class LandlordTenantInfoPage extends StatelessWidget {
                           widthFactor: 0.8,
                           child: WhiteBox(
                             label: 'CNIC Number',
-                            value: 'Dummy CNIC Number',
+                            value: tenant.cnicNumber,
                           ),
                         ),
                       ),
@@ -104,7 +107,7 @@ class LandlordTenantInfoPage extends StatelessWidget {
                           widthFactor: 0.8,
                           child: WhiteBox(
                             label: 'Contact Number',
-                            value: 'Dummy Contact Number',
+                            value: tenant.contactNumber,
                           ),
                         ),
                       ),
@@ -114,7 +117,9 @@ class LandlordTenantInfoPage extends StatelessWidget {
                           widthFactor: 0.8,
                           child: WhiteBox(
                             label: 'Tasdeeq Verification',
-                            value: 'Dummy Verification',
+                            value: tenant.tasdeeqVerification
+                                ? 'Verified'
+                                : 'Not Verified',
                           ),
                         ),
                       ),
@@ -124,7 +129,7 @@ class LandlordTenantInfoPage extends StatelessWidget {
                           widthFactor: 0.8,
                           child: WhiteBox(
                             label: 'Family Members',
-                            value: 'Dummy Family Members',
+                            value: tenant.familyMembers.toString(),
                           ),
                         ),
                       ),
