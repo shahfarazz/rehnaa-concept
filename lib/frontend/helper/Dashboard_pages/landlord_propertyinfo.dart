@@ -6,8 +6,15 @@ import '../../../backend/models/propertymodel.dart';
 
 class PropertyPage extends StatefulWidget {
   final Property property;
+  final String firstName;
+  final String lastName;
+  final String pathToImage;
 
-  const PropertyPage({required this.property});
+  const PropertyPage(
+      {required this.property,
+      required this.firstName,
+      required this.lastName,
+      required this.pathToImage});
 
   @override
   _PropertyPageState createState() => _PropertyPageState();
@@ -38,7 +45,12 @@ class _PropertyPageState extends State<PropertyPage> {
                 ),
                 Expanded(
                   flex: 5,
-                  child: PropertyDetails(property: widget.property),
+                  child: PropertyDetails(
+                    property: widget.property,
+                    firstName: widget.firstName,
+                    lastName: widget.lastName,
+                    pathToImage: widget.pathToImage,
+                  ),
                 ),
               ],
             ),
@@ -162,8 +174,15 @@ class PropertyCarousel extends StatelessWidget {
 
 class PropertyDetails extends StatelessWidget {
   final Property property;
+  final String firstName;
+  final String lastName;
+  final String pathToImage;
 
-  const PropertyDetails({required this.property});
+  const PropertyDetails(
+      {required this.property,
+      required this.firstName,
+      required this.lastName,
+      required this.pathToImage});
 
   @override
   Widget build(BuildContext context) {
@@ -279,7 +298,8 @@ class PropertyDetails extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Malik Riaz', // Replace with the owner's name fetched from Firebase
+                        // 'hello',
+                        '$firstName $lastName', // Replace with the owner's name fetched from Firebase
                         style: GoogleFonts.montserrat(
                           fontWeight: FontWeight.bold,
                         ),

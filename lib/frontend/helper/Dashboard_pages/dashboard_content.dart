@@ -14,41 +14,42 @@ class DashboardContent extends StatelessWidget {
   final String uid; // UID of the landlord
   const DashboardContent({required this.uid});
 
-  Future<List<Property>> fetchProperties(
-      DocumentReference<Map<String, dynamic>> propertyDataList) async {
-    DocumentSnapshot<Map<String, dynamic>> propertySnapshot =
-        await propertyDataList.get();
-    Map<String, dynamic>? data = propertySnapshot.data();
-    if (data != null) {
-      List<Property> properties = [];
-      for (var propertyData in data.values) {
-        if (propertyData is Map<String, dynamic>) {
-          // Check if propertyData is a map
-          properties.add(Property(
-            imagePath: List<String>.from(propertyData['imagePath']),
-            type: propertyData['type'],
-            beds: propertyData['beds'],
-            baths: propertyData['baths'],
-            garden: propertyData['garden'],
-            living: propertyData['living'],
-            floors: propertyData['floors'],
-            carspace: propertyData['carspace'],
-            description: propertyData['description'],
-            title: propertyData['title'],
-            location: propertyData['location'],
-            price: propertyData['price'],
-            landlord:
-                null, // You may need to provide the landlord instance here
-            rehnaaRating: propertyData['rehnaaRating'],
-            tenantRating: propertyData['tenantRating'],
-            tenantReview: propertyData['tenantReview'],
-          ));
-        }
-      }
-      return properties;
-    } else {
-      return [];
+  Future<List<Property>> fetchProperties(List<dynamic> propertyDataList) async {
+    List<Future<DocumentSnapshot<Map<String, dynamic>>>> propertySnapshots = [];
+    for (var propertyDataRef in propertyDataList) {
+      propertySnapshots.add(propertyDataRef.get());
     }
+
+    List<DocumentSnapshot<Map<String, dynamic>>> propertyResults =
+        await Future.wait(propertySnapshots);
+    List<Property> properties = [];
+
+    for (var propertySnapshot in propertyResults) {
+      Map<String, dynamic>? propertyData = propertySnapshot.data();
+      if (propertyData != null) {
+        properties.add(Property(
+          imagePath: List<String>.from(propertyData['imagePath']),
+          type: propertyData['type'],
+          beds: propertyData['beds'],
+          baths: propertyData['baths'],
+          garden: propertyData['garden'],
+          living: propertyData['living'],
+          floors: propertyData['floor'],
+          carspace: propertyData['carspace'],
+          description: propertyData['description'],
+          title: propertyData['title'],
+          location: propertyData['location'],
+          price: propertyData['price'].toDouble(),
+          landlordRef: propertyData[
+              'landlordRef'], // You may need to provide the landlord instance here
+          rehnaaRating: propertyData['rehnaaRating'],
+          tenantRating: propertyData['tenantRating'],
+          tenantReview: propertyData['tenantReview'],
+        ));
+      }
+    }
+
+    return properties;
   }
 
   Future<List<Tenant>> fetchTenants(
@@ -118,12 +119,13 @@ class DashboardContent extends StatelessWidget {
           String firstName = data['firstName'];
           String lastName = data['lastName'];
           int balance = data['balance'];
-          DocumentReference<Map<String, dynamic>> propertyDataList =
-              data['propertyRef'];
+          // Update the variable type to List<dynamic>
+          List<DocumentReference<Map<String, dynamic>>> propertyDataList =
+              (data['propertyRef'] as List<dynamic>)
+                  .cast<DocumentReference<Map<String, dynamic>>>();
           List<DocumentReference<Map<String, dynamic>>> tenantDataList =
               (data['tenantRef'] as List<dynamic>)
                   .cast<DocumentReference<Map<String, dynamic>>>();
-
           String pathToImage = data['pathToImage'];
 
           // Fetch properties and tenants using the respective methods

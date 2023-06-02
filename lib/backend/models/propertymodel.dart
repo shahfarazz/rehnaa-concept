@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'landlordmodel.dart';
 
 class Property {
@@ -16,7 +18,7 @@ class Property {
   // final String owner;
   // final String pathToOwnerImage;
   // final String ownerPhoneNumber;
-  final Landlord? landlord;
+  final DocumentReference<Map<String, dynamic>>? landlordRef;
   final double rehnaaRating;
   final double tenantRating;
   final String tenantReview;
@@ -34,7 +36,7 @@ class Property {
     required this.title,
     required this.location,
     required this.price,
-    this.landlord,
+    this.landlordRef,
     required this.rehnaaRating,
     required this.tenantRating,
     required this.tenantReview,

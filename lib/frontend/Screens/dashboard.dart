@@ -53,7 +53,9 @@ class _DashboardPageState extends State<DashboardPage> {
           LandlordTenantsPage(
             uid: widget.uid,
           ),
-          LandlordPropertiesPage(),
+          LandlordPropertiesPage(
+            uid: widget.uid,
+          ),
           LandlordRentHistoryPage(),
           LandlordProfilePage(),
           // ProfilePage(),
