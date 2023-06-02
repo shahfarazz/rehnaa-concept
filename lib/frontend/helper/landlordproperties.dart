@@ -154,7 +154,7 @@ class PropertyCard extends StatelessWidget {
                           // (property.landlord?.firstName +
                           //         ' ' +
                           //         property.landlord?.lastName) ??
-                          'Landlord Name',
+                          'Malik Riaz',
                           style: TextStyle(fontSize: screenWidth * 0.035),
                         ),
                       ],

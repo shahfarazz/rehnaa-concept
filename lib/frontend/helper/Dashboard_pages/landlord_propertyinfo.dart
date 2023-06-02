@@ -279,13 +279,13 @@ class PropertyDetails extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Owner Name', // Replace with the owner's name fetched from Firebase
+                        'Malik Riaz', // Replace with the owner's name fetched from Firebase
                         style: GoogleFonts.montserrat(
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       Text(
-                        'Phone Number', // Replace with the owner's phone number fetched from Firebase
+                        '03333295546', // Replace with the owner's phone number fetched from Firebase
                         style: GoogleFonts.montserrat(),
                       ),
                     ],

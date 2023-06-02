@@ -50,7 +50,9 @@ class _DashboardPageState extends State<DashboardPage> {
           DashboardContent(
             uid: widget.uid,
           ),
-          LandlordTenantsPage(),
+          LandlordTenantsPage(
+            uid: widget.uid,
+          ),
           LandlordPropertiesPage(),
           LandlordRentHistoryPage(),
           LandlordProfilePage(),
@@ -89,7 +91,7 @@ class _DashboardPageState extends State<DashboardPage> {
                   clipper: HexagonClipper(),
                   child: Transform.scale(
                     scale:
-                        1.0, // This value will control the size of the hexagonal container. Adjust as needed.
+                        0.87, // This value will control the size of the hexagonal container. Adjust as needed.
                     child: Container(
                       color: Colors.white,
                       width: 60,

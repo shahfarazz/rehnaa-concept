@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:rehnaa/backend/models/landlordmodel.dart';
 import 'package:rehnaa/backend/models/tenantsmodel.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
@@ -9,6 +10,8 @@ import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'landlordtenantinfo.dart';
 
 class LandlordTenantsPage extends StatefulWidget {
+  final String uid; // UID of the landlord
+  const LandlordTenantsPage({required this.uid});
   @override
   _LandlordTenantsPageState createState() => _LandlordTenantsPageState();
 }
@@ -36,70 +39,55 @@ class _LandlordTenantsPageState extends State<LandlordTenantsPage> {
   }
 
   Future<void> _loadTenants() async {
-    // Simulate fetching tenants from Firebase
-    await Future.delayed(Duration(seconds: 1));
+    DocumentSnapshot<Map<String, dynamic>> landlordSnapshot =
+        await FirebaseFirestore.instance
+            .collection('Landlords')
+            .doc(widget.uid)
+            .get();
 
-    // Replace this with your Firebase logic to fetch tenants
-    List<Tenant> fetchedTenants = [
-      Tenant(
-        firstName: 'John',
-        lastName: 'Doe',
-        description: 'Lorem ipsum dolor sit amet',
-        rating: 4.5,
-        rent: 1500,
-        creditPoints: 100,
-        propertyDetails: 'Lorem ipsum dolor sit amet',
-        cnicNumber: '1234567890',
-        contactNumber: '9876543210',
-        tasdeeqVerification: true,
-        familyMembers: 3,
-        // landlord: Landlord(balance: 10000, firstName: 'John', lastName: 'Doe'),
-      ),
-      Tenant(
-        firstName: 'Jane',
-        lastName: 'Smith',
-        description: 'Lorem ipsum dolor sit amet',
-        rating: 4.2,
-        rent: 1200,
-        creditPoints: 80,
-        propertyDetails: 'Lorem ipsum dolor sit amet',
-        cnicNumber: '0987654321',
-        contactNumber: '1234567890',
-        tasdeeqVerification: false,
-        familyMembers: 2,
-      ),
-      Tenant(
-        firstName: 'Michael',
-        lastName: 'Johnson',
-        description: 'Lorem ipsum dolor sit amet',
-        rating: 4.8,
-        rent: 1800,
-        creditPoints: 90,
-        propertyDetails: 'Lorem ipsum dolor sit amet',
-        cnicNumber: '5678901234',
-        contactNumber: '4567890123',
-        tasdeeqVerification: true,
-        familyMembers: 2,
-      ),
-      Tenant(
-        firstName: 'Emily',
-        lastName: 'Thompson',
-        description: 'Lorem ipsum dolor sit amet',
-        rating: 4.7,
-        rent: 1600,
-        creditPoints: 95,
-        propertyDetails: 'Lorem ipsum dolor sit amet',
-        cnicNumber: '4321098765',
-        contactNumber: '3210987654',
-        tasdeeqVerification: false,
-        familyMembers: 1,
-      ),
-    ];
+    if (landlordSnapshot.exists) {
+      Map<String, dynamic>? landlordData = landlordSnapshot.data();
+      if (landlordData != null && landlordData['tenantRef'] != null) {
+        List<DocumentReference<Map<String, dynamic>>> tenantRefs =
+            (landlordData['tenantRef'] as List<dynamic>)
+                .cast<DocumentReference<Map<String, dynamic>>>();
 
-    if (mounted) {
-      setState(() {
-        _tenants = fetchedTenants;
-      });
+        List<Future<DocumentSnapshot<Map<String, dynamic>>>> tenantSnapshots =
+            tenantRefs.map((ref) => ref.get()).toList();
+
+        List<DocumentSnapshot<Map<String, dynamic>>> tenantsSnapshots =
+            await Future.wait(tenantSnapshots);
+
+        List<Tenant> fetchedTenants = [];
+
+        for (var tenantSnapshot in tenantsSnapshots) {
+          if (tenantSnapshot.exists) {
+            Map<String, dynamic>? tenantData = tenantSnapshot.data();
+
+            if (tenantData != null) {
+              fetchedTenants.add(Tenant(
+                firstName: tenantData['firstName'],
+                lastName: tenantData['lastName'],
+                description: tenantData['description'],
+                rating: tenantData['rating'],
+                rent: tenantData['rent'],
+                creditPoints: tenantData['creditPoints'],
+                propertyDetails: tenantData['propertyDetails'],
+                cnicNumber: tenantData['cnicNumber'],
+                contactNumber: tenantData['contactNumber'],
+                tasdeeqVerification: tenantData['tasdeeqVerification'],
+                familyMembers: tenantData['familyMembers'],
+              ));
+            }
+          }
+        }
+
+        if (mounted) {
+          setState(() {
+            _tenants = fetchedTenants;
+          });
+        }
+      }
     }
   }
 

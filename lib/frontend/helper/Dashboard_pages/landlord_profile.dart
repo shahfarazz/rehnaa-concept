@@ -20,14 +20,14 @@ class LandlordProfilePage extends StatelessWidget {
             ),
             SizedBox(height: 20),
             Text(
-              'John Doe',
+              'Shah Faraz',
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
               ),
             ),
             Text(
-              'Software Developer',
+              'Landlord',
               style: TextStyle(
                 fontSize: 18,
                 color: Colors.grey,
@@ -43,12 +43,12 @@ class LandlordProfilePage extends StatelessWidget {
             ProfileInfoItem(
               icon: Icons.phone,
               title: 'Phone',
-              subtitle: '+1 123-456-7890',
+              subtitle: '+92 333-248-0587',
             ),
             ProfileInfoItem(
               icon: Icons.location_on,
               title: 'Location',
-              subtitle: 'New York, USA',
+              subtitle: 'Lahore, Punjab',
             ),
           ],
         ),

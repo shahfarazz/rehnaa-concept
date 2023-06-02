@@ -77,7 +77,7 @@ class LandlordTenantInfoPage extends StatelessWidget {
                           child: WhiteBox(
                             label: 'Rating',
                             value: '${tenant.rating}',
-                            points: '1140',
+                            points: '${tenant.creditPoints}',
                           ),
                         ),
                       ),
