@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:rehnaa/frontend/helper/Dashboard_pages/dashboard_content.dart';
+import 'package:rehnaa/frontend/helper/Dashboard_pages/landlord_profile.dart';
 
 import '../helper/Dashboard_pages/landlord_propertyinfo.dart';
 import '../helper/Dashboard_pages/landlord_renthistory.dart';
@@ -46,6 +47,7 @@ class _DashboardPageState extends State<DashboardPage> {
           LandlordTenantsPage(),
           LandlordPropertiesPage(),
           LandlordRentHistoryPage(),
+          LandlordProfilePage(),
           // ProfilePage(),
         ],
       ),
@@ -57,7 +59,7 @@ class _DashboardPageState extends State<DashboardPage> {
   PreferredSizeWidget? _appBar(Size size) {
     return AppBar(
       // Set the height of the AppBar.
-      toolbarHeight: 100,
+      toolbarHeight: 70,
       leading: Padding(
         padding: EdgeInsets.only(top: 15.0), // Move the menu icon a bit up
         child: IconButton(
@@ -70,8 +72,8 @@ class _DashboardPageState extends State<DashboardPage> {
       ),
       title: Padding(
         padding: EdgeInsets.only(
-            top: 5.0,
-            left: 30.0), // You can adjust this value to align vertically
+            top: 2.0,
+            ),// You can adjust this value to align vertically
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
@@ -84,8 +86,8 @@ class _DashboardPageState extends State<DashboardPage> {
                         1.0, // This value will control the size of the hexagonal container. Adjust as needed.
                     child: Container(
                       color: Colors.white,
-                      width: 76,
-                      height: 76,
+                      width: 60,
+                      height: 60,
                     ),
                   ),
                 ),
@@ -93,8 +95,8 @@ class _DashboardPageState extends State<DashboardPage> {
                   clipper: HexagonClipper(),
                   child: Image.asset(
                     'assets/mainlogo.png',
-                    width: 76,
-                    height: 76,
+                    width: 60,
+                    height: 60,
                   ),
                 ),
               ],
@@ -107,7 +109,7 @@ class _DashboardPageState extends State<DashboardPage> {
         Padding(
           padding: const EdgeInsets.only(
               top:
-                  28.0), // Padding to align notification icon with userimage.png
+                  15.0), // Padding to align notification icon with userimage.png
           child: Stack(
             children: [
               IconButton(
@@ -118,7 +120,7 @@ class _DashboardPageState extends State<DashboardPage> {
                 },
               ),
               Positioned(
-                right: 11,
+                right: 13,
                 child: Container(
                   padding: EdgeInsets.all(2),
                   decoration: BoxDecoration(
@@ -126,8 +128,8 @@ class _DashboardPageState extends State<DashboardPage> {
                     borderRadius: BorderRadius.circular(6),
                   ),
                   constraints: BoxConstraints(
-                    minWidth: 16,
-                    minHeight: 16,
+                    minWidth: 10,
+                    minHeight: 10,
                   ),
                   child: Text(
                     '9', // Dummy number for notifications
@@ -142,19 +144,19 @@ class _DashboardPageState extends State<DashboardPage> {
             ],
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.only(bottom: 8.0),
-          child: CircleAvatar(
-            radius: 25, // Increase radius of the CircleAvatar
-            child: ClipOval(
-              child: Image.asset(
-                'assets/userimage.png',
-                width: 50, // Increase width and height of userimage.png
-                height: 50,
-              ),
-            ),
-          ),
-        ),
+        // Padding(
+        //   padding: const EdgeInsets.only(bottom: 8.0),
+        //   child: CircleAvatar(
+        //     radius: 25, // Increase radius of the CircleAvatar
+        //     child: ClipOval(
+        //       child: Image.asset(
+        //         'assets/userimage.png',
+        //         width: 50, // Increase width and height of userimage.png
+        //         height: 50,
+        //       ),
+        //     ),
+        //   ),
+        // ),
       ],
       flexibleSpace: Container(
         decoration: BoxDecoration(

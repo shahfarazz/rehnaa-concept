@@ -11,16 +11,40 @@ class DashboardContent extends StatelessWidget {
     // Move the code for your dashboard's content here
     return Column(
       children: <Widget>[
-        Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Text(
-            'Welcome Aristotle!',
-            style: GoogleFonts.montserrat(
-              fontSize: 18,
-              color: Colors.black,
+        SizedBox(height: size.height * 0.05),
+
+        Column(
+          
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Text(
+              'Welcome Aristotle!',
+              style: GoogleFonts.montserrat(
+                fontSize: 26,
+                color: Colors.black,
+              ),
             ),
           ),
-        ),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8.0),
+            child: CircleAvatar(
+              radius: 75,
+              child: ClipOval(
+                child: Image.asset(
+                  'assets/userimage.png',
+                  width: 150,
+                  height: 150,
+                ),
+              ),
+            ),
+          ),
+        SizedBox(height: size.height * 0.05),
+
+        ],
+      ),
+
         Center(
           child: Container(
             width: size.width * 0.8,
