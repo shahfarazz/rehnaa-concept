@@ -74,6 +74,7 @@ class _PropertyPageState extends State<PropertyPage> {
                   child: Container(
                     decoration: BoxDecoration(
                       color: Color(0xFF33907C),
+                      
                       borderRadius: BorderRadius.circular(30),
                     ),
                     child: IconButton(
@@ -81,6 +82,7 @@ class _PropertyPageState extends State<PropertyPage> {
                         // Handle back button press
                       },
                       icon: Icon(Icons.arrow_back),
+                      
                       color:  Colors.white,
                     ),
                   ),
