@@ -26,6 +26,7 @@ class _DashboardContentState extends State<DashboardContent>
   @override
   void initState() {
     super.initState();
+    // Fetch landlord data from Firestore
     _landlordFuture = getLandlordFromFirestore(widget.uid);
   }
 

@@ -1,38 +1,39 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:rehnaa/backend/models/propertymodel.dart';
 import 'package:rehnaa/backend/models/rentpaymentmodel.dart';
-import 'package:rehnaa/backend/models/tenantsmodel.dart';
 import 'package:rehnaa/backend/services/helperfunctions.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
-import 'package:intl/intl.dart';
-
-import 'landlord_tenants.dart';
 
 class LandlordRentHistoryPage extends StatefulWidget {
   final String uid; // UID of the landlord
-  const LandlordRentHistoryPage({super.key, required this.uid});
+
+  const LandlordRentHistoryPage({Key? key, required this.uid})
+      : super(key: key);
+
   @override
   _LandlordRentHistoryPageState createState() =>
       _LandlordRentHistoryPageState();
 }
 
-class _LandlordRentHistoryPageState extends State<LandlordRentHistoryPage> {
+class _LandlordRentHistoryPageState extends State<LandlordRentHistoryPage>
+    with AutomaticKeepAliveClientMixin<LandlordRentHistoryPage> {
   List<RentPayment> _rentPayments = [];
+  String firstName = '';
+  String lastName = '';
+
+  @override
+  bool get wantKeepAlive => true;
+
   @override
   void initState() {
     super.initState();
-    fetchRentPayments(); // Call fetchRentPayments method when the state is initialized
+    _loadRentPayments(); // Call method to load rent payments when the state is initialized
   }
 
-  String firstName = '';
-  String lastName = '';
-  Future<List<RentPayment>> fetchRentPayments() async {
-    List<RentPayment> rentPayments = [];
-
+  Future<void> _loadRentPayments() async {
     try {
+      // Fetch landlord data from Firestore
       DocumentSnapshot<Map<String, dynamic>> landlordSnapshot =
           await FirebaseFirestore.instance
               .collection('Landlords')
@@ -44,28 +45,28 @@ class _LandlordRentHistoryPageState extends State<LandlordRentHistoryPage> {
       firstName = data['firstName'];
       lastName = data['lastName'];
 
+      // Fetch each rent payment document using the document references
       for (DocumentReference<Map<String, dynamic>> rentPaymentRef
           in rentPaymentRefs) {
         DocumentSnapshot<Map<String, dynamic>> rentPaymentSnapshot =
             await rentPaymentRef.get();
-        print('data is ${rentPaymentSnapshot.data().runtimeType}');
+
         Map<String, dynamic>? data = rentPaymentSnapshot.data();
         if (data != null) {
-          RentPayment rentPayment =
-              await RentPayment.fromJson(data); // Await here
-          // await rentPayment.getProperty();
-          rentPayments.add(rentPayment);
+          RentPayment rentPayment = await RentPayment.fromJson(data);
+          _rentPayments.add(rentPayment);
         }
       }
 
-      print('rentpayments are $rentPayments');
-
-      _rentPayments = rentPayments;
+      print('Rent payments: $_rentPayments');
     } catch (e) {
       print('Error fetching rent payments: $e');
     }
 
-    return rentPayments;
+    setState(() {
+      // Update the state to trigger a rebuild with the fetched rent payments
+      _rentPayments = _rentPayments;
+    });
   }
 
   final PageController _pageController = PageController(initialPage: 0);
@@ -79,8 +80,6 @@ class _LandlordRentHistoryPageState extends State<LandlordRentHistoryPage> {
     final double whiteBoxWidth = size.width * 0.75;
 
     String iconAsset = 'assets/mainlogo.png'; // Default icon
-
-    print('buildrentpayment called with ${rentPayment.paymentType}');
 
     // Update the iconAsset based on paymentType
     switch (rentPayment.paymentType) {
@@ -234,6 +233,8 @@ class _LandlordRentHistoryPageState extends State<LandlordRentHistoryPage> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context); // Ensure the mixin's build method is called
+
     final Size size = MediaQuery.of(context).size;
     final int pageCount = (_rentPayments.length / _pageSize).ceil();
 
@@ -241,17 +242,23 @@ class _LandlordRentHistoryPageState extends State<LandlordRentHistoryPage> {
       body: Column(
         children: [
           SizedBox(height: size.height * 0.03),
-          Text('Payment History',
-              style: GoogleFonts.montserrat(
-                  fontWeight: FontWeight.bold,
-                  fontSize: size.width * 0.05,
-                  color: const Color(0xff33907c))),
+          Text(
+            'Payment History',
+            style: GoogleFonts.montserrat(
+              fontWeight: FontWeight.bold,
+              fontSize: size.width * 0.05,
+              color: const Color(0xff33907c),
+            ),
+          ),
           SizedBox(height: size.height * 0.03),
-          Text('All Tenant Property',
-              style: GoogleFonts.montserrat(
-                  fontWeight: FontWeight.bold,
-                  fontSize: size.width * 0.045,
-                  color: const Color(0xff33907c))),
+          Text(
+            'All Tenant Property',
+            style: GoogleFonts.montserrat(
+              fontWeight: FontWeight.bold,
+              fontSize: size.width * 0.045,
+              color: const Color(0xff33907c),
+            ),
+          ),
           SizedBox(height: size.height * 0.01),
           Center(
             child: Column(
@@ -282,22 +289,10 @@ class _LandlordRentHistoryPageState extends State<LandlordRentHistoryPage> {
           ),
           SizedBox(height: size.height * 0.03),
           Expanded(
-            child: FutureBuilder<List<RentPayment>>(
-              future: fetchRentPayments(),
-              builder: (BuildContext context,
-                  AsyncSnapshot<List<RentPayment>> snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator());
-                } else if (snapshot.hasError) {
-                  return Text('Error: ${snapshot.error}');
-                } else {
-                  return SingleChildScrollView(
-                    child: Column(
-                      children: _buildRentPaymentCards(0),
-                    ),
-                  );
-                }
-              },
+            child: SingleChildScrollView(
+              child: Column(
+                children: _buildRentPaymentCards(0),
+              ),
             ),
           ),
           SmoothPageIndicator(

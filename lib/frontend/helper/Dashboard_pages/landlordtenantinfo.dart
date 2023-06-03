@@ -17,6 +17,7 @@ class LandlordTenantInfoPage extends StatelessWidget {
       body: SingleChildScrollView(
         child: Stack(
           children: [
+            // Background gradient with diagonal clip
             ClipPath(
               clipper: DiagonalClipper(),
               child: Container(
@@ -38,6 +39,7 @@ class LandlordTenantInfoPage extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 SizedBox(height: size.height * 0.1),
+                // Display tenant's avatar
                 CircleAvatar(
                   radius: size.width * 0.2,
                   backgroundColor: Colors.white,
@@ -46,6 +48,7 @@ class LandlordTenantInfoPage extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: 20.0),
+                // Display tenant's name
                 Text(
                   '${tenant.firstName} ${tenant.lastName}',
                   style: GoogleFonts.montserrat(
@@ -55,6 +58,7 @@ class LandlordTenantInfoPage extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: 10.0),
+                // Display tenant's description
                 Center(
                   child: Text(
                     tenant.description,

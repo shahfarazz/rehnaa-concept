@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class ContractPage extends StatelessWidget {
   @override
@@ -28,7 +29,7 @@ class MyScreen extends StatelessWidget {
                 height: MediaQuery.of(context).size.height * 0.3,
                 child: Image.asset(
                   'assets/image1.jpg',
-                  // fit: BoxFit.cover,
+                  fit: BoxFit.cover,
                 ),
               ),
             ),
@@ -38,54 +39,57 @@ class MyScreen extends StatelessWidget {
             child: SingleChildScrollView(
               child: Center(
                 child: Padding(
-                  padding: const EdgeInsets.all(1.0),
+                  padding: const EdgeInsets.all(16.0),
                   child: Card(
-                    color: Color.fromARGB(255, 235, 235, 235),
+                    color: Colors.grey[200],
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20.0),
                     ),
-                    child: Container(
-                      padding: EdgeInsets.all(8.0),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
                       child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          SizedBox(height: 10),
                           Text(
                             "Contracts",
-                            style: TextStyle(
+                            style: GoogleFonts.montserrat(
                               fontSize: 24,
                               color: Color(0xff33907c),
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          SizedBox(height: 16),
+                          SizedBox(height: 24),
                           ContractCard(label: 'Property:', data: '123 Main St'),
-                          SizedBox(height: 10),
+                          SizedBox(height: 16),
                           ContractCard(label: 'Tenant Name:', data: 'John Doe'),
-                          SizedBox(height: 10),
-                          ContractCard(label: 'Tenant CNIC:', data: '1234567890'),
-                          SizedBox(height: 10),
+                          SizedBox(height: 16),
+                          ContractCard(
+                            label: 'Tenant CNIC:',
+                            data: '1234567890',
+                          ),
+                          SizedBox(height: 16),
                           ContractCard(
                             label: 'Contract Start Date:',
                             data: '2023-06-01',
                           ),
-                          SizedBox(height: 10),
+                          SizedBox(height: 16),
                           ContractCard(
                             label: 'Contract End Date:',
                             data: '2024-05-31',
                           ),
-                          SizedBox(height: 10),
+                          SizedBox(height: 16),
                           ContractCard(label: 'Police Verified:', data: 'Yes'),
-                          SizedBox(height: 10),
+                          SizedBox(height: 16),
                           ContractCard(
                             label: 'Court Regulation:',
                             data: 'ABC123',
                           ),
-                          SizedBox(height: 10),
+                          SizedBox(height: 16),
                           ContractCard(
                             label: 'Notary Republic Stamp:',
                             data: 'XYZ456',
                           ),
-                          SizedBox(height: 16.0),
+                          SizedBox(height: 24),
                         ],
                       ),
                     ),
@@ -104,14 +108,44 @@ class ContractCard extends StatelessWidget {
   final String label;
   final String data;
 
-  const ContractCard({required this.label, required this.data});
+  ContractCard({required this.label, required this.data});
 
   @override
   Widget build(BuildContext context) {
     return Card(
-      child: ListTile(
-        title: Text(label),
-        subtitle: Text(data),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15.0), // rounded corners
+      ),
+      elevation: 5, // shadow
+      child: Padding(
+        padding: EdgeInsets.all(10),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            ListTile(
+              leading:
+                  Icon(Icons.description), // an icon next to the contract label
+              title: Text(
+                label,
+                style: GoogleFonts.montserrat(
+                  fontWeight: FontWeight.bold, // bold contract label
+                  fontSize: 18,
+                  color: Color(0xff33907c),
+                ),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.only(left: 15),
+              child: Text(
+                data,
+                style: GoogleFonts.montserrat(
+                  fontWeight: FontWeight.normal, // normal contract data
+                  fontSize: 16,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

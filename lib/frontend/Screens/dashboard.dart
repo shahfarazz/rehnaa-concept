@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:rehnaa/frontend/Screens/contract.dart';
+import 'package:rehnaa/frontend/Screens/contractSample.dart';
 import 'package:rehnaa/frontend/Screens/vouchers.dart';
 import 'package:rehnaa/frontend/helper/Dashboard_pages/dashboard_content.dart';
 import 'package:rehnaa/frontend/helper/Dashboard_pages/landlord_profile.dart';
@@ -18,10 +18,31 @@ class DashboardPage extends StatefulWidget {
 }
 
 class _DashboardPageState extends State<DashboardPage>
-    with AutomaticKeepAliveClientMixin<DashboardPage> {
+    with
+        AutomaticKeepAliveClientMixin<DashboardPage>,
+        TickerProviderStateMixin {
   int _currentIndex = 0;
   final _pageController = PageController();
   bool _isSidebarOpen = false;
+  // Declare the AnimationController
+  late AnimationController _sidebarController;
+
+  @override
+  void initState() {
+    super.initState();
+    // Initialize the AnimationController
+    _sidebarController = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: 300),
+    );
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    _sidebarController.dispose(); // Dispose the AnimationController
+    super.dispose();
+  }
 
   @override
   bool get wantKeepAlive => true;
@@ -37,19 +58,19 @@ class _DashboardPageState extends State<DashboardPage>
   void _toggleSidebar() {
     setState(() {
       _isSidebarOpen = !_isSidebarOpen;
+      if (_isSidebarOpen) {
+        _sidebarController.forward();
+      } else {
+        _sidebarController.reverse();
+      }
     });
   }
 
   void _closeSidebar() {
     setState(() {
       _isSidebarOpen = false;
+      _sidebarController.reverse();
     });
-  }
-
-  @override
-  void dispose() {
-    _pageController.dispose();
-    super.dispose();
   }
 
   @override
@@ -82,6 +103,7 @@ class _DashboardPageState extends State<DashboardPage>
     );
   }
 
+  // AppBar widget for the dashboard
   PreferredSizeWidget? _appBar(Size size) {
     return AppBar(
       toolbarHeight: 70,
@@ -189,16 +211,20 @@ class _DashboardPageState extends State<DashboardPage>
     );
   }
 
+  // Sidebar widget
   Widget _sidebar(Size size) {
-    return GestureDetector(
-      onHorizontalDragUpdate: (details) {
-        if (details.delta.dx < 0) {
-          _closeSidebar();
-        }
-      },
-      child: Container(
-        width: size.width * 0.6,
-        color: Colors.white,
+    return AnimatedContainer(
+      duration: Duration(milliseconds: 300),
+      width: _isSidebarOpen ? size.width * 0.6 : 0,
+      color: Colors.white,
+      child: SlideTransition(
+        position: Tween<Offset>(
+          begin: Offset(-1, 0),
+          end: Offset(0, 0),
+        ).animate(CurvedAnimation(
+          parent: _sidebarController,
+          curve: Curves.easeInOut,
+        )),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -206,26 +232,26 @@ class _DashboardPageState extends State<DashboardPage>
               leading: Icon(Icons.description),
               title: Text('Contract'),
               onTap: () {
-                // TODO: Handle contract option tap
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => ContractPage(),
+                    builder: (context) => ContractSamplePage(),
                   ),
                 );
+                _closeSidebar(); // Close the sidebar after navigation
               },
             ),
             ListTile(
               leading: Icon(Icons.receipt),
               title: Text('Vouchers'),
               onTap: () {
-                // TODO: Handle contract option tap
                 Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => VouchersPage(),
                   ),
                 );
+                _closeSidebar(); // Close the sidebar after navigation
               },
             ),
           ],
@@ -234,6 +260,7 @@ class _DashboardPageState extends State<DashboardPage>
     );
   }
 
+  // BottomNavigationBar widget
   Widget _bottomNavigationBar() {
     return BottomNavigationBar(
       type: BottomNavigationBarType.fixed,
@@ -256,6 +283,7 @@ class _DashboardPageState extends State<DashboardPage>
   }
 }
 
+// Custom Clipper for hexagonal shape
 class HexagonClipper extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {
