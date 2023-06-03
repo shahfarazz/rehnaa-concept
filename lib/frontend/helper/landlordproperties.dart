@@ -28,7 +28,7 @@ class LandlordPropertiesPage extends StatelessWidget {
     for (var propertySnapshot in propertyResults) {
       Map<String, dynamic>? propertyData = propertySnapshot.data();
       if (propertyData != null) {
-        print('propertyData: $propertyData');
+        // print('propertyData: $propertyData');
 
         DocumentReference<Map<String, dynamic>> landlordRef =
             propertyData['landlordRef'];
@@ -49,7 +49,7 @@ class LandlordPropertiesPage extends StatelessWidget {
             baths: propertyData['baths'],
             garden: propertyData['garden'],
             living: propertyData['living'],
-            floors: propertyData['floor'],
+            floors: propertyData['floors'],
             carspace: propertyData['carspace'],
             description: propertyData['description'],
             title: propertyData['title'],

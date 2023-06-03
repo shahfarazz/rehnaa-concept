@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-
 import 'landlordmodel.dart';
 
 class Property {
@@ -15,10 +14,8 @@ class Property {
   final String title;
   final String location;
   final double price;
-  // final String owner;
-  // final String pathToOwnerImage;
-  // final String ownerPhoneNumber;
   final DocumentReference<Map<String, dynamic>>? landlordRef;
+  Landlord? landlord;
   final double rehnaaRating;
   final double tenantRating;
   final String tenantReview;
@@ -37,8 +34,47 @@ class Property {
     required this.location,
     required this.price,
     this.landlordRef,
+    this.landlord,
     required this.rehnaaRating,
     required this.tenantRating,
     required this.tenantReview,
   });
+
+  static Future<Property> fromJson(Map<String, dynamic> json) async {
+    Property property = Property(
+      imagePath: List<String>.from(json['imagePath']),
+      type: json['type'],
+      beds: json['beds'],
+      baths: json['baths'],
+      garden: json['garden'],
+      living: json['living'],
+      floors: json['floors'],
+      carspace: json['carspace'],
+      description: json['description'],
+      title: json['title'],
+      location: json['location'],
+      price: json['price'].toDouble(),
+      landlordRef: json['landlordRef'],
+      rehnaaRating: json['rehnaaRating'].toDouble(),
+      tenantRating: json['tenantRating'].toDouble(),
+      tenantReview: json['tenantReview'],
+    );
+
+    // if (property.landlordRef != null) {
+    //   DocumentSnapshot<Map<String, dynamic>> landlordSnapshot =
+    //       await property.landlordRef!.get();
+    //   property.landlord = await Landlord.fromJson(landlordSnapshot.data());
+    // }
+
+    return property;
+  }
+
+  Future<Landlord> fetchLandlord() async {
+    if (landlordRef != null) {
+      DocumentSnapshot<Map<String, dynamic>> snapshot =
+          await landlordRef!.get();
+      return Landlord.fromJson(snapshot.data());
+    }
+    throw Exception('Landlord reference is null');
+  }
 }

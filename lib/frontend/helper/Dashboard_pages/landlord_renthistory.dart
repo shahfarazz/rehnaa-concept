@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:rehnaa/backend/models/propertymodel.dart';
@@ -9,153 +11,59 @@ import 'package:intl/intl.dart';
 import 'landlord_tenants.dart';
 
 class LandlordRentHistoryPage extends StatefulWidget {
+  final String uid; // UID of the landlord
+  const LandlordRentHistoryPage({super.key, required this.uid});
   @override
   _LandlordRentHistoryPageState createState() =>
       _LandlordRentHistoryPageState();
 }
 
 class _LandlordRentHistoryPageState extends State<LandlordRentHistoryPage> {
-  final List<RentPayment> _rentPayments = [
-    RentPayment(
-      tenant: Tenant(
-        firstName: 'John',
-        lastName: 'Doe',
-        description: 'Lorem ipsum dolor sit amet',
-        rating: 4.5,
-        rent: 1500,
-        creditPoints: 100,
-        propertyDetails: 'Lorem ipsum dolor sit amet',
-        cnicNumber: '1234567890',
-        contactNumber: '9876543210',
-        tasdeeqVerification: true,
-        familyMembers: 3,
-      ),
-      amount: '100K',
-      date: DateTime(2021, 1, 1),
-      paymentType: "app", // Use PaymentType.app for Rehnaa app transactions
-      property: Property(
-        imagePath: ['assets/image1.jpg'],
-        type: 'House',
-        beds: 3,
-        baths: 2,
-        garden: true,
-        living: 1,
-        floors: 2,
-        carspace: 2,
-        description: 'Spacious house with a beautiful garden.',
-        title: 'Luxury House',
-        location: 'City Center',
-        price: 3000,
-        landlordRef: null,
-        rehnaaRating: 4.5,
-        tenantRating: 4.2,
-        tenantReview: 'Great property! Highly recommended.',
-      ),
-    ),
-    RentPayment(
-      tenant: Tenant(
-        firstName: 'Jane',
-        lastName: 'Smith',
-        description: 'Lorem ipsum dolor sit amet',
-        rating: 4.2,
-        rent: 1200,
-        creditPoints: 80,
-        propertyDetails: 'Lorem ipsum dolor sit amet',
-        cnicNumber: '0987654321',
-        contactNumber: '1234567890',
-        tasdeeqVerification: false,
-        familyMembers: 2,
-      ),
-      amount: '80K',
-      date: DateTime(2021, 2, 1),
-      paymentType: "cash", // Use PaymentType.cash for cash transactions
-      property: Property(
-        imagePath: ['assets/image2.jpg'],
-        type: 'Apartment',
-        beds: 2,
-        baths: 1,
-        garden: false,
-        living: 1,
-        floors: 1,
-        carspace: 1,
-        description: 'Cozy apartment in a prime location.',
-        title: 'Modern Apartment',
-        location: 'Suburb',
-        price: 2000,
-        landlordRef: null,
-        rehnaaRating: 4.2,
-        tenantRating: 4.5,
-        tenantReview: 'Excellent property! Had a wonderful stay.',
-      ),
-    ),
-    RentPayment(
-      tenant: Tenant(
-        firstName: 'Emily',
-        lastName: 'Thompson',
-        description: 'Lorem ipsum dolor sit amet',
-        rating: 4.7,
-        rent: 1600,
-        creditPoints: 95,
-        propertyDetails: 'Lorem ipsum dolor sit amet',
-        cnicNumber: '4321098765',
-        contactNumber: '3210987654',
-        tasdeeqVerification: false,
-        familyMembers: 1,
-      ),
-      amount: '90K',
-      date: DateTime(2021, 3, 1),
-      paymentType:
-          "jazzcash", // Use PaymentType.bankTransfer for bank transfer transactions
-      property: Property(
-        imagePath: ['assets/image2.jpg'],
-        type: 'House',
-        beds: 3,
-        baths: 2,
-        garden: true,
-        living: 1,
-        floors: 2,
-        carspace: 1,
-        description: 'Cozy apartment in a prime location.',
-        title: 'Modern Apartment',
-        location: 'Suburb',
-        price: 2000,
-        // landlord: null,
-        rehnaaRating: 4.2,
-        tenantRating: 4.5,
-        tenantReview: 'Excellent property! Had a wonderful stay.',
-      ),
-    ),
-    // Add more RentPayment objects as needed
-  ];
+  List<RentPayment> _rentPayments = [];
+  @override
+  void initState() {
+    super.initState();
+    fetchRentPayments(); // Call fetchRentPayments method when the state is initialized
+  }
+
+  Future<List<RentPayment>> fetchRentPayments() async {
+    List<RentPayment> rentPayments = [];
+
+    try {
+      DocumentSnapshot<Map<String, dynamic>> landlordSnapshot =
+          await FirebaseFirestore.instance
+              .collection('Landlords')
+              .doc(widget.uid)
+              .get();
+
+      Map<String, dynamic>? data = landlordSnapshot.data();
+      List<dynamic> rentPaymentRefs = data!['rentPaymentRef'] ?? [];
+
+      for (DocumentReference<Map<String, dynamic>> rentPaymentRef
+          in rentPaymentRefs) {
+        DocumentSnapshot<Map<String, dynamic>> rentPaymentSnapshot =
+            await rentPaymentRef.get();
+        print('data is ${rentPaymentSnapshot.data().runtimeType}');
+        Map<String, dynamic>? data = rentPaymentSnapshot.data();
+        if (data != null) {
+          RentPayment rentPayment =
+              await RentPayment.fromJson(data); // Await here
+          rentPayments.add(rentPayment);
+        }
+      }
+
+      _rentPayments = rentPayments;
+    } catch (e) {
+      print('Error fetching rent payments: $e');
+    }
+
+    return rentPayments;
+  }
 
   final PageController _pageController = PageController(initialPage: 0);
   int _pageSize = 2; // Number of rent payments to show per page
   String? latestMonth;
   String? previousMonth;
-
-  @override
-  void initState() {
-    super.initState();
-    // _pageController.addListener(_updateLatestMonth);
-    // _updateLatestMonth(); // Initialize latestMonth
-  }
-
-  // void _updateLatestMonth() {
-  //   WidgetsBinding.instance!.addPostFrameCallback((_) {
-  //     int currentPage = _pageController.page?.round() ?? 0;
-  //     int startIndex = currentPage * _pageSize;
-  //     List<RentPayment> visiblePayments =
-  //         _rentPayments.skip(startIndex).take(_pageSize).toList();
-
-  //     setState(() {
-  //       latestMonth = visiblePayments.isNotEmpty
-  //           ? visiblePayments
-  //               .map((payment) => payment.month.split(' ')[0])
-  //               .reduce((a, b) => a.compareTo(b) > 0 ? a : b)
-  //           : null;
-  //     });
-  //   });
-  // }
 
   Widget _buildRentPaymentCard(RentPayment rentPayment) {
     final Size size = MediaQuery.of(context).size;
@@ -216,7 +124,7 @@ class _LandlordRentHistoryPageState extends State<LandlordRentHistoryPage> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            '${rentPayment.tenant.firstName} ${rentPayment.tenant.lastName}',
+                            '${rentPayment.tenant!.firstName} ${rentPayment.tenant!.lastName}',
                             style: GoogleFonts.montserrat(
                               fontSize: size.width * 0.04,
                               fontWeight: FontWeight.bold,
@@ -225,7 +133,7 @@ class _LandlordRentHistoryPageState extends State<LandlordRentHistoryPage> {
                           ),
                           SizedBox(height: size.height * 0.01),
                           Text(
-                            rentPayment.property.location,
+                            rentPayment.property!.location,
                             style: GoogleFonts.montserrat(
                               fontSize: size.width * 0.03,
                               color: Color(0xff33907c),
@@ -260,7 +168,7 @@ class _LandlordRentHistoryPageState extends State<LandlordRentHistoryPage> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Text(
-                              rentPayment.tenant.firstName == 'Withdraw'
+                              rentPayment.tenant!.firstName == 'Withdraw'
                                   ? '-'
                                   : '+',
                               style: GoogleFonts.montserrat(
@@ -376,14 +284,6 @@ class _LandlordRentHistoryPageState extends State<LandlordRentHistoryPage> {
                 int startIndex = index * _pageSize;
                 List<RentPayment> visiblePayments =
                     _rentPayments.skip(startIndex).take(_pageSize).toList();
-
-                // _updateLatestMonth(); // Call _updateLatestMonth here
-
-                // if (visiblePayments.isNotEmpty) {
-                //   latestMonth = DateFormat.MMM().format(
-                //     DateFormat('MMMM yyyy').parse(visiblePayments[0].month),
-                //   );
-                // }
 
                 return ListView(
                   children: _buildRentPaymentCards(startIndex),
