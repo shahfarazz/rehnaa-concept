@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:rehnaa/frontend/Screens/contract.dart';
+import 'package:rehnaa/frontend/Screens/vouchers.dart';
 import 'package:rehnaa/frontend/helper/Dashboard_pages/dashboard_content.dart';
 import 'package:rehnaa/frontend/helper/Dashboard_pages/landlord_profile.dart';
 
-// import '../helper/Dashboard_pages/landlord_propertyinfo.dart';
 import '../helper/Dashboard_pages/landlord_renthistory.dart';
 import '../helper/Dashboard_pages/landlord_tenants.dart';
 import '../helper/landlordproperties.dart';
@@ -20,6 +21,7 @@ class _DashboardPageState extends State<DashboardPage>
     with AutomaticKeepAliveClientMixin<DashboardPage> {
   int _currentIndex = 0;
   final _pageController = PageController();
+  bool _isSidebarOpen = false;
 
   @override
   bool get wantKeepAlive => true;
@@ -30,6 +32,18 @@ class _DashboardPageState extends State<DashboardPage>
       duration: Duration(milliseconds: 300),
       curve: Curves.easeInOut,
     );
+  }
+
+  void _toggleSidebar() {
+    setState(() {
+      _isSidebarOpen = !_isSidebarOpen;
+    });
+  }
+
+  void _closeSidebar() {
+    setState(() {
+      _isSidebarOpen = false;
+    });
   }
 
   @override
@@ -44,19 +58,24 @@ class _DashboardPageState extends State<DashboardPage>
     super.build(context); // Ensure the state is kept alive
     return Scaffold(
       appBar: _appBar(size),
-      body: PageView(
-        controller: _pageController,
-        onPageChanged: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
-        children: <Widget>[
-          DashboardContent(uid: widget.uid),
-          LandlordTenantsPage(uid: widget.uid),
-          LandlordPropertiesPage(uid: widget.uid),
-          LandlordRentHistoryPage(uid: widget.uid),
-          LandlordProfilePage(),
+      body: Stack(
+        children: [
+          PageView(
+            controller: _pageController,
+            onPageChanged: (index) {
+              setState(() {
+                _currentIndex = index;
+              });
+            },
+            children: <Widget>[
+              DashboardContent(uid: widget.uid),
+              LandlordTenantsPage(uid: widget.uid),
+              LandlordPropertiesPage(uid: widget.uid),
+              LandlordRentHistoryPage(uid: widget.uid),
+              LandlordProfilePage(),
+            ],
+          ),
+          if (_isSidebarOpen) _sidebar(size),
         ],
       ),
       bottomNavigationBar: _bottomNavigationBar(),
@@ -68,12 +87,19 @@ class _DashboardPageState extends State<DashboardPage>
       toolbarHeight: 70,
       leading: Padding(
         padding: EdgeInsets.only(top: 8.0),
-        child: IconButton(
-          iconSize: 30.0,
-          icon: const Icon(Icons.menu),
-          onPressed: () {
-            // TODO: Implement sidebar handling here
+        child: GestureDetector(
+          onHorizontalDragUpdate: (details) {
+            if (details.delta.dx > 0) {
+              _toggleSidebar();
+            } else if (details.delta.dx < 0) {
+              _closeSidebar();
+            }
           },
+          child: IconButton(
+            iconSize: 30.0,
+            icon: Icon(Icons.menu),
+            onPressed: _toggleSidebar,
+          ),
         ),
       ),
       title: Padding(
@@ -112,9 +138,7 @@ class _DashboardPageState extends State<DashboardPage>
       ),
       actions: <Widget>[
         Padding(
-          padding: const EdgeInsets.only(
-            top: 15.0,
-          ),
+          padding: const EdgeInsets.only(top: 15.0),
           child: Stack(
             children: [
               IconButton(
@@ -160,6 +184,51 @@ class _DashboardPageState extends State<DashboardPage>
               Color(0xff0DF205),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _sidebar(Size size) {
+    return GestureDetector(
+      onHorizontalDragUpdate: (details) {
+        if (details.delta.dx < 0) {
+          _closeSidebar();
+        }
+      },
+      child: Container(
+        width: size.width * 0.6,
+        color: Colors.white,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ListTile(
+              leading: Icon(Icons.description),
+              title: Text('Contract'),
+              onTap: () {
+                // TODO: Handle contract option tap
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ContractPage(),
+                  ),
+                );
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.receipt),
+              title: Text('Vouchers'),
+              onTap: () {
+                // TODO: Handle contract option tap
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => VouchersPage(),
+                  ),
+                );
+              },
+            ),
+          ],
         ),
       ),
     );
