@@ -16,11 +16,21 @@ class MyScreen extends StatelessWidget {
       body: Column(
         children: [
           SizedBox(height: 30),
-          Container(
-            height: MediaQuery.of(context).size.height * 0.3,
-            child: Image.asset(
-              'assets/image1.jpg',
-              // fit: BoxFit.cover,
+          GestureDetector(
+            onTap: () {
+              Navigator.push(context, MaterialPageRoute(builder: (_) {
+                return ZoomedScreen();
+              }));
+            },
+            child: Hero(
+              tag: 'imageTag',
+              child: Container(
+                height: MediaQuery.of(context).size.height * 0.3,
+                child: Image.asset(
+                  'assets/image1.jpg',
+                  // fit: BoxFit.cover,
+                ),
+              ),
             ),
           ),
           SizedBox(height: 20),
@@ -100,9 +110,30 @@ class ContractCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       child: ListTile(
-        
         title: Text(label),
         subtitle: Text(data),
+      ),
+    );
+  }
+}
+
+class ZoomedScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: GestureDetector(
+        onTap: () {
+          Navigator.pop(context);
+        },
+        child: Center(
+          child: Hero(
+            tag: 'imageTag',
+            child: Image.asset(
+              'assets/image1.jpg',
+              fit: BoxFit.contain,
+            ),
+          ),
+        ),
       ),
     );
   }
