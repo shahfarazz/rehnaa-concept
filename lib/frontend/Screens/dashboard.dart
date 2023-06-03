@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:rehnaa/frontend/Screens/contract.dart';
+import 'package:rehnaa/frontend/Screens/vouchers.dart';
 import 'package:rehnaa/frontend/helper/Dashboard_pages/dashboard_content.dart';
 import 'package:rehnaa/frontend/helper/Dashboard_pages/landlord_profile.dart';
-
 import '../helper/Dashboard_pages/landlord_propertyinfo.dart';
 import '../helper/Dashboard_pages/landlord_renthistory.dart';
 import '../helper/Dashboard_pages/landlord_tenants.dart';
@@ -19,6 +20,7 @@ class DashboardPage extends StatefulWidget {
 class _DashboardPageState extends State<DashboardPage> {
   int _currentIndex = 0;
   final _pageController = PageController();
+  bool _isSidebarOpen = false;
 
   void onTabTapped(int index) {
     _pageController.animateToPage(
@@ -26,6 +28,18 @@ class _DashboardPageState extends State<DashboardPage> {
       duration: Duration(milliseconds: 300),
       curve: Curves.easeInOut,
     );
+  }
+
+  void _toggleSidebar() {
+    setState(() {
+      _isSidebarOpen = !_isSidebarOpen;
+    });
+  }
+
+  void _closeSidebar() {
+    setState(() {
+      _isSidebarOpen = false;
+    });
   }
 
   @override
@@ -39,53 +53,54 @@ class _DashboardPageState extends State<DashboardPage> {
     final Size size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: _appBar(size),
-      body: PageView(
-        controller: _pageController,
-        onPageChanged: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
-        children: <Widget>[
-          DashboardContent(
-            uid: widget.uid,
+      body: Stack(
+        children: [
+          PageView(
+            controller: _pageController,
+            onPageChanged: (index) {
+              setState(() {
+                _currentIndex = index;
+              });
+            },
+            children: <Widget>[
+              DashboardContent(uid: widget.uid),
+              LandlordTenantsPage(uid: widget.uid),
+              LandlordPropertiesPage(uid: widget.uid),
+              LandlordRentHistoryPage(uid: widget.uid),
+              LandlordProfilePage(),
+            ],
           ),
-          LandlordTenantsPage(
-            uid: widget.uid,
-          ),
-          LandlordPropertiesPage(
-            uid: widget.uid,
-          ),
-          LandlordRentHistoryPage(
-            uid: widget.uid,
-          ),
-          LandlordProfilePage(),
-          // ProfilePage(),
+          if (_isSidebarOpen) _sidebar(size),
         ],
       ),
       bottomNavigationBar: _bottomNavigationBar(),
     );
   }
 
-  // Your other methods go here (e.g., _appBar, _bottomNavigationBar)
   PreferredSizeWidget? _appBar(Size size) {
     return AppBar(
-      // Set the height of the AppBar.
       toolbarHeight: 70,
       leading: Padding(
-        padding: EdgeInsets.only(top: 8.0), // Move the menu icon a bit up
-        child: IconButton(
-          iconSize: 30.0, // Increase size of the menu icon
-          icon: Icon(Icons.menu),
-          onPressed: () {
-            // TODO: Implement sidebar handling hered
+        padding: EdgeInsets.only(top: 8.0),
+        child: GestureDetector(
+          onHorizontalDragUpdate: (details) {
+            if (details.delta.dx > 0) {
+              _toggleSidebar();
+            } else if (details.delta.dx < 0) {
+              _closeSidebar();
+            }
           },
+          child: IconButton(
+            iconSize: 30.0,
+            icon: Icon(Icons.menu),
+            onPressed: _toggleSidebar,
+          ),
         ),
       ),
       title: Padding(
         padding: EdgeInsets.only(
           top: 2.0,
-        ), // You can adjust this value to align vertically
+        ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
@@ -94,8 +109,7 @@ class _DashboardPageState extends State<DashboardPage> {
                 ClipPath(
                   clipper: HexagonClipper(),
                   child: Transform.scale(
-                    scale:
-                        0.87, // This value will control the size of the hexagonal container. Adjust as needed.
+                    scale: 0.87,
                     child: Container(
                       color: Colors.white,
                       width: 60,
@@ -119,14 +133,11 @@ class _DashboardPageState extends State<DashboardPage> {
       ),
       actions: <Widget>[
         Padding(
-          padding: const EdgeInsets.only(
-              top:
-                  15.0), // Padding to align notification icon with userimage.png
+          padding: const EdgeInsets.only(top: 15.0),
           child: Stack(
             children: [
               IconButton(
-                icon: Icon(Icons
-                    .notifications_active), // Using a different notification icon
+                icon: Icon(Icons.notifications_active),
                 onPressed: () {
                   // TODO: Implement notifications handling here
                 },
@@ -144,7 +155,7 @@ class _DashboardPageState extends State<DashboardPage> {
                     minHeight: 10,
                   ),
                   child: Text(
-                    '9', // Dummy number for notifications
+                    '9',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 10,
@@ -156,19 +167,6 @@ class _DashboardPageState extends State<DashboardPage> {
             ],
           ),
         ),
-        // Padding(
-        //   padding: const EdgeInsets.only(bottom: 8.0),
-        //   child: CircleAvatar(
-        //     radius: 25, // Increase radius of the CircleAvatar
-        //     child: ClipOval(
-        //       child: Image.asset(
-        //         'assets/userimage.png',
-        //         width: 50, // Increase width and height of userimage.png
-        //         height: 50,
-        //       ),
-        //     ),
-        //   ),
-        // ),
       ],
       flexibleSpace: Container(
         decoration: BoxDecoration(
@@ -178,9 +176,54 @@ class _DashboardPageState extends State<DashboardPage> {
             colors: [
               Color(0xff0FA697),
               Color(0xff45BF7A),
-              Color(0xff0DF205) // Change to F6F9FF
+              Color(0xff0DF205),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _sidebar(Size size) {
+    return GestureDetector(
+      onHorizontalDragUpdate: (details) {
+        if (details.delta.dx < 0) {
+          _closeSidebar();
+        }
+      },
+      child: Container(
+        width: size.width * 0.6,
+        color: Colors.white,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ListTile(
+              leading: Icon(Icons.description),
+              title: Text('Contract'),
+              onTap: () {
+                // TODO: Handle contract option tap
+                 Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ContractPage(),
+                ),
+              );
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.receipt),
+              title: Text('Vouchers'),
+              onTap: () {
+                // TODO: Handle contract option tap
+                 Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => VouchersPage(),
+                ),
+              );
+              },
+            ),
+          ],
         ),
       ),
     );
