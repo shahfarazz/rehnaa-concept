@@ -52,6 +52,107 @@ class _DashboardContentState extends State<DashboardContent>
       throw error;
     }
   }
+      
+    void showOptionDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        String selectedOption = '';
+
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return AlertDialog(
+              title: Text('Withdraw Options'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  ListTile(
+                    leading: selectedOption == 'Cash'
+                          ?CircleAvatar(
+                          backgroundColor: Colors.green,
+                          radius: 10,
+                        ): Icon(Icons.circle,size:20),
+                    title: Text('Cash'),
+                    onTap: () {
+                      setState(() {
+                        selectedOption = 'Cash';
+                      });
+                    },
+                  ),
+                  ListTile(
+                    leading: selectedOption == 'Easy Paisa'
+                        ? CircleAvatar(
+                          backgroundColor: Colors.green,
+                          radius: 10,
+                        )
+                        : Icon(Icons.circle,size:20),
+                    title: Text('Easy Paisa'),
+                    onTap: () {
+                      setState(() {
+                        selectedOption = 'Easy Paisa';
+                      });
+                    },
+                  ),
+                  ListTile(
+                    leading: selectedOption == 'Jazz Cash'
+                        ? CircleAvatar(
+                          backgroundColor: Colors.green,
+                          radius: 10,
+                        )
+                        : Icon(Icons.circle,size:20),
+                    title: Text('Jazz Cash'),
+                    onTap: () {
+                      setState(() {
+                        selectedOption = 'Jazz Cash';
+                      });
+                    },
+                  ),
+                  ListTile(
+                    leading: selectedOption == 'Bank Transfer'
+                        ? CircleAvatar(
+                          backgroundColor: Colors.green,
+                          radius: 10,
+                        )
+                        : Icon(Icons.circle,size:20),
+                    title: Text('Bank Transfer'),
+                    onTap: () {
+                      setState(() {
+                        selectedOption = 'Bank Transfer';
+                      });
+                    },
+                  ),
+                ],
+              ),
+              actions: <Widget>[
+                TextButton(
+                  child: Text('Cancel',style: TextStyle(
+                  color: Colors.green,
+                ),),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                ),
+                TextButton(
+                  child: Text('Submit',style: TextStyle(
+                    color: Colors.green,
+                  ),),
+                  onPressed: () {
+                    // Handle submit logic here
+                    print('Selected option: $selectedOption');
+                    Navigator.pop(context);
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -180,12 +281,7 @@ class _DashboardContentState extends State<DashboardContent>
                                   child: InkWell(
                                     borderRadius: BorderRadius.circular(20),
                                     onTap: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => LoginPage(),
-                                        ),
-                                      );
+                                      showOptionDialog(); // Show the option dialog
                                     },
                                     child: Center(
                                       child: Text(
