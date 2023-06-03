@@ -77,9 +77,3 @@ class ProfileInfoItem extends StatelessWidget {
     );
   }
 }
-
-void main() {
-  runApp(MaterialApp(
-    home: LandlordProfilePage(),
-  ));
-}

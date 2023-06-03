@@ -43,6 +43,7 @@ class _LandlordTenantsPageState extends State<LandlordTenantsPage>
     super.dispose();
   }
 
+  // Fetch tenant data from Firestore
   Future<void> _loadTenants() async {
     DocumentSnapshot<Map<String, dynamic>> landlordSnapshot =
         await FirebaseFirestore.instance
@@ -53,10 +54,12 @@ class _LandlordTenantsPageState extends State<LandlordTenantsPage>
     if (landlordSnapshot.exists) {
       Map<String, dynamic>? landlordData = landlordSnapshot.data();
       if (landlordData != null && landlordData['tenantRef'] != null) {
+        // Extract tenant references from landlord data
         List<DocumentReference<Map<String, dynamic>>> tenantRefs =
             (landlordData['tenantRef'] as List<dynamic>)
                 .cast<DocumentReference<Map<String, dynamic>>>();
 
+        // Fetch tenant documents from Firestore
         List<Future<DocumentSnapshot<Map<String, dynamic>>>> tenantSnapshots =
             tenantRefs.map((ref) => ref.get()).toList();
 
@@ -65,6 +68,7 @@ class _LandlordTenantsPageState extends State<LandlordTenantsPage>
 
         List<Tenant> fetchedTenants = [];
 
+        // Convert tenant documents to Tenant objects
         for (var tenantSnapshot in tenantsSnapshots) {
           if (tenantSnapshot.exists) {
             Map<String, dynamic>? tenantData = tenantSnapshot.data();
@@ -85,6 +89,7 @@ class _LandlordTenantsPageState extends State<LandlordTenantsPage>
     }
   }
 
+  // Navigate to a specific page
   void _goToPage(int page) {
     if (mounted) {
       _pageController.animateToPage(
@@ -95,9 +100,11 @@ class _LandlordTenantsPageState extends State<LandlordTenantsPage>
     }
   }
 
+  // Build a card widget for a tenant
   Widget _buildTenantCard(Tenant tenant) {
     return GestureDetector(
       onTap: () {
+        // Navigate to tenant info page
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -188,6 +195,7 @@ class _LandlordTenantsPageState extends State<LandlordTenantsPage>
     );
   }
 
+  // Build a list of tenant cards for a given starting index
   List<Widget> _buildTenantCards(int startIndex) {
     return _tenants
         .skip(startIndex)

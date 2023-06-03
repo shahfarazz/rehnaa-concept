@@ -6,6 +6,7 @@ import 'Dashboard_pages/landlord_propertyinfo.dart';
 
 class LandlordPropertiesPage extends StatefulWidget {
   final String uid; // UID of the landlord
+
   LandlordPropertiesPage({Key? key, required this.uid}) : super(key: key);
 
   @override
@@ -16,50 +17,6 @@ class _LandlordPropertiesPageState extends State<LandlordPropertiesPage>
     with AutomaticKeepAliveClientMixin<LandlordPropertiesPage> {
   List<Property> properties = [];
 
-  Future<List<Property>> fetchPropertiesFromFirebase() async {
-    // Fetch the document snapshot for the landlord
-    DocumentSnapshot<Map<String, dynamic>> landlordSnapshot =
-        await FirebaseFirestore.instance
-            .collection('Landlords')
-            .doc(widget.uid)
-            .get();
-
-    if (landlordSnapshot.exists) {
-      Map<String, dynamic> data = landlordSnapshot.data()!;
-
-      List<DocumentReference<Map<String, dynamic>>> propertyDataList =
-          (data['propertyRef'] as List<dynamic>)
-              .cast<DocumentReference<Map<String, dynamic>>>();
-
-      // Fetch properties using the fetchProperties method
-      return fetchProperties(propertyDataList);
-    } else {
-      // Handle the case where the landlord document doesn't exist
-      return [];
-    }
-  }
-
-  Future<List<Property>> fetchProperties(List<dynamic> propertyDataList) async {
-    List<Future<DocumentSnapshot<Map<String, dynamic>>>> propertySnapshots = [];
-    for (var propertyDataRef in propertyDataList) {
-      propertySnapshots.add(propertyDataRef.get());
-    }
-
-    List<DocumentSnapshot<Map<String, dynamic>>> propertyResults =
-        await Future.wait(propertySnapshots);
-    List<Property> properties = [];
-
-    for (var propertySnapshot in propertyResults) {
-      Map<String, dynamic>? propertyData = propertySnapshot.data();
-      if (propertyData != null) {
-        Property property = await Property.fromJson(propertyData);
-        property.landlord = await property.fetchLandlord();
-        properties.add(property);
-      }
-    }
-    return properties;
-  }
-
   @override
   void initState() {
     super.initState();
@@ -67,12 +24,57 @@ class _LandlordPropertiesPageState extends State<LandlordPropertiesPage>
   }
 
   Future<void> _loadProperties() async {
-    List<Property> fetchedProperties = await fetchPropertiesFromFirebase();
-    if (mounted) {
-      setState(() {
-        properties = fetchedProperties;
-      });
+    try {
+      // Fetch the document snapshot for the landlord
+      DocumentSnapshot<Map<String, dynamic>> landlordSnapshot =
+          await FirebaseFirestore.instance
+              .collection('Landlords')
+              .doc(widget.uid)
+              .get();
+
+      if (landlordSnapshot.exists) {
+        Map<String, dynamic> data = landlordSnapshot.data()!;
+
+        List<DocumentReference<Map<String, dynamic>>> propertyDataList =
+            (data['propertyRef'] as List<dynamic>)
+                .cast<DocumentReference<Map<String, dynamic>>>();
+
+        // Fetch properties using the fetchProperties method
+        properties = await fetchProperties(propertyDataList);
+
+        if (mounted) {
+          setState(() {
+            // Update the state with the fetched properties
+            properties = properties;
+          });
+        }
+      } else {
+        // Handle the case where the landlord document doesn't exist
+        properties = [];
+      }
+    } catch (e) {
+      // Handle any error that occurred while fetching the properties
+      print('Error fetching properties: $e');
+      properties = [];
     }
+  }
+
+  Future<List<Property>> fetchProperties(List<dynamic> propertyDataList) async {
+    List<Property> fetchedProperties = [];
+
+    for (var propertyDataRef in propertyDataList) {
+      DocumentSnapshot<Map<String, dynamic>> propertySnapshot =
+          await propertyDataRef.get();
+
+      Map<String, dynamic>? propertyData = propertySnapshot.data();
+      if (propertyData != null) {
+        Property property = await Property.fromJson(propertyData);
+        property.landlord = await property.fetchLandlord();
+        fetchedProperties.add(property);
+      }
+    }
+
+    return fetchedProperties;
   }
 
   @override
@@ -82,57 +84,34 @@ class _LandlordPropertiesPageState extends State<LandlordPropertiesPage>
   Widget build(BuildContext context) {
     super.build(context); // Necessary for AutomaticKeepAliveClientMixin
 
-    return FutureBuilder<List<Property>>(
-      future: fetchPropertiesFromFirebase(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          // Show a loading indicator while waiting for the data
-          return Center(
-            child: CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
-            ),
+    return Scaffold(
+      backgroundColor: Color.fromARGB(255, 255, 255, 255),
+      body: ListView.builder(
+        itemCount: properties.length,
+        itemBuilder: (context, index) {
+          return PropertyCard(
+            property: properties[index],
+            firstName: properties[index].landlord?.firstName ?? '',
+            lastName: properties[index].landlord?.lastName ?? '',
+            pathToImage: properties[index].landlord?.pathToImage ??
+                'assets/userimage.png',
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => PropertyPage(
+                    property: properties[index],
+                    firstName: properties[index].landlord?.firstName ?? '',
+                    lastName: properties[index].landlord?.lastName ?? '',
+                    pathToImage: properties[index].landlord?.pathToImage ??
+                        'assets/userimage.png',
+                  ),
+                ),
+              );
+            },
           );
-        } else if (snapshot.hasError) {
-          // Handle any error that occurred while fetching the data
-          return Text('Error: ${snapshot.error}');
-        } else if (snapshot.hasData) {
-          properties = snapshot.data!;
-          return Scaffold(
-            backgroundColor: Color.fromARGB(255, 255, 255, 255),
-            body: ListView.builder(
-              itemCount: properties.length,
-              itemBuilder: (context, index) {
-                return PropertyCard(
-                  property: properties[index],
-                  firstName: properties[index].landlord?.firstName ?? '',
-                  lastName: properties[index].landlord?.lastName ?? '',
-                  pathToImage: properties[index].landlord?.pathToImage ??
-                      'assets/userimage.png',
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => PropertyPage(
-                          property: properties[index],
-                          firstName:
-                              properties[index].landlord?.firstName ?? '',
-                          lastName: properties[index].landlord?.lastName ?? '',
-                          pathToImage:
-                              properties[index].landlord?.pathToImage ??
-                                  'assets/userimage.png',
-                        ),
-                      ),
-                    );
-                  },
-                );
-              },
-            ),
-          );
-        } else {
-          // Handle the case where no data is available
-          return const Text('No data available');
-        }
-      },
+        },
+      ),
     );
   }
 }
@@ -151,6 +130,7 @@ class PropertyCard extends StatelessWidget {
     required this.pathToImage,
     required this.onTap,
   });
+
   @override
   Widget build(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
