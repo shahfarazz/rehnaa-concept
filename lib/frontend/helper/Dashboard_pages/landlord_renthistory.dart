@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:rehnaa/backend/models/propertymodel.dart';
 import 'package:rehnaa/backend/models/rentpaymentmodel.dart';
 import 'package:rehnaa/backend/models/tenantsmodel.dart';
+import 'package:rehnaa/backend/services/helperfunctions.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:intl/intl.dart';
 
@@ -26,6 +27,8 @@ class _LandlordRentHistoryPageState extends State<LandlordRentHistoryPage> {
     fetchRentPayments(); // Call fetchRentPayments method when the state is initialized
   }
 
+  String firstName = '';
+  String lastName = '';
   Future<List<RentPayment>> fetchRentPayments() async {
     List<RentPayment> rentPayments = [];
 
@@ -38,6 +41,8 @@ class _LandlordRentHistoryPageState extends State<LandlordRentHistoryPage> {
 
       Map<String, dynamic>? data = landlordSnapshot.data();
       List<dynamic> rentPaymentRefs = data!['rentPaymentRef'] ?? [];
+      firstName = data['firstName'];
+      lastName = data['lastName'];
 
       for (DocumentReference<Map<String, dynamic>> rentPaymentRef
           in rentPaymentRefs) {
@@ -48,9 +53,12 @@ class _LandlordRentHistoryPageState extends State<LandlordRentHistoryPage> {
         if (data != null) {
           RentPayment rentPayment =
               await RentPayment.fromJson(data); // Await here
+          // await rentPayment.getProperty();
           rentPayments.add(rentPayment);
         }
       }
+
+      print('rentpayments are $rentPayments');
 
       _rentPayments = rentPayments;
     } catch (e) {
@@ -71,6 +79,8 @@ class _LandlordRentHistoryPageState extends State<LandlordRentHistoryPage> {
     final double whiteBoxWidth = size.width * 0.75;
 
     String iconAsset = 'assets/mainlogo.png'; // Default icon
+
+    print('buildrentpayment called with ${rentPayment.paymentType}');
 
     // Update the iconAsset based on paymentType
     switch (rentPayment.paymentType) {
@@ -106,34 +116,50 @@ class _LandlordRentHistoryPageState extends State<LandlordRentHistoryPage> {
             color: Colors.white,
           ),
           padding: EdgeInsets.all(size.width * 0.04),
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // monthWidget, // Display the month widget
-                Row(
-                  children: [
-                    Image.asset(
-                      iconAsset,
-                      width: size.width * 0.2,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Image.asset(
+                    iconAsset,
+                    width: size.width * 0.2,
+                  ),
+                  SizedBox(width: size.width * 0.04),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          '${firstName} ${lastName}',
+                          style: GoogleFonts.montserrat(
+                            fontSize: size.width * 0.04,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xff33907c),
+                          ),
+                        ),
+                        SizedBox(height: size.height * 0.01),
+                        Text(
+                          rentPayment.property!.location,
+                          style: GoogleFonts.montserrat(
+                            fontSize: size.width * 0.03,
+                            color: Color(0xff33907c),
+                          ),
+                        ),
+                      ],
                     ),
-                    SizedBox(width: size.width * 0.04),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.center,
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            '${rentPayment.tenant!.firstName} ${rentPayment.tenant!.lastName}',
-                            style: GoogleFonts.montserrat(
-                              fontSize: size.width * 0.04,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xff33907c),
-                            ),
-                          ),
-                          SizedBox(height: size.height * 0.01),
-                          Text(
-                            rentPayment.property!.location,
+                            //display in format day/month/year
+                            '${rentPayment.date.day}/${rentPayment.date.month}/${rentPayment.date.year}',
                             style: GoogleFonts.montserrat(
                               fontSize: size.width * 0.03,
                               color: Color(0xff33907c),
@@ -141,58 +167,37 @@ class _LandlordRentHistoryPageState extends State<LandlordRentHistoryPage> {
                           ),
                         ],
                       ),
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              //display in format day/month/year
-                              '${rentPayment.date.day}/${rentPayment.date.month}/${rentPayment.date.year}',
-                              style: GoogleFonts.montserrat(
-                                fontSize: size.width * 0.03,
-                                color: Color(0xff33907c),
-                              ),
+                      SizedBox(height: size.height * 0.05),
+                      //add a padding so that the next row is pushed further down
+                      Padding(
+                        padding: EdgeInsets.only(bottom: size.height * 0.02),
+                      ),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            firstName == 'Withdraw' ? '-' : '+',
+                            style: GoogleFonts.montserrat(
+                              fontSize: size.width * 0.04,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xff33907c),
                             ),
-                          ],
-                        ),
-                        SizedBox(height: size.height * 0.07),
-                        //add a padding so that the next row is pushed further down
-                        Padding(
-                          padding: EdgeInsets.only(bottom: size.height * 0.02),
-                        ),
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              rentPayment.tenant!.firstName == 'Withdraw'
-                                  ? '-'
-                                  : '+',
-                              style: GoogleFonts.montserrat(
-                                fontSize: size.width * 0.04,
-                                fontWeight: FontWeight.bold,
-                                color: Color(0xff33907c),
-                              ),
+                          ),
+                          Text(
+                            formatNumber(rentPayment.amount),
+                            style: GoogleFonts.montserrat(
+                              fontSize: size.width * 0.035,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xff33907c),
                             ),
-                            Text(
-                              rentPayment.amount,
-                              style: GoogleFonts.montserrat(
-                                fontSize: size.width * 0.035,
-                                fontWeight: FontWeight.bold,
-                                color: Color(0xff33907c),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ],
-            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ],
           ),
         ),
       ),
@@ -277,17 +282,21 @@ class _LandlordRentHistoryPageState extends State<LandlordRentHistoryPage> {
           ),
           SizedBox(height: size.height * 0.03),
           Expanded(
-            child: PageView.builder(
-              controller: _pageController,
-              itemCount: pageCount,
-              itemBuilder: (context, index) {
-                int startIndex = index * _pageSize;
-                List<RentPayment> visiblePayments =
-                    _rentPayments.skip(startIndex).take(_pageSize).toList();
-
-                return ListView(
-                  children: _buildRentPaymentCards(startIndex),
-                );
+            child: FutureBuilder<List<RentPayment>>(
+              future: fetchRentPayments(),
+              builder: (BuildContext context,
+                  AsyncSnapshot<List<RentPayment>> snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Text('Error: ${snapshot.error}');
+                } else {
+                  return SingleChildScrollView(
+                    child: Column(
+                      children: _buildRentPaymentCards(0),
+                    ),
+                  );
+                }
               },
             ),
           ),
@@ -311,7 +320,6 @@ class _LandlordRentHistoryPageState extends State<LandlordRentHistoryPage> {
   @override
   void dispose() {
     _pageController.dispose();
-    // pageController.dispose();
     super.dispose();
   }
 }

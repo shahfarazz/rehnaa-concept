@@ -60,12 +60,6 @@ class Property {
       tenantReview: json['tenantReview'],
     );
 
-    // if (property.landlordRef != null) {
-    //   DocumentSnapshot<Map<String, dynamic>> landlordSnapshot =
-    //       await property.landlordRef!.get();
-    //   property.landlord = await Landlord.fromJson(landlordSnapshot.data());
-    // }
-
     return property;
   }
 

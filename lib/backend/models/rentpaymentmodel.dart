@@ -5,7 +5,7 @@ import 'propertymodel.dart';
 import 'tenantsmodel.dart';
 
 class RentPayment {
-  final String amount;
+  final double amount;
   final DateTime date;
   final String paymentType;
   final DocumentReference<Map<String, dynamic>>? propertyRef;
@@ -28,55 +28,44 @@ class RentPayment {
   });
 
   static Future<RentPayment> fromJson(Map<String, dynamic> json) async {
-    print('RentPayment.fromJson: $json');
-
     final propertyRef =
-        json['propertyRef'] as DocumentReference<Map<String, dynamic>>;
+        json['propertyRef'] as DocumentReference<Map<String, dynamic>>?;
     final tenantRef =
-        json['tenantRef'] as DocumentReference<Map<String, dynamic>>;
+        json['tenantRef'] as DocumentReference<Map<String, dynamic>>?;
     final landlordRef =
-        json['landlordRef'] as DocumentReference<Map<String, dynamic>>;
+        json['landlordRef'] as DocumentReference<Map<String, dynamic>>?;
 
-    RentPayment rentPayment = RentPayment(
-      amount: json['amount'],
-      date: DateTime.parse(json['date']),
-      paymentType: json['paymentType'],
-      propertyRef: propertyRef,
-      tenantRef: tenantRef,
-      landlordRef: landlordRef,
-    );
+    try {
+      RentPayment rentPayment = RentPayment(
+        amount: json['amount'].toDouble(),
+        date: (json['date'] as Timestamp).toDate(),
+        paymentType: json['paymentType'],
+        propertyRef: propertyRef,
+        tenantRef: tenantRef,
+        landlordRef: landlordRef,
+      );
 
-    await rentPayment.fetchData();
+      if (propertyRef != null) {
+        DocumentSnapshot<Map<String, dynamic>> propertySnapshot =
+            await propertyRef.get();
+        rentPayment.property =
+            await Property.fromJson(propertySnapshot.data()!);
+      }
 
-    return rentPayment;
-  }
+      // if (tenantRef != null) {
+      //   DocumentSnapshot<Map<String, dynamic>> tenantSnapshot = await tenantRef.get();
+      //   rentPayment.tenant = Tenant.fromJson(tenantSnapshot.data()!);
+      // }
 
-  Future<void> fetchData() async {
-    await getProperty();
-    await getTenant();
-    await getLandlord();
-  }
+      // if (landlordRef != null) {
+      //   DocumentSnapshot<Map<String, dynamic>> landlordSnapshot = await landlordRef.get();
+      //   rentPayment.landlord = await rentPayment.property?.fetchLandlord();
+      // }
 
-  Future<void> getProperty() async {
-    if (propertyRef != null) {
-      DocumentSnapshot<Map<String, dynamic>> snapshot =
-          await propertyRef!.get();
-      property = await Property.fromJson(snapshot.data()!);
-    }
-  }
-
-  Future<void> getTenant() async {
-    if (tenantRef != null) {
-      DocumentSnapshot<Map<String, dynamic>> snapshot = await tenantRef!.get();
-      tenant = Tenant.fromJson(snapshot.data()!);
-    }
-  }
-
-  Future<void> getLandlord() async {
-    if (landlordRef != null) {
-      DocumentSnapshot<Map<String, dynamic>> snapshot =
-          await landlordRef!.get();
-      property?.landlord = await property?.fetchLandlord();
+      return rentPayment;
+    } catch (e) {
+      // Handle the exception according to your app's needs
+      throw Exception('Error parsing RentPayment: $e');
     }
   }
 }

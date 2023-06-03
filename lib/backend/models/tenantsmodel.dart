@@ -51,8 +51,8 @@ class Tenant {
       pathToImage: json['pathToImage'],
     );
 
-    tenant
-        .getLandlord(); // Call getLandlord method to fetch and populate landlord asynchronously
+    // tenant
+    //     .getLandlord(); // Call getLandlord method to fetch and populate landlord asynchronously
 
     return tenant;
   }

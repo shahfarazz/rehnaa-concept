@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:rehnaa/frontend/helper/Dashboard_pages/dashboard_content.dart';
 import 'package:rehnaa/frontend/helper/Dashboard_pages/landlord_profile.dart';
 
-import '../helper/Dashboard_pages/landlord_propertyinfo.dart';
+// import '../helper/Dashboard_pages/landlord_propertyinfo.dart';
 import '../helper/Dashboard_pages/landlord_renthistory.dart';
 import '../helper/Dashboard_pages/landlord_tenants.dart';
 import '../helper/landlordproperties.dart';
@@ -16,9 +16,13 @@ class DashboardPage extends StatefulWidget {
   _DashboardPageState createState() => _DashboardPageState();
 }
 
-class _DashboardPageState extends State<DashboardPage> {
+class _DashboardPageState extends State<DashboardPage>
+    with AutomaticKeepAliveClientMixin<DashboardPage> {
   int _currentIndex = 0;
   final _pageController = PageController();
+
+  @override
+  bool get wantKeepAlive => true;
 
   void onTabTapped(int index) {
     _pageController.animateToPage(
@@ -37,6 +41,7 @@ class _DashboardPageState extends State<DashboardPage> {
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
+    super.build(context); // Ensure the state is kept alive
     return Scaffold(
       appBar: _appBar(size),
       body: PageView(
@@ -47,45 +52,34 @@ class _DashboardPageState extends State<DashboardPage> {
           });
         },
         children: <Widget>[
-          DashboardContent(
-            uid: widget.uid,
-          ),
-          LandlordTenantsPage(
-            uid: widget.uid,
-          ),
-          LandlordPropertiesPage(
-            uid: widget.uid,
-          ),
-          LandlordRentHistoryPage(
-            uid: widget.uid,
-          ),
+          DashboardContent(uid: widget.uid),
+          LandlordTenantsPage(uid: widget.uid),
+          LandlordPropertiesPage(uid: widget.uid),
+          LandlordRentHistoryPage(uid: widget.uid),
           LandlordProfilePage(),
-          // ProfilePage(),
         ],
       ),
       bottomNavigationBar: _bottomNavigationBar(),
     );
   }
 
-  // Your other methods go here (e.g., _appBar, _bottomNavigationBar)
   PreferredSizeWidget? _appBar(Size size) {
     return AppBar(
-      // Set the height of the AppBar.
       toolbarHeight: 70,
       leading: Padding(
-        padding: EdgeInsets.only(top: 8.0), // Move the menu icon a bit up
+        padding: EdgeInsets.only(top: 8.0),
         child: IconButton(
-          iconSize: 30.0, // Increase size of the menu icon
-          icon: Icon(Icons.menu),
+          iconSize: 30.0,
+          icon: const Icon(Icons.menu),
           onPressed: () {
-            // TODO: Implement sidebar handling hered
+            // TODO: Implement sidebar handling here
           },
         ),
       ),
       title: Padding(
         padding: EdgeInsets.only(
           top: 2.0,
-        ), // You can adjust this value to align vertically
+        ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
@@ -94,8 +88,7 @@ class _DashboardPageState extends State<DashboardPage> {
                 ClipPath(
                   clipper: HexagonClipper(),
                   child: Transform.scale(
-                    scale:
-                        0.87, // This value will control the size of the hexagonal container. Adjust as needed.
+                    scale: 0.87,
                     child: Container(
                       color: Colors.white,
                       width: 60,
@@ -120,13 +113,12 @@ class _DashboardPageState extends State<DashboardPage> {
       actions: <Widget>[
         Padding(
           padding: const EdgeInsets.only(
-              top:
-                  15.0), // Padding to align notification icon with userimage.png
+            top: 15.0,
+          ),
           child: Stack(
             children: [
               IconButton(
-                icon: Icon(Icons
-                    .notifications_active), // Using a different notification icon
+                icon: Icon(Icons.notifications_active),
                 onPressed: () {
                   // TODO: Implement notifications handling here
                 },
@@ -144,7 +136,7 @@ class _DashboardPageState extends State<DashboardPage> {
                     minHeight: 10,
                   ),
                   child: Text(
-                    '9', // Dummy number for notifications
+                    '9',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 10,
@@ -156,19 +148,6 @@ class _DashboardPageState extends State<DashboardPage> {
             ],
           ),
         ),
-        // Padding(
-        //   padding: const EdgeInsets.only(bottom: 8.0),
-        //   child: CircleAvatar(
-        //     radius: 25, // Increase radius of the CircleAvatar
-        //     child: ClipOval(
-        //       child: Image.asset(
-        //         'assets/userimage.png',
-        //         width: 50, // Increase width and height of userimage.png
-        //         height: 50,
-        //       ),
-        //     ),
-        //   ),
-        // ),
       ],
       flexibleSpace: Container(
         decoration: BoxDecoration(
@@ -178,7 +157,7 @@ class _DashboardPageState extends State<DashboardPage> {
             colors: [
               Color(0xff0FA697),
               Color(0xff45BF7A),
-              Color(0xff0DF205) // Change to F6F9FF
+              Color(0xff0DF205),
             ],
           ),
         ),

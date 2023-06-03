@@ -1,126 +1,28 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-
-import 'package:rehnaa/frontend/Screens/dashboard.dart';
-
 import '../../backend/models/propertymodel.dart';
 import 'Dashboard_pages/landlord_propertyinfo.dart';
 
-class LandlordPropertiesPage extends StatelessWidget {
+class LandlordPropertiesPage extends StatefulWidget {
   final String uid; // UID of the landlord
-  LandlordPropertiesPage({required this.uid});
-
-  String firstName = '';
-  String lastName = '';
-  String pathToImage = '';
-
-  Future<List<Property>> fetchProperties(List<dynamic> propertyDataList) async {
-    List<Future<DocumentSnapshot<Map<String, dynamic>>>> propertySnapshots = [];
-    for (var propertyDataRef in propertyDataList) {
-      propertySnapshots.add(propertyDataRef.get());
-    }
-
-    List<DocumentSnapshot<Map<String, dynamic>>> propertyResults =
-        await Future.wait(propertySnapshots);
-    List<Property> properties = [];
-
-    for (var propertySnapshot in propertyResults) {
-      Map<String, dynamic>? propertyData = propertySnapshot.data();
-      if (propertyData != null) {
-        // print('propertyData: $propertyData');
-
-        DocumentReference<Map<String, dynamic>> landlordRef =
-            propertyData['landlordRef'];
-
-        DocumentSnapshot<Map<String, dynamic>> landlordSnapshot =
-            await landlordRef.get();
-
-        if (landlordSnapshot.exists) {
-          Map<String, dynamic> landlordData = landlordSnapshot.data()!;
-          firstName = landlordData['firstName'];
-          lastName = landlordData['lastName'];
-          pathToImage = landlordData['pathToImage'];
-
-          properties.add(Property(
-            imagePath: List<String>.from(propertyData['imagePath']),
-            type: propertyData['type'],
-            beds: propertyData['beds'],
-            baths: propertyData['baths'],
-            garden: propertyData['garden'],
-            living: propertyData['living'],
-            floors: propertyData['floors'],
-            carspace: propertyData['carspace'],
-            description: propertyData['description'],
-            title: propertyData['title'],
-            location: propertyData['location'],
-            price: propertyData['price'].toDouble(),
-            rehnaaRating: propertyData['rehnaaRating'],
-            tenantRating: propertyData['tenantRating'],
-            tenantReview: propertyData['tenantReview'],
-          ));
-        }
-      }
-    }
-
-    return properties;
-  }
+  LandlordPropertiesPage({Key? key, required this.uid}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    return FutureBuilder<List<Property>>(
-      future: fetchPropertiesFromFirebase(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          // Show a loading indicator while waiting for the data
-          return Center(
-            child: CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
-            ),
-          );
-        } else if (snapshot.hasError) {
-          // Handle any error that occurred while fetching the data
-          return Text('Error: ${snapshot.error}');
-        } else if (snapshot.hasData) {
-          List<Property> properties = snapshot.data!;
-          return Scaffold(
-            backgroundColor: Color.fromARGB(255, 255, 255, 255),
-            body: ListView.builder(
-              itemCount: properties.length,
-              itemBuilder: (context, index) {
-                return PropertyCard(
-                  property: properties[index],
-                  firstName: firstName, // Pass the firstName string
-                  lastName: lastName, // Pass the lastName string
-                  pathToImage: pathToImage, // Pass the pathToImage string
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => PropertyPage(
-                            property: properties[index],
-                            firstName: firstName,
-                            lastName: lastName,
-                            pathToImage: pathToImage),
-                      ),
-                    );
-                  },
-                );
-              },
-            ),
-          );
-        } else {
-          // Handle the case where no data is available
-          return Text('No data available');
-        }
-      },
-    );
-  }
+  _LandlordPropertiesPageState createState() => _LandlordPropertiesPageState();
+}
+
+class _LandlordPropertiesPageState extends State<LandlordPropertiesPage>
+    with AutomaticKeepAliveClientMixin<LandlordPropertiesPage> {
+  List<Property> properties = [];
 
   Future<List<Property>> fetchPropertiesFromFirebase() async {
     // Fetch the document snapshot for the landlord
     DocumentSnapshot<Map<String, dynamic>> landlordSnapshot =
-        await FirebaseFirestore.instance.collection('Landlords').doc(uid).get();
+        await FirebaseFirestore.instance
+            .collection('Landlords')
+            .doc(widget.uid)
+            .get();
 
     if (landlordSnapshot.exists) {
       Map<String, dynamic> data = landlordSnapshot.data()!;
@@ -135,6 +37,103 @@ class LandlordPropertiesPage extends StatelessWidget {
       // Handle the case where the landlord document doesn't exist
       return [];
     }
+  }
+
+  Future<List<Property>> fetchProperties(List<dynamic> propertyDataList) async {
+    List<Future<DocumentSnapshot<Map<String, dynamic>>>> propertySnapshots = [];
+    for (var propertyDataRef in propertyDataList) {
+      propertySnapshots.add(propertyDataRef.get());
+    }
+
+    List<DocumentSnapshot<Map<String, dynamic>>> propertyResults =
+        await Future.wait(propertySnapshots);
+    List<Property> properties = [];
+
+    for (var propertySnapshot in propertyResults) {
+      Map<String, dynamic>? propertyData = propertySnapshot.data();
+      if (propertyData != null) {
+        Property property = await Property.fromJson(propertyData);
+        property.landlord = await property.fetchLandlord();
+        properties.add(property);
+      }
+    }
+    return properties;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProperties();
+  }
+
+  Future<void> _loadProperties() async {
+    List<Property> fetchedProperties = await fetchPropertiesFromFirebase();
+    if (mounted) {
+      setState(() {
+        properties = fetchedProperties;
+      });
+    }
+  }
+
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
+  Widget build(BuildContext context) {
+    super.build(context); // Necessary for AutomaticKeepAliveClientMixin
+
+    return FutureBuilder<List<Property>>(
+      future: fetchPropertiesFromFirebase(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          // Show a loading indicator while waiting for the data
+          return Center(
+            child: CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
+            ),
+          );
+        } else if (snapshot.hasError) {
+          // Handle any error that occurred while fetching the data
+          return Text('Error: ${snapshot.error}');
+        } else if (snapshot.hasData) {
+          properties = snapshot.data!;
+          return Scaffold(
+            backgroundColor: Color.fromARGB(255, 255, 255, 255),
+            body: ListView.builder(
+              itemCount: properties.length,
+              itemBuilder: (context, index) {
+                return PropertyCard(
+                  property: properties[index],
+                  firstName: properties[index].landlord?.firstName ?? '',
+                  lastName: properties[index].landlord?.lastName ?? '',
+                  pathToImage: properties[index].landlord?.pathToImage ??
+                      'assets/userimage.png',
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => PropertyPage(
+                          property: properties[index],
+                          firstName:
+                              properties[index].landlord?.firstName ?? '',
+                          lastName: properties[index].landlord?.lastName ?? '',
+                          pathToImage:
+                              properties[index].landlord?.pathToImage ??
+                                  'assets/userimage.png',
+                        ),
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
+          );
+        } else {
+          // Handle the case where no data is available
+          return const Text('No data available');
+        }
+      },
+    );
   }
 }
 

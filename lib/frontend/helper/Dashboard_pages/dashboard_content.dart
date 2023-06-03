@@ -7,9 +7,27 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:rehnaa/backend/models/landlordmodel.dart';
 import 'package:rehnaa/frontend/Screens/login_page.dart';
 
-class DashboardContent extends StatelessWidget {
+class DashboardContent extends StatefulWidget {
   final String uid; // UID of the landlord
+
   const DashboardContent({Key? key, required this.uid}) : super(key: key);
+
+  @override
+  _DashboardContentState createState() => _DashboardContentState();
+}
+
+class _DashboardContentState extends State<DashboardContent>
+    with AutomaticKeepAliveClientMixin<DashboardContent> {
+  late Future<Landlord> _landlordFuture;
+
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
+  void initState() {
+    super.initState();
+    _landlordFuture = getLandlordFromFirestore(widget.uid);
+  }
 
   Future<Landlord> getLandlordFromFirestore(String uid) async {
     try {
@@ -37,12 +55,13 @@ class DashboardContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context); // Ensure the state is kept alive
     final Size size = MediaQuery.of(context).size;
 
-    print('UID: $uid');
+    print('UID: ${widget.uid}');
 
     return FutureBuilder<Landlord>(
-      future: getLandlordFromFirestore(uid),
+      future: _landlordFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           // Show a loading indicator while waiting for the data

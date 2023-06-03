@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:rehnaa/backend/models/landlordmodel.dart';
 import 'package:rehnaa/backend/models/tenantsmodel.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
@@ -11,18 +10,24 @@ import 'landlordtenantinfo.dart';
 
 class LandlordTenantsPage extends StatefulWidget {
   final String uid; // UID of the landlord
+
   const LandlordTenantsPage({required this.uid});
+
   @override
   _LandlordTenantsPageState createState() => _LandlordTenantsPageState();
 }
 
-class _LandlordTenantsPageState extends State<LandlordTenantsPage> {
+class _LandlordTenantsPageState extends State<LandlordTenantsPage>
+    with AutomaticKeepAliveClientMixin<LandlordTenantsPage> {
   PageController _pageController = PageController(initialPage: 0);
   List<Tenant> _tenants = [];
   int _currentPage = 0;
   int _pageSize = 4; // Number of tenants to show per page
   Completer<void> _loadTenantsCompleter =
       Completer<void>(); // Completer for canceling the Future.delayed() call
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {
@@ -65,19 +70,8 @@ class _LandlordTenantsPageState extends State<LandlordTenantsPage> {
             Map<String, dynamic>? tenantData = tenantSnapshot.data();
 
             if (tenantData != null) {
-              fetchedTenants.add(Tenant(
-                firstName: tenantData['firstName'],
-                lastName: tenantData['lastName'],
-                description: tenantData['description'],
-                rating: tenantData['rating'],
-                rent: tenantData['rent'],
-                creditPoints: tenantData['creditPoints'],
-                propertyDetails: tenantData['propertyDetails'],
-                cnicNumber: tenantData['cnicNumber'],
-                contactNumber: tenantData['contactNumber'],
-                tasdeeqVerification: tenantData['tasdeeqVerification'],
-                familyMembers: tenantData['familyMembers'],
-              ));
+              fetchedTenants.add(Tenant.fromJson(
+                  tenantData)); // Create a TenantModel object from the tenantData
             }
           }
         }
@@ -204,6 +198,7 @@ class _LandlordTenantsPageState extends State<LandlordTenantsPage> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context); // Ensure the parent's build method is called
     final Size size = MediaQuery.of(context).size;
     final int pageCount = (_tenants.length / _pageSize).ceil();
 
