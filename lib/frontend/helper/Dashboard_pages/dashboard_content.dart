@@ -53,6 +53,143 @@ class _DashboardContentState extends State<DashboardContent>
       throw error;
     }
   }
+void showOptionDialog() {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      String selectedOption = '';
+
+
+      return StatefulBuilder(
+        builder: (BuildContext context, StateSetter setState) {
+          return AlertDialog(
+            
+            title:Padding(
+              padding: EdgeInsets.only(top: 16.0), // Adjust the value as needed
+              child: Text(
+                'Withdraw Options',
+                style: TextStyle(fontSize: 20.0,fontWeight: FontWeight.normal),
+              ),
+            ),
+
+            titlePadding: EdgeInsets.fromLTRB(20.0, 16.0, 16.0, 0.0), // padding above title
+            contentPadding: EdgeInsets.fromLTRB(16.0, 20.0, 16.0, 8.0),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Divider(color: Colors.grey,),  // added grey line
+                buildOptionTile(
+                  selectedOption: selectedOption,
+                  optionImage: 'assets/cashicon.png',
+                  optionName: 'Cash',
+                  onTap: () {
+                    setState(() {
+                      selectedOption = 'Cash';
+                    });
+                  },
+                ),
+                buildOptionTile(
+                  selectedOption: selectedOption,
+                  optionImage: 'assets/easypaisa.png',
+                  optionName: 'Easy Paisa',
+                  onTap: () {
+                    setState(() {
+                      selectedOption = 'Easy Paisa';
+                    });
+                  },
+                ),
+                buildOptionTile(
+                  selectedOption: selectedOption,
+                  optionImage: 'assets/jazzcash.png',
+                  optionName: 'Jazz Cash',
+                  onTap: () {
+                    setState(() {
+                      selectedOption = 'Jazz Cash';
+                    });
+                  },
+                ),
+                buildOptionTile(
+                  selectedOption: selectedOption,
+                  optionImage: 'assets/banktransfer.png',
+                  optionName: 'Bank Transfer',
+                  onTap: () {
+                    setState(() {
+                      selectedOption = 'Bank Transfer';
+                    });
+                  },
+                ),
+              ],
+            ),
+            actions: <Widget>[
+              TextButton(
+                child: Text(
+                  'Cancel',
+                  style: TextStyle(
+                    color: Colors.red,
+                  ),
+                ),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  primary: selectedOption.isNotEmpty ? Colors.green : Colors.grey,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20.0),
+                  ),
+                ),
+                child: Text(
+                  'Submit',
+                  style: TextStyle(
+                    color: Colors.white,
+                  ),
+                ),
+                onPressed: () {
+                  if(selectedOption.isNotEmpty){
+                    print('Selected option: $selectedOption');
+                    Navigator.pop(context);
+                  }else{
+                    print('Please select an option');
+                  }
+                },
+              ),
+            ],
+          );
+        },
+      );
+    },
+  );
+}
+
+Widget buildOptionTile({
+  String selectedOption ="",
+  String optionImage="",
+  String optionName="",
+  VoidCallback? onTap,
+}) {
+  return ListTile(
+    leading: selectedOption == optionName
+        ? CircleAvatar(
+            backgroundColor: Colors.green,
+            radius: 10,
+          )
+        : Icon(Icons.circle, size: 20),
+    title: Row(
+      children: [
+        Image.asset(
+          optionImage,
+          width: 50,
+          height: 30,
+        ),
+        SizedBox(width: 20),
+        Text(optionName),
+      ],
+    ),
+    onTap: onTap,
+  );
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -182,12 +319,7 @@ class _DashboardContentState extends State<DashboardContent>
                                   child: InkWell(
                                     borderRadius: BorderRadius.circular(20),
                                     onTap: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => LoginPage(),
-                                        ),
-                                      );
+                                      showOptionDialog(); // Show the option dialog
                                     },
                                     child: Center(
                                       child: Text(
