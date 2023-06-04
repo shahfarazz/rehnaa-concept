@@ -5,13 +5,14 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
-import 'dashboard.dart';
+import 'Landlord/landlord_dashboard.dart';
 import 'login_page.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _SignUpPageState createState() => _SignUpPageState();
 }
 
@@ -60,6 +61,7 @@ class _SignUpPageState extends State<SignUpPage> {
         if (FirebaseAuth.instance.currentUser!.emailVerified) {
           timer.cancel();
           setState(() => isLoading = false);
+          // ignore: use_build_context_synchronously
           Navigator.push(
             context,
             MaterialPageRoute(
@@ -144,6 +146,7 @@ class _SignUpPageState extends State<SignUpPage> {
       await FirebaseAuth.instance.signInWithCredential(phoneAuthCredential);
       _showToast('Phone number successfully verified and user signed in.',
           Colors.green);
+      // ignore: use_build_context_synchronously
       Navigator.push(
         context,
         MaterialPageRoute(

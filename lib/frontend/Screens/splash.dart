@@ -1,13 +1,14 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:rehnaa/frontend/Screens/forget_password.dart';
 import 'login_page.dart'; // Import your login page
-import 'dashboard.dart'; // Import your main dashboard page
+import 'Landlord/landlord_dashboard.dart'; // Import your main dashboard page
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _SplashScreenState createState() => _SplashScreenState();
 }
 
@@ -27,12 +28,16 @@ class _SplashScreenState extends State<SplashScreen> {
 
     if (user != null) {
       // If the user is logged in, navigate to the main page.
+      // ignore: use_build_context_synchronously
       Navigator.of(context).pushReplacement(MaterialPageRoute(
         builder: (context) => DashboardPage(uid: user.uid),
       ));
     } else {
       // If the user is not logged in, navigate to the login page.
-      print('User is not logged in');
+      if (kDebugMode) {
+        print('User is not logged in');
+      }
+      // ignore: use_build_context_synchronously
       Navigator.of(context).pushReplacement(MaterialPageRoute(
         builder: (context) => LoginPage(),
       ));

@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 
 class ContractSamplePage extends StatelessWidget {
+  const ContractSamplePage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Contract'),
+        title: const Text('Contract'),
         flexibleSpace: Container(
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
@@ -23,14 +25,14 @@ class ContractSamplePage extends StatelessWidget {
       body: SingleChildScrollView(
         child: Container(
           width: MediaQuery.of(context).size.width,
-          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 30),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 30),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               GestureDetector(
                 onTap: () {
                   Navigator.push(context, MaterialPageRoute(builder: (_) {
-                    return ZoomImageScreen(
+                    return const ZoomImageScreen(
                       image: 'assets/mainlogo.png',
                     );
                   }));
@@ -38,7 +40,7 @@ class ContractSamplePage extends StatelessWidget {
                 child: Hero(
                   tag: 'zoom_image',
                   child: Container(
-                    margin: EdgeInsets.only(bottom: 30),
+                    margin: const EdgeInsets.only(bottom: 30),
                     child: Image.asset(
                       'assets/mainlogo.png',
                       width: MediaQuery.of(context).size.width,
@@ -48,21 +50,21 @@ class ContractSamplePage extends StatelessWidget {
                   ),
                 ),
               ),
-              ContractCard(label: 'Property:', data: '123 Main St'),
-              SizedBox(height:10),
-              ContractCard(label: 'Tenant Name:', data: 'John Doe'),
-              SizedBox(height:10),
-              ContractCard(label: 'Tenant CNIC:', data: '1234567890'),
-              SizedBox(height:10),
-              ContractCard(label: 'Contract Start Date:', data: '2023-06-01'),
-              SizedBox(height:10),
-              ContractCard(label: 'Contract End Date:', data: '2024-05-31'),
-              SizedBox(height:10),
-              ContractCard(label: 'Police Verified:', data: 'Yes'),
-              SizedBox(height:10),
-              ContractCard(label: 'Court Regulation:', data: 'ABC123'),
-              SizedBox(height:10),
-              ContractCard(label: 'Notary Republic Stamp:', data: 'XYZ456'),
+              const ContractCard(label: 'Property:', data: '123 Main St'),
+              const SizedBox(height:10),
+              const ContractCard(label: 'Tenant Name:', data: 'John Doe'),
+              const SizedBox(height:10),
+              const ContractCard(label: 'Tenant CNIC:', data: '1234567890'),
+              const SizedBox(height:10),
+              const ContractCard(label: 'Contract Start Date:', data: '2023-06-01'),
+              const SizedBox(height:10),
+              const ContractCard(label: 'Contract End Date:', data: '2024-05-31'),
+              const SizedBox(height:10),
+              const ContractCard(label: 'Police Verified:', data: 'Yes'),
+              const SizedBox(height:10),
+              const ContractCard(label: 'Court Regulation:', data: 'ABC123'),
+              const SizedBox(height:10),
+              const ContractCard(label: 'Notary Republic Stamp:', data: 'XYZ456'),
             ],
           ),
         ),
@@ -75,7 +77,7 @@ class ContractCard extends StatelessWidget {
   final String label;
   final String data;
 
-  ContractCard({required this.label, required this.data});
+  const ContractCard({super.key, required this.label, required this.data});
 
   @override
   Widget build(BuildContext context) {
@@ -89,26 +91,26 @@ class ContractCard extends StatelessWidget {
             color: Colors.grey.withOpacity(0.3),
             spreadRadius: 2,
             blurRadius: 4,
-            offset: Offset(0, 2),
+            offset: const Offset(0, 2),
           ),
         ],
       ),
       child: Padding(
-        padding: EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               label,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             Text(
               data,
-              style: TextStyle(fontSize: 16),
+              style: const TextStyle(fontSize: 16),
             ),
           ],
         ),
@@ -120,7 +122,7 @@ class ContractCard extends StatelessWidget {
 class ZoomImageScreen extends StatelessWidget {
   final String image;
 
-  ZoomImageScreen({required this.image});
+  const ZoomImageScreen({super.key, required this.image});
 
   @override
   Widget build(BuildContext context) {

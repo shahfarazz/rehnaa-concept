@@ -2,12 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:rehnaa/backend/models/tenantsmodel.dart';
 
-import 'landlord_tenants.dart';
-
 class LandlordTenantInfoPage extends StatelessWidget {
   final Tenant tenant;
 
-  LandlordTenantInfoPage({required this.tenant});
+  const LandlordTenantInfoPage({super.key, required this.tenant});
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +20,7 @@ class LandlordTenantInfoPage extends StatelessWidget {
               clipper: DiagonalClipper(),
               child: Container(
                 height: size.height * 0.5,
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
@@ -47,17 +45,17 @@ class LandlordTenantInfoPage extends StatelessWidget {
                     tenant.pathToImage ?? 'assets/defaulticon.png',
                   ),
                 ),
-                SizedBox(height: 20.0),
+                const SizedBox(height: 20.0),
                 // Display tenant's name
                 Text(
                   '${tenant.firstName} ${tenant.lastName}',
                   style: GoogleFonts.montserrat(
                     fontSize: 20.0,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xff33907c),
+                    color: const Color(0xff33907c),
                   ),
                 ),
-                SizedBox(height: 10.0),
+                const SizedBox(height: 10.0),
                 // Display tenant's description
                 Center(
                   child: Text(
@@ -65,16 +63,16 @@ class LandlordTenantInfoPage extends StatelessWidget {
                     textAlign: TextAlign.center,
                     style: GoogleFonts.montserrat(
                       fontSize: 16.0,
-                      color: Color(0xff33907c),
+                      color: const Color(0xff33907c),
                     ),
                   ),
                 ),
-                SizedBox(height: 20.0),
+                const SizedBox(height: 20.0),
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
                   child: Column(
                     children: [
-                      SizedBox(height: 10.0),
+                      const SizedBox(height: 10.0),
                       Center(
                         child: FractionallySizedBox(
                           widthFactor: 0.8,
@@ -85,7 +83,7 @@ class LandlordTenantInfoPage extends StatelessWidget {
                           ),
                         ),
                       ),
-                      SizedBox(height: 10.0),
+                      const SizedBox(height: 10.0),
                       Center(
                         child: FractionallySizedBox(
                           widthFactor: 0.8,
@@ -95,7 +93,7 @@ class LandlordTenantInfoPage extends StatelessWidget {
                           ),
                         ),
                       ),
-                      SizedBox(height: 10.0),
+                      const SizedBox(height: 10.0),
                       Center(
                         child: FractionallySizedBox(
                           widthFactor: 0.8,
@@ -105,7 +103,7 @@ class LandlordTenantInfoPage extends StatelessWidget {
                           ),
                         ),
                       ),
-                      SizedBox(height: 10.0),
+                      const SizedBox(height: 10.0),
                       Center(
                         child: FractionallySizedBox(
                           widthFactor: 0.8,
@@ -115,7 +113,7 @@ class LandlordTenantInfoPage extends StatelessWidget {
                           ),
                         ),
                       ),
-                      SizedBox(height: 10.0),
+                      const SizedBox(height: 10.0),
                       Center(
                         child: FractionallySizedBox(
                           widthFactor: 0.8,
@@ -127,7 +125,7 @@ class LandlordTenantInfoPage extends StatelessWidget {
                           ),
                         ),
                       ),
-                      SizedBox(height: 10.0),
+                      const SizedBox(height: 10.0),
                       Center(
                         child: FractionallySizedBox(
                           widthFactor: 0.8,
@@ -137,7 +135,7 @@ class LandlordTenantInfoPage extends StatelessWidget {
                           ),
                         ),
                       ),
-                      SizedBox(height: 10.0),
+                      const SizedBox(height: 10.0),
                     ],
                   ),
                 ),
@@ -155,7 +153,7 @@ class WhiteBox extends StatelessWidget {
   final String value;
   final String? points;
 
-  WhiteBox({required this.label, required this.value, this.points});
+  const WhiteBox({super.key, required this.label, required this.value, this.points});
 
   @override
   Widget build(BuildContext context) {
@@ -167,7 +165,7 @@ class WhiteBox extends StatelessWidget {
           borderRadius: BorderRadius.circular(20.0),
         ),
         child: Padding(
-          padding: EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -193,16 +191,16 @@ class WhiteBox extends StatelessWidget {
                     ),
                 ],
               ),
-              SizedBox(height: 10.0),
+              const SizedBox(height: 10.0),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    '$value',
+                    value,
                     style: GoogleFonts.montserrat(
                       fontSize: 14.0,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xff33907c),
+                      color: const Color(0xff33907c),
                     ),
                   ),
                   Text(
@@ -210,7 +208,7 @@ class WhiteBox extends StatelessWidget {
                     style: GoogleFonts.montserrat(
                       fontSize: 14.0,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xff33907c),
+                      color: const Color(0xff33907c),
                     ),
                   ),
                 ],

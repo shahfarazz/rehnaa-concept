@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'propertymodel.dart';
 import 'rentpaymentmodel.dart';
 import 'tenantsmodel.dart';
@@ -58,11 +59,15 @@ class Landlord {
   }
 
   Future<void> fetchData() async {
-    print('Fetching landlord data...');
+    if (kDebugMode) {
+      print('Fetching landlord data...');
+    }
     await getProperty();
     await fetchTenant();
     await fetchRentPayment();
-    print('Landlord data fetched successfully.');
+    if (kDebugMode) {
+      print('Landlord data fetched successfully.');
+    }
   }
 
   Future<void> fetchTenant() async {

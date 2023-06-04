@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -10,7 +11,7 @@ class LoginPage extends StatelessWidget {
   final TextEditingController _emailOrPhoneController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-  LoginPage({Key? key});
+  LoginPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -121,8 +122,12 @@ class LoginPage extends StatelessWidget {
                           if (authService.isPhoneNumber(emailOrPhone)) {
                             // Modify the phone number format
                             emailOrPhone = '+92${emailOrPhone.substring(1)}';
-                            print('email or phone is:');
-                            print(emailOrPhone);
+                            if (kDebugMode) {
+                              print('email or phone is:');
+                            }
+                            if (kDebugMode) {
+                              print(emailOrPhone);
+                            }
 
                             // Call the sign-in function using the modified phone number
                             authService.signInWithPhoneNumber(

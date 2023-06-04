@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:rehnaa/backend/models/rentpaymentmodel.dart';
@@ -12,6 +13,7 @@ class LandlordRentHistoryPage extends StatefulWidget {
       : super(key: key);
 
   @override
+  // ignore: library_private_types_in_public_api
   _LandlordRentHistoryPageState createState() =>
       _LandlordRentHistoryPageState();
 }
@@ -58,9 +60,13 @@ class _LandlordRentHistoryPageState extends State<LandlordRentHistoryPage>
         }
       }
 
-      print('Rent payments: $_rentPayments');
+      if (kDebugMode) {
+        print('Rent payments: $_rentPayments');
+      }
     } catch (e) {
-      print('Error fetching rent payments: $e');
+      if (kDebugMode) {
+        print('Error fetching rent payments: $e');
+      }
     }
 
     setState(() {
@@ -70,7 +76,7 @@ class _LandlordRentHistoryPageState extends State<LandlordRentHistoryPage>
   }
 
   final PageController _pageController = PageController(initialPage: 0);
-  int _pageSize = 2; // Number of rent payments to show per page
+  final int _pageSize = 2; // Number of rent payments to show per page
   String? latestMonth;
   String? previousMonth;
 
@@ -131,11 +137,11 @@ class _LandlordRentHistoryPageState extends State<LandlordRentHistoryPage>
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          '${firstName} ${lastName}',
+                          '$firstName $lastName',
                           style: GoogleFonts.montserrat(
                             fontSize: size.width * 0.04,
                             fontWeight: FontWeight.bold,
-                            color: Color(0xff33907c),
+                            color: const Color(0xff33907c),
                           ),
                         ),
                         SizedBox(height: size.height * 0.01),
@@ -143,7 +149,7 @@ class _LandlordRentHistoryPageState extends State<LandlordRentHistoryPage>
                           rentPayment.property!.location,
                           style: GoogleFonts.montserrat(
                             fontSize: size.width * 0.03,
-                            color: Color(0xff33907c),
+                            color: const Color(0xff33907c),
                           ),
                         ),
                       ],
@@ -161,7 +167,7 @@ class _LandlordRentHistoryPageState extends State<LandlordRentHistoryPage>
                             '${rentPayment.date.day}/${rentPayment.date.month}/${rentPayment.date.year}',
                             style: GoogleFonts.montserrat(
                               fontSize: size.width * 0.03,
-                              color: Color(0xff33907c),
+                              color: const Color(0xff33907c),
                             ),
                           ),
                         ],
@@ -179,7 +185,7 @@ class _LandlordRentHistoryPageState extends State<LandlordRentHistoryPage>
                             style: GoogleFonts.montserrat(
                               fontSize: size.width * 0.04,
                               fontWeight: FontWeight.bold,
-                              color: Color(0xff33907c),
+                              color: const Color(0xff33907c),
                             ),
                           ),
                           Text(
@@ -187,7 +193,7 @@ class _LandlordRentHistoryPageState extends State<LandlordRentHistoryPage>
                             style: GoogleFonts.montserrat(
                               fontSize: size.width * 0.035,
                               fontWeight: FontWeight.bold,
-                              color: Color(0xff33907c),
+                              color: const Color(0xff33907c),
                             ),
                           ),
                         ],
@@ -298,7 +304,7 @@ class _LandlordRentHistoryPageState extends State<LandlordRentHistoryPage>
           SmoothPageIndicator(
             controller: _pageController,
             count: pageCount,
-            effect: WormEffect(
+            effect: const WormEffect(
               dotColor: Colors.grey,
               activeDotColor: Color(0xff33907c),
               dotHeight: 10.0,

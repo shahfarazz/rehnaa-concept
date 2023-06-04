@@ -1,12 +1,14 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'login_page.dart';
 import 'package:rehnaa/backend/services/authentication_service.dart';
 
 class ForgetPasswordPage extends StatefulWidget {
-  const ForgetPasswordPage({Key? key});
+  const ForgetPasswordPage({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _ForgetPasswordPageState createState() => _ForgetPasswordPageState();
 }
 
@@ -20,7 +22,7 @@ class _ForgetPasswordPageState extends State<ForgetPasswordPage> {
       String phoneNumber, BuildContext context) async {
     // Strip the initial "0" if present and prepend "+92" to the start of the phoneNumber.
     if (phoneNumber.startsWith("0")) {
-      phoneNumber = "+92" + phoneNumber.substring(1);
+      phoneNumber = "+92${phoneNumber.substring(1)}";
     }
 
     // Call your existing signInWithPhoneNumber function with the adjusted phone number.
@@ -36,6 +38,7 @@ class _ForgetPasswordPageState extends State<ForgetPasswordPage> {
         'Email successfully sent to $emailOrPhone',
         Colors.green,
       );
+      // ignore: use_build_context_synchronously
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => LoginPage()),
@@ -65,7 +68,7 @@ class _ForgetPasswordPageState extends State<ForgetPasswordPage> {
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16.0),
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -81,7 +84,7 @@ class _ForgetPasswordPageState extends State<ForgetPasswordPage> {
                   style: TextStyle(
                     fontFamily: 'Montserrat',
                     fontSize: screenWidth * 0.06,
-                    color: Color(0xFF33907C),
+                    color: const Color(0xFF33907C),
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -126,18 +129,18 @@ class _ForgetPasswordPageState extends State<ForgetPasswordPage> {
       decoration: BoxDecoration(
         color: Colors.transparent,
         border: Border.all(
-          color: Color(0xFF33907C),
+          color: const Color(0xFF33907C),
         ),
         borderRadius: BorderRadius.circular(24),
       ),
       child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 16),
         child: TextField(
           controller: _emailOrPhoneController,
-          style: TextStyle(
+          style: const TextStyle(
             color: Colors.black,
           ),
-          decoration: InputDecoration(
+          decoration: const InputDecoration(
             border: InputBorder.none,
             hintText: 'Email/Phone Number',
             hintStyle: TextStyle(
@@ -202,10 +205,12 @@ class _ForgetPasswordPageState extends State<ForgetPasswordPage> {
       child: InkWell(
         borderRadius: BorderRadius.circular(24),
         onTap: () {
-          print('Next button pressed');
+          if (kDebugMode) {
+            print('Next button pressed');
+          }
           handleForgetPassword(_emailOrPhoneController.text);
         },
-        child: Center(
+        child: const Center(
           child: Text(
             "Next",
             style: TextStyle(

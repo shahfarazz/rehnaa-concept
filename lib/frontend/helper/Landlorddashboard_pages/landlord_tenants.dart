@@ -12,19 +12,20 @@ import 'landlordtenantinfo.dart';
 class LandlordTenantsPage extends StatefulWidget {
   final String uid; // UID of the landlord
 
-  const LandlordTenantsPage({required this.uid});
+  const LandlordTenantsPage({super.key, required this.uid});
 
   @override
+  // ignore: library_private_types_in_public_api
   _LandlordTenantsPageState createState() => _LandlordTenantsPageState();
 }
 
 class _LandlordTenantsPageState extends State<LandlordTenantsPage>
     with AutomaticKeepAliveClientMixin<LandlordTenantsPage> {
-  PageController _pageController = PageController(initialPage: 0);
+  final PageController _pageController = PageController(initialPage: 0);
   List<Tenant> _tenants = [];
-  int _currentPage = 0;
-  int _pageSize = 4; // Number of tenants to show per page
-  Completer<void> _loadTenantsCompleter =
+  // int _currentPage = 0;
+  final int _pageSize = 4; // Number of tenants to show per page
+  final Completer<void> _loadTenantsCompleter =
       Completer<void>(); // Completer for canceling the Future.delayed() call
 
   @override
@@ -90,16 +91,16 @@ class _LandlordTenantsPageState extends State<LandlordTenantsPage>
     }
   }
 
-  // Navigate to a specific page
-  void _goToPage(int page) {
-    if (mounted) {
-      _pageController.animateToPage(
-        page,
-        duration: const Duration(milliseconds: 500),
-        curve: Curves.easeInOut,
-      );
-    }
-  }
+  // // Navigate to a specific page
+  // void _goToPage(int page) {
+  //   if (mounted) {
+  //     _pageController.animateToPage(
+  //       page,
+  //       duration: const Duration(milliseconds: 500),
+  //       curve: Curves.easeInOut,
+  //     );
+  //   }
+  // }
 
   // Build a card widget for a tenant
   Widget _buildTenantCard(Tenant tenant) {
@@ -123,7 +124,7 @@ class _LandlordTenantsPageState extends State<LandlordTenantsPage>
             borderRadius: BorderRadius.circular(20.0),
             color: Colors.white,
           ),
-          padding: EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
@@ -142,12 +143,12 @@ class _LandlordTenantsPageState extends State<LandlordTenantsPage>
                     style: GoogleFonts.montserrat(
                       fontSize: 14.0,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xff33907c),
+                      color: const Color(0xff33907c),
                     ),
                   ),
                 ],
               ),
-              SizedBox(height: 10.0),
+              const SizedBox(height: 10.0),
               Row(
                 children: [
                   Text(
@@ -163,12 +164,12 @@ class _LandlordTenantsPageState extends State<LandlordTenantsPage>
                     style: GoogleFonts.montserrat(
                       fontSize: 14.0,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xff33907c),
+                      color: const Color(0xff33907c),
                     ),
                   ),
                 ],
               ),
-              SizedBox(height: 10.0),
+              const SizedBox(height: 10.0),
               Row(
                 children: [
                   Text(
@@ -184,7 +185,7 @@ class _LandlordTenantsPageState extends State<LandlordTenantsPage>
                     style: GoogleFonts.montserrat(
                       fontSize: 14.0,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xff33907c),
+                      color: const Color(0xff33907c),
                     ),
                   ),
                 ],
@@ -216,14 +217,14 @@ class _LandlordTenantsPageState extends State<LandlordTenantsPage>
         children: [
           SizedBox(height: size.height * 0.03),
           Container(
-            padding: EdgeInsets.symmetric(vertical: 16.0),
+            padding: const EdgeInsets.symmetric(vertical: 16.0),
             alignment: Alignment.center,
             child: Text(
               'Tenants',
               style: GoogleFonts.montserrat(
                 fontSize: 20.0,
                 fontWeight: FontWeight.bold,
-                color: Color(0xff33907c),
+                color: const Color(0xff33907c),
               ),
             ),
           ),
@@ -242,7 +243,7 @@ class _LandlordTenantsPageState extends State<LandlordTenantsPage>
           SmoothPageIndicator(
             controller: _pageController,
             count: max(1, pageCount.isFinite ? pageCount.toInt() : 0),
-            effect: WormEffect(
+            effect: const WormEffect(
               dotColor: Colors.grey,
               activeDotColor: Color(0xff33907c),
               dotHeight: 10.0,

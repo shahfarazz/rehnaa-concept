@@ -1,15 +1,17 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../backend/models/propertymodel.dart';
-import 'Dashboard_pages/landlord_propertyinfo.dart';
+import 'Landlorddashboard_pages/landlord_propertyinfo.dart';
 
 class LandlordPropertiesPage extends StatefulWidget {
   final String uid; // UID of the landlord
 
-  LandlordPropertiesPage({Key? key, required this.uid}) : super(key: key);
+  const LandlordPropertiesPage({Key? key, required this.uid}) : super(key: key);
 
   @override
+  // ignore: library_private_types_in_public_api
   _LandlordPropertiesPageState createState() => _LandlordPropertiesPageState();
 }
 
@@ -54,7 +56,9 @@ class _LandlordPropertiesPageState extends State<LandlordPropertiesPage>
       }
     } catch (e) {
       // Handle any error that occurred while fetching the properties
-      print('Error fetching properties: $e');
+      if (kDebugMode) {
+        print('Error fetching properties: $e');
+      }
       properties = [];
     }
   }
@@ -85,7 +89,7 @@ class _LandlordPropertiesPageState extends State<LandlordPropertiesPage>
     super.build(context); // Necessary for AutomaticKeepAliveClientMixin
 
     return Scaffold(
-      backgroundColor: Color.fromARGB(255, 255, 255, 255),
+      backgroundColor: const Color.fromARGB(255, 255, 255, 255),
       body: ListView.builder(
         itemCount: properties.length,
         itemBuilder: (context, index) {
@@ -120,10 +124,11 @@ class PropertyCard extends StatelessWidget {
   final Property property;
   final String firstName;
   final String lastName;
-  final String pathToImage;
+  final String? pathToImage;
   final VoidCallback onTap;
 
   const PropertyCard({
+    super.key,
     required this.property,
     required this.firstName,
     required this.lastName,
@@ -140,7 +145,7 @@ class PropertyCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Card(
-        child: Container(
+        child: SizedBox(
           width: screenWidth *
               0.4, // Adjust the width as a fraction of the screen width
           height: screenHeight *
@@ -148,7 +153,7 @@ class PropertyCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
+              SizedBox(
                 height: screenHeight *
                     0.2, // Adjust the height as a fraction of the card height
                 width: double.infinity,
@@ -168,7 +173,7 @@ class PropertyCard extends StatelessWidget {
                       style: GoogleFonts.montserrat(
                         fontSize: screenWidth * 0.04,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF33907C),
+                        color: const Color(0xFF33907C),
                       ),
                     ),
                     SizedBox(height: screenHeight * 0.01),
@@ -201,7 +206,7 @@ class PropertyCard extends StatelessWidget {
                         ),
                         SizedBox(width: screenWidth * 0.01),
                         Text(
-                          '${firstName} ${lastName}',
+                          '$firstName $lastName',
                           style: TextStyle(fontSize: screenWidth * 0.035),
                         ),
                       ],

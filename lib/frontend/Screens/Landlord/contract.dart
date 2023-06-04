@@ -2,45 +2,51 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       home: ContractPage(),
     );
   }
 }
 
 class ContractPage extends StatelessWidget {
+  const ContractPage({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return const Scaffold(
       body: MyScreen(),
     );
   }
 }
 
 class MyScreen extends StatelessWidget {
+  const MyScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        SizedBox(height: 30),
+        const SizedBox(height: 30),
         Stack(
           alignment: Alignment.topLeft,
           children: [
             GestureDetector(
               onTap: () {
                 Navigator.push(context, MaterialPageRoute(builder: (_) {
-                  return ZoomedScreen();
+                  return const ZoomedScreen();
                 }));
               },
               child: Hero(
                 tag: 'imageTag',
-                child: Container(
+                child: SizedBox(
                   height: MediaQuery.of(context).size.height * 0.3,
                   child: Image.asset(
                     'assets/image1.jpg',
@@ -49,53 +55,51 @@ class MyScreen extends StatelessWidget {
                 ),
               ),
             ),
-          Stack(
-  children: [
-    SafeArea(
-      child: Container(
-        alignment: Alignment.topLeft,
-        padding: EdgeInsets.all(16.0),
-        // child: Text('Your Content'),
-      ),
-    ),
-    Positioned(
-      top: 10.0,
-      left: 10.0,
-      child: GestureDetector(
-        onTap: () {
-          Navigator.pop(context);
-        },
-        child: Container(
-          width: 40,
-          height: 40,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: Color(0xFF33907C),
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Color(0xff0FA697),
-                Color(0xff45BF7A),
-                Color(0xff0DF205),
+            Stack(
+              children: [
+                SafeArea(
+                  child: Container(
+                    alignment: Alignment.topLeft,
+                    padding: const EdgeInsets.all(16.0),
+                    // child: Text('Your Content'),
+                  ),
+                ),
+                Positioned(
+                  top: 10.0,
+                  left: 10.0,
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
+                    child: Container(
+                      width: 40,
+                      height: 40,
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Color(0xFF33907C),
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            Color(0xff0FA697),
+                            Color(0xff45BF7A),
+                            Color(0xff0DF205),
+                          ],
+                        ),
+                      ),
+                      child: const Icon(
+                        Icons.arrow_back,
+                        size: 20,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
               ],
             ),
-          ),
-          child: Icon(
-            Icons.arrow_back,
-            size: 20,
-            color: Colors.white,
-          ),
-        ),
-      ),
-    ),
-  ],
-),
-
-
           ],
         ),
-        SizedBox(height: 20),
+        const SizedBox(height: 20),
         Expanded(
           child: SingleChildScrollView(
             child: Center(
@@ -115,43 +119,45 @@ class MyScreen extends StatelessWidget {
                           "Contracts",
                           style: GoogleFonts.montserrat(
                             fontSize: 24,
-                            color: Color(0xff33907c),
+                            color: const Color(0xff33907c),
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        SizedBox(height: 24),
-                        ContractCard(label: 'Property:', data: '123 Main St'),
-                        SizedBox(height: 16),
-                        ContractCard(label: 'Tenant Name:', data: 'John Doe'),
-                        SizedBox(height: 16),
-                        ContractCard(
+                        const SizedBox(height: 24),
+                        const ContractCard(
+                            label: 'Property:', data: '123 Main St'),
+                        const SizedBox(height: 16),
+                        const ContractCard(
+                            label: 'Tenant Name:', data: 'John Doe'),
+                        const SizedBox(height: 16),
+                        const ContractCard(
                           label: 'Tenant CNIC:',
                           data: '1234567890',
                         ),
-                        SizedBox(height: 16),
-                        ContractCard(
+                        const SizedBox(height: 16),
+                        const ContractCard(
                           label: 'Contract Start Date:',
                           data: '2023-06-01',
                         ),
-                        SizedBox(height: 16),
-                        ContractCard(
+                        const SizedBox(height: 16),
+                        const ContractCard(
                           label: 'Contract End Date:',
                           data: '2024-05-31',
                         ),
-                        SizedBox(height: 16),
-                        ContractCard(
+                        const SizedBox(height: 16),
+                        const ContractCard(
                             label: 'Police Verified:', data: 'Yes'),
-                        SizedBox(height: 16),
-                        ContractCard(
+                        const SizedBox(height: 16),
+                        const ContractCard(
                           label: 'Court Regulation:',
                           data: 'ABC123',
                         ),
-                        SizedBox(height: 16),
-                        ContractCard(
+                        const SizedBox(height: 16),
+                        const ContractCard(
                           label: 'Notary Republic Stamp:',
                           data: 'XYZ456',
                         ),
-                        SizedBox(height: 24),
+                        const SizedBox(height: 24),
                       ],
                     ),
                   ),
@@ -169,7 +175,7 @@ class ContractCard extends StatelessWidget {
   final String label;
   final String data;
 
-  ContractCard({required this.label, required this.data});
+  const ContractCard({super.key, required this.label, required this.data});
 
   @override
   Widget build(BuildContext context) {
@@ -179,24 +185,24 @@ class ContractCard extends StatelessWidget {
       ),
       elevation: 5, // shadow
       child: Padding(
-        padding: EdgeInsets.all(10),
+        padding: const EdgeInsets.all(10),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             ListTile(
-              leading:
-                  Icon(Icons.description), // an icon next to the contract label
+              leading: const Icon(
+                  Icons.description), // an icon next to the contract label
               title: Text(
                 label,
                 style: GoogleFonts.montserrat(
                   fontWeight: FontWeight.bold, // bold contract label
                   fontSize: 18,
-                  color: Color(0xff33907c),
+                  color: const Color(0xff33907c),
                 ),
               ),
             ),
             Padding(
-              padding: EdgeInsets.only(left: 15),
+              padding: const EdgeInsets.only(left: 15),
               child: Text(
                 data,
                 style: GoogleFonts.montserrat(
@@ -211,8 +217,12 @@ class ContractCard extends StatelessWidget {
     );
   }
 }
+
 class ZoomedScreen extends StatefulWidget {
+  const ZoomedScreen({super.key});
+
   @override
+  // ignore: library_private_types_in_public_api
   _ZoomedScreenState createState() => _ZoomedScreenState();
 }
 
@@ -263,7 +273,7 @@ class _ZoomedScreenState extends State<ZoomedScreen> {
               SafeArea(
                 child: Container(
                   alignment: Alignment.topLeft,
-                  padding: EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.all(16.0),
                   // child: Text('Your Content'),
                 ),
               ),
@@ -277,7 +287,7 @@ class _ZoomedScreenState extends State<ZoomedScreen> {
                   child: Container(
                     width: 40,
                     height: 40,
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       shape: BoxShape.circle,
                       color: Color(0xFF33907C),
                       gradient: LinearGradient(
@@ -294,7 +304,7 @@ class _ZoomedScreenState extends State<ZoomedScreen> {
                       onPressed: () {
                         Navigator.pop(context);
                       },
-                      icon: Icon(
+                      icon: const Icon(
                         Icons.arrow_back,
                         size: 20,
                       ),

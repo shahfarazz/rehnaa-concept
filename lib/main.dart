@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
-import 'package:rehnaa/frontend/Screens/login_page.dart';
 import 'backend/services/authentication_service.dart';
 import 'frontend/Screens/splash.dart';
 
@@ -9,7 +8,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   runApp(
-    MyApp(),
+    const MyApp(),
   );
 }
 
@@ -28,7 +27,6 @@ class MyApp extends StatelessWidget {
         ),
         home: const SplashScreen(),
         // home:  LoginPage(),
-
       ),
     );
   }

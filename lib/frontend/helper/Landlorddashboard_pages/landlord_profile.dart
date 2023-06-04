@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-
-import 'landlord_tenants.dart';
-import 'package:flutter/material.dart';
 
 class LandlordProfilePage extends StatelessWidget {
+  const LandlordProfilePage({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return const Scaffold(
       body: SingleChildScrollView(
         padding: EdgeInsets.all(16),
         child: Column(
@@ -62,7 +60,7 @@ class ProfileInfoItem extends StatelessWidget {
   final String title;
   final String subtitle;
 
-  ProfileInfoItem({
+  const ProfileInfoItem({super.key, 
     required this.icon,
     required this.title,
     required this.subtitle,

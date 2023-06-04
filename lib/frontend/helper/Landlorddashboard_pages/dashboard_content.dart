@@ -1,11 +1,11 @@
 import 'dart:ui';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:rehnaa/backend/models/landlordmodel.dart';
-import 'package:rehnaa/frontend/Screens/login_page.dart';
 
 class DashboardContent extends StatefulWidget {
   final String uid; // UID of the landlord
@@ -13,6 +13,7 @@ class DashboardContent extends StatefulWidget {
   const DashboardContent({Key? key, required this.uid}) : super(key: key);
 
   @override
+  // ignore: library_private_types_in_public_api
   _DashboardContentState createState() => _DashboardContentState();
 }
 
@@ -37,173 +38,191 @@ class _DashboardContentState extends State<DashboardContent>
           .collection('Landlords')
           .doc(uid)
           .get();
-      print('Fetched snapshot: $snapshot');
+      if (kDebugMode) {
+        print('Fetched snapshot: $snapshot');
+      }
 
       // Convert the snapshot to JSON
       Map<String, dynamic> json = snapshot.data() as Map<String, dynamic>;
-      print('Landlord JSON: $json');
+      if (kDebugMode) {
+        print('Landlord JSON: $json');
+      }
 
       // Use the Landlord.fromJson method to create a Landlord instance
       Landlord landlord = await Landlord.fromJson(json);
-      print('Created landlord: $landlord');
+      if (kDebugMode) {
+        print('Created landlord: $landlord');
+      }
 
       return landlord;
     } catch (error) {
-      print('Error fetching landlord: $error');
-      throw error;
+      if (kDebugMode) {
+        print('Error fetching landlord: $error');
+      }
+      rethrow;
     }
   }
-void showOptionDialog() {
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      String selectedOption = '';
 
+  void showOptionDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        String selectedOption = '';
 
-      return StatefulBuilder(
-        builder: (BuildContext context, StateSetter setState) {
-          return AlertDialog(
-            
-            title:Padding(
-              padding: EdgeInsets.only(top: 16.0), // Adjust the value as needed
-              child: Text(
-                'Withdraw Options',
-                style: TextStyle(fontSize: 20.0,fontWeight: FontWeight.normal),
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return AlertDialog(
+              title: const Padding(
+                padding:
+                    EdgeInsets.only(top: 16.0), // Adjust the value as needed
+                child: Text(
+                  'Withdraw Options',
+                  style:
+                      TextStyle(fontSize: 20.0, fontWeight: FontWeight.normal),
+                ),
               ),
-            ),
 
-            titlePadding: EdgeInsets.fromLTRB(20.0, 16.0, 16.0, 0.0), // padding above title
-            contentPadding: EdgeInsets.fromLTRB(16.0, 20.0, 16.0, 8.0),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                Divider(color: Colors.grey,),  // added grey line
-                buildOptionTile(
-                  selectedOption: selectedOption,
-                  optionImage: 'assets/cashicon.png',
-                  optionName: 'Cash',
-                  onTap: () {
-                    setState(() {
-                      selectedOption = 'Cash';
-                    });
+              titlePadding: const EdgeInsets.fromLTRB(
+                  20.0, 16.0, 16.0, 0.0), // padding above title
+              contentPadding: const EdgeInsets.fromLTRB(16.0, 20.0, 16.0, 8.0),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  const Divider(
+                    color: Colors.grey,
+                  ), // added grey line
+                  buildOptionTile(
+                    selectedOption: selectedOption,
+                    optionImage: 'assets/cashicon.png',
+                    optionName: 'Cash',
+                    onTap: () {
+                      setState(() {
+                        selectedOption = 'Cash';
+                      });
+                    },
+                  ),
+                  buildOptionTile(
+                    selectedOption: selectedOption,
+                    optionImage: 'assets/easypaisa.png',
+                    optionName: 'Easy Paisa',
+                    onTap: () {
+                      setState(() {
+                        selectedOption = 'Easy Paisa';
+                      });
+                    },
+                  ),
+                  buildOptionTile(
+                    selectedOption: selectedOption,
+                    optionImage: 'assets/jazzcash.png',
+                    optionName: 'Jazz Cash',
+                    onTap: () {
+                      setState(() {
+                        selectedOption = 'Jazz Cash';
+                      });
+                    },
+                  ),
+                  buildOptionTile(
+                    selectedOption: selectedOption,
+                    optionImage: 'assets/banktransfer.png',
+                    optionName: 'Bank Transfer',
+                    onTap: () {
+                      setState(() {
+                        selectedOption = 'Bank Transfer';
+                      });
+                    },
+                  ),
+                ],
+              ),
+              actions: <Widget>[
+                TextButton(
+                  child: const Text(
+                    'Cancel',
+                    style: TextStyle(
+                      color: Colors.red,
+                    ),
+                  ),
+                  onPressed: () {
+                    Navigator.pop(context);
                   },
                 ),
-                buildOptionTile(
-                  selectedOption: selectedOption,
-                  optionImage: 'assets/easypaisa.png',
-                  optionName: 'Easy Paisa',
-                  onTap: () {
-                    setState(() {
-                      selectedOption = 'Easy Paisa';
-                    });
-                  },
-                ),
-                buildOptionTile(
-                  selectedOption: selectedOption,
-                  optionImage: 'assets/jazzcash.png',
-                  optionName: 'Jazz Cash',
-                  onTap: () {
-                    setState(() {
-                      selectedOption = 'Jazz Cash';
-                    });
-                  },
-                ),
-                buildOptionTile(
-                  selectedOption: selectedOption,
-                  optionImage: 'assets/banktransfer.png',
-                  optionName: 'Bank Transfer',
-                  onTap: () {
-                    setState(() {
-                      selectedOption = 'Bank Transfer';
-                    });
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor:
+                        selectedOption.isNotEmpty ? Colors.green : Colors.grey,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20.0),
+                    ),
+                  ),
+                  child: const Text(
+                    'Submit',
+                    style: TextStyle(
+                      color: Colors.white,
+                    ),
+                  ),
+                  onPressed: () {
+                    if (selectedOption.isNotEmpty) {
+                      if (kDebugMode) {
+                        print('Selected option: $selectedOption');
+                      }
+                      Navigator.pop(context);
+                    } else {
+                      if (kDebugMode) {
+                        print('Please select an option');
+                      }
+                    }
                   },
                 ),
               ],
-            ),
-            actions: <Widget>[
-              TextButton(
-                child: Text(
-                  'Cancel',
-                  style: TextStyle(
-                    color: Colors.red,
-                  ),
-                ),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              ),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  primary: selectedOption.isNotEmpty ? Colors.green : Colors.grey,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20.0),
-                  ),
-                ),
-                child: Text(
-                  'Submit',
-                  style: TextStyle(
-                    color: Colors.white,
-                  ),
-                ),
-                onPressed: () {
-                  if(selectedOption.isNotEmpty){
-                    print('Selected option: $selectedOption');
-                    Navigator.pop(context);
-                  }else{
-                    print('Please select an option');
-                  }
-                },
-              ),
-            ],
-          );
-        },
-      );
-    },
-  );
-}
+            );
+          },
+        );
+      },
+    );
+  }
 
-Widget buildOptionTile({
-  String selectedOption ="",
-  String optionImage="",
-  String optionName="",
-  VoidCallback? onTap,
-}) {
-  return ListTile(
-    leading: selectedOption == optionName
-        ? CircleAvatar(
-            backgroundColor: Colors.green,
-            radius: 10,
-          )
-        : Icon(Icons.circle, size: 20),
-    title: Row(
-      children: [
-        Image.asset(
-          optionImage,
-          width: 50,
-          height: 30,
-        ),
-        SizedBox(width: 20),
-        Text(optionName),
-      ],
-    ),
-    onTap: onTap,
-  );
-}
-
+  Widget buildOptionTile({
+    String selectedOption = "",
+    String optionImage = "",
+    String optionName = "",
+    VoidCallback? onTap,
+  }) {
+    return ListTile(
+      leading: selectedOption == optionName
+          ? const CircleAvatar(
+              backgroundColor: Colors.green,
+              radius: 10,
+            )
+          : const Icon(Icons.circle, size: 20),
+      title: Row(
+        children: [
+          Image.asset(
+            optionImage,
+            width: 50,
+            height: 30,
+          ),
+          const SizedBox(width: 20),
+          Text(optionName),
+        ],
+      ),
+      onTap: onTap,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     super.build(context); // Ensure the state is kept alive
     final Size size = MediaQuery.of(context).size;
 
-    print('UID: ${widget.uid}');
+    if (kDebugMode) {
+      print('UID: ${widget.uid}');
+    }
 
     return FutureBuilder<Landlord>(
       future: _landlordFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           // Show a loading indicator while waiting for the data
-          return Center(
+          return const Center(
             child: CircularProgressIndicator(
               valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
             ),
@@ -264,7 +283,8 @@ Widget buildOptionTile({
                         color: Colors.grey.withOpacity(0.4),
                         spreadRadius: 2,
                         blurRadius: 8,
-                        offset: Offset(0, 4), // changes position of shadow
+                        offset:
+                            const Offset(0, 4), // changes position of shadow
                       ),
                     ],
                   ),

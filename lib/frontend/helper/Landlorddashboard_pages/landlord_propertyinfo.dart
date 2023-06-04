@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+// ignore: depend_on_referenced_packages
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -11,12 +12,14 @@ class PropertyPage extends StatefulWidget {
   final String pathToImage;
 
   const PropertyPage(
-      {required this.property,
+      {super.key,
+      required this.property,
       required this.firstName,
       required this.lastName,
       required this.pathToImage});
 
   @override
+  // ignore: library_private_types_in_public_api
   _PropertyPageState createState() => _PropertyPageState();
 }
 
@@ -26,7 +29,7 @@ class _PropertyPageState extends State<PropertyPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Color.fromARGB(255, 255, 255, 255),
+        backgroundColor: const Color.fromARGB(255, 255, 255, 255),
         body: Stack(
           children: [
             Column(
@@ -65,6 +68,7 @@ class PropertyCarousel extends StatelessWidget {
   final List<String> imagePaths;
 
   const PropertyCarousel({
+    super.key,
     required this.currentIndex,
     required this.onPageChanged,
     required this.imagePaths,
@@ -114,17 +118,18 @@ class PropertyCarousel extends StatelessWidget {
         Align(
           alignment: Alignment.bottomCenter,
           child: Container(
-            padding: EdgeInsets.symmetric(horizontal: 0, vertical: 3),
+            padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 3),
             decoration: BoxDecoration(
               color: Colors.black.withOpacity(0.3),
-              borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+              borderRadius:
+                  const BorderRadius.vertical(top: Radius.circular(16)),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 for (int i = 0; i < imagePaths.length; i++)
                   Container(
-                    margin: EdgeInsets.symmetric(horizontal: 4),
+                    margin: const EdgeInsets.symmetric(horizontal: 4),
                     width: 8,
                     height: 8,
                     decoration: BoxDecoration(
@@ -143,12 +148,12 @@ class PropertyCarousel extends StatelessWidget {
             height: 40,
             width: 40,
             decoration: BoxDecoration(
-              color: Color(0xFF33907C),
+              color: const Color(0xFF33907C),
               borderRadius: BorderRadius.circular(30),
             ),
             child: Container(
               decoration: BoxDecoration(
-                gradient: LinearGradient(
+                gradient: const LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
@@ -163,7 +168,10 @@ class PropertyCarousel extends StatelessWidget {
                 onPressed: () {
                   Navigator.pop(context);
                 },
-                icon: Icon(Icons.arrow_back, size:20,),
+                icon: const Icon(
+                  Icons.arrow_back,
+                  size: 20,
+                ),
                 color: Colors.white,
               ),
             ),
@@ -181,7 +189,8 @@ class PropertyDetails extends StatelessWidget {
   final String pathToImage;
 
   const PropertyDetails(
-      {required this.property,
+      {super.key,
+      required this.property,
       required this.firstName,
       required this.lastName,
       required this.pathToImage});
@@ -194,16 +203,16 @@ class PropertyDetails extends StatelessWidget {
     return SizedBox(
       width: screenWidth * 0.92,
       child: Container(
-        padding: EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
           boxShadow: [
             BoxShadow(
               color: Colors.grey.withOpacity(0.5),
               spreadRadius: 3,
               blurRadius: 7,
-              offset: Offset(0, -3),
+              offset: const Offset(0, -3),
             ),
           ],
         ),
@@ -217,7 +226,7 @@ class PropertyDetails extends StatelessWidget {
                 style: GoogleFonts.montserrat(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF33907C),
+                  color: const Color(0xFF33907C),
                 ),
               ),
               SizedBox(height: screenHeight * 0.01),
@@ -236,7 +245,7 @@ class PropertyDetails extends StatelessWidget {
               const SizedBox(height: 15),
               SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
-                physics: AlwaysScrollableScrollPhysics(),
+                physics: const AlwaysScrollableScrollPhysics(),
                 child: Row(
                   children: [
                     if (property.beds > 0)
@@ -250,7 +259,7 @@ class PropertyDetails extends StatelessWidget {
                         text: '${property.baths} Bath',
                       ),
                     if (property.garden)
-                      PropertySpecs(
+                      const PropertySpecs(
                         icon: Icons.landscape_outlined,
                         text: '1 Garden',
                       ),
@@ -280,7 +289,7 @@ class PropertyDetails extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              SizedBox(height: 8),
+              const SizedBox(height: 8),
               Row(
                 children: [
                   Container(
@@ -290,12 +299,12 @@ class PropertyDetails extends StatelessWidget {
                       shape: BoxShape.circle,
                       border: Border.all(color: Colors.black, width: 2),
                     ),
-                    child: CircleAvatar(
+                    child: const CircleAvatar(
                       // Replace with the owner's image
                       backgroundImage: AssetImage('assets/userimage.jpg'),
                     ),
                   ),
-                  SizedBox(width: 8),
+                  const SizedBox(width: 8),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -315,13 +324,13 @@ class PropertyDetails extends StatelessWidget {
                       ),
                     ],
                   ),
-                  Spacer(),
+                  const Spacer(),
                   GradientButton(
                     onPressed: () {
                       // handle request button press
                     },
                     text: 'Request',
-                    gradientColors: [
+                    gradientColors: const [
                       Color(0xff0FA697),
                       Color(0xff45BF7A),
                       Color(0xff0DF205),
@@ -337,16 +346,16 @@ class PropertyDetails extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              SizedBox(height: 8),
+              const SizedBox(height: 8),
               Card(
                 child: Padding(
-                  padding: EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.all(16.0),
                   child: Column(
                     children: [
                       Row(
                         children: [
-                          Icon(Icons.star, color: Colors.amber),
-                          SizedBox(width: 8),
+                          const Icon(Icons.star, color: Colors.amber),
+                          const SizedBox(width: 8),
                           Text(
                             'Rehnaa Rating: ${property.rehnaaRating}',
                             style: GoogleFonts.montserrat(
@@ -358,8 +367,8 @@ class PropertyDetails extends StatelessWidget {
                       SizedBox(height: screenHeight * 0.01),
                       Row(
                         children: [
-                          Icon(Icons.star, color: Colors.amber),
-                          SizedBox(width: 8),
+                          const Icon(Icons.star, color: Colors.amber),
+                          const SizedBox(width: 8),
                           Text(
                             'Past Tenant Rating: ${property.tenantRating}',
                             style: GoogleFonts.montserrat(
@@ -372,7 +381,7 @@ class PropertyDetails extends StatelessWidget {
                   ),
                 ),
               ),
-              SizedBox(height: 30),
+              const SizedBox(height: 30),
               Text(
                 'Past Tenant Review',
                 style: GoogleFonts.montserrat(
@@ -380,17 +389,17 @@ class PropertyDetails extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              SizedBox(height: 8),
+              const SizedBox(height: 8),
               Card(
                 child: Padding(
-                  padding: EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.all(16.0),
                   child: Text(
                     property.tenantReview,
                     style: GoogleFonts.montserrat(),
                   ),
                 ),
               ),
-              SizedBox(height: 30),
+              const SizedBox(height: 30),
               Text(
                 'Monthly Rent',
                 style: GoogleFonts.montserrat(
@@ -398,10 +407,10 @@ class PropertyDetails extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              SizedBox(height: 8),
+              const SizedBox(height: 8),
               Card(
                 child: Padding(
-                  padding: EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.all(16.0),
                   child: Text(
                     property.price.toString(),
                     style: GoogleFonts.montserrat(),
@@ -421,6 +430,7 @@ class PropertySpecs extends StatelessWidget {
   final String text;
 
   const PropertySpecs({
+    super.key,
     required this.icon,
     required this.text,
   });
@@ -428,14 +438,14 @@ class PropertySpecs extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 20),
+      padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Column(
         children: [
           Icon(
             icon,
-            color: Color(0xFF33907C),
+            color: const Color(0xFF33907C),
           ),
-          SizedBox(height: 8),
+          const SizedBox(height: 8),
           Text(text),
         ],
       ),
@@ -449,6 +459,7 @@ class GradientButton extends StatelessWidget {
   final List<Color> gradientColors;
 
   const GradientButton({
+    super.key,
     required this.onPressed,
     required this.text,
     this.gradientColors = const [
@@ -483,14 +494,14 @@ class GradientButton extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(
+                const Icon(
                   Icons.arrow_forward,
                   color: Colors.white,
                 ),
-                SizedBox(width: 8),
+                const SizedBox(width: 8),
                 Text(
                   text,
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 16,
                   ),
@@ -503,12 +514,14 @@ class GradientButton extends StatelessWidget {
     );
   }
 }
+
 class ExpandedImagePage extends StatefulWidget {
   final String imagePath;
 
-  const ExpandedImagePage({required this.imagePath});
+  const ExpandedImagePage({super.key, required this.imagePath});
 
   @override
+  // ignore: library_private_types_in_public_api
   _ExpandedImagePageState createState() => _ExpandedImagePageState();
 }
 
@@ -560,7 +573,7 @@ class _ExpandedImagePageState extends State<ExpandedImagePage> {
               child: Container(
                 width: 40,
                 height: 40,
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   shape: BoxShape.circle,
                   color: Color(0xFF33907C),
                   gradient: LinearGradient(
@@ -573,7 +586,7 @@ class _ExpandedImagePageState extends State<ExpandedImagePage> {
                     ],
                   ),
                 ),
-                child: Icon(
+                child: const Icon(
                   Icons.arrow_back,
                   size: 20,
                   color: Colors.white,

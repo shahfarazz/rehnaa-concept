@@ -1,8 +1,9 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:rehnaa/frontend/Screens/dashboard.dart';
-import 'package:flutter/foundation.dart'; // Required for ChangeNotifier
+import 'package:rehnaa/frontend/Screens/Landlord/landlord_dashboard.dart';
+// Required for ChangeNotifier
 
 class AuthenticationService extends ChangeNotifier {
   // Extend ChangeNotifier
@@ -44,8 +45,11 @@ class AuthenticationService extends ChangeNotifier {
       phoneNumber: phoneNumber,
       verificationCompleted: (PhoneAuthCredential credential) async {
         await _auth.signInWithCredential(credential);
-        print(
-            "Phone number automatically verified and user signed in: ${_auth.currentUser?.uid}");
+        if (kDebugMode) {
+          print(
+              "Phone number automatically verified and user signed in: ${_auth.currentUser?.uid}");
+        }
+        // ignore: use_build_context_synchronously
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -53,8 +57,10 @@ class AuthenticationService extends ChangeNotifier {
         );
       },
       verificationFailed: (FirebaseAuthException e) {
-        print(
-            "Phone number verification failed. Code: ${e.code}. Message: ${e.message}");
+        if (kDebugMode) {
+          print(
+              "Phone number verification failed. Code: ${e.code}. Message: ${e.message}");
+        }
         showToast(
           'Phone number verification failed. Please try again.',
           Colors.red,
@@ -86,9 +92,13 @@ class AuthenticationService extends ChangeNotifier {
                           PhoneAuthProvider.credential(
                               verificationId: verificationId, smsCode: smsCode);
                       await _auth.signInWithCredential(credential);
-                      print(
-                          "Phone number verified and user signed in: ${_auth.currentUser?.uid}");
+                      if (kDebugMode) {
+                        print(
+                            "Phone number verified and user signed in: ${_auth.currentUser?.uid}");
+                      }
+                      // ignore: use_build_context_synchronously
                       Navigator.of(context).pop();
+                      // ignore: use_build_context_synchronously
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -122,14 +132,19 @@ class AuthenticationService extends ChangeNotifier {
   Future<void> signInWithEmailAndPassword(
       String email, String password, BuildContext context) async {
     try {
-      print('Signing in with Email and Password...');
+      if (kDebugMode) {
+        print('Signing in with Email and Password...');
+      }
       await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
-      print('Signed in with Email and Password.');
+      if (kDebugMode) {
+        print('Signed in with Email and Password.');
+      }
       // Notify listeners to update
       notifyListeners();
+      // ignore: use_build_context_synchronously
       Navigator.push(
         context,
         MaterialPageRoute(

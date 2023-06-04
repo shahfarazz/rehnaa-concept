@@ -1,8 +1,12 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class PropertyListingPage extends StatefulWidget {
+  const PropertyListingPage({super.key});
+
   @override
+  // ignore: library_private_types_in_public_api
   _PropertyListingPageState createState() => _PropertyListingPageState();
 }
 
@@ -24,13 +28,13 @@ class _PropertyListingPageState extends State<PropertyListingPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Property Listing'),
-        backgroundColor: Color(0xFF33907C),
+        title: const Text('Property Listing'),
+        backgroundColor: const Color(0xFF33907C),
       ),
       body: Form(
         key: _formKey,
         child: ListView(
-          padding: EdgeInsets.all(16),
+          padding: const EdgeInsets.all(16),
           children: <Widget>[
             buildIntegerFormField(_rentController, 'Rent Expectations'),
             buildIntegerFormField(_bedroomsController, 'Bedrooms'),
@@ -42,33 +46,36 @@ class _PropertyListingPageState extends State<PropertyListingPage> {
             buildIntegerFormField(_areaController, 'Area'),
             TextFormField(
               controller: _locationController,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: 'Location',
               ),
             ),
             TextFormField(
               controller: _utilitiesController,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: 'Utilities Available',
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
                 if (_formKey.currentState!.validate()) {
                   // Process data, send to Firebase or your server...
-                  print('Processing data...');
+                  if (kDebugMode) {
+                    print('Processing data...');
+                  }
                 }
               },
-              child: Text('Submit'),
               style: ElevatedButton.styleFrom(
-                primary: Color(0xFF33907C), // button color
-                fixedSize: Size(314, 48), // button width and height
+                backgroundColor: const Color(0xFF33907C), // button color
+                fixedSize: const Size(314, 48), // button width and height
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(24), // button corner radius
+                  borderRadius:
+                      BorderRadius.circular(24), // button corner radius
                 ),
                 textStyle: GoogleFonts.montserrat(), // button text style
               ),
+              child: const Text('Submit'),
             ),
           ],
         ),
@@ -76,7 +83,8 @@ class _PropertyListingPageState extends State<PropertyListingPage> {
     );
   }
 
-  TextFormField buildIntegerFormField(TextEditingController controller, String labelText) {
+  TextFormField buildIntegerFormField(
+      TextEditingController controller, String labelText) {
     return TextFormField(
       controller: controller,
       keyboardType: TextInputType.number,
@@ -94,6 +102,8 @@ class _PropertyListingPageState extends State<PropertyListingPage> {
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -104,7 +114,7 @@ class MyApp extends StatelessWidget {
           Theme.of(context).textTheme,
         ),
       ),
-      home: PropertyListingPage(),
+      home: const PropertyListingPage(),
     );
   }
 }

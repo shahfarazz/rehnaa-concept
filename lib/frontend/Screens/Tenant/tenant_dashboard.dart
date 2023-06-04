@@ -1,20 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:rehnaa/frontend/Screens/contract.dart';
-import 'package:rehnaa/frontend/Screens/contractSample.dart';
-import 'package:rehnaa/frontend/Screens/vouchers.dart';
-import 'package:rehnaa/frontend/helper/Dashboard_pages/dashboard_content.dart';
-import 'package:rehnaa/frontend/helper/Dashboard_pages/landlord_profile.dart';
-
-import '../helper/Dashboard_pages/landlord_renthistory.dart';
-import '../helper/Dashboard_pages/landlord_tenants.dart';
-import '../helper/landlordproperties.dart';
+import 'package:rehnaa/frontend/Screens/Landlord/contract.dart';
+import 'package:rehnaa/frontend/Screens/Landlord/vouchers.dart';
 
 class DashboardPage extends StatefulWidget {
-  final String uid; // UID of the landlord
+  final String uid; // UID of the tenant
 
-  DashboardPage({required this.uid});
+  const DashboardPage({super.key, required this.uid});
 
   @override
+  // ignore: library_private_types_in_public_api
   _DashboardPageState createState() => _DashboardPageState();
 }
 
@@ -34,7 +28,7 @@ class _DashboardPageState extends State<DashboardPage>
     // Initialize the AnimationController
     _sidebarController = AnimationController(
       vsync: this,
-      duration: Duration(milliseconds: 300),
+      duration: const Duration(milliseconds: 300),
     );
   }
 
@@ -51,7 +45,7 @@ class _DashboardPageState extends State<DashboardPage>
   void onTabTapped(int index) {
     _pageController.animateToPage(
       index,
-      duration: Duration(milliseconds: 300),
+      duration: const Duration(milliseconds: 300),
       curve: Curves.easeInOut,
     );
   }
@@ -80,35 +74,27 @@ class _DashboardPageState extends State<DashboardPage>
     super.build(context); // Ensure the state is kept alive
     return Scaffold(
       appBar: _appBar(size),
-        body:  Stack(
-    children: [
-      GestureDetector(
-        onTap: () {
-          if (_isSidebarOpen) {
-            _closeSidebar();
-          }
-        },
-        child: PageView(
-          controller: _pageController,
-          onPageChanged: (index) {
-            setState(() {
-              _currentIndex = index;
-            });
-          },
-          children: <Widget>[
-            DashboardContent(uid: widget.uid),
-            LandlordTenantsPage(uid: widget.uid),
-            LandlordPropertiesPage(uid: widget.uid),
-            LandlordRentHistoryPage(uid: widget.uid),
-            LandlordProfilePage(),
-          ],
-        ),
+      body: Stack(
+        children: [
+          GestureDetector(
+            onTap: () {
+              if (_isSidebarOpen) {
+                _closeSidebar();
+              }
+            },
+            child: PageView(
+              controller: _pageController,
+              onPageChanged: (index) {
+                setState(() {
+                  _currentIndex = index;
+                });
+              },
+              children: const <Widget>[],
+            ),
+          ),
+          if (_isSidebarOpen) _sidebar(size),
+        ],
       ),
-      if (_isSidebarOpen) _sidebar(size),
-    ],
-  ),
-
-
       bottomNavigationBar: _bottomNavigationBar(),
     );
   }
@@ -118,7 +104,7 @@ class _DashboardPageState extends State<DashboardPage>
     return AppBar(
       toolbarHeight: 70,
       leading: Padding(
-        padding: EdgeInsets.only(top: 8.0),
+        padding: const EdgeInsets.only(top: 8.0),
         child: GestureDetector(
           onHorizontalDragUpdate: (details) {
             if (details.delta.dx > 0) {
@@ -129,13 +115,13 @@ class _DashboardPageState extends State<DashboardPage>
           },
           child: IconButton(
             iconSize: 30.0,
-            icon: Icon(Icons.menu),
+            icon: const Icon(Icons.menu),
             onPressed: _toggleSidebar,
           ),
         ),
       ),
       title: Padding(
-        padding: EdgeInsets.only(
+        padding: const EdgeInsets.only(
           top: 2.0,
         ),
         child: Row(
@@ -164,7 +150,7 @@ class _DashboardPageState extends State<DashboardPage>
                 ),
               ],
             ),
-            SizedBox(width: 8),
+            const SizedBox(width: 8),
           ],
         ),
       ),
@@ -174,7 +160,7 @@ class _DashboardPageState extends State<DashboardPage>
           child: Stack(
             children: [
               IconButton(
-                icon: Icon(Icons.notifications_active),
+                icon: const Icon(Icons.notifications_active),
                 onPressed: () {
                   // TODO: Implement notifications handling here
                 },
@@ -182,16 +168,16 @@ class _DashboardPageState extends State<DashboardPage>
               Positioned(
                 right: 13,
                 child: Container(
-                  padding: EdgeInsets.all(2),
+                  padding: const EdgeInsets.all(2),
                   decoration: BoxDecoration(
                     color: Colors.red,
                     borderRadius: BorderRadius.circular(6),
                   ),
-                  constraints: BoxConstraints(
+                  constraints: const BoxConstraints(
                     minWidth: 10,
                     minHeight: 10,
                   ),
-                  child: Text(
+                  child: const Text(
                     '9',
                     style: TextStyle(
                       color: Colors.white,
@@ -206,7 +192,7 @@ class _DashboardPageState extends State<DashboardPage>
         ),
       ],
       flexibleSpace: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -220,17 +206,18 @@ class _DashboardPageState extends State<DashboardPage>
       ),
     );
   }
+
 // Sidebar widget
 // Sidebar widget
   Widget _sidebar(Size size) {
     return AnimatedContainer(
-      duration: Duration(milliseconds: 300),
+      duration: const Duration(milliseconds: 300),
       width: _isSidebarOpen ? size.width * 0.6 : 0,
       color: Colors.white,
       child: SlideTransition(
         position: Tween<Offset>(
-          begin: Offset(-1, 0),
-          end: Offset(0, 0),
+          begin: const Offset(-1, 0),
+          end: const Offset(0, 0),
         ).animate(CurvedAnimation(
           parent: _sidebarController,
           curve: Curves.easeInOut,
@@ -239,8 +226,8 @@ class _DashboardPageState extends State<DashboardPage>
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              padding: EdgeInsets.only(left: 16, top: 64, bottom: 16),
-              child: Text(
+              padding: const EdgeInsets.only(left: 16, top: 64, bottom: 16),
+              child: const Text(
                 'Menu',
                 style: TextStyle(
                   fontSize: 24,
@@ -253,8 +240,8 @@ class _DashboardPageState extends State<DashboardPage>
               thickness: 0.5,
             ),
             ListTile(
-              leading: Icon(Icons.description),
-              title: Text(
+              leading: const Icon(Icons.description),
+              title: const Text(
                 'Contract',
                 style: TextStyle(
                   fontSize: 18,
@@ -264,34 +251,35 @@ class _DashboardPageState extends State<DashboardPage>
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => ContractPage(),
+                    builder: (context) => const ContractPage(),
                   ),
                 );
                 _closeSidebar(); // Close the sidebar after navigation
               },
             ),
             ListTile(
-              leading: Icon(Icons.receipt),
+              leading: const Icon(Icons.receipt),
               title: Row(
                 children: <Widget>[
-                  Text(
+                  const Text(
                     'Vouchers',
                     style: TextStyle(
                       fontSize: 18,
                     ),
                   ),
-                  SizedBox(width: 10.0), // add some spacing
+                  const SizedBox(width: 10.0), // add some spacing
                   Container(
-                    padding: EdgeInsets.symmetric(horizontal: 6.0, vertical: 2.0),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 6.0, vertical: 2.0),
                     decoration: BoxDecoration(
                       color: Colors.red,
                       borderRadius: BorderRadius.circular(8.0),
                     ),
-                    child: Text(
+                    child: const Text(
                       'new',
                       style: TextStyle(
                         color: Colors.white,
-                        fontSize: 12.0,  // adjust the size to fit your needs
+                        fontSize: 12.0, // adjust the size to fit your needs
                       ),
                     ),
                   ),
@@ -301,14 +289,14 @@ class _DashboardPageState extends State<DashboardPage>
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => VouchersPage(),
+                    builder: (context) => const VouchersPage(),
                   ),
                 );
                 _closeSidebar(); // Close the sidebar after navigation
               },
             ),
             // Add more list items if needed
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             Divider(
               color: Colors.grey[400],
               thickness: 0.5,
@@ -319,7 +307,6 @@ class _DashboardPageState extends State<DashboardPage>
       ),
     );
   }
-
 
   // BottomNavigationBar widget
   Widget _bottomNavigationBar() {
