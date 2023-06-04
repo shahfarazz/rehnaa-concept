@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -139,7 +140,7 @@ class _LandlordTenantsPageState extends State<LandlordTenantsPage>
                   Text(
                     '${tenant.firstName} ${tenant.lastName}',
                     style: GoogleFonts.montserrat(
-                      fontSize: 16.0,
+                      fontSize: 14.0,
                       fontWeight: FontWeight.bold,
                       color: Color(0xff33907c),
                     ),
@@ -240,7 +241,7 @@ class _LandlordTenantsPageState extends State<LandlordTenantsPage>
           ),
           SmoothPageIndicator(
             controller: _pageController,
-            count: pageCount.isFinite && pageCount > 0 ? pageCount.toInt() : 0,
+            count: max(1, pageCount.isFinite ? pageCount.toInt() : 0),
             effect: WormEffect(
               dotColor: Colors.grey,
               activeDotColor: Color(0xff33907c),

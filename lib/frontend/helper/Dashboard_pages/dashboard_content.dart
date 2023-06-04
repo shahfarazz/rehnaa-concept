@@ -83,7 +83,8 @@ class _DashboardContentState extends State<DashboardContent>
               NumberFormat('#,##0').format(landlord.balance);
 
           // Return the widget tree with the fetched data
-          return Column(
+          return SingleChildScrollView(
+              child: Column(
             children: <Widget>[
               SizedBox(height: size.height * 0.05),
               Column(
@@ -209,7 +210,7 @@ class _DashboardContentState extends State<DashboardContent>
                 ),
               ),
             ],
-          );
+          ));
         }
 
         // By default, return an empty container if no data is available

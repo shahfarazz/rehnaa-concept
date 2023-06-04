@@ -302,11 +302,14 @@ class PropertyDetails extends StatelessWidget {
                         '$firstName $lastName', // Replace with the owner's name fetched from Firebase
                         style: GoogleFonts.montserrat(
                           fontWeight: FontWeight.bold,
+                          fontSize: 12,
                         ),
                       ),
                       Text(
                         '03333295546', // Replace with the owner's phone number fetched from Firebase
-                        style: GoogleFonts.montserrat(),
+                        style: GoogleFonts.montserrat(
+                          fontSize: 10,
+                        ),
                       ),
                     ],
                   ),
@@ -324,7 +327,7 @@ class PropertyDetails extends StatelessWidget {
                   ),
                 ],
               ),
-              SizedBox(height: 30),
+              SizedBox(height: screenHeight * 0.07),
               Text(
                 'Ratings',
                 style: GoogleFonts.montserrat(
