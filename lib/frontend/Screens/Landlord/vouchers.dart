@@ -146,24 +146,58 @@ class VouchersPage extends StatelessWidget {
 class ExpandedImageDialog extends StatelessWidget {
   final String imagePath;
 
-  const ExpandedImageDialog({super.key, required this.imagePath});
+  const ExpandedImageDialog({Key? key, required this.imagePath}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Dialog(
       insetPadding: EdgeInsets.zero,
-      child: Container(
-        
-        constraints: const BoxConstraints.expand(),
-        child: InteractiveViewer(
-          boundaryMargin: const EdgeInsets.all(20),
-          minScale: 0.5,
-          maxScale: 5.0,
-          child: Image.asset(
-            imagePath,
-            fit: BoxFit.contain,
+      child: Stack(
+        children: [
+          Container(
+            constraints: const BoxConstraints.expand(),
+            child: InteractiveViewer(
+              boundaryMargin: const EdgeInsets.all(20),
+              minScale: 0.5,
+              maxScale: 5.0,
+              child: Image.asset(
+                imagePath,
+                fit: BoxFit.contain,
+              ),
+            ),
           ),
-        ),
+          Positioned(
+            top: 10.0,
+            left: 10.0,
+            child: GestureDetector(
+              onTap: () {
+                Navigator.pop(context);
+              },
+              child: Container(
+                width: 40,
+                height: 40,
+                decoration: const BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Color(0xFF33907C),
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      Color(0xff0FA697),
+                      Color(0xff45BF7A),
+                      Color(0xff0DF205),
+                    ],
+                  ),
+                ),
+                child: const Icon(
+                  Icons.arrow_back,
+                  size: 20,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

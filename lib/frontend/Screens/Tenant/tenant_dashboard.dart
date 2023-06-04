@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:rehnaa/frontend/Screens/Landlord/contract.dart';
 import 'package:rehnaa/frontend/Screens/Landlord/vouchers.dart';
 import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenant_dashboard_content';
+import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenant_profile.dart';
 
 class TenantDashboardPage extends StatefulWidget {
   final String uid; // UID of the tenant
@@ -94,6 +95,7 @@ class _DashboardPageState extends State<TenantDashboardPage>
                 TenantDashboardContent(
                   uid: widget.uid,
                 ),
+                const TenantProfilePage(),
               ],
             ),
           ),
@@ -214,19 +216,21 @@ class _DashboardPageState extends State<TenantDashboardPage>
 
 // Sidebar widget
 // Sidebar widget
-  Widget _sidebar(Size size) {
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 300),
-      width: _isSidebarOpen ? size.width * 0.6 : 0,
-      color: Colors.white,
-      child: SlideTransition(
-        position: Tween<Offset>(
-          begin: const Offset(-1, 0),
-          end: const Offset(0, 0),
-        ).animate(CurvedAnimation(
-          parent: _sidebarController,
-          curve: Curves.easeInOut,
-        )),
+Widget _sidebar(Size size) {
+  return AnimatedContainer(
+    duration: const Duration(milliseconds: 300),
+    width: _isSidebarOpen ? size.width * 0.6 : 0,
+    height: _isSidebarOpen ? size.height : 0,
+    color: Colors.white,
+    child: SlideTransition(
+      position: Tween<Offset>(
+        begin: const Offset(-1, 0),
+        end: const Offset(0, 0),
+      ).animate(CurvedAnimation(
+        parent: _sidebarController,
+        curve: Curves.easeInOut,
+      )),
+      child: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -266,10 +270,12 @@ class _DashboardPageState extends State<TenantDashboardPage>
               leading: const Icon(Icons.receipt),
               title: Row(
                 children: <Widget>[
-                  const Text(
-                    'Vouchers',
-                    style: TextStyle(
-                      fontSize: 18,
+                  Expanded(
+                    child: const Text(
+                      'Vouchers',
+                      style: TextStyle(
+                        fontSize: 18,
+                      ),
                     ),
                   ),
                   const SizedBox(width: 10.0), // add some spacing
@@ -310,8 +316,10 @@ class _DashboardPageState extends State<TenantDashboardPage>
           ],
         ),
       ),
-    );
-  }
+    ),
+  );
+}
+
 
   // BottomNavigationBar widget
   Widget _bottomNavigationBar() {

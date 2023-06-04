@@ -63,9 +63,9 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
     }
   }
 
-  void showOptionDialog() {
-    // Option dialog code remains the same
-  }
+  // void showOptionDialog() {
+  //   // Option dialog code remains the same
+  // }
 
   // Widget buildOptionTile({
   //   String selectedOption = "",
@@ -75,6 +75,154 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
   // }) {
   //   // Option tile code remains the same
   // }
+
+
+  
+  void showOptionDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        String selectedOption = '';
+
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return AlertDialog(
+              title: const Padding(
+                padding:
+                    EdgeInsets.only(top: 16.0), // Adjust the value as needed
+                child: Text(
+                  'Payment Options',
+                  style:
+                      TextStyle(fontSize: 20.0, fontWeight: FontWeight.normal),
+                ),
+              ),
+
+              titlePadding: const EdgeInsets.fromLTRB(
+                  20.0, 16.0, 16.0, 0.0), // padding above title
+              contentPadding: const EdgeInsets.fromLTRB(16.0, 20.0, 16.0, 8.0),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  const Divider(
+                    color: Colors.grey,
+                    
+                  ), // added grey line
+                  buildOptionTile(
+                    selectedOption: selectedOption,
+                    optionImage: 'assets/cashicon.png',
+                    optionName: 'Cash',
+                    onTap: () {
+                      setState(() {
+                        selectedOption = 'Cash';
+                      });
+                    },
+                  ),
+                  buildOptionTile(
+                    selectedOption: selectedOption,
+                    optionImage: 'assets/easypaisa.png',
+                    optionName: 'Easy Paisa',
+                    onTap: () {
+                      setState(() {
+                        selectedOption = 'Easy Paisa';
+                      });
+                    },
+                  ),
+                  buildOptionTile(
+                    selectedOption: selectedOption,
+                    optionImage: 'assets/jazzcash.png',
+                    optionName: 'Jazz Cash',
+                    onTap: () {
+                      setState(() {
+                        selectedOption = 'Jazz Cash';
+                      });
+                    },
+                  ),
+                  buildOptionTile(
+                    selectedOption: selectedOption,
+                    optionImage: 'assets/banktransfer.png',
+                    optionName: 'Bank Transfer',
+                    onTap: () {
+                      setState(() {
+                        selectedOption = 'Bank Transfer';
+                      });
+                    },
+                  ),
+                ],
+              ),
+              actions: <Widget>[
+                TextButton(
+                  child: const Text(
+                    'Cancel',
+                    style: TextStyle(
+                      color: Colors.red,
+                    ),
+                  ),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor:
+                        selectedOption.isNotEmpty ? Colors.green : Colors.grey,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20.0),
+                    ),
+                  ),
+                  child: const Text(
+                    'Submit',
+                    style: TextStyle(
+                      color: Colors.white,
+                    ),
+                  ),
+                  onPressed: () {
+                    if (selectedOption.isNotEmpty) {
+                      if (kDebugMode) {
+                        print('Selected option: $selectedOption');
+                      }
+                      Navigator.pop(context);
+                    } else {
+                      if (kDebugMode) {
+                        print('Please select an option');
+                      }
+                    }
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget buildOptionTile({
+    String selectedOption = "",
+    String optionImage = "",
+    String optionName = "",
+    VoidCallback? onTap,
+  }) {
+    return ListTile(
+      leading: selectedOption == optionName
+          ? const CircleAvatar(
+              backgroundColor: Colors.green,
+              radius: 10,
+            )
+          : const Icon(Icons.circle, size: 20),
+      title: Row(
+        children: [
+          Image.asset(
+            optionImage,
+            width: 30,
+            height: 20,
+          ),
+          const SizedBox(width: 20),
+          Text(optionName),
+        ],
+      ),
+      onTap: onTap,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -209,7 +357,7 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                                       },
                                       child: Center(
                                         child: Text(
-                                          "Withdraw",
+                                          "Pay",
                                           style: GoogleFonts.montserrat(
                                             color: Colors.white,
                                             fontSize: 18,
