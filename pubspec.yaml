@@ -54,8 +54,8 @@ dev_dependencies:
     # rules and activating additional ones.
     flutter_lints: ^2.0.0
     carousel_slider: ^4.0.0
-    photo_view: ^0.14.0 
-    flutter_outline_text: ^0.4.0
+    photo_view: ^0.14.0
+
     # photo_view: ^latest_version
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
