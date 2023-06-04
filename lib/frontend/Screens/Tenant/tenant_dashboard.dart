@@ -1,20 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:rehnaa/frontend/Screens/Landlord/contract.dart';
 import 'package:rehnaa/frontend/Screens/Landlord/vouchers.dart';
+import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenant_dashboard_content';
 
-class DashboardPage extends StatefulWidget {
+class TenantDashboardPage extends StatefulWidget {
   final String uid; // UID of the tenant
 
-  const DashboardPage({super.key, required this.uid});
+  const TenantDashboardPage({super.key, required this.uid});
 
   @override
   // ignore: library_private_types_in_public_api
   _DashboardPageState createState() => _DashboardPageState();
 }
 
-class _DashboardPageState extends State<DashboardPage>
+class _DashboardPageState extends State<TenantDashboardPage>
     with
-        AutomaticKeepAliveClientMixin<DashboardPage>,
+        AutomaticKeepAliveClientMixin<TenantDashboardPage>,
         TickerProviderStateMixin {
   int _currentIndex = 0;
   final _pageController = PageController();
@@ -89,7 +90,11 @@ class _DashboardPageState extends State<DashboardPage>
                   _currentIndex = index;
                 });
               },
-              children: const <Widget>[],
+              children: <Widget>[
+                TenantDashboardContent(
+                  uid: widget.uid,
+                ),
+              ],
             ),
           ),
           if (_isSidebarOpen) _sidebar(size),

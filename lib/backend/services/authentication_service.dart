@@ -53,7 +53,8 @@ class AuthenticationService extends ChangeNotifier {
         Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (context) => DashboardPage(uid: _auth.currentUser!.uid)),
+              builder: (context) =>
+                  LandlordDashboardPage(uid: _auth.currentUser!.uid)),
         );
       },
       verificationFailed: (FirebaseAuthException e) {
@@ -102,8 +103,8 @@ class AuthenticationService extends ChangeNotifier {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) =>
-                                DashboardPage(uid: _auth.currentUser!.uid)),
+                            builder: (context) => LandlordDashboardPage(
+                                uid: _auth.currentUser!.uid)),
                       );
                     } catch (e) {
                       showToast(
@@ -148,7 +149,7 @@ class AuthenticationService extends ChangeNotifier {
       Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (context) => DashboardPage(
+            builder: (context) => LandlordDashboardPage(
                   uid: _auth.currentUser!.uid,
                 )),
       );

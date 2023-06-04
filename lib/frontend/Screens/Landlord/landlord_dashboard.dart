@@ -1,26 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:rehnaa/frontend/Screens/Landlord/contract.dart';
 import 'package:rehnaa/frontend/Screens/Landlord/vouchers.dart';
-import 'package:rehnaa/frontend/helper/Landlorddashboard_pages/dashboard_content.dart';
+import 'package:rehnaa/frontend/helper/Landlorddashboard_pages/landlord_dashboard_content.dart';
 import 'package:rehnaa/frontend/helper/Landlorddashboard_pages/landlord_profile.dart';
 
 import '../../helper/Landlorddashboard_pages/landlord_renthistory.dart';
 import '../../helper/Landlorddashboard_pages/landlord_tenants.dart';
 import '../../helper/landlordproperties.dart';
 
-class DashboardPage extends StatefulWidget {
+class LandlordDashboardPage extends StatefulWidget {
   final String uid; // UID of the landlord
 
-  const DashboardPage({super.key, required this.uid});
+  const LandlordDashboardPage({super.key, required this.uid});
 
   @override
   // ignore: library_private_types_in_public_api
-  _DashboardPageState createState() => _DashboardPageState();
+  _LandlordDashboardPageState createState() => _LandlordDashboardPageState();
 }
 
-class _DashboardPageState extends State<DashboardPage>
+class _LandlordDashboardPageState extends State<LandlordDashboardPage>
     with
-        AutomaticKeepAliveClientMixin<DashboardPage>,
+        AutomaticKeepAliveClientMixin<LandlordDashboardPage>,
         TickerProviderStateMixin {
   int _currentIndex = 0;
   final _pageController = PageController();
@@ -96,7 +96,7 @@ class _DashboardPageState extends State<DashboardPage>
                 });
               },
               children: <Widget>[
-                DashboardContent(uid: widget.uid),
+                LandlordDashboardContent(uid: widget.uid),
                 LandlordTenantsPage(uid: widget.uid),
                 LandlordPropertiesPage(uid: widget.uid),
                 LandlordRentHistoryPage(uid: widget.uid),

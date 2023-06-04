@@ -7,18 +7,20 @@ import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:rehnaa/backend/models/landlordmodel.dart';
 
-class DashboardContent extends StatefulWidget {
+class LandlordDashboardContent extends StatefulWidget {
   final String uid; // UID of the landlord
 
-  const DashboardContent({Key? key, required this.uid}) : super(key: key);
+  const LandlordDashboardContent({Key? key, required this.uid})
+      : super(key: key);
 
   @override
   // ignore: library_private_types_in_public_api
-  _DashboardContentState createState() => _DashboardContentState();
+  _LandlordDashboardContentState createState() =>
+      _LandlordDashboardContentState();
 }
 
-class _DashboardContentState extends State<DashboardContent>
-    with AutomaticKeepAliveClientMixin<DashboardContent> {
+class _LandlordDashboardContentState extends State<LandlordDashboardContent>
+    with AutomaticKeepAliveClientMixin<LandlordDashboardContent> {
   late Future<Landlord> _landlordFuture;
 
   @override

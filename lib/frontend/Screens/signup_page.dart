@@ -66,7 +66,7 @@ class _SignUpPageState extends State<SignUpPage> {
             context,
             MaterialPageRoute(
                 builder: (context) =>
-                    DashboardPage(uid: userCredential.user!.uid)),
+                    LandlordDashboardPage(uid: userCredential.user!.uid)),
           );
         }
       });
@@ -150,8 +150,8 @@ class _SignUpPageState extends State<SignUpPage> {
       Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (context) =>
-                DashboardPage(uid: FirebaseAuth.instance.currentUser!.uid)),
+            builder: (context) => LandlordDashboardPage(
+                uid: FirebaseAuth.instance.currentUser!.uid)),
       );
     } catch (e) {
       _showToast('Failed to verify SMS code.', Colors.red);
