@@ -3,6 +3,7 @@ import 'package:rehnaa/frontend/Screens/Landlord/contract.dart';
 import 'package:rehnaa/frontend/Screens/Landlord/vouchers.dart';
 import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenant_dashboard_content';
 import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenant_profile.dart';
+import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenant_renthistory.dart';
 
 class TenantDashboardPage extends StatefulWidget {
   final String uid; // UID of the tenant
@@ -92,9 +93,9 @@ class _DashboardPageState extends State<TenantDashboardPage>
                 });
               },
               children: <Widget>[
-                TenantDashboardContent(
-                  uid: widget.uid,
-                ),
+                TenantDashboardContent(uid: widget.uid,),
+                TenantRentHistoryPage(uid: widget.uid),
+
                 const TenantProfilePage(),
               ],
             ),
