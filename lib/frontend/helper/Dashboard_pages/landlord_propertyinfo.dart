@@ -137,9 +137,11 @@ class PropertyCarousel extends StatelessWidget {
           ),
         ),
         Positioned(
-          top: 20,
-          left: 20,
+          top: 30,
+          left: 10,
           child: Container(
+            height: 40,
+            width: 40,
             decoration: BoxDecoration(
               color: Color(0xFF33907C),
               borderRadius: BorderRadius.circular(30),
@@ -161,7 +163,7 @@ class PropertyCarousel extends StatelessWidget {
                 onPressed: () {
                   Navigator.pop(context);
                 },
-                icon: Icon(Icons.arrow_back),
+                icon: Icon(Icons.arrow_back, size:20,),
                 color: Colors.white,
               ),
             ),
@@ -498,24 +500,85 @@ class GradientButton extends StatelessWidget {
     );
   }
 }
-
-class ExpandedImagePage extends StatelessWidget {
+class ExpandedImagePage extends StatefulWidget {
   final String imagePath;
 
   const ExpandedImagePage({required this.imagePath});
 
   @override
+  _ExpandedImagePageState createState() => _ExpandedImagePageState();
+}
+
+class _ExpandedImagePageState extends State<ExpandedImagePage> {
+  double _scale = 1.0;
+  double _previousScale = 1.0;
+  Offset _previousOffset = Offset.zero;
+  Offset _offset = Offset.zero;
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: GestureDetector(
-        onTap: () {
-          Navigator.pop(context);
-        },
-        child: Container(
-          color: Colors.black,
-          alignment: Alignment.center,
-          child: Image.asset(imagePath),
-        ),
+      backgroundColor: Colors.white, // Set the background color to white
+      body: Stack(
+        children: [
+          GestureDetector(
+            onTap: () {
+              // Do nothing when tapped on the image
+            },
+            onScaleStart: (ScaleStartDetails details) {
+              _previousScale = _scale;
+              _previousOffset = details.focalPoint - _offset;
+            },
+            onScaleUpdate: (ScaleUpdateDetails details) {
+              setState(() {
+                _scale = (_previousScale * details.scale).clamp(1.0, 4.0);
+                _offset = details.focalPoint - _previousOffset;
+              });
+            },
+            child: Container(
+              color: Colors.white,
+              alignment: Alignment.center,
+              child: Transform.scale(
+                scale: _scale,
+                child: Transform.translate(
+                  offset: _offset,
+                  child: Image.asset(widget.imagePath),
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            top: 30.0,
+            left: 10.0,
+            child: GestureDetector(
+              onTap: () {
+                Navigator.pop(context);
+              },
+              child: Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Color(0xFF33907C),
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      Color(0xff0FA697),
+                      Color(0xff45BF7A),
+                      Color(0xff0DF205),
+                    ],
+                  ),
+                ),
+                child: Icon(
+                  Icons.arrow_back,
+                  size: 20,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

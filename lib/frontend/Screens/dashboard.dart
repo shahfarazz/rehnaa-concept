@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:rehnaa/frontend/Screens/contract.dart';
 import 'package:rehnaa/frontend/Screens/contractSample.dart';
 import 'package:rehnaa/frontend/Screens/vouchers.dart';
 import 'package:rehnaa/frontend/helper/Dashboard_pages/dashboard_content.dart';
@@ -79,26 +80,35 @@ class _DashboardPageState extends State<DashboardPage>
     super.build(context); // Ensure the state is kept alive
     return Scaffold(
       appBar: _appBar(size),
-      body: Stack(
-        children: [
-          PageView(
-            controller: _pageController,
-            onPageChanged: (index) {
-              setState(() {
-                _currentIndex = index;
-              });
-            },
-            children: <Widget>[
-              DashboardContent(uid: widget.uid),
-              LandlordTenantsPage(uid: widget.uid),
-              LandlordPropertiesPage(uid: widget.uid),
-              LandlordRentHistoryPage(uid: widget.uid),
-              LandlordProfilePage(),
-            ],
-          ),
-          if (_isSidebarOpen) _sidebar(size),
-        ],
+        body:  Stack(
+    children: [
+      GestureDetector(
+        onTap: () {
+          if (_isSidebarOpen) {
+            _closeSidebar();
+          }
+        },
+        child: PageView(
+          controller: _pageController,
+          onPageChanged: (index) {
+            setState(() {
+              _currentIndex = index;
+            });
+          },
+          children: <Widget>[
+            DashboardContent(uid: widget.uid),
+            LandlordTenantsPage(uid: widget.uid),
+            LandlordPropertiesPage(uid: widget.uid),
+            LandlordRentHistoryPage(uid: widget.uid),
+            LandlordProfilePage(),
+          ],
+        ),
       ),
+      if (_isSidebarOpen) _sidebar(size),
+    ],
+  ),
+
+
       bottomNavigationBar: _bottomNavigationBar(),
     );
   }
@@ -210,8 +220,8 @@ class _DashboardPageState extends State<DashboardPage>
       ),
     );
   }
-
-  // Sidebar widget
+// Sidebar widget
+// Sidebar widget
   Widget _sidebar(Size size) {
     return AnimatedContainer(
       duration: Duration(milliseconds: 300),
@@ -228,14 +238,33 @@ class _DashboardPageState extends State<DashboardPage>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Container(
+              padding: EdgeInsets.only(left: 16, top: 64, bottom: 16),
+              child: Text(
+                'Menu',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            Divider(
+              color: Colors.grey[400],
+              thickness: 0.5,
+            ),
             ListTile(
               leading: Icon(Icons.description),
-              title: Text('Contract'),
+              title: Text(
+                'Contract',
+                style: TextStyle(
+                  fontSize: 18,
+                ),
+              ),
               onTap: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => ContractSamplePage(),
+                    builder: (context) => ContractPage(),
                   ),
                 );
                 _closeSidebar(); // Close the sidebar after navigation
@@ -243,7 +272,31 @@ class _DashboardPageState extends State<DashboardPage>
             ),
             ListTile(
               leading: Icon(Icons.receipt),
-              title: Text('Vouchers'),
+              title: Row(
+                children: <Widget>[
+                  Text(
+                    'Vouchers',
+                    style: TextStyle(
+                      fontSize: 18,
+                    ),
+                  ),
+                  SizedBox(width: 10.0), // add some spacing
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 6.0, vertical: 2.0),
+                    decoration: BoxDecoration(
+                      color: Colors.red,
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                    child: Text(
+                      'new',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 12.0,  // adjust the size to fit your needs
+                      ),
+                    ),
+                  ),
+                ],
+              ),
               onTap: () {
                 Navigator.push(
                   context,
@@ -254,11 +307,19 @@ class _DashboardPageState extends State<DashboardPage>
                 _closeSidebar(); // Close the sidebar after navigation
               },
             ),
+            // Add more list items if needed
+            SizedBox(height: 16),
+            Divider(
+              color: Colors.grey[400],
+              thickness: 0.5,
+            ),
+            // Add any additional widgets or content at the bottom of the sidebar
           ],
         ),
       ),
     );
   }
+
 
   // BottomNavigationBar widget
   Widget _bottomNavigationBar() {
