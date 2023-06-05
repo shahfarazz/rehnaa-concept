@@ -64,11 +64,13 @@ class Property {
   }
 
   Future<Landlord> fetchLandlord() async {
+    print('Fetching landlord.. with ref: $landlordRef');
     if (landlordRef != null) {
       DocumentSnapshot<Map<String, dynamic>> snapshot =
           await landlordRef!.get();
       return Landlord.fromJson(snapshot.data());
     }
+
     throw Exception('Landlord reference is null');
   }
 }

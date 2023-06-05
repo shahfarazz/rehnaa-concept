@@ -136,11 +136,18 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
                 ],
               ),
               actions: <Widget>[
-                TextButton(
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor:
+                        selectedOption.isNotEmpty ? Colors.grey : Colors.green,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20.0),
+                    ),
+                  ),
                   child: const Text(
                     'Cancel',
                     style: TextStyle(
-                      color: Colors.red,
+                      color: Colors.white,
                     ),
                   ),
                   onPressed: () {

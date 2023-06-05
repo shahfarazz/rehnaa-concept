@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:rehnaa/frontend/Screens/Landlord/contract.dart';
 import 'package:rehnaa/frontend/Screens/Landlord/vouchers.dart';
@@ -111,7 +113,25 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
     );
   }
 
-  // AppBar widget for the dashboard
+  List<Map<String, String>> notifications = [
+    {
+      'title': 'Rent paid by Tenant: Michelle',
+      'amount': '\$30000',
+    },
+    {
+      'title': 'Maintenance request by Tenant: John',
+      'amount': '',
+    },
+    {
+      'title': 'Contract renewal notice for Property: ABC Apartment',
+      'amount': '',
+    },
+    {
+      'title': 'Notification 4',
+      'amount': '',
+    },
+    // Add more notifications here
+  ]; // AppBar widget for the dashboard
   PreferredSizeWidget? _appBar(Size size) {
     return AppBar(
       toolbarHeight: 70,
@@ -174,7 +194,150 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
               IconButton(
                 icon: const Icon(Icons.notifications_active),
                 onPressed: () {
-                  // TODO: Implement notifications handling here
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return Dialog(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20.0),
+                        ),
+                        child: Container(
+                          height: MediaQuery.of(context).size.height * 0.25,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(25.0),
+                          ),
+                          child: Stack(
+                            children: <Widget>[
+                              Positioned.fill(
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
+                                      colors: [
+                                        Color(0xFF0FA697),
+                                        Color(0xFF45BF7A),
+                                        Color(0xFF0DF205),
+                                      ],
+                                    ),
+                                    borderRadius: BorderRadius.circular(25.0),
+                                  ),
+                                ),
+                              ),
+                              Column(
+                                children: <Widget>[
+                                  Padding(
+                                    padding: const EdgeInsets.all(16.0),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: <Widget>[
+                                        Hero(
+                                          tag: 'notificationTitle',
+                                          child: Text(
+                                            'Notifications',
+                                            style: TextStyle(
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.white,
+                                              fontFamily: 'Montserrat',
+                                            ),
+                                          ),
+                                        ),
+                                        IconButton(
+                                          icon: Icon(Icons.close),
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                          },
+                                          color: Colors.white,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Divider(
+                                    height: 0,
+                                    color: Colors.grey,
+                                  ),
+                                  Expanded(
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.only(
+                                        bottomLeft: Radius.circular(20.0),
+                                        bottomRight: Radius.circular(20.0),
+                                      ),
+                                      child: Container(
+                                        padding: EdgeInsets.only(bottom: 4.0),
+                                        color: Colors.white,
+                                        child: Scrollbar(
+                                          isAlwaysShown: true,
+                                          child: SingleChildScrollView(
+                                            child: Column(
+                                              children: notifications
+                                                  .map((notification) {
+                                                return ListTile(
+                                                  title: Text(
+                                                    notification['title']!,
+                                                    style: TextStyle(
+                                                      fontSize: 16,
+                                                      fontFamily: 'Montserrat',
+                                                    ),
+                                                  ),
+                                                  subtitle:
+                                                      notification['amount']!
+                                                              .isNotEmpty
+                                                          ? RichText(
+                                                              text: TextSpan(
+                                                                style:
+                                                                    TextStyle(
+                                                                  fontSize: 14,
+                                                                  fontFamily:
+                                                                      'Montserrat',
+                                                                  color: Colors
+                                                                      .black,
+                                                                ),
+                                                                children: [
+                                                                  TextSpan(
+                                                                    text:
+                                                                        'Amount: ',
+                                                                    style:
+                                                                        TextStyle(
+                                                                      fontFamily:
+                                                                          'Montserrat',
+                                                                    ),
+                                                                  ),
+                                                                  TextSpan(
+                                                                    text: notification[
+                                                                        'amount']!,
+                                                                    style:
+                                                                        TextStyle(
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold,
+                                                                      color: Color(
+                                                                          0xFF45BF7A),
+                                                                      fontFamily:
+                                                                          'Montserrat',
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            )
+                                                          : null,
+                                                );
+                                              }).toList(),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  );
                 },
               ),
               Positioned(
@@ -335,8 +498,7 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
         BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
         BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Tenant'),
         BottomNavigationBarItem(icon: Icon(Icons.home_work), label: 'Property'),
-        BottomNavigationBarItem(
-            icon: Icon(Icons.history), label: 'Rent History'),
+        BottomNavigationBarItem(icon: Icon(Icons.history), label: 'History'),
         BottomNavigationBarItem(icon: Icon(Icons.person_pin), label: 'Profile'),
       ],
     );

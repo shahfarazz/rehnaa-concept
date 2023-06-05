@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:rehnaa/frontend/Screens/Landlord/contract.dart';
 import 'package:rehnaa/frontend/Screens/Landlord/vouchers.dart';
 import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenant_profile.dart';
+import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenant_properties.dart';
+import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenant_rentaccrual.dart';
 import 'dart:ui';
 import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenant_renthistory.dart';
 import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenant_dashboard_content.dart';
+import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenantmonthlyrentoff.dart';
 
 class TenantDashboardPage extends StatefulWidget {
   final String uid; // UID of the tenant
@@ -102,6 +105,9 @@ class _DashboardPageState extends State<TenantDashboardPage>
                           },
                           children: <Widget>[
                             TenantDashboardContent(uid: widget.uid),
+                            TenantRentAccrualPage(),
+                            TenantPropertiesPage(uid: widget.uid),
+                            TenantMonthlyRentOffPage(),
                             TenantRentHistoryPage(uid: widget.uid),
                             const TenantProfilePage(),
                           ],
@@ -120,12 +126,25 @@ class _DashboardPageState extends State<TenantDashboardPage>
     );
   }
 
-  List<String> notifications = [
-    'Notification 1',
-    'Notification 2',
-    'Notification 3',
+  List<Map<String, String>> notifications = [
+    {
+      'title': 'Rent paid by Tenant: Michelle',
+      'amount': '\$30000',
+    },
+    {
+      'title': 'Maintenance request by Tenant: John',
+      'amount': '',
+    },
+    {
+      'title': 'Contract renewal notice for Property: ABC Apartment',
+      'amount': '',
+    },
+    {
+      'title': 'Notification 4',
+      'amount': '',
+    },
     // Add more notifications here
-  ];
+  ]; // AppBar widget for the dashboard
 
   PreferredSizeWidget? _appBar(Size size) {
     return AppBar(
@@ -191,84 +210,144 @@ class _DashboardPageState extends State<TenantDashboardPage>
                   showDialog(
                     context: context,
                     builder: (BuildContext context) {
-                      return Stack(
-                        children: [
-                          Positioned.fill(
-                            child: BackdropFilter(
-                              filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
-                              child: Container(
-                                color: Colors.black.withOpacity(0.5),
-                              ),
-                            ),
+                      return Dialog(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20.0),
+                        ),
+                        child: Container(
+                          height: MediaQuery.of(context).size.height * 0.25,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(25.0),
                           ),
-                          AlertDialog(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20.0),
-                            ),
-                            contentPadding: EdgeInsets.zero,
-                            content: Builder(
-                              builder: (BuildContext context) {
-                                return Container(
+                          child: Stack(
+                            children: <Widget>[
+                              Positioned.fill(
+                                child: Container(
                                   decoration: BoxDecoration(
-                                    color: Colors.white,
+                                    gradient: LinearGradient(
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
+                                      colors: [
+                                        Color(0xFF0FA697),
+                                        Color(0xFF45BF7A),
+                                        Color(0xFF0DF205),
+                                      ],
+                                    ),
                                     borderRadius: BorderRadius.circular(25.0),
                                   ),
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: <Widget>[
-                                      Padding(
-                                        padding: const EdgeInsets.all(16.0),
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: <Widget>[
-                                            Hero(
-                                              tag: 'notificationTitle',
-                                              child: Text(
-                                                'Notifications',
-                                                style: TextStyle(
-                                                  fontSize: 20,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
+                                ),
+                              ),
+                              Column(
+                                children: <Widget>[
+                                  Padding(
+                                    padding: const EdgeInsets.all(16.0),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: <Widget>[
+                                        Hero(
+                                          tag: 'notificationTitle',
+                                          child: Text(
+                                            'Notifications',
+                                            style: TextStyle(
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.white,
+                                              fontFamily: 'Montserrat',
                                             ),
-                                            IconButton(
-                                              icon: Icon(Icons.close),
-                                              onPressed: () {
-                                                Navigator.pop(context);
-                                              },
-                                            ),
-                                          ],
+                                          ),
                                         ),
+                                        IconButton(
+                                          icon: Icon(Icons.close),
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                          },
+                                          color: Colors.white,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Divider(
+                                    height: 0,
+                                    color: Colors.grey,
+                                  ),
+                                  Expanded(
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.only(
+                                        bottomLeft: Radius.circular(20.0),
+                                        bottomRight: Radius.circular(20.0),
                                       ),
-                                      Divider(
-                                        height: 0,
-                                        color: Colors.grey,
-                                      ),
-                                      Flexible(
-                                        child: SingleChildScrollView(
-                                          child: Column(
-                                            children: notifications
-                                                .map((notification) {
-                                              return ListTile(
-                                                title: Text(
-                                                  notification,
-                                                  style:
-                                                      TextStyle(fontSize: 16),
-                                                ),
-                                              );
-                                            }).toList(),
+                                      child: Container(
+                                        padding: EdgeInsets.only(bottom: 4.0),
+                                        color: Colors.white,
+                                        child: Scrollbar(
+                                          isAlwaysShown: true,
+                                          child: SingleChildScrollView(
+                                            child: Column(
+                                              children: notifications
+                                                  .map((notification) {
+                                                return ListTile(
+                                                  title: Text(
+                                                    notification['title']!,
+                                                    style: TextStyle(
+                                                      fontSize: 16,
+                                                      fontFamily: 'Montserrat',
+                                                    ),
+                                                  ),
+                                                  subtitle:
+                                                      notification['amount']!
+                                                              .isNotEmpty
+                                                          ? RichText(
+                                                              text: TextSpan(
+                                                                style:
+                                                                    TextStyle(
+                                                                  fontSize: 14,
+                                                                  fontFamily:
+                                                                      'Montserrat',
+                                                                  color: Colors
+                                                                      .black,
+                                                                ),
+                                                                children: [
+                                                                  TextSpan(
+                                                                    text:
+                                                                        'Amount: ',
+                                                                    style:
+                                                                        TextStyle(
+                                                                      fontFamily:
+                                                                          'Montserrat',
+                                                                    ),
+                                                                  ),
+                                                                  TextSpan(
+                                                                    text: notification[
+                                                                        'amount']!,
+                                                                    style:
+                                                                        TextStyle(
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold,
+                                                                      color: Color(
+                                                                          0xFF45BF7A),
+                                                                      fontFamily:
+                                                                          'Montserrat',
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            )
+                                                          : null,
+                                                );
+                                              }).toList(),
+                                            ),
                                           ),
                                         ),
                                       ),
-                                      SizedBox(height: 10),
-                                    ],
+                                    ),
                                   ),
-                                );
-                              },
-                            ),
+                                ],
+                              ),
+                            ],
                           ),
-                        ],
+                        ),
                       );
                     },
                   );
@@ -456,12 +535,17 @@ class _DashboardPageState extends State<TenantDashboardPage>
         currentIndex: _currentIndex,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Tenant'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.real_estate_agent), label: 'Accrual'),
           BottomNavigationBarItem(
               icon: Icon(Icons.home_work), label: 'Property'),
           BottomNavigationBarItem(
+            icon: Icon(Icons.discount_sharp),
+            label: 'Discounts',
+          ),
+          BottomNavigationBarItem(
             icon: Icon(Icons.history),
-            label: 'Rent History',
+            label: 'History',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person_pin),

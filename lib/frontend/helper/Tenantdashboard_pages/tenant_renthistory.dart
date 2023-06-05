@@ -9,13 +9,11 @@ import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 class TenantRentHistoryPage extends StatefulWidget {
   final String uid; // UID of the landlord
 
-  const TenantRentHistoryPage({Key? key, required this.uid})
-      : super(key: key);
+  const TenantRentHistoryPage({Key? key, required this.uid}) : super(key: key);
 
   @override
   // ignore: library_private_types_in_public_api
-  _TenantRentHistoryPageState createState() =>
-      _TenantRentHistoryPageState();
+  _TenantRentHistoryPageState createState() => _TenantRentHistoryPageState();
 }
 
 class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
@@ -38,7 +36,7 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
       // Fetch landlord data from Firestore
       DocumentSnapshot<Map<String, dynamic>> landlordSnapshot =
           await FirebaseFirestore.instance
-              .collection('Landlords')
+              .collection('Tenants')
               .doc(widget.uid)
               .get();
 
@@ -181,7 +179,7 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            firstName == 'Withdraw' ? '-' : '+',
+                            '-',
                             style: GoogleFonts.montserrat(
                               fontSize: size.width * 0.04,
                               fontWeight: FontWeight.bold,
@@ -258,7 +256,7 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
           ),
           SizedBox(height: size.height * 0.03),
           Text(
-            'All Tenant Property',
+            'All Tenant Rentals',
             style: GoogleFonts.montserrat(
               fontWeight: FontWeight.bold,
               fontSize: size.width * 0.045,
