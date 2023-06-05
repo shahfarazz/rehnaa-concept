@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
+import 'package:rehnaa/frontend/Screens/login_page.dart';
 import 'backend/services/authentication_service.dart';
 import 'frontend/Screens/Tenant/tenant_dashboard.dart';
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,6 +30,7 @@ class MyApp extends StatelessWidget {
         // home: const SplashScreen(),
         home: TenantDashboardPage(
             uid: 'K55YzmkUXt09OgFwnDuT'), //TODO remove this Jugaar
+        // home: LoginPage(),
       ),
     );
   }
