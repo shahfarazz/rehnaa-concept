@@ -5,6 +5,8 @@ import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenant_dashboard_co
 import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenant_profile.dart';
 import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenant_renthistory.dart';
 
+import '../../helper/Tenantdashboard_pages/tenant_landlord.dart';
+
 class TenantDashboardPage extends StatefulWidget {
   final String uid; // UID of the tenant
 
@@ -94,6 +96,8 @@ class _DashboardPageState extends State<TenantDashboardPage>
               },
               children: <Widget>[
                 TenantDashboardContent(uid: widget.uid,),
+                TenantLandlordPage (uid: widget.uid,),
+
                 TenantRentHistoryPage(uid: widget.uid),
 
                 const TenantProfilePage(),
