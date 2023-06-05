@@ -63,18 +63,7 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
     }
   }
 
-  // void showOptionDialog() {
-  //   // Option dialog code remains the same
-  // }
-
-  // Widget buildOptionTile({
-  //   String selectedOption = "",
-  //   String optionImage = "",
-  //   String optionName = "",
-  //   VoidCallback? onTap,
-  // }) {
-  //   // Option tile code remains the same
-  // }
+  
 
 
   
@@ -316,7 +305,7 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: <Widget>[
                                 Text(
-                                  'Rent Amount',
+                                  'Rent Accrue',
                                   style: GoogleFonts.montserrat(
                                     fontSize: size.width * 0.05,
                                     fontWeight: FontWeight.w400,
