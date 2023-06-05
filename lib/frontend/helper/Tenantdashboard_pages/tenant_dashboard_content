@@ -87,6 +87,9 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setState) {
             return AlertDialog(
+              shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(25.0),
+            ),
               title: const Padding(
                 padding:
                     EdgeInsets.only(top: 16.0), // Adjust the value as needed
