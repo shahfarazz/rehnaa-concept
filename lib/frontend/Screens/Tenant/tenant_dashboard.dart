@@ -3,6 +3,7 @@ import 'package:rehnaa/frontend/Screens/Landlord/contract.dart';
 import 'package:rehnaa/frontend/Screens/Landlord/vouchers.dart';
 import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenant_dashboard_content';
 import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenant_profile.dart';
+import 'dart:ui';
 import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenant_renthistory.dart';
 
 class TenantDashboardPage extends StatefulWidget {
@@ -119,114 +120,201 @@ Widget build(BuildContext context) {
   );
 }
 
+List<String> notifications = [
+  'Notification 1',
+  'Notification 2',
+  'Notification 3',
+  // Add more notifications here
+];
 
-  // AppBar widget for the dashboard
-  PreferredSizeWidget? _appBar(Size size) {
-    return AppBar(
-      toolbarHeight: 70,
-      leading: Padding(
-        padding: const EdgeInsets.only(top: 8.0),
-        child: GestureDetector(
-          onHorizontalDragUpdate: (details) {
-            if (details.delta.dx > 0) {
-              _toggleSidebar();
-            } else if (details.delta.dx < 0) {
-              _closeSidebar();
-            }
-          },
-          child: IconButton(
-            iconSize: 30.0,
-            icon: const Icon(Icons.menu),
-            onPressed: _toggleSidebar,
-          ),
+
+PreferredSizeWidget? _appBar(Size size) {
+  return AppBar(
+    toolbarHeight: 70,
+    leading: Padding(
+      padding: const EdgeInsets.only(top: 8.0),
+      child: GestureDetector(
+        onHorizontalDragUpdate: (details) {
+          if (details.delta.dx > 0) {
+            _toggleSidebar();
+          } else if (details.delta.dx < 0) {
+            _closeSidebar();
+          }
+        },
+        child: IconButton(
+          iconSize: 30.0,
+          icon: const Icon(Icons.menu),
+          onPressed: _toggleSidebar,
         ),
       ),
-      title: Padding(
-        padding: const EdgeInsets.only(
-          top: 2.0,
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Stack(
-              children: [
-                ClipPath(
-                  clipper: HexagonClipper(),
-                  child: Transform.scale(
-                    scale: 0.87,
-                    child: Container(
-                      color: Colors.white,
-                      width: 60,
-                      height: 60,
-                    ),
-                  ),
-                ),
-                ClipPath(
-                  clipper: HexagonClipper(),
-                  child: Image.asset(
-                    'assets/mainlogo.png',
+    ),
+    title: Padding(
+      padding: const EdgeInsets.only(top: 2.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Stack(
+            children: [
+              ClipPath(
+                clipper: HexagonClipper(),
+                child: Transform.scale(
+                  scale: 0.87,
+                  child: Container(
+                    color: Colors.white,
                     width: 60,
                     height: 60,
                   ),
                 ),
-              ],
-            ),
-            const SizedBox(width: 8),
-          ],
-        ),
-      ),
-      actions: <Widget>[
-        Padding(
-          padding: const EdgeInsets.only(top: 15.0),
-          child: Stack(
-            children: [
-              IconButton(
-                icon: const Icon(Icons.notifications_active),
-                onPressed: () {
-                  // TODO: Implement notifications handling here
-                },
               ),
-              Positioned(
-                right: 13,
-                child: Container(
-                  padding: const EdgeInsets.all(2),
-                  decoration: BoxDecoration(
-                    color: Colors.red,
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  constraints: const BoxConstraints(
-                    minWidth: 10,
-                    minHeight: 10,
-                  ),
-                  child: const Text(
-                    '9',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 10,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
+              ClipPath(
+                clipper: HexagonClipper(),
+                child: Image.asset(
+                  'assets/mainlogo.png',
+                  width: 60,
+                  height: 60,
                 ),
               ),
             ],
           ),
-        ),
-      ],
-      flexibleSpace: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Color(0xff0FA697),
-              Color(0xff45BF7A),
-              Color(0xff0DF205),
-            ],
+          const SizedBox(width: 8),
+        ],
+      ),
+    ),
+    actions: <Widget>[
+      Padding(
+        padding: const EdgeInsets.only(top: 15.0),
+        child: Stack(
+          children: [
+          IconButton(
+            icon: const Icon(Icons.notifications_active),
+            onPressed: () {
+              // Show notifications panel
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return Stack(
+                    children: [
+                      Positioned.fill(
+                        child: BackdropFilter(
+                          filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+                          child: Container(
+                            color: Colors.black.withOpacity(0.5),
+                          ),
+                        ),
+                      ),
+                      AlertDialog(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20.0),
+                        ),
+                        contentPadding: EdgeInsets.zero,
+                        content: Builder(
+                          builder: (BuildContext context) {
+                            return Container(
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(20.0),
+                              ),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: <Widget>[
+                                  Padding(
+                                    padding: const EdgeInsets.all(16.0),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: <Widget>[
+                                        Hero(
+                                          tag: 'notificationTitle',
+                                          child: Text(
+                                            'Notifications',
+                                            style: TextStyle(
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ),
+                                        IconButton(
+                                          icon: Icon(Icons.close),
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                          },
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Divider(
+                                    height: 0,
+                                    color: Colors.grey,
+                                  ),
+                                  Flexible(
+                                    child: SingleChildScrollView(
+                                      child: Column(
+                                        children: notifications.map((notification) {
+                                          return ListTile(
+                                            title: Text(
+                                              notification,
+                                              style: TextStyle(fontSize: 16),
+                                            ),
+                                          );
+                                        }).toList(),
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(height: 10),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              );
+            },
           ),
+            Positioned(
+              right: 13,
+              child: Container(
+                padding: const EdgeInsets.all(2),
+                decoration: BoxDecoration(
+                  color: Colors.red,
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                constraints: const BoxConstraints(
+                  minWidth: 10,
+                  minHeight: 10,
+                ),
+                child: const Text(
+                  '9',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 10,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ),
+          ],
         ),
       ),
-    );
-  }
+    ],
+    flexibleSpace: Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Color(0xff0FA697),
+            Color(0xff45BF7A),
+            Color(0xff0DF205),
+          ],
+        ),
+      ),
+    ),
+  );
+}
+
+  
 Widget _sidebar(Size size) {
   return GestureDetector(
     onHorizontalDragUpdate: (details) {
