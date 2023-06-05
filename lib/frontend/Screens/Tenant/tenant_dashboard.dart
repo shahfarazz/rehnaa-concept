@@ -70,6 +70,7 @@ class _DashboardPageState extends State<TenantDashboardPage>
       _sidebarController.reverse();
     });
   }
+  
 @override
 Widget build(BuildContext context) {
   final Size size = MediaQuery.of(context).size;
@@ -226,117 +227,136 @@ Widget build(BuildContext context) {
       ),
     );
   }
-
-// Sidebar widget
-// Sidebar widget
 Widget _sidebar(Size size) {
-  return AnimatedContainer(
-    duration: const Duration(milliseconds: 300),
-    width: _isSidebarOpen ? size.width * 0.6 : 0,
-    height: _isSidebarOpen ? size.height : 0,
-    color: Colors.white,
-    child: SlideTransition(
-      position: Tween<Offset>(
-        begin: const Offset(-1, 0),
-        end: const Offset(0, 0),
-      ).animate(CurvedAnimation(
-        parent: _sidebarController,
-        curve: Curves.easeInOut,
-      )),
-      child: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              padding: const EdgeInsets.only(left: 16, top: 64, bottom: 16),
-              child: const Text(
-                'Menu',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
+  return GestureDetector(
+    onHorizontalDragUpdate: (details) {
+      if (details.delta.dx > 0) {
+        // Swipe right, open the sidebar
+        setState(() {
+          _isSidebarOpen = true;
+        });
+      } else if (details.delta.dx < 0) {
+        // Swipe left, close the sidebar
+        setState(() {
+          _isSidebarOpen = false;
+        });
+      }
+    },
+    child: AnimatedContainer(
+      duration: const Duration(milliseconds: 300),
+      width: _isSidebarOpen ? size.width * 0.6 : 0,
+      height: _isSidebarOpen ? size.height : 0,
+      color: Colors.white,
+      child: SlideTransition(
+        position: Tween<Offset>(
+          begin: const Offset(-1, 0),
+          end: const Offset(0, 0),
+        ).animate(CurvedAnimation(
+          parent: _sidebarController,
+          curve: Curves.easeInOut,
+        )),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                padding: const EdgeInsets.only(left: 16, top: 64, bottom: 16),
+                child: const Text(
+                  'Menu',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
-            ),
-            Divider(
-              color: Colors.grey[400],
-              thickness: 0.5,
-            ),
-            ListTile(
-              leading: const Icon(Icons.description),
-              title: const Text(
-                'Contract',
-                style: TextStyle(
-                  fontSize: 18,
+              Divider(
+                color: Colors.grey[400],
+                thickness: 0.5,
+              ),
+              ListTile(
+                leading: const Icon(Icons.description),
+                title: const Text(
+                  'Contract',
+                  style: TextStyle(
+                    fontSize: 18,
+                  ),
                 ),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const ContractPage(),
+                    ),
+                  );
+                  _closeSidebar(); // Close the sidebar after navigation
+                },
               ),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const ContractPage(),
-                  ),
-                );
-                _closeSidebar(); // Close the sidebar after navigation
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.receipt),
-              title: Row(
-                children: <Widget>[
-                  Expanded(
-                    child: const Text(
-                      'Vouchers',
-                      style: TextStyle(
-                        fontSize: 18,
+              ListTile(
+                leading: const Icon(Icons.receipt),
+                title: Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: const Text(
+                        'Vouchers',
+                        style: TextStyle(
+                          fontSize: 18,
+                        ),
                       ),
                     ),
-                  ),
-                  const SizedBox(width: 10.0), // add some spacing
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 6.0, vertical: 2.0),
-                    decoration: BoxDecoration(
-                      color: Colors.red,
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                    child: const Text(
-                      'new',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 12.0, // adjust the size to fit your needs
+                    const SizedBox(width: 10.0), // add some spacing
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 6.0, vertical: 2.0),
+                      decoration: BoxDecoration(
+                        color: Colors.red,
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                      child: const Text(
+                        'new',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 12.0, // adjust the size to fit your needs
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const VouchersPage(),
+                    ),
+                  );
+                  _closeSidebar(); // Close the sidebar after navigation
+                },
               ),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const VouchersPage(),
-                  ),
-                );
-                _closeSidebar(); // Close the sidebar after navigation
-              },
-            ),
-            // Add more list items if needed
-            const SizedBox(height: 16),
-            Divider(
-              color: Colors.grey[400],
-              thickness: 0.5,
-            ),
-            // Add any additional widgets or content at the bottom of the sidebar
-          ],
+              // Add more list items if needed
+              const SizedBox(height: 16),
+              Divider(
+                color: Colors.grey[400],
+                thickness: 0.5,
+              ),
+              // Add any additional widgets or content at the bottom of the sidebar
+            ],
+          ),
         ),
       ),
     ),
   );
 }
 
-
-  // BottomNavigationBar widget
-  Widget _bottomNavigationBar() {
-    return BottomNavigationBar(
+Widget _bottomNavigationBar() {
+  return Container(
+    decoration: BoxDecoration(
+      border: Border(
+        top: BorderSide(
+          color: Colors.grey[200]!, // Set the color of the gray line
+          width: 1.0, // Set the width of the gray line
+        ),
+      ),
+    ),
+    child: BottomNavigationBar(
       type: BottomNavigationBarType.fixed,
       backgroundColor: Colors.white,
       selectedItemColor: Colors.black,
@@ -350,11 +370,18 @@ Widget _sidebar(Size size) {
         BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Tenant'),
         BottomNavigationBarItem(icon: Icon(Icons.home_work), label: 'Property'),
         BottomNavigationBarItem(
-            icon: Icon(Icons.history), label: 'Rent History'),
-        BottomNavigationBarItem(icon: Icon(Icons.person_pin), label: 'Profile'),
+          icon: Icon(Icons.history),
+          label: 'Rent History',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.person_pin),
+          label: 'Profile',
+        ),
       ],
-    );
-  }
+    ),
+  );
+}
+
 }
 
 // Custom Clipper for hexagonal shape
