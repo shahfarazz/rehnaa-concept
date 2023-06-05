@@ -30,10 +30,10 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
   @override
   void initState() {
     super.initState();
-    _loadRentPayments(); // Call method to load rent payments when the state is initialized
+    _tenantRentPayments(); // Call method to load rent payments when the state is initialized
   }
 
-  Future<void> _loadRentPayments() async {
+  Future<void> _tenantRentPayments() async {
     try {
       // Fetch landlord data from Firestore
       DocumentSnapshot<Map<String, dynamic>> landlordSnapshot =
