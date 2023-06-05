@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:rehnaa/backend/models/landlordmodel.dart';
 import 'package:rehnaa/backend/models/tenantsmodel.dart';
 
 class TenantDashboardContent extends StatefulWidget {
@@ -34,10 +33,8 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
   Future<Tenant> getTenantFromFirestore(String uid) async {
     try {
       // Fetch the tenant document from Firestore
-      DocumentSnapshot snapshot = await FirebaseFirestore.instance
-          .collection('Tenants')
-          .doc(uid)
-          .get();
+      DocumentSnapshot snapshot =
+          await FirebaseFirestore.instance.collection('Tenants').doc(uid).get();
       if (kDebugMode) {
         print('Fetched snapshot: $snapshot');
       }
@@ -63,10 +60,6 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
     }
   }
 
-  
-
-
-  
   void showOptionDialog() {
     showDialog(
       context: context,
@@ -77,8 +70,8 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
           builder: (BuildContext context, StateSetter setState) {
             return AlertDialog(
               shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(25.0),
-            ),
+                borderRadius: BorderRadius.circular(25.0),
+              ),
               title: const Padding(
                 padding:
                     EdgeInsets.only(top: 16.0), // Adjust the value as needed
@@ -97,7 +90,6 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                 children: <Widget>[
                   const Divider(
                     color: Colors.grey,
-                    
                   ), // added grey line
                   buildOptionTile(
                     selectedOption: selectedOption,
@@ -145,7 +137,7 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor:
-                        Colors.green ,
+                        selectedOption.isNotEmpty ? Colors.grey : Colors.green,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20.0),
                     ),
@@ -297,7 +289,8 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                           color: Colors.grey.withOpacity(0.4),
                           spreadRadius: 2,
                           blurRadius: 8,
-                          offset: const Offset(0, 4), // changes position of shadow
+                          offset:
+                              const Offset(0, 4), // changes position of shadow
                         ),
                       ],
                     ),

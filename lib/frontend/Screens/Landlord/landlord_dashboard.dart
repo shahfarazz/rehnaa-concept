@@ -6,7 +6,7 @@ import 'package:rehnaa/frontend/helper/Landlorddashboard_pages/landlord_profile.
 
 import '../../helper/Landlorddashboard_pages/landlord_renthistory.dart';
 import '../../helper/Landlorddashboard_pages/landlord_tenants.dart';
-import '../../helper/landlordproperties.dart';
+import '../../helper/Landlorddashboard_pages/landlordproperties.dart';
 
 class LandlordDashboardPage extends StatefulWidget {
   final String uid; // UID of the landlord

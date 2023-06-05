@@ -2,8 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../backend/models/propertymodel.dart';
-import 'Landlorddashboard_pages/landlord_propertyinfo.dart';
+import '../../../backend/models/propertymodel.dart';
+import 'landlord_propertyinfo.dart';
 
 class LandlordPropertiesPage extends StatefulWidget {
   final String uid; // UID of the landlord

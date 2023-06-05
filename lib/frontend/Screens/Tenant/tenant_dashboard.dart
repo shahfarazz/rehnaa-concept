@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:rehnaa/frontend/Screens/Landlord/contract.dart';
 import 'package:rehnaa/frontend/Screens/Landlord/vouchers.dart';
-import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenant_dashboard_content';
 import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenant_profile.dart';
 import 'dart:ui';
 import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenant_renthistory.dart';
+import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenant_dashboard_content.dart';
 
 class TenantDashboardPage extends StatefulWidget {
   final String uid; // UID of the tenant
@@ -71,405 +71,406 @@ class _DashboardPageState extends State<TenantDashboardPage>
       _sidebarController.reverse();
     });
   }
-  
-@override
-Widget build(BuildContext context) {
-  final Size size = MediaQuery.of(context).size;
-  super.build(context); // Ensure the state is kept alive
-  return Scaffold(
-    appBar: _appBar(size),
-    body: Stack(
-      children: [
-        GestureDetector(
-          onTap: () {
-            if (_isSidebarOpen) {
+
+  @override
+  Widget build(BuildContext context) {
+    final Size size = MediaQuery.of(context).size;
+    super.build(context); // Ensure the state is kept alive
+    return Scaffold(
+      appBar: _appBar(size),
+      body: Stack(
+        children: [
+          GestureDetector(
+            onTap: () {
+              if (_isSidebarOpen) {
+                _closeSidebar();
+              }
+            },
+            child: Stack(
+              children: [
+                Transform.translate(
+                  offset: Offset(_isSidebarOpen ? size.width * 0.6 : 0, 0),
+                  child: Column(
+                    children: [
+                      Expanded(
+                        child: PageView(
+                          controller: _pageController,
+                          onPageChanged: (index) {
+                            setState(() {
+                              _currentIndex = index;
+                            });
+                          },
+                          children: <Widget>[
+                            TenantDashboardContent(uid: widget.uid),
+                            TenantRentHistoryPage(uid: widget.uid),
+                            const TenantProfilePage(),
+                          ],
+                        ),
+                      ),
+                      _bottomNavigationBar(),
+                    ],
+                  ),
+                ),
+                if (_isSidebarOpen) _sidebar(size),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  List<String> notifications = [
+    'Notification 1',
+    'Notification 2',
+    'Notification 3',
+    // Add more notifications here
+  ];
+
+  PreferredSizeWidget? _appBar(Size size) {
+    return AppBar(
+      toolbarHeight: 70,
+      leading: Padding(
+        padding: const EdgeInsets.only(top: 8.0),
+        child: GestureDetector(
+          onHorizontalDragUpdate: (details) {
+            if (details.delta.dx > 0) {
+              _toggleSidebar();
+            } else if (details.delta.dx < 0) {
               _closeSidebar();
             }
           },
-          child: Stack(
-            children: [
-              Transform.translate(
-                offset: Offset(_isSidebarOpen ? size.width * 0.6 : 0, 0),
-                child: Column(
-                  children: [
-                    Expanded(
-                      child: PageView(
-                        controller: _pageController,
-                        onPageChanged: (index) {
-                          setState(() {
-                            _currentIndex = index;
-                          });
-                        },
-                        children: <Widget>[
-                          TenantDashboardContent(uid: widget.uid),
-                          TenantRentHistoryPage(uid: widget.uid),
-                          const TenantProfilePage(),
-                        ],
-                      ),
-                    ),
-                    _bottomNavigationBar(),
-                  ],
-                ),
-              ),
-              if (_isSidebarOpen) _sidebar(size),
-            ],
+          child: IconButton(
+            iconSize: 30.0,
+            icon: const Icon(Icons.menu),
+            onPressed: _toggleSidebar,
           ),
         ),
-      ],
-    ),
-  );
-}
-
-List<String> notifications = [
-  'Notification 1',
-  'Notification 2',
-  'Notification 3',
-  // Add more notifications here
-];
-
-
-PreferredSizeWidget? _appBar(Size size) {
-  return AppBar(
-    toolbarHeight: 70,
-    leading: Padding(
-      padding: const EdgeInsets.only(top: 8.0),
-      child: GestureDetector(
-        onHorizontalDragUpdate: (details) {
-          if (details.delta.dx > 0) {
-            _toggleSidebar();
-          } else if (details.delta.dx < 0) {
-            _closeSidebar();
-          }
-        },
-        child: IconButton(
-          iconSize: 30.0,
-          icon: const Icon(Icons.menu),
-          onPressed: _toggleSidebar,
-        ),
       ),
-    ),
-    title: Padding(
-      padding: const EdgeInsets.only(top: 2.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          Stack(
-            children: [
-              ClipPath(
-                clipper: HexagonClipper(),
-                child: Transform.scale(
-                  scale: 0.87,
-                  child: Container(
-                    color: Colors.white,
+      title: Padding(
+        padding: const EdgeInsets.only(top: 2.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Stack(
+              children: [
+                ClipPath(
+                  clipper: HexagonClipper(),
+                  child: Transform.scale(
+                    scale: 0.87,
+                    child: Container(
+                      color: Colors.white,
+                      width: 60,
+                      height: 60,
+                    ),
+                  ),
+                ),
+                ClipPath(
+                  clipper: HexagonClipper(),
+                  child: Image.asset(
+                    'assets/mainlogo.png',
                     width: 60,
                     height: 60,
                   ),
                 ),
+              ],
+            ),
+            const SizedBox(width: 8),
+          ],
+        ),
+      ),
+      actions: <Widget>[
+        Padding(
+          padding: const EdgeInsets.only(top: 15.0),
+          child: Stack(
+            children: [
+              IconButton(
+                icon: const Icon(Icons.notifications_active),
+                onPressed: () {
+                  // Show notifications panel
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return Stack(
+                        children: [
+                          Positioned.fill(
+                            child: BackdropFilter(
+                              filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+                              child: Container(
+                                color: Colors.black.withOpacity(0.5),
+                              ),
+                            ),
+                          ),
+                          AlertDialog(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20.0),
+                            ),
+                            contentPadding: EdgeInsets.zero,
+                            content: Builder(
+                              builder: (BuildContext context) {
+                                return Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(25.0),
+                                  ),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: <Widget>[
+                                      Padding(
+                                        padding: const EdgeInsets.all(16.0),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: <Widget>[
+                                            Hero(
+                                              tag: 'notificationTitle',
+                                              child: Text(
+                                                'Notifications',
+                                                style: TextStyle(
+                                                  fontSize: 20,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ),
+                                            IconButton(
+                                              icon: Icon(Icons.close),
+                                              onPressed: () {
+                                                Navigator.pop(context);
+                                              },
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      Divider(
+                                        height: 0,
+                                        color: Colors.grey,
+                                      ),
+                                      Flexible(
+                                        child: SingleChildScrollView(
+                                          child: Column(
+                                            children: notifications
+                                                .map((notification) {
+                                              return ListTile(
+                                                title: Text(
+                                                  notification,
+                                                  style:
+                                                      TextStyle(fontSize: 16),
+                                                ),
+                                              );
+                                            }).toList(),
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(height: 10),
+                                    ],
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                },
               ),
-              ClipPath(
-                clipper: HexagonClipper(),
-                child: Image.asset(
-                  'assets/mainlogo.png',
-                  width: 60,
-                  height: 60,
+              Positioned(
+                right: 13,
+                child: Container(
+                  padding: const EdgeInsets.all(2),
+                  decoration: BoxDecoration(
+                    color: Colors.red,
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  constraints: const BoxConstraints(
+                    minWidth: 10,
+                    minHeight: 10,
+                  ),
+                  child: const Text(
+                    '9',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 10,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
                 ),
               ),
             ],
           ),
-          const SizedBox(width: 8),
-        ],
+        ),
+      ],
+      flexibleSpace: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Color(0xff0FA697),
+              Color(0xff45BF7A),
+              Color(0xff0DF205),
+            ],
+          ),
+        ),
       ),
-    ),
-    actions: <Widget>[
-      Padding(
-        padding: const EdgeInsets.only(top: 15.0),
-        child: Stack(
-          children: [
-          IconButton(
-            icon: const Icon(Icons.notifications_active),
-            onPressed: () {
-              // Show notifications panel
-              showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return Stack(
-                    children: [
-                      Positioned.fill(
-                        child: BackdropFilter(
-                          filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
-                          child: Container(
-                            color: Colors.black.withOpacity(0.5),
+    );
+  }
+
+  Widget _sidebar(Size size) {
+    return GestureDetector(
+      onHorizontalDragUpdate: (details) {
+        if (details.delta.dx > 0) {
+          // Swipe right, open the sidebar
+          setState(() {
+            _isSidebarOpen = true;
+          });
+        } else if (details.delta.dx < 0) {
+          // Swipe left, close the sidebar
+          setState(() {
+            _isSidebarOpen = false;
+          });
+        }
+      },
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        width: _isSidebarOpen ? size.width * 0.6 : 0,
+        height: _isSidebarOpen ? size.height : 0,
+        color: Colors.white,
+        child: SlideTransition(
+          position: Tween<Offset>(
+            begin: const Offset(-1, 0),
+            end: const Offset(0, 0),
+          ).animate(CurvedAnimation(
+            parent: _sidebarController,
+            curve: Curves.easeInOut,
+          )),
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  padding: const EdgeInsets.only(left: 16, top: 64, bottom: 16),
+                  child: const Text(
+                    'Menu',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                Divider(
+                  color: Colors.grey[400],
+                  thickness: 0.5,
+                ),
+                ListTile(
+                  leading: const Icon(Icons.description),
+                  title: const Text(
+                    'Contract',
+                    style: TextStyle(
+                      fontSize: 18,
+                    ),
+                  ),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const ContractPage(),
+                      ),
+                    );
+                    _closeSidebar(); // Close the sidebar after navigation
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.receipt),
+                  title: Row(
+                    children: <Widget>[
+                      Expanded(
+                        child: const Text(
+                          'Vouchers',
+                          style: TextStyle(
+                            fontSize: 18,
                           ),
                         ),
                       ),
-                      AlertDialog(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20.0),
+                      const SizedBox(width: 10.0), // add some spacing
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 6.0, vertical: 2.0),
+                        decoration: BoxDecoration(
+                          color: Colors.red,
+                          borderRadius: BorderRadius.circular(8.0),
                         ),
-                        contentPadding: EdgeInsets.zero,
-                        content: Builder(
-                          builder: (BuildContext context) {
-                            return Container(
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(25.0),
-                              ),
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: <Widget>[
-                                  Padding(
-                                    padding: const EdgeInsets.all(16.0),
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: <Widget>[
-                                        Hero(
-                                          tag: 'notificationTitle',
-                                          child: Text(
-                                            'Notifications',
-                                            style: TextStyle(
-                                              fontSize: 20,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ),
-                                        IconButton(
-                                          icon: Icon(Icons.close),
-                                          onPressed: () {
-                                            Navigator.pop(context);
-                                          },
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  Divider(
-                                    height: 0,
-                                    color: Colors.grey,
-                                  ),
-                                  Flexible(
-                                    child: SingleChildScrollView(
-                                      child: Column(
-                                        children: notifications.map((notification) {
-                                          return ListTile(
-                                            title: Text(
-                                              notification,
-                                              style: TextStyle(fontSize: 16),
-                                            ),
-                                          );
-                                        }).toList(),
-                                      ),
-                                    ),
-                                  ),
-                                  SizedBox(height: 10),
-                                ],
-                              ),
-                            );
-                          },
+                        child: const Text(
+                          'new',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 12.0, // adjust the size to fit your needs
+                          ),
                         ),
                       ),
                     ],
-                  );
-                },
-              );
-            },
-          ),
-            Positioned(
-              right: 13,
-              child: Container(
-                padding: const EdgeInsets.all(2),
-                decoration: BoxDecoration(
-                  color: Colors.red,
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                constraints: const BoxConstraints(
-                  minWidth: 10,
-                  minHeight: 10,
-                ),
-                child: const Text(
-                  '9',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 10,
                   ),
-                  textAlign: TextAlign.center,
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const VouchersPage(),
+                      ),
+                    );
+                    _closeSidebar(); // Close the sidebar after navigation
+                  },
                 ),
-              ),
+                // Add more list items if needed
+                const SizedBox(height: 16),
+                Divider(
+                  color: Colors.grey[400],
+                  thickness: 0.5,
+                ),
+                // Add any additional widgets or content at the bottom of the sidebar
+              ],
             ),
-          ],
-        ),
-      ),
-    ],
-    flexibleSpace: Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            Color(0xff0FA697),
-            Color(0xff45BF7A),
-            Color(0xff0DF205),
-          ],
-        ),
-      ),
-    ),
-  );
-}
-
-  
-Widget _sidebar(Size size) {
-  return GestureDetector(
-    onHorizontalDragUpdate: (details) {
-      if (details.delta.dx > 0) {
-        // Swipe right, open the sidebar
-        setState(() {
-          _isSidebarOpen = true;
-        });
-      } else if (details.delta.dx < 0) {
-        // Swipe left, close the sidebar
-        setState(() {
-          _isSidebarOpen = false;
-        });
-      }
-    },
-    child: AnimatedContainer(
-      duration: const Duration(milliseconds: 300),
-      width: _isSidebarOpen ? size.width * 0.6 : 0,
-      height: _isSidebarOpen ? size.height : 0,
-      color: Colors.white,
-      child: SlideTransition(
-        position: Tween<Offset>(
-          begin: const Offset(-1, 0),
-          end: const Offset(0, 0),
-        ).animate(CurvedAnimation(
-          parent: _sidebarController,
-          curve: Curves.easeInOut,
-        )),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                padding: const EdgeInsets.only(left: 16, top: 64, bottom: 16),
-                child: const Text(
-                  'Menu',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              Divider(
-                color: Colors.grey[400],
-                thickness: 0.5,
-              ),
-              ListTile(
-                leading: const Icon(Icons.description),
-                title: const Text(
-                  'Contract',
-                  style: TextStyle(
-                    fontSize: 18,
-                  ),
-                ),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const ContractPage(),
-                    ),
-                  );
-                  _closeSidebar(); // Close the sidebar after navigation
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.receipt),
-                title: Row(
-                  children: <Widget>[
-                    Expanded(
-                      child: const Text(
-                        'Vouchers',
-                        style: TextStyle(
-                          fontSize: 18,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 10.0), // add some spacing
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 6.0, vertical: 2.0),
-                      decoration: BoxDecoration(
-                        color: Colors.red,
-                        borderRadius: BorderRadius.circular(8.0),
-                      ),
-                      child: const Text(
-                        'new',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 12.0, // adjust the size to fit your needs
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const VouchersPage(),
-                    ),
-                  );
-                  _closeSidebar(); // Close the sidebar after navigation
-                },
-              ),
-              // Add more list items if needed
-              const SizedBox(height: 16),
-              Divider(
-                color: Colors.grey[400],
-                thickness: 0.5,
-              ),
-              // Add any additional widgets or content at the bottom of the sidebar
-            ],
           ),
         ),
       ),
-    ),
-  );
-}
+    );
+  }
 
-Widget _bottomNavigationBar() {
-  return Container(
-    decoration: BoxDecoration(
-      border: Border(
-        top: BorderSide(
-          color: Colors.grey[200]!, // Set the color of the gray line
-          width: 1.0, // Set the width of the gray line
+  Widget _bottomNavigationBar() {
+    return Container(
+      decoration: BoxDecoration(
+        border: Border(
+          top: BorderSide(
+            color: Colors.grey[200]!, // Set the color of the gray line
+            width: 1.0, // Set the width of the gray line
+          ),
         ),
       ),
-    ),
-    child: BottomNavigationBar(
-      type: BottomNavigationBarType.fixed,
-      backgroundColor: Colors.white,
-      selectedItemColor: Colors.black,
-      unselectedItemColor: Colors.grey,
-      showSelectedLabels: true,
-      showUnselectedLabels: true,
-      onTap: onTabTapped,
-      currentIndex: _currentIndex,
-      items: const [
-        BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-        BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Tenant'),
-        BottomNavigationBarItem(icon: Icon(Icons.home_work), label: 'Property'),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.history),
-          label: 'Rent History',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.person_pin),
-          label: 'Profile',
-        ),
-      ],
-    ),
-  );
-}
-
+      child: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
+        backgroundColor: Colors.white,
+        selectedItemColor: Colors.black,
+        unselectedItemColor: Colors.grey,
+        showSelectedLabels: true,
+        showUnselectedLabels: true,
+        onTap: onTabTapped,
+        currentIndex: _currentIndex,
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Tenant'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.home_work), label: 'Property'),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.history),
+            label: 'Rent History',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person_pin),
+            label: 'Profile',
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 // Custom Clipper for hexagonal shape
