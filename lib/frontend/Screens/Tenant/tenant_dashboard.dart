@@ -5,8 +5,6 @@ import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenant_dashboard_co
 import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenant_profile.dart';
 import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenant_renthistory.dart';
 
-import '../../helper/Tenantdashboard_pages/tenant_landlord.dart';
-
 class TenantDashboardPage extends StatefulWidget {
   final String uid; // UID of the tenant
 
@@ -72,44 +70,54 @@ class _DashboardPageState extends State<TenantDashboardPage>
       _sidebarController.reverse();
     });
   }
-
-  @override
-  Widget build(BuildContext context) {
-    final Size size = MediaQuery.of(context).size;
-    super.build(context); // Ensure the state is kept alive
-    return Scaffold(
-      appBar: _appBar(size),
-      body: Stack(
-        children: [
-          GestureDetector(
-            onTap: () {
-              if (_isSidebarOpen) {
-                _closeSidebar();
-              }
-            },
-            child: PageView(
-              controller: _pageController,
-              onPageChanged: (index) {
-                setState(() {
-                  _currentIndex = index;
-                });
-              },
-              children: <Widget>[
-                TenantDashboardContent(uid: widget.uid,),
-                TenantLandlordPage (uid: widget.uid,),
-
-                TenantRentHistoryPage(uid: widget.uid),
-
-                const TenantProfilePage(),
-              ],
-            ),
+@override
+Widget build(BuildContext context) {
+  final Size size = MediaQuery.of(context).size;
+  super.build(context); // Ensure the state is kept alive
+  return Scaffold(
+    appBar: _appBar(size),
+    body: Stack(
+      children: [
+        GestureDetector(
+          onTap: () {
+            if (_isSidebarOpen) {
+              _closeSidebar();
+            }
+          },
+          child: Stack(
+            children: [
+              Transform.translate(
+                offset: Offset(_isSidebarOpen ? size.width * 0.6 : 0, 0),
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: PageView(
+                        controller: _pageController,
+                        onPageChanged: (index) {
+                          setState(() {
+                            _currentIndex = index;
+                          });
+                        },
+                        children: <Widget>[
+                          TenantDashboardContent(uid: widget.uid),
+                          TenantRentHistoryPage(uid: widget.uid),
+                          const TenantProfilePage(),
+                        ],
+                      ),
+                    ),
+                    _bottomNavigationBar(),
+                  ],
+                ),
+              ),
+              if (_isSidebarOpen) _sidebar(size),
+            ],
           ),
-          if (_isSidebarOpen) _sidebar(size),
-        ],
-      ),
-      bottomNavigationBar: _bottomNavigationBar(),
-    );
-  }
+        ),
+      ],
+    ),
+  );
+}
+
 
   // AppBar widget for the dashboard
   PreferredSizeWidget? _appBar(Size size) {
