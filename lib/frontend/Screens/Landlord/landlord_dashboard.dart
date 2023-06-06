@@ -102,7 +102,7 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
                 LandlordTenantsPage(uid: widget.uid),
                 LandlordPropertiesPage(uid: widget.uid),
                 LandlordRentHistoryPage(uid: widget.uid),
-                const LandlordProfilePage(),
+                LandlordProfilePage(uid: widget.uid),
               ],
             ),
           ),
@@ -199,7 +199,7 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
                     builder: (BuildContext context) {
                       return Dialog(
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20.0),
+                          borderRadius: BorderRadius.circular(25.0),
                         ),
                         child: Container(
                           height: MediaQuery.of(context).size.height * 0.25,
@@ -272,58 +272,100 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
                                           child: SingleChildScrollView(
                                             child: Column(
                                               children: notifications
-                                                  .map((notification) {
-                                                return ListTile(
-                                                  title: Text(
-                                                    notification['title']!,
-                                                    style: TextStyle(
-                                                      fontSize: 16,
-                                                      fontFamily: 'Montserrat',
-                                                    ),
-                                                  ),
-                                                  subtitle:
-                                                      notification['amount']!
-                                                              .isNotEmpty
-                                                          ? RichText(
-                                                              text: TextSpan(
-                                                                style:
-                                                                    TextStyle(
-                                                                  fontSize: 14,
-                                                                  fontFamily:
-                                                                      'Montserrat',
-                                                                  color: Colors
-                                                                      .black,
+                                                  .map(
+                                                      (notification) => Padding(
+                                                            padding: EdgeInsets
+                                                                .symmetric(
+                                                                    vertical:
+                                                                        8.0),
+                                                            child: Row(
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .start,
+                                                              children: <Widget>[
+                                                                SizedBox(
+                                                                  width: 24.0,
+                                                                  child:
+                                                                      Padding(
+                                                                    padding: EdgeInsets
+                                                                        .only(
+                                                                            left:
+                                                                                8.0),
+                                                                    child: Text(
+                                                                      '\u2022', // Bullet point character
+                                                                      style:
+                                                                          TextStyle(
+                                                                        fontSize:
+                                                                            24.0,
+                                                                        fontWeight:
+                                                                            FontWeight.bold,
+                                                                        color: Color(
+                                                                            0xFF45BF7A),
+                                                                      ),
+                                                                    ),
+                                                                  ),
                                                                 ),
-                                                                children: [
-                                                                  TextSpan(
-                                                                    text:
-                                                                        'Amount: ',
-                                                                    style:
-                                                                        TextStyle(
-                                                                      fontFamily:
-                                                                          'Montserrat',
-                                                                    ),
+                                                                SizedBox(
+                                                                    width:
+                                                                        12.0),
+                                                                Expanded(
+                                                                  child: Column(
+                                                                    crossAxisAlignment:
+                                                                        CrossAxisAlignment
+                                                                            .start,
+                                                                    children: [
+                                                                      Text(
+                                                                        notification[
+                                                                            'title']!,
+                                                                        style:
+                                                                            TextStyle(
+                                                                          fontSize:
+                                                                              18.0,
+                                                                          fontFamily:
+                                                                              'Montserrat',
+                                                                        ),
+                                                                      ),
+                                                                      if (notification[
+                                                                              'amount']!
+                                                                          .isNotEmpty)
+                                                                        Padding(
+                                                                          padding:
+                                                                              EdgeInsets.only(left: 24.0),
+                                                                          child:
+                                                                              RichText(
+                                                                            text:
+                                                                                TextSpan(
+                                                                              style: TextStyle(
+                                                                                fontSize: 16.0,
+                                                                                fontFamily: 'Montserrat',
+                                                                                color: Colors.black,
+                                                                              ),
+                                                                              children: [
+                                                                                TextSpan(
+                                                                                  text: 'Amount: ',
+                                                                                  style: TextStyle(
+                                                                                    fontFamily: 'Montserrat',
+                                                                                  ),
+                                                                                ),
+                                                                                TextSpan(
+                                                                                  text: notification['amount']!,
+                                                                                  style: TextStyle(
+                                                                                    fontWeight: FontWeight.bold,
+                                                                                    color: Color(0xFF45BF7A),
+                                                                                    fontFamily: 'Montserrat',
+                                                                                  ),
+                                                                                ),
+                                                                              ],
+                                                                            ),
+                                                                          ),
+                                                                        ),
+                                                                    ],
                                                                   ),
-                                                                  TextSpan(
-                                                                    text: notification[
-                                                                        'amount']!,
-                                                                    style:
-                                                                        TextStyle(
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .bold,
-                                                                      color: Color(
-                                                                          0xFF45BF7A),
-                                                                      fontFamily:
-                                                                          'Montserrat',
-                                                                    ),
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                            )
-                                                          : null,
-                                                );
-                                              }).toList(),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ))
+                                                  .toList(),
                                             ),
                                           ),
                                         ),

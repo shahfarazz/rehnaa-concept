@@ -21,6 +21,8 @@ class _TenantMonthlyRentOffPageState extends State<TenantMonthlyRentOffPage>
     'assets/defaulticon.png',
     'assets/image1.jpg',
     'assets/image2.jpg',
+    'assets/mainlogo.png',
+    'assets/image2.jpg'
     // Add more user images...
   ];
 
@@ -30,7 +32,7 @@ class _TenantMonthlyRentOffPageState extends State<TenantMonthlyRentOffPage>
     _confettiController =
         ConfettiController(duration: const Duration(seconds: 5));
     _animationController = AnimationController(
-      duration: const Duration(seconds: 5),
+      duration: const Duration(seconds: 8),
       vsync: this,
     );
     _animationController.addListener(() {
@@ -139,7 +141,7 @@ class _TenantMonthlyRentOffPageState extends State<TenantMonthlyRentOffPage>
                         backgroundImage: AssetImage('assets/defaulticon.png'),
                       )
                     : Transform.rotate(
-                        angle: _currentRotation,
+                        angle: 3.14159,
                         child: Stack(
                           alignment: Alignment.center,
                           children: _userImages
@@ -148,7 +150,8 @@ class _TenantMonthlyRentOffPageState extends State<TenantMonthlyRentOffPage>
                               .map(
                                 (entry) => Transform(
                                   transform:
-                                      Matrix4.rotationX(_currentRotation),
+                                      Matrix4.rotationY(_currentRotation) *
+                                          Matrix4.rotationZ(_currentRotation),
                                   alignment: Alignment.center,
                                   child: Transform.translate(
                                     offset: Offset(
@@ -160,17 +163,13 @@ class _TenantMonthlyRentOffPageState extends State<TenantMonthlyRentOffPage>
                                                   _userImages.length)),
                                       0.0, // No vertical translation along the Y-axis
                                     ),
-                                    child: Transform(
-                                      transform:
-                                          Matrix4.rotationZ(_currentRotation),
-                                      child: Transform.scale(
-                                        scale: _animationController.value,
-                                        child: CircleAvatar(
-                                          radius: 30.0,
-                                          backgroundColor: Colors.white,
-                                          backgroundImage:
-                                              AssetImage(entry.value),
-                                        ),
+                                    child: Transform.scale(
+                                      scale: _animationController.value,
+                                      child: CircleAvatar(
+                                        radius: 30.0,
+                                        backgroundColor: Colors.white,
+                                        backgroundImage:
+                                            AssetImage(entry.value),
                                       ),
                                     ),
                                   ),

@@ -109,7 +109,7 @@ class TenantLandlordInfoPage extends StatelessWidget {
                           widthFactor: 0.8,
                           child: WhiteBox(
                             label: 'Contact Number',
-                            value: tenant.contactNumber,
+                            value: tenant.emailOrPhone,
                           ),
                         ),
                       ),
@@ -153,7 +153,8 @@ class WhiteBox extends StatelessWidget {
   final String value;
   final String? points;
 
-  const WhiteBox({super.key, required this.label, required this.value, this.points});
+  const WhiteBox(
+      {super.key, required this.label, required this.value, this.points});
 
   @override
   Widget build(BuildContext context) {

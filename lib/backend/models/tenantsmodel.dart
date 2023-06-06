@@ -10,7 +10,7 @@ class Tenant {
   final int creditPoints;
   final String propertyDetails;
   final String cnicNumber;
-  final String contactNumber;
+  final String emailOrPhone;
   final bool tasdeeqVerification;
   final int familyMembers;
   final DocumentReference<Map<String, dynamic>>? landlordRef;
@@ -26,7 +26,7 @@ class Tenant {
     required this.creditPoints,
     required this.propertyDetails,
     required this.cnicNumber,
-    required this.contactNumber,
+    required this.emailOrPhone,
     required this.tasdeeqVerification,
     required this.familyMembers,
     this.landlordRef,
@@ -44,7 +44,7 @@ class Tenant {
       creditPoints: json['creditPoints'],
       propertyDetails: json['propertyDetails'],
       cnicNumber: json['cnicNumber'],
-      contactNumber: json['contactNumber'],
+      emailOrPhone: json['emailOrPhone'],
       tasdeeqVerification: json['tasdeeqVerification'],
       familyMembers: json['familyMembers'],
       landlordRef: json['landlordRef'],
