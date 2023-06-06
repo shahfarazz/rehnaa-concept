@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 // ignore: depend_on_referenced_packages
 import 'package:carousel_slider/carousel_slider.dart';
@@ -105,9 +106,14 @@ class PropertyCarousel extends StatelessWidget {
                   },
                   child: Hero(
                     tag: imagePath,
-                    child: Image.asset(
-                      imagePath,
-                      fit: BoxFit.fill,
+                    child: CachedNetworkImage(
+                      imageUrl:
+                          imagePath, // TODO define a new property.iconimagepath
+
+                      placeholder: (context, url) =>
+                          CircularProgressIndicator(),
+                      errorWidget: (context, url, error) => Icon(Icons.error),
+                      fit: BoxFit.cover,
                     ),
                   ),
                 );
@@ -558,7 +564,14 @@ class _ExpandedImagePageState extends State<ExpandedImagePage> {
                 scale: _scale,
                 child: Transform.translate(
                   offset: _offset,
-                  child: Image.asset(widget.imagePath),
+                  child: CachedNetworkImage(
+                    imageUrl: widget
+                        .imagePath, // TODO define a new property.iconimagepath
+
+                    placeholder: (context, url) => CircularProgressIndicator(),
+                    errorWidget: (context, url, error) => Icon(Icons.error),
+                    fit: BoxFit.cover,
+                  ),
                 ),
               ),
             ),
