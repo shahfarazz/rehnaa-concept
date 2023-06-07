@@ -48,6 +48,7 @@ class MyScreen extends StatelessWidget {
                 tag: 'imageTag',
                 child: SizedBox(
                   height: MediaQuery.of(context).size.height * 0.3,
+                  width: MediaQuery.of(context).size.width,
                   child: Image.asset(
                     'assets/image1.jpg',
                     fit: BoxFit.cover,
