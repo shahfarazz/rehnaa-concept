@@ -17,7 +17,6 @@ class MyApp extends StatelessWidget {
   }
 }
 
-
 class ContractCard extends StatelessWidget {
   final IconData icon;
   final String label;
