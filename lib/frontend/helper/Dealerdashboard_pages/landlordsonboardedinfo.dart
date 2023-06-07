@@ -12,7 +12,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const MaterialApp(
-      home: LandlordsOnboardedPage(),
+      home: LandlordsOnboardedInfoPage(),
     );
   }
 }
@@ -74,8 +74,8 @@ class ContractCard extends StatelessWidget {
 }
 
 
-class LandlordsOnboardedPage extends StatelessWidget {
-  const LandlordsOnboardedPage({super.key});
+class LandlordsOnboardedInfoPage extends StatelessWidget {
+  const LandlordsOnboardedInfoPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -167,7 +167,7 @@ class LandlordsOnboardedPage extends StatelessWidget {
                                ContractCard(
     icon: Icons.person,
     label: 'LandLords Name:',
-    data: 'Khan Omer',
+    data: 'Arshad Ali',
   ),
   const SizedBox(height: 16),
   ContractCard(
