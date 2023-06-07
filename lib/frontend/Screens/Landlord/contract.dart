@@ -175,7 +175,7 @@ class ContractCard extends StatelessWidget {
   final String label;
   final String data;
 
-  const ContractCard({super.key, required this.label, required this.data});
+  const ContractCard({Key? key, required this.label, required this.data}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -191,7 +191,8 @@ class ContractCard extends StatelessWidget {
           children: <Widget>[
             ListTile(
               leading: const Icon(
-                  Icons.description), // an icon next to the contract label
+                Icons.description,
+              ), // an icon next to the contract label
               title: Text(
                 label,
                 style: GoogleFonts.montserrat(
@@ -201,14 +202,15 @@ class ContractCard extends StatelessWidget {
                 ),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.only(left: 15),
+            SizedBox(height: 8),
+            Center(
               child: Text(
                 data,
                 style: GoogleFonts.montserrat(
                   fontWeight: FontWeight.normal, // normal contract data
                   fontSize: 16,
                 ),
+                textAlign: TextAlign.center,
               ),
             ),
           ],
