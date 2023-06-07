@@ -561,26 +561,39 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
   }
 
   // BottomNavigationBar widget
+
   Widget _bottomNavigationBar() {
-    return BottomNavigationBar(
-      type: BottomNavigationBarType.fixed,
-      backgroundColor: Colors.white,
-      selectedItemColor: Colors.black,
-      unselectedItemColor: Colors.grey,
-      showSelectedLabels: true,
-      showUnselectedLabels: true,
-      onTap: onTabTapped,
-      currentIndex: _currentIndex,
-      items: const [
+    return Container(
+      decoration: BoxDecoration(
+        border: Border(
+          top: BorderSide(
+            color: Colors.grey[200]!, // Set the color of the gray line
+            width: 1.0, // Set the width of the gray line
+          ),
+        ),
+      ),
+      child: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
+        backgroundColor: Colors.white,
+        selectedItemColor: Colors.black,
+        unselectedItemColor: Colors.grey,
+        showSelectedLabels: true,
+        showUnselectedLabels: true,
+        onTap: onTabTapped,
+        currentIndex: _currentIndex,
+         items: const [
         BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
         BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Tenant'),
         BottomNavigationBarItem(icon: Icon(Icons.home_work), label: 'Property'),
         BottomNavigationBarItem(icon: Icon(Icons.history), label: 'History'),
         BottomNavigationBarItem(icon: Icon(Icons.person_pin), label: 'Profile'),
       ],
+
+      ),
     );
   }
 }
+
 
 // Custom Clipper for hexagonal shape
 class HexagonClipper extends CustomClipper<Path> {
