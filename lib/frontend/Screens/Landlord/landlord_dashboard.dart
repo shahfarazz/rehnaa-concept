@@ -77,7 +77,7 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
   }
 
   @override
-  Widget build(BuildContext context) {
+   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
     super.build(context); // Ensure the state is kept alive
     return Scaffold(
@@ -90,28 +90,43 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
                 _closeSidebar();
               }
             },
-            child: PageView(
-              controller: _pageController,
-              onPageChanged: (index) {
-                setState(() {
-                  _currentIndex = index;
-                });
-              },
-              children: <Widget>[
-                LandlordDashboardContent(uid: widget.uid),
-                LandlordTenantsPage(uid: widget.uid),
-                LandlordPropertiesPage(uid: widget.uid),
-                LandlordRentHistoryPage(uid: widget.uid),
-                LandlordProfilePage(uid: widget.uid),
+            child: Stack(
+              children: [
+                Transform.translate(
+                  offset: Offset(_isSidebarOpen ? size.width * 0.6 : 0, 0),
+                  child: Column(
+                    children: [
+                      Expanded(
+                        child: PageView(
+                          controller: _pageController,
+                          onPageChanged: (index) {
+                            setState(() {
+                              _currentIndex = index;
+                            });
+                          },
+                          children: <Widget>[
+                          LandlordDashboardContent(uid: widget.uid),
+                          LandlordTenantsPage(uid: widget.uid),
+                          LandlordPropertiesPage(uid: widget.uid),
+                          LandlordRentHistoryPage(uid: widget.uid),
+                          LandlordProfilePage(uid: widget.uid),
+                          ],
+                        ),
+                      ),
+                      _bottomNavigationBar(),
+                    ],
+                  ),
+                ),
+                if (_isSidebarOpen) _sidebar(size),
               ],
             ),
           ),
-          if (_isSidebarOpen) _sidebar(size),
         ],
       ),
-      bottomNavigationBar: _bottomNavigationBar(),
     );
   }
+
+
 
   List<Map<String, String>> notifications = [
     {
@@ -202,7 +217,7 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
                           borderRadius: BorderRadius.circular(25.0),
                         ),
                         child: Container(
-                          height: MediaQuery.of(context).size.height * 0.25,
+                          height: MediaQuery.of(context).size.height * 0.3,
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(25.0),
                           ),
@@ -426,100 +441,120 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
 
 // Sidebar widget
 // Sidebar widget
-  Widget _sidebar(Size size) {
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 300),
-      width: _isSidebarOpen ? size.width * 0.6 : 0,
-      color: Colors.white,
-      child: SlideTransition(
-        position: Tween<Offset>(
-          begin: const Offset(-1, 0),
-          end: const Offset(0, 0),
-        ).animate(CurvedAnimation(
-          parent: _sidebarController,
-          curve: Curves.easeInOut,
-        )),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              padding: const EdgeInsets.only(left: 16, top: 64, bottom: 16),
-              child: const Text(
-                'Menu',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            Divider(
-              color: Colors.grey[400],
-              thickness: 0.5,
-            ),
-            ListTile(
-              leading: const Icon(Icons.description),
-              title: const Text(
-                'Contract',
-                style: TextStyle(
-                  fontSize: 18,
-                ),
-              ),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const ContractPage(),
+ Widget _sidebar(Size size) {
+    return GestureDetector(
+      onHorizontalDragUpdate: (details) {
+        if (details.delta.dx > 0) {
+          // Swipe right, open the sidebar
+          setState(() {
+            _isSidebarOpen = true;
+          });
+        } else if (details.delta.dx < 0) {
+          // Swipe left, close the sidebar
+          setState(() {
+            _isSidebarOpen = false;
+          });
+        }
+      },
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        width: _isSidebarOpen ? size.width * 0.6 : 0,
+        height: _isSidebarOpen ? size.height : 0,
+        color: Colors.white,
+        child: SlideTransition(
+          position: Tween<Offset>(
+            begin: const Offset(-1, 0),
+            end: const Offset(0, 0),
+          ).animate(CurvedAnimation(
+            parent: _sidebarController,
+            curve: Curves.easeInOut,
+          )),
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  padding: const EdgeInsets.only(left: 16, top: 64, bottom: 16),
+                  child: const Text(
+                    'Menu',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                );
-                _closeSidebar(); // Close the sidebar after navigation
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.receipt),
-              title: Row(
-                children: <Widget>[
-                  const Text(
-                    'Vouchers',
+                ),
+                Divider(
+                  color: Colors.grey[400],
+                  thickness: 0.5,
+                ),
+                ListTile(
+                  leading: const Icon(Icons.description),
+                  title: const Text(
+                    'Contract',
                     style: TextStyle(
                       fontSize: 18,
                     ),
                   ),
-                  const SizedBox(width: 10.0), // add some spacing
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 6.0, vertical: 2.0),
-                    decoration: BoxDecoration(
-                      color: Colors.red,
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                    child: const Text(
-                      'new',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 12.0, // adjust the size to fit your needs
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const ContractPage(),
                       ),
-                    ),
+                    );
+                    _closeSidebar(); // Close the sidebar after navigation
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.receipt),
+                  title: Row(
+                    children: <Widget>[
+                      Expanded(
+                        child: const Text(
+                          'Vouchers',
+                          style: TextStyle(
+                            fontSize: 18,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 10.0), // add some spacing
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 6.0, vertical: 2.0),
+                        decoration: BoxDecoration(
+                          color: Colors.red,
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                        child: const Text(
+                          'new',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 12.0, // adjust the size to fit your needs
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const VouchersPage(),
-                  ),
-                );
-                _closeSidebar(); // Close the sidebar after navigation
-              },
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const VouchersPage(),
+                      ),
+                    );
+                    _closeSidebar(); // Close the sidebar after navigation
+                  },
+                ),
+                // Add more list items if needed
+                const SizedBox(height: 16),
+                Divider(
+                  color: Colors.grey[400],
+                  thickness: 0.5,
+                ),
+                // Add any additional widgets or content at the bottom of the sidebar
+              ],
             ),
-            // Add more list items if needed
-            const SizedBox(height: 16),
-            Divider(
-              color: Colors.grey[400],
-              thickness: 0.5,
-            ),
-            // Add any additional widgets or content at the bottom of the sidebar
-          ],
+          ),
         ),
       ),
     );

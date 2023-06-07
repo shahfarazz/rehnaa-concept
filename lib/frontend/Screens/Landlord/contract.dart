@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../helper/Dealerdashboard_pages/landlordonboarded.dart';
 import '../../helper/Dealerdashboard_pages/landlordonboardedinfo.dart';
 
 void main() {
@@ -71,15 +72,15 @@ class MyScreen extends StatelessWidget {
                   top: 10.0,
                   left: 10.0,
                   child: GestureDetector(
-                    // onTap: () {
-                    //   Navigator.pop(context);
-                    // },
-                     onTap: () { // changeeeeeeeeeeeeeeeeee
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => LandlordsOnboardedInfoPage()),
-                      );
+                    onTap: () {
+                      Navigator.pop(context);
                     },
+                    //  onTap: () { // changeeeeeeeeeeeeeeeeee
+                    // Navigator.push(
+                    //     context,
+                    //     MaterialPageRoute(builder: (context) => LandlordOnboardedPage(uid: '',)),
+                    //   );
+                    // },
                     child: Container(
                       width: 40,
                       height: 40,

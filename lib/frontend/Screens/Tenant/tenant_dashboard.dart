@@ -215,7 +215,7 @@ class _DashboardPageState extends State<TenantDashboardPage>
                           borderRadius: BorderRadius.circular(25.0),
                         ),
                         child: Container(
-                          height: MediaQuery.of(context).size.height * 0.25,
+                          height: MediaQuery.of(context).size.height * 0.3,
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(25.0),
                           ),
