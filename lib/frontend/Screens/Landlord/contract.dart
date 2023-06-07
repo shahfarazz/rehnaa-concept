@@ -115,50 +115,65 @@ class MyScreen extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          "Contracts",
-                          style: GoogleFonts.montserrat(
-                            fontSize: 24,
-                            color: const Color(0xff33907c),
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 24),
-                        const ContractCard(
-                            label: 'Property:', data: '123 Main St'),
-                        const SizedBox(height: 16),
-                        const ContractCard(
-                            label: 'Tenant Name:', data: 'John Doe'),
-                        const SizedBox(height: 16),
-                        const ContractCard(
-                          label: 'Tenant CNIC:',
-                          data: '1234567890',
-                        ),
-                        const SizedBox(height: 16),
-                        const ContractCard(
-                          label: 'Contract Start Date:',
-                          data: '2023-06-01',
-                        ),
-                        const SizedBox(height: 16),
-                        const ContractCard(
-                          label: 'Contract End Date:',
-                          data: '2024-05-31',
-                        ),
-                        const SizedBox(height: 16),
-                        const ContractCard(
-                            label: 'Police Verified:', data: 'Yes'),
-                        const SizedBox(height: 16),
-                        const ContractCard(
-                          label: 'Court Regulation:',
-                          data: 'ABC123',
-                        ),
-                        const SizedBox(height: 16),
-                        const ContractCard(
-                          label: 'Notary Republic Stamp:',
-                          data: 'XYZ456',
-                        ),
-                        const SizedBox(height: 24),
-                      ],
+  Text(
+    "Contracts",
+    style: GoogleFonts.montserrat(
+      fontSize: 24,
+      color: const Color(0xff33907c),
+      fontWeight: FontWeight.bold,
+    ),
+  ),
+  const SizedBox(height: 24),
+  ContractCard(
+    icon: Icons.home,
+    label: 'Property:',
+    data: '123 Main St',
+  ),
+  const SizedBox(height: 16),
+  ContractCard(
+    icon: Icons.person,
+    label: 'Tenant Name:',
+    data: 'John Doe',
+  ),
+  const SizedBox(height: 16),
+  ContractCard(
+    icon: Icons.credit_card,
+    label: 'Tenant CNIC:',
+    data: '1234567890',
+  ),
+  const SizedBox(height: 16),
+  ContractCard(
+    icon: Icons.calendar_today,
+    label: 'Contract Start Date:',
+    data: '2023-06-01',
+  ),
+  const SizedBox(height: 16),
+  ContractCard(
+    icon: Icons.calendar_today,
+    label: 'Contract End Date:',
+    data: '2024-05-31',
+  ),
+  const SizedBox(height: 16),
+  ContractCard(
+    icon: Icons.verified_user,
+    label: 'Police Verified:',
+    data: 'Yes',
+  ),
+  const SizedBox(height: 16),
+  ContractCard(
+    icon: Icons.gavel,
+    label: 'Court Regulation:',
+    data: 'ABC123',
+  ),
+  const SizedBox(height: 16),
+  ContractCard(
+    icon: Icons.assignment,
+    label: 'Notary Republic Stamp:',
+    data: 'XYZ456',
+  ),
+  const SizedBox(height: 24),
+],
+
                     ),
                   ),
                 ),
@@ -172,10 +187,11 @@ class MyScreen extends StatelessWidget {
 }
 
 class ContractCard extends StatelessWidget {
+  final IconData icon;
   final String label;
   final String data;
 
-  const ContractCard({Key? key, required this.label, required this.data}) : super(key: key);
+  const ContractCard({Key? key, required this.icon, required this.label, required this.data}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -186,31 +202,36 @@ class ContractCard extends StatelessWidget {
       elevation: 5, // shadow
       child: Padding(
         padding: const EdgeInsets.all(10),
-        child: Column(
+        child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            ListTile(
-              leading: const Icon(
-                Icons.description,
-              ), // an icon next to the contract label
-              title: Text(
-                label,
-                style: GoogleFonts.montserrat(
-                  fontWeight: FontWeight.bold, // bold contract label
-                  fontSize: 18,
-                  color: const Color(0xff33907c),
-                ),
-              ),
+            Icon(
+              icon,
+              size: 24,
+              color: const Color(0xff33907c),
             ),
-            SizedBox(height: 8),
-            Center(
-              child: Text(
-                data,
-                style: GoogleFonts.montserrat(
-                  fontWeight: FontWeight.normal, // normal contract data
-                  fontSize: 16,
-                ),
-                textAlign: TextAlign.center,
+            SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: GoogleFonts.montserrat(
+                      fontWeight: FontWeight.bold, // bold contract label
+                      fontSize: 18,
+                      color: const Color(0xff33907c),
+                    ),
+                  ),
+                  SizedBox(height: 5),
+                  Text(
+                    data,
+                    style: GoogleFonts.montserrat(
+                      fontWeight: FontWeight.normal, // normal contract data
+                      fontSize: 16,
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
