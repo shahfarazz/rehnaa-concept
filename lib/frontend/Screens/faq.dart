@@ -189,6 +189,7 @@ class _FAQCardState extends State<FAQCard> {
                       widget.question,
                       style: const TextStyle(
                         fontSize: 16,
+                        decoration: TextDecoration.underline,
                         // fontWeight: FontWeight.bold,
                       ),
                       maxLines: 1,
