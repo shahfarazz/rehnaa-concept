@@ -180,7 +180,7 @@ class MyScreen extends StatelessWidget {
                         const SizedBox(height: 16),
                         ContractCard(
                           icon: Icons.assignment,
-                          label: 'Notary Public Stamp:',
+                          label: 'Notary Republic Stamp:',
                           data: 'XYZ456',
                         ),
                         const SizedBox(height: 24),
@@ -197,14 +197,13 @@ class MyScreen extends StatelessWidget {
   }
 }
 
+
 class ContractCard extends StatelessWidget {
   final IconData icon;
   final String label;
   final String data;
 
-  const ContractCard(
-      {Key? key, required this.icon, required this.label, required this.data})
-      : super(key: key);
+  const ContractCard({Key? key, required this.icon, required this.label, required this.data}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -214,7 +213,7 @@ class ContractCard extends StatelessWidget {
       ),
       elevation: 5, // shadow
       child: Padding(
-        padding: const EdgeInsets.all(15),
+        padding: const EdgeInsets.all(12),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
@@ -232,7 +231,7 @@ class ContractCard extends StatelessWidget {
                     label,
                     style: GoogleFonts.montserrat(
                       fontWeight: FontWeight.bold, // bold contract label
-                      fontSize: 18,
+                      fontSize: 17,
                       color: const Color(0xff33907c),
                     ),
                   ),
@@ -241,7 +240,7 @@ class ContractCard extends StatelessWidget {
                     data,
                     style: GoogleFonts.montserrat(
                       fontWeight: FontWeight.normal, // normal contract data
-                      fontSize: 16,
+                      fontSize: 15,
                     ),
                   ),
                 ],
