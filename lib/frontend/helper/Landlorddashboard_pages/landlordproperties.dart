@@ -88,12 +88,52 @@ class _LandlordPropertiesPageState extends State<LandlordPropertiesPage>
   @override
   Widget build(BuildContext context) {
     super.build(context); // Necessary for AutomaticKeepAliveClientMixin
+    // print('properties.isEmpty is ${properties.isEmpty}');
+
+    if (properties.isEmpty) {
+      return Center(
+        child: Card(
+          elevation: 4.0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20.0),
+          ),
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20.0),
+              color: Colors.white,
+            ),
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.house,
+                  size: 48.0,
+                  color: const Color(0xff33907c),
+                ),
+                const SizedBox(height: 16.0),
+                Text(
+                  'Oops! No Properties yet...',
+                  style: GoogleFonts.montserrat(
+                    fontSize: 20.0,
+                    fontWeight: FontWeight.bold,
+                    color: const Color(0xff33907c),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
 
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 255, 255, 255),
       body: ListView.builder(
         itemCount: properties.length,
         itemBuilder: (context, index) {
+          // if properties is empty return empty container
+
           return PropertyCard(
             property: properties[index],
             firstName: properties[index].landlord?.firstName ?? '',
@@ -226,14 +266,4 @@ class PropertyCard extends StatelessWidget {
       ),
     );
   }
-
-  // CachedNetworkImage(
-  //   imageUrl:
-  //                 property
-  //                     .imagePath[0], // TODO define a new property.iconimagepath
-  //       ,
-  //   placeholder: (context, url) => CircularProgressIndicator(),
-  //   errorWidget: (context, url, error) => Icon(Icons.error),
-  //   fit: BoxFit.cover,
-  // );
 }

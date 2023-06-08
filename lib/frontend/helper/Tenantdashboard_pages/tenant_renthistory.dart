@@ -264,33 +264,68 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
             ),
           ),
           SizedBox(height: size.height * 0.01),
-          Center(
-            child: Column(
-              children: [
-                SizedBox(height: size.height * 0.02),
-                Container(
-                  width: 300,
-                  height: 50,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    border:
-                        Border.all(width: 1, color: const Color(0xff33907c)),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: TextFormField(
-                    decoration: const InputDecoration(
-                      labelText: "Search",
-                      suffixIcon: Icon(Icons.search),
-                      border: InputBorder.none,
-                      contentPadding: EdgeInsets.all(10),
+          _rentPayments.isEmpty
+              ? Center(
+                  child: Card(
+                    elevation: 4.0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20.0),
+                    ),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20.0),
+                        color: Colors.white,
+                      ),
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.error_outline,
+                            size: 48.0,
+                            color: const Color(0xff33907c),
+                          ),
+                          const SizedBox(height: 16.0),
+                          Text(
+                            'Oops! Nothing to show here...',
+                            style: GoogleFonts.montserrat(
+                              fontSize: 20.0,
+                              fontWeight: FontWeight.bold,
+                              color: const Color(0xff33907c),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
+                )
+              : Center(
+                  child: Column(
+                    children: [
+                      SizedBox(height: size.height * 0.02),
+                      Container(
+                        width: 300,
+                        height: 50,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                              width: 1, color: const Color(0xff33907c)),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: TextFormField(
+                          decoration: const InputDecoration(
+                            labelText: "Search",
+                            suffixIcon: Icon(Icons.search),
+                            border: InputBorder.none,
+                            contentPadding: EdgeInsets.all(10),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: size.height * 0.02),
+                      _buildLatestMonthWidget(),
+                    ],
+                  ),
                 ),
-                SizedBox(height: size.height * 0.02),
-                _buildLatestMonthWidget(),
-              ],
-            ),
-          ),
           SizedBox(height: size.height * 0.03),
           Expanded(
             child: SingleChildScrollView(

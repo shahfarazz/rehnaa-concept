@@ -265,6 +265,7 @@ class _LandlordRentHistoryPageState extends State<LandlordRentHistoryPage>
               color: const Color(0xff33907c),
             ),
           ),
+          // check if rent payments is empty in the build widget
           SizedBox(height: size.height * 0.01),
           Center(
             child: Column(
@@ -293,7 +294,42 @@ class _LandlordRentHistoryPageState extends State<LandlordRentHistoryPage>
               ],
             ),
           ),
-          SizedBox(height: size.height * 0.03),
+          _rentPayments.isEmpty
+              ? Center(
+                  child: Card(
+                    elevation: 4.0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20.0),
+                    ),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20.0),
+                        color: Colors.white,
+                      ),
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.error_outline,
+                            size: 48.0,
+                            color: const Color(0xff33907c),
+                          ),
+                          const SizedBox(height: 16.0),
+                          Text(
+                            'Oops! Nothing to show here...',
+                            style: GoogleFonts.montserrat(
+                              fontSize: 20.0,
+                              fontWeight: FontWeight.bold,
+                              color: const Color(0xff33907c),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                )
+              : SizedBox(height: size.height * 0.03),
           Expanded(
             child: SingleChildScrollView(
               child: Column(
@@ -301,6 +337,7 @@ class _LandlordRentHistoryPageState extends State<LandlordRentHistoryPage>
               ),
             ),
           ),
+
           SmoothPageIndicator(
             controller: _pageController,
             count: pageCount,

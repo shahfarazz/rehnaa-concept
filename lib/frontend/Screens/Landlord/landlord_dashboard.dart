@@ -1,13 +1,12 @@
 import 'dart:ui';
-
 import 'package:flutter/material.dart';
+
 import 'package:rehnaa/frontend/Screens/contract.dart';
 import 'package:rehnaa/frontend/Screens/Landlord/privacypolicy.dart';
 import 'package:rehnaa/frontend/Screens/faq.dart';
 import 'package:rehnaa/frontend/Screens/vouchers.dart';
 import 'package:rehnaa/frontend/helper/Landlorddashboard_pages/landlord_dashboard_content.dart';
 import 'package:rehnaa/frontend/helper/Landlorddashboard_pages/landlord_profile.dart';
-
 import '../../helper/Landlorddashboard_pages/landlord_renthistory.dart';
 import '../../helper/Landlorddashboard_pages/landlord_tenants.dart';
 import '../../helper/Landlorddashboard_pages/landlordproperties.dart';
@@ -15,10 +14,9 @@ import '../../helper/Landlorddashboard_pages/landlordproperties.dart';
 class LandlordDashboardPage extends StatefulWidget {
   final String uid; // UID of the landlord
 
-  const LandlordDashboardPage({super.key, required this.uid});
+  const LandlordDashboardPage({Key? key, required this.uid}) : super(key: key);
 
   @override
-  // ignore: library_private_types_in_public_api
   _LandlordDashboardPageState createState() => _LandlordDashboardPageState();
 }
 
@@ -29,13 +27,11 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
   int _currentIndex = 0;
   final _pageController = PageController();
   bool _isSidebarOpen = false;
-  // Declare the AnimationController
   late AnimationController _sidebarController;
 
   @override
   void initState() {
     super.initState();
-    // Initialize the AnimationController
     _sidebarController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 300),
@@ -45,7 +41,7 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
   @override
   void dispose() {
     _pageController.dispose();
-    _sidebarController.dispose(); // Dispose the AnimationController
+    _sidebarController.dispose();
     super.dispose();
   }
 
@@ -59,6 +55,26 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
       curve: Curves.easeInOut,
     );
   }
+
+  List<Map<String, String>> notifications = [
+    {
+      'title': 'Rent paid by Tenant: Michelle',
+      'amount': '\$30000',
+    },
+    {
+      'title': 'Maintenance request by Tenant: John',
+      'amount': '',
+    },
+    {
+      'title': 'Contract renewal notice for Property: ABC Apartment',
+      'amount': '',
+    },
+    {
+      'title': 'Notification 4',
+      'amount': '',
+    },
+    // Add more notifications here
+  ];
 
   void _toggleSidebar() {
     setState(() {
@@ -81,9 +97,9 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
-    super.build(context); // Ensure the state is kept alive
+    super.build(context);
     return Scaffold(
-      appBar: _appBar(size),
+      appBar: _buildAppBar(size),
       body: Stack(
         children: [
           GestureDetector(
@@ -115,11 +131,11 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
                           ],
                         ),
                       ),
-                      _bottomNavigationBar(),
+                      _buildBottomNavigationBar(),
                     ],
                   ),
                 ),
-                if (_isSidebarOpen) _sidebar(size),
+                if (_isSidebarOpen) _buildSidebar(size),
               ],
             ),
           ),
@@ -128,26 +144,7 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
     );
   }
 
-  List<Map<String, String>> notifications = [
-    {
-      'title': 'Rent paid by Tenant: Michelle',
-      'amount': '\$30000',
-    },
-    {
-      'title': 'Maintenance request by Tenant: John',
-      'amount': '',
-    },
-    {
-      'title': 'Contract renewal notice for Property: ABC Apartment',
-      'amount': '',
-    },
-    {
-      'title': 'Notification 4',
-      'amount': '',
-    },
-    // Add more notifications here
-  ]; // AppBar widget for the dashboard
-  PreferredSizeWidget? _appBar(Size size) {
+  PreferredSizeWidget _buildAppBar(Size size) {
     return AppBar(
       toolbarHeight: 70,
       leading: Padding(
@@ -208,194 +205,7 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
             children: [
               IconButton(
                 icon: const Icon(Icons.notifications_active),
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return Dialog(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(25.0),
-                        ),
-                        child: Container(
-                          height: MediaQuery.of(context).size.height * 0.3,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(25.0),
-                          ),
-                          child: Stack(
-                            children: <Widget>[
-                              Positioned.fill(
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    gradient: LinearGradient(
-                                      begin: Alignment.topLeft,
-                                      end: Alignment.bottomRight,
-                                      colors: [
-                                        Color(0xFF0FA697),
-                                        Color(0xFF45BF7A),
-                                        Color(0xFF0DF205),
-                                      ],
-                                    ),
-                                    borderRadius: BorderRadius.circular(25.0),
-                                  ),
-                                ),
-                              ),
-                              Column(
-                                children: <Widget>[
-                                  Padding(
-                                    padding: const EdgeInsets.all(16.0),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: <Widget>[
-                                        Hero(
-                                          tag: 'notificationTitle',
-                                          child: Text(
-                                            'Notifications',
-                                            style: TextStyle(
-                                              fontSize: 20,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.white,
-                                              fontFamily: 'Montserrat',
-                                            ),
-                                          ),
-                                        ),
-                                        IconButton(
-                                          icon: Icon(Icons.close),
-                                          onPressed: () {
-                                            Navigator.pop(context);
-                                          },
-                                          color: Colors.white,
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  Divider(
-                                    height: 0,
-                                    color: Colors.grey,
-                                  ),
-                                  Expanded(
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.only(
-                                        bottomLeft: Radius.circular(20.0),
-                                        bottomRight: Radius.circular(20.0),
-                                      ),
-                                      child: Container(
-                                        padding: EdgeInsets.only(bottom: 4.0),
-                                        color: Colors.white,
-                                        child: Scrollbar(
-                                          isAlwaysShown: true,
-                                          child: SingleChildScrollView(
-                                            child: Column(
-                                              children: notifications
-                                                  .map(
-                                                      (notification) => Padding(
-                                                            padding: EdgeInsets
-                                                                .symmetric(
-                                                                    vertical:
-                                                                        8.0),
-                                                            child: Row(
-                                                              crossAxisAlignment:
-                                                                  CrossAxisAlignment
-                                                                      .start,
-                                                              children: <Widget>[
-                                                                SizedBox(
-                                                                  width: 24.0,
-                                                                  child:
-                                                                      Padding(
-                                                                    padding: EdgeInsets
-                                                                        .only(
-                                                                            left:
-                                                                                8.0),
-                                                                    child: Text(
-                                                                      '\u2022', // Bullet point character
-                                                                      style:
-                                                                          TextStyle(
-                                                                        fontSize:
-                                                                            24.0,
-                                                                        fontWeight:
-                                                                            FontWeight.bold,
-                                                                        color: Color(
-                                                                            0xFF45BF7A),
-                                                                      ),
-                                                                    ),
-                                                                  ),
-                                                                ),
-                                                                SizedBox(
-                                                                    width:
-                                                                        12.0),
-                                                                Expanded(
-                                                                  child: Column(
-                                                                    crossAxisAlignment:
-                                                                        CrossAxisAlignment
-                                                                            .start,
-                                                                    children: [
-                                                                      Text(
-                                                                        notification[
-                                                                            'title']!,
-                                                                        style:
-                                                                            TextStyle(
-                                                                          fontSize:
-                                                                              18.0,
-                                                                          fontFamily:
-                                                                              'Montserrat',
-                                                                        ),
-                                                                      ),
-                                                                      if (notification[
-                                                                              'amount']!
-                                                                          .isNotEmpty)
-                                                                        Padding(
-                                                                          padding:
-                                                                              EdgeInsets.only(left: 24.0),
-                                                                          child:
-                                                                              RichText(
-                                                                            text:
-                                                                                TextSpan(
-                                                                              style: TextStyle(
-                                                                                fontSize: 16.0,
-                                                                                fontFamily: 'Montserrat',
-                                                                                color: Colors.black,
-                                                                              ),
-                                                                              children: [
-                                                                                TextSpan(
-                                                                                  text: 'Amount: ',
-                                                                                  style: TextStyle(
-                                                                                    fontFamily: 'Montserrat',
-                                                                                  ),
-                                                                                ),
-                                                                                TextSpan(
-                                                                                  text: notification['amount']!,
-                                                                                  style: TextStyle(
-                                                                                    fontWeight: FontWeight.bold,
-                                                                                    color: Color(0xFF45BF7A),
-                                                                                    fontFamily: 'Montserrat',
-                                                                                  ),
-                                                                                ),
-                                                                              ],
-                                                                            ),
-                                                                          ),
-                                                                        ),
-                                                                    ],
-                                                                  ),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                          ))
-                                                  .toList(),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    },
-                  );
-                },
+                onPressed: _showNotificationsDialog,
               ),
               Positioned(
                 right: 13,
@@ -439,18 +249,14 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
     );
   }
 
-// Sidebar widget
-// Sidebar widget
-  Widget _sidebar(Size size) {
+  Widget _buildSidebar(Size size) {
     return GestureDetector(
       onHorizontalDragUpdate: (details) {
         if (details.delta.dx > 0) {
-          // Swipe right, open the sidebar
           setState(() {
             _isSidebarOpen = true;
           });
         } else if (details.delta.dx < 0) {
-          // Swipe left, close the sidebar
           setState(() {
             _isSidebarOpen = false;
           });
@@ -461,14 +267,12 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
           if (_isSidebarOpen)
             GestureDetector(
               onTap: () {
-                // Close the sidebar when tapping on the shadow
                 setState(() {
                   _isSidebarOpen = false;
                 });
               },
               child: Container(
-                color: Colors
-                    .black54, // Adjust the color and opacity of the shadow here
+                color: Colors.black54,
               ),
             ),
           AnimatedContainer(
@@ -527,103 +331,57 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
                       color: Colors.grey[400],
                       thickness: 0.5,
                     ),
-                    ListTile(
-                      leading: const Icon(Icons.description),
-                      title: const Text(
-                        'Contract',
-                        style: TextStyle(
-                          fontFamily: 'Montserrat',
-                          fontSize: 18,
-                        ),
-                      ),
+                    _buildSidebarItem(
+                      icon: Icons.description,
+                      label: 'Contract',
                       onTap: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const ContractPage(),
+                            builder: (context) => ContractPage(),
                           ),
                         );
-                        _closeSidebar(); // Close the sidebar after navigation
+                        _closeSidebar();
                       },
                     ),
-                    ListTile(
-                      leading: const Icon(Icons.receipt),
-                      title: Row(
-                        children: <Widget>[
-                          Expanded(
-                            child: const Text(
-                              'Vouchers',
-                              style: TextStyle(
-                                fontFamily: 'Montserrat',
-                                fontSize: 18,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 10.0), // add some spacing
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 6.0, vertical: 2.0),
-                            decoration: BoxDecoration(
-                              color: Colors.red,
-                              borderRadius: BorderRadius.circular(8.0),
-                            ),
-                            child: const Text(
-                              'new',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize:
-                                    12.0, // adjust the size to fit your needs
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+                    _buildSidebarItem(
+                      icon: Icons.receipt,
+                      label: 'Vouchers',
                       onTap: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const VouchersPage(),
+                            builder: (context) => VouchersPage(),
                           ),
                         );
-                        _closeSidebar(); // Close the sidebar after navigation
+                        _closeSidebar();
                       },
+                      showBadge: true,
                     ),
-                    ListTile(
-                      leading: const Icon(Icons.lock),
-                      title: const Text(
-                        'Privacy Policy',
-                        style: TextStyle(
-                          fontFamily: 'Montserrat',
-                          fontSize: 18,
-                        ),
-                      ),
+                    _buildSidebarItem(
+                      icon: Icons.lock,
+                      label: 'Privacy Policy',
                       onTap: () {
-                        // Handle Privacy Policy button tap
                         Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (context) => PrivacyPolicyPage(),
                           ),
-                        ); // Close the sidebar after action
+                        );
+                        _closeSidebar();
                       },
                     ),
-                    ListTile(
-                      leading: const Icon(Icons.question_answer),
-                      title: const Text(
-                        'FAQs',
-                        style: TextStyle(
-                          fontFamily: 'Montserrat',
-                          fontSize: 18,
-                        ),
-                      ),
+                    _buildSidebarItem(
+                      icon: Icons.question_answer,
+                      label: 'FAQs',
                       onTap: () {
-                        // Handle FAQs button tap
                         Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (context) => FAQPage(),
                           ),
-                        ); // Close the sidebar after action
+                        );
+                        _closeSidebar();
                       },
                     ),
                     const SizedBox(height: 16),
@@ -631,7 +389,6 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
                       color: Colors.grey[400],
                       thickness: 0.5,
                     ),
-                    // Add any additional widgets or content at the bottom of the sidebar
                   ],
                 ),
               ),
@@ -642,15 +399,230 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
     );
   }
 
-  // BottomNavigationBar widget
+  Widget _buildSidebarItem({
+    required IconData icon,
+    required String label,
+    required VoidCallback onTap,
+    bool showBadge = false,
+  }) {
+    return ListTile(
+      leading: Icon(icon),
+      title: Row(
+        children: <Widget>[
+          Expanded(
+            child: Text(
+              label,
+              style: TextStyle(
+                fontFamily: 'Montserrat',
+                fontSize: 18,
+              ),
+            ),
+          ),
+          if (showBadge)
+            Container(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 6.0, vertical: 2.0),
+              decoration: BoxDecoration(
+                color: Colors.red,
+                borderRadius: BorderRadius.circular(8.0),
+              ),
+              child: const Text(
+                'new',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 12.0,
+                ),
+              ),
+            ),
+        ],
+      ),
+      onTap: onTap,
+    );
+  }
 
-  Widget _bottomNavigationBar() {
+  void _showNotificationsDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(25.0),
+          ),
+          child: Container(
+            height: MediaQuery.of(context).size.height * 0.3,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(25.0),
+            ),
+            child: Stack(
+              children: <Widget>[
+                Positioned.fill(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          Color(0xFF0FA697),
+                          Color(0xFF45BF7A),
+                          Color(0xFF0DF205),
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(25.0),
+                    ),
+                  ),
+                ),
+                Column(
+                  children: <Widget>[
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Hero(
+                            tag: 'notificationTitle',
+                            child: Text(
+                              'Notifications',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                                fontFamily: 'Montserrat',
+                              ),
+                            ),
+                          ),
+                          IconButton(
+                            icon: Icon(Icons.close),
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            color: Colors.white,
+                          ),
+                        ],
+                      ),
+                    ),
+                    Divider(
+                      height: 0,
+                      color: Colors.grey,
+                    ),
+                    Expanded(
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.only(
+                          bottomLeft: Radius.circular(20.0),
+                          bottomRight: Radius.circular(20.0),
+                        ),
+                        child: Container(
+                          padding: EdgeInsets.only(bottom: 4.0),
+                          color: Colors.white,
+                          child: Scrollbar(
+                            isAlwaysShown: true,
+                            child: SingleChildScrollView(
+                              child: Column(
+                                children: notifications
+                                    .map(
+                                      (notification) => Padding(
+                                        padding:
+                                            EdgeInsets.symmetric(vertical: 8.0),
+                                        child: Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: <Widget>[
+                                            SizedBox(
+                                              width: 24.0,
+                                              child: Padding(
+                                                padding:
+                                                    EdgeInsets.only(left: 8.0),
+                                                child: Text(
+                                                  '\u2022',
+                                                  style: TextStyle(
+                                                    fontSize: 24.0,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Color(0xFF45BF7A),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            SizedBox(width: 12.0),
+                                            Expanded(
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    notification['title']!,
+                                                    style: TextStyle(
+                                                      fontSize: 18.0,
+                                                      fontFamily: 'Montserrat',
+                                                    ),
+                                                  ),
+                                                  if (notification['amount']!
+                                                      .isNotEmpty)
+                                                    Padding(
+                                                      padding: EdgeInsets.only(
+                                                          left: 24.0),
+                                                      child: RichText(
+                                                        text: TextSpan(
+                                                          style: TextStyle(
+                                                            fontSize: 16.0,
+                                                            fontFamily:
+                                                                'Montserrat',
+                                                            color: Colors.black,
+                                                          ),
+                                                          children: [
+                                                            TextSpan(
+                                                              text: 'Amount: ',
+                                                              style: TextStyle(
+                                                                fontFamily:
+                                                                    'Montserrat',
+                                                              ),
+                                                            ),
+                                                            TextSpan(
+                                                              text: notification[
+                                                                  'amount']!,
+                                                              style: TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                                color: Color(
+                                                                    0xFF45BF7A),
+                                                                fontFamily:
+                                                                    'Montserrat',
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ),
+                                                ],
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    )
+                                    .toList(),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildBottomNavigationBar() {
     return Container(
       decoration: BoxDecoration(
         border: Border(
           top: BorderSide(
-            color: Colors.grey[200]!, // Set the color of the gray line
-            width: 1.0, // Set the width of the gray line
+            color: Colors.grey[200]!,
+            width: 1.0,
           ),
         ),
       ),
@@ -677,7 +649,6 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
   }
 }
 
-// Custom Clipper for hexagonal shape
 class HexagonClipper extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {

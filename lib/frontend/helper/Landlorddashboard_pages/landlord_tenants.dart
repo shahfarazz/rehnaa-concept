@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:rehnaa/backend/models/tenantsmodel.dart';
+import 'package:rehnaa/frontend/helper/Landlorddashboard_pages/skeleton.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 import 'landlordtenantinfo.dart';
@@ -23,6 +24,8 @@ class _LandlordTenantsPageState extends State<LandlordTenantsPage>
     with AutomaticKeepAliveClientMixin<LandlordTenantsPage> {
   final PageController _pageController = PageController(initialPage: 0);
   List<Tenant> _tenants = [];
+  bool shouldDisplayContent = true;
+
   // int _currentPage = 0;
   final int _pageSize = 4; // Number of tenants to show per page
   final Completer<void> _loadTenantsCompleter =
@@ -82,6 +85,8 @@ class _LandlordTenantsPageState extends State<LandlordTenantsPage>
           }
         }
 
+        print('reached here');
+
         if (mounted) {
           setState(() {
             _tenants = fetchedTenants;
@@ -90,17 +95,6 @@ class _LandlordTenantsPageState extends State<LandlordTenantsPage>
       }
     }
   }
-
-  // // Navigate to a specific page
-  // void _goToPage(int page) {
-  //   if (mounted) {
-  //     _pageController.animateToPage(
-  //       page,
-  //       duration: const Duration(milliseconds: 500),
-  //       curve: Curves.easeInOut,
-  //     );
-  //   }
-  // }
 
   // Build a card widget for a tenant
   Widget _buildTenantCard(Tenant tenant) {
@@ -208,9 +202,61 @@ class _LandlordTenantsPageState extends State<LandlordTenantsPage>
 
   @override
   Widget build(BuildContext context) {
-    super.build(context); // Ensure the parent's build method is called
+    super.build(context);
     final Size size = MediaQuery.of(context).size;
     final int pageCount = (_tenants.length / _pageSize).ceil();
+
+    Widget buildTenantsList() {
+      if (_tenants.isEmpty && shouldDisplayContent) {
+        return LandlordTenantSkeleton();
+      } else if (_tenants.isEmpty && !shouldDisplayContent) {
+        return Center(
+          child: Card(
+            elevation: 4.0,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20.0),
+            ),
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20.0),
+                color: Colors.white,
+              ),
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.sentiment_dissatisfied,
+                    size: 48.0,
+                    color: const Color(0xff33907c),
+                  ),
+                  const SizedBox(height: 16.0),
+                  Text(
+                    'Oops! No Tenants yet...',
+                    style: GoogleFonts.montserrat(
+                      fontSize: 20.0,
+                      fontWeight: FontWeight.bold,
+                      color: const Color(0xff33907c),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      } else {
+        return PageView.builder(
+          controller: _pageController,
+          itemCount: pageCount,
+          itemBuilder: (context, index) {
+            int startIndex = index * _pageSize;
+            return Column(
+              children: _buildTenantCards(startIndex),
+            );
+          },
+        );
+      }
+    }
 
     return Scaffold(
       body: Column(
@@ -229,16 +275,7 @@ class _LandlordTenantsPageState extends State<LandlordTenantsPage>
             ),
           ),
           Expanded(
-            child: PageView.builder(
-              controller: _pageController,
-              itemCount: pageCount,
-              itemBuilder: (context, index) {
-                int startIndex = index * _pageSize;
-                return Column(
-                  children: _buildTenantCards(startIndex),
-                );
-              },
-            ),
+            child: buildTenantsList(),
           ),
           SmoothPageIndicator(
             controller: _pageController,
@@ -252,6 +289,36 @@ class _LandlordTenantsPageState extends State<LandlordTenantsPage>
             ),
           ),
           SizedBox(height: size.height * 0.03),
+        ],
+      ),
+    );
+  }
+}
+
+class LandlordTenantSkeleton extends StatelessWidget {
+  const LandlordTenantSkeleton({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final Size size = MediaQuery.of(context).size;
+
+    return SingleChildScrollView(
+      child: Column(
+        children: <Widget>[
+          SizedBox(height: size.height * 0.03),
+          Container(
+            padding: const EdgeInsets.symmetric(vertical: 16.0),
+            alignment: Alignment.center,
+            child: Skeleton(
+              width: size.width * 0.4,
+              height: 30,
+            ),
+          ),
+          SizedBox(height: size.height * 0.02),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: CardSkeleton(height: size.height * 0.3),
+          ),
         ],
       ),
     );

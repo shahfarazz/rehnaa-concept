@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:rehnaa/backend/models/landlordmodel.dart';
+import 'skeleton.dart';
 
 class LandlordDashboardContent extends StatefulWidget {
   final String uid; // UID of the landlord
@@ -231,11 +232,12 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           // Show a loading indicator while waiting for the data
-          return const Center(
-            child: CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
-            ),
-          );
+          // return const Center(
+          //   child: CircularProgressIndicator(
+          //     valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
+          //   ),
+          // );
+          return LandlordDashboardContentSkeleton();
         } else if (snapshot.hasError) {
           // Handle any error that occurred while fetching the data
           return Text('Error: ${snapshot.error}');
@@ -377,6 +379,77 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
         // By default, return an empty container if no data is available
         return Container();
       },
+    );
+  }
+}
+
+class LandlordDashboardContentSkeleton extends StatelessWidget {
+  const LandlordDashboardContentSkeleton({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final Size size = MediaQuery.of(context).size;
+
+    return SingleChildScrollView(
+      child: Column(
+        children: <Widget>[
+          SizedBox(height: size.height * 0.05),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Skeleton(width: size.width * 0.5, height: 30),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8.0),
+                child: CircleSkeleton(
+                  size: 150,
+                ),
+              ),
+              SizedBox(height: size.height * 0.05),
+            ],
+          ),
+          Center(
+            child: Container(
+              width: size.width * 0.8,
+              height: size.height * 0.4,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.4),
+                    spreadRadius: 2,
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(20),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.9),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Skeleton(width: size.width * 0.5, height: 20),
+                        SizedBox(height: 16),
+                        Skeleton(width: size.width * 0.5, height: 30),
+                        SizedBox(height: size.height * 0.05),
+                        Skeleton(width: size.width * 0.5, height: 50),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
