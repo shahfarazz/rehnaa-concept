@@ -114,7 +114,7 @@ class MyScreen extends StatelessWidget {
           child: SingleChildScrollView(
             child: Center(
               child: Padding(
-                padding: const EdgeInsets.all(0.0),
+                padding: const EdgeInsets.all(25.0),
                 child: Card(
                   color: Colors.grey[200],
                   shape: RoundedRectangleBorder(
@@ -127,7 +127,7 @@ class MyScreen extends StatelessWidget {
                       children: [
                         Center(
                           child: Text(
-                            "Contracts",
+                            "Contract",
                             style: GoogleFonts.montserrat(
                               fontSize: 24,
                               color: const Color(0xff33907c),
@@ -207,50 +207,56 @@ class ContractCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15.0), // rounded corners
-      ),
-      elevation: 2, // shadow
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Icon(
-              icon,
-              size: 24,
-              color: const Color(0xff33907c),
-            ),
-            SizedBox(width: 10),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    label,
-                    style: GoogleFonts.montserrat(
-                      fontWeight: FontWeight.bold, // bold contract label
-                      fontSize: 17,
-                      color: const Color(0xff33907c),
-                    ),
-                  ),
-                  SizedBox(height: 5),
-                  Text(
-                    data,
-                    style: GoogleFonts.montserrat(
-                      fontWeight: FontWeight.normal, // normal contract data
-                      fontSize: 15,
-                    ),
-                  ),
-                ],
+  return Center(
+    child: Container(
+      width: 300, // Set the desired width of the card
+      child: Card(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15.0), // rounded corners
+        ),
+        elevation: 2, // shadow
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Icon(
+                icon,
+                size: 24,
+                color: const Color(0xff33907c),
               ),
-            ),
-          ],
+              SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      label,
+                      style: GoogleFonts.montserrat(
+                        fontWeight: FontWeight.bold, // bold contract label
+                        fontSize: 17,
+                        color: const Color(0xff33907c),
+                      ),
+                    ),
+                    SizedBox(height: 5),
+                    Text(
+                      data,
+                      style: GoogleFonts.montserrat(
+                        fontWeight: FontWeight.normal, // normal contract data
+                        fontSize: 15,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
+
 }
 
 class ZoomedScreen extends StatefulWidget {
