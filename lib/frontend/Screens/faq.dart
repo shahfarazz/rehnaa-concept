@@ -74,7 +74,7 @@ class FAQPage extends StatelessWidget {
                 child: SingleChildScrollView(
                   child: Center(
                     child: Padding(
-                      padding: const EdgeInsets.all(1.0),
+                      padding: const EdgeInsets.all(20.0),
                       child: Card(
                         color: const Color.fromARGB(255, 235, 235, 235),
                         shape: RoundedRectangleBorder(
@@ -131,6 +131,8 @@ class FAQPage extends StatelessWidget {
                               answer:
                                   'Yes, you can use Flutter for web development. Flutter provides support for building web applications in addition to mobile and desktop platforms.',
                             ),
+                            const SizedBox(height: 30),
+
                             // Add more FAQs
                           ],
                         ),

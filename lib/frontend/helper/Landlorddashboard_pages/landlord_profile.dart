@@ -2,17 +2,37 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:rehnaa/backend/services/authentication_service.dart';
 
-class LandlordProfilePage extends StatelessWidget {
+class LandlordProfilePage extends StatefulWidget {
   final String uid;
-  const LandlordProfilePage({super.key, required this.uid});
+
+  const LandlordProfilePage({Key? key, required this.uid}) : super(key: key);
+
+  @override
+  _LandlordProfilePageState createState() => _LandlordProfilePageState();
+}
+
+class _LandlordProfilePageState extends State<LandlordProfilePage> {
+  bool showAdditionalSettings = false;
+  bool showChangePassword = false;
+
+  void toggleAdditionalSettings() {
+    setState(() {
+      showAdditionalSettings = !showAdditionalSettings;
+    });
+  }
+
+  void toggleChangePassword() {
+    setState(() {
+      showChangePassword = !showChangePassword;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     final authService = AuthenticationService();
     return Scaffold(
       body: FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-        future:
-            FirebaseFirestore.instance.collection('Landlords').doc(uid).get(),
+        future: FirebaseFirestore.instance.collection('Landlords').doc(widget.uid).get(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             // While data is being fetched, show a loading indicator
@@ -59,9 +79,23 @@ class LandlordProfilePage extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 SizedBox(height: 40),
-                CircleAvatar(
-                  radius: 80,
-                  backgroundImage: AssetImage(pathToImage),
+                Stack(
+                  alignment: Alignment.bottomRight,
+                  children: [
+                    CircleAvatar(
+                      radius: 80,
+                      backgroundImage: AssetImage(pathToImage),
+                    ),
+                    IconButton(
+                      icon: Icon(
+                        Icons.edit,
+                        color: Colors.white,
+                      ),
+                      onPressed: () {
+                        // Handle edit image logic here
+                      },
+                    ),
+                  ],
                 ),
                 SizedBox(height: 20),
                 Text(
@@ -90,6 +124,97 @@ class LandlordProfilePage extends StatelessWidget {
                   title: 'Location',
                   subtitle: 'Lahore, Punjab',
                 ),
+                GestureDetector(
+                  onTap: toggleAdditionalSettings,
+                  child: Row(
+                    children: [
+                      SizedBox(width: 17, height: 60),
+                      Icon(
+                        Icons.settings,
+                        color: Colors.grey,
+                      ),
+                      SizedBox(width: 31),
+                      Expanded(
+                        child: Text(
+                          'Additional Settings',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 20,
+                        child: AnimatedSwitcher(
+                          duration: Duration(milliseconds: 200),
+                          transitionBuilder: (child, animation) {
+                            return ScaleTransition(
+                              scale: animation,
+                              child: child,
+                            );
+                          },
+                          child: showAdditionalSettings
+                              ? Icon(
+                                  Icons.arrow_drop_up,
+                                  color: Colors.grey,
+                                  key: UniqueKey(),
+                                )
+                              : Icon(
+                                  Icons.arrow_drop_down,
+                                  color: Colors.grey,
+                                  key: UniqueKey(),
+                                ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                if (showAdditionalSettings)
+                  Column(
+                    children: [
+                      SizedBox(height: 2),
+                      ProfileInfoItem(
+                        icon: Icons.lock,
+                        title: 'Change Password',
+                        subtitle: 'Click to change your password',
+                        onTap: () {
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              String newPassword = '';
+
+                              return AlertDialog(
+                                title: Text('Change Password'),
+                                content: TextField(
+                                  onChanged: (value) {
+                                    newPassword = value;
+                                  },
+                                  decoration: InputDecoration(hintText: 'Enter new password'),
+                                ),
+                                actions: [
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      // Handle password change logic here
+                                      print('New password: $newPassword');
+                                      Navigator.of(context).pop();
+                                    },
+                                    child: Text('Save'),
+                                  ),
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                    child: Text('Cancel'),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        },
+                      ),
+                    ],
+                  ),
               ],
             ),
           );
@@ -103,20 +228,28 @@ class ProfileInfoItem extends StatelessWidget {
   final IconData icon;
   final String title;
   final String subtitle;
+  final VoidCallback? onTap;
 
   const ProfileInfoItem({
-    super.key,
+    Key? key,
     required this.icon,
     required this.title,
     required this.subtitle,
-  });
+    this.onTap,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
       leading: Icon(icon),
-      title: Text(title),
+      title: Text(
+        title,
+        style: TextStyle(
+          fontWeight: FontWeight.bold,
+        ),
+      ),
       subtitle: Text(subtitle),
+      onTap: onTap,
     );
   }
 }

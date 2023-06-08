@@ -2,13 +2,16 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 
 import 'package:rehnaa/frontend/Screens/contract.dart';
-import 'package:rehnaa/frontend/Screens/Landlord/privacypolicy.dart';
+import 'package:rehnaa/frontend/Screens/privacypolicy.dart';
 import 'package:rehnaa/frontend/Screens/faq.dart';
+import 'package:rehnaa/frontend/Screens/login_page.dart';
 import 'package:rehnaa/frontend/Screens/vouchers.dart';
 import 'package:rehnaa/frontend/helper/Landlorddashboard_pages/landlord_dashboard_content.dart';
 import 'package:rehnaa/frontend/helper/Landlorddashboard_pages/landlord_profile.dart';
 import '../../helper/Landlorddashboard_pages/landlord_renthistory.dart';
 import '../../helper/Landlorddashboard_pages/landlord_tenants.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
 import '../../helper/Landlorddashboard_pages/landlordproperties.dart';
 
 class LandlordDashboardPage extends StatefulWidget {
@@ -248,156 +251,182 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
       ),
     );
   }
-
-  Widget _buildSidebar(Size size) {
-    return GestureDetector(
-      onHorizontalDragUpdate: (details) {
-        if (details.delta.dx > 0) {
-          setState(() {
-            _isSidebarOpen = true;
-          });
-        } else if (details.delta.dx < 0) {
-          setState(() {
-            _isSidebarOpen = false;
-          });
-        }
-      },
-      child: Stack(
-        children: [
-          if (_isSidebarOpen)
-            GestureDetector(
-              onTap: () {
-                setState(() {
-                  _isSidebarOpen = false;
-                });
-              },
-              child: Container(
-                color: Colors.black54,
-              ),
+Widget _buildSidebar(Size size) {
+  return GestureDetector(
+    onHorizontalDragUpdate: (details) {
+      if (details.delta.dx > 0) {
+        setState(() {
+          _isSidebarOpen = true;
+        });
+      } else if (details.delta.dx < 0) {
+        setState(() {
+          _isSidebarOpen = false;
+        });
+      }
+    },
+    child: Stack(
+      children: [
+        if (_isSidebarOpen)
+          GestureDetector(
+            onTap: () {
+              setState(() {
+                _isSidebarOpen = false;
+              });
+            },
+            child: Container(
+              color: Colors.black54,
             ),
-          AnimatedContainer(
-            duration: const Duration(milliseconds: 300),
-            width: _isSidebarOpen ? size.width * 0.7 : 0,
-            height: _isSidebarOpen ? size.height : 0,
-            color: Colors.white,
-            child: SlideTransition(
-              position: Tween<Offset>(
-                begin: const Offset(-1, 0),
-                end: const Offset(0, 0),
-              ).animate(CurvedAnimation(
-                parent: _sidebarController,
-                curve: Curves.easeInOut,
-              )),
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Center(
-                            child: Container(
-                              padding: const EdgeInsets.only(
-                                  left: 0, top: 30, bottom: 16),
-                              child: InkWell(
-                                onTap: () {
-                                  // Add your onTap functionality here
-                                },
-                                child: ShaderMask(
-                                  shaderCallback: (bounds) => LinearGradient(
-                                    colors: [
-                                      Color(0xFF0FA697),
-                                      Color(0xFF45BF7A),
-                                      Color(0xFF0DF205),
-                                    ],
-                                  ).createShader(bounds),
-                                  child: Text(
-                                    'Rehnaa',
-                                    style: TextStyle(
-                                      fontSize: 24,
-                                      fontFamily: 'Montserrat',
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                    ),
+          ),
+        AnimatedContainer(
+          duration: const Duration(milliseconds: 300),
+          width: _isSidebarOpen ? size.width * 0.7 : 0,
+          height: _isSidebarOpen ? size.height : 0,
+          color: Colors.white,
+          child: SlideTransition(
+            position: Tween<Offset>(
+              begin: const Offset(-1, 0),
+              end: const Offset(0, 0),
+            ).animate(CurvedAnimation(
+              parent: _sidebarController,
+              curve: Curves.easeInOut,
+            )),
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Center(
+                          child: Container(
+                            padding: const EdgeInsets.only(
+                                left: 0, top: 30, bottom: 16),
+                            child: InkWell(
+                              onTap: () {
+                                // Add your onTap functionality here
+                              },
+                              child: ShaderMask(
+                                shaderCallback: (bounds) => LinearGradient(
+                                  colors: [
+                                    Color(0xFF0FA697),
+                                    Color(0xFF45BF7A),
+                                    Color(0xFF0DF205),
+                                  ],
+                                ).createShader(bounds),
+                                child: Text(
+                                  'Rehnaa',
+                                  style: TextStyle(
+                                    fontSize: 24,
+                                    fontFamily: 'Montserrat',
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
                                   ),
                                 ),
                               ),
                             ),
                           ),
                         ),
-                      ],
-                    ),
-                    Divider(
-                      color: Colors.grey[400],
-                      thickness: 0.5,
-                    ),
-                    _buildSidebarItem(
-                      icon: Icons.description,
-                      label: 'Contract',
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => ContractPage(),
-                          ),
-                        );
-                        _closeSidebar();
-                      },
-                    ),
-                    _buildSidebarItem(
-                      icon: Icons.receipt,
-                      label: 'Vouchers',
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => VouchersPage(),
-                          ),
-                        );
-                        _closeSidebar();
-                      },
-                      showBadge: true,
-                    ),
-                    _buildSidebarItem(
-                      icon: Icons.lock,
-                      label: 'Privacy Policy',
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => PrivacyPolicyPage(),
-                          ),
-                        );
-                        _closeSidebar();
-                      },
-                    ),
-                    _buildSidebarItem(
-                      icon: Icons.question_answer,
-                      label: 'FAQs',
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => FAQPage(),
-                          ),
-                        );
-                        _closeSidebar();
-                      },
-                    ),
-                    const SizedBox(height: 16),
-                    Divider(
-                      color: Colors.grey[400],
-                      thickness: 0.5,
-                    ),
-                  ],
-                ),
+                      ),
+                    ],
+                  ),
+                  Divider(
+                    color: Colors.grey[400],
+                    thickness: 0.5,
+                  ),
+                  _buildSidebarItem(
+                    icon: Icons.description,
+                    label: 'Contract',
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ContractPage(),
+                        ),
+                      );
+                      // _closeSidebar();
+                    },
+                  ),
+                  _buildSidebarItem(
+                    icon: Icons.receipt,
+                    label: 'Vouchers',
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => VouchersPage(),
+                        ),
+                      );
+                      // _closeSidebar();
+                    },
+                    showBadge: true,
+                  ),
+                  _buildSidebarItem(
+                    icon: Icons.lock,
+                    label: 'Privacy Policy',
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => PrivacyPolicyPage(),
+                        ),
+                      );
+                      // _closeSidebar();
+                    },
+                  ),
+                  _buildSidebarItem(
+                    icon: Icons.question_answer,
+                    label: 'FAQs',
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => FAQPage(),
+                        ),
+                      );
+                      // _closeSidebar();
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  Divider(
+                    color: Colors.grey[400],
+                    thickness: 0.5,
+                  ),
+                  _buildSidebarItem(
+                    icon: Icons.logout,
+                    label: 'Logout',
+                    onTap: () {
+                      // Implement sign-out functionality here
+                      // For example, clear user session, navigate to login page, etc.
+                      _signOutUser();
+                    },
+                  ),
+                ],
               ),
             ),
           ),
-        ],
-      ),
-    );
-  }
+        ),
+      ],
+    ),
+  );
+}
+
+
+void _signOutUser() async {
+  // Implement your sign-out logic here
+  // For example, clear user session, navigate to login page, etc.
+  // Sign out the user using Firebase Authentication
+  await FirebaseAuth.instance.signOut();
+  
+  // Navigate to login page
+  Navigator.pushReplacement(
+    context,
+    MaterialPageRoute(
+      builder: (context) => LoginPage(),
+    ),
+  );
+}
+
+
 
   Widget _buildSidebarItem({
     required IconData icon,

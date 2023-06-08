@@ -114,7 +114,7 @@ class MyScreen extends StatelessWidget {
           child: SingleChildScrollView(
             child: Center(
               child: Padding(
-                padding: const EdgeInsets.all(25.0),
+                padding: const EdgeInsets.all(20.0),
                 child: Card(
                   color: Colors.grey[200],
                   shape: RoundedRectangleBorder(
