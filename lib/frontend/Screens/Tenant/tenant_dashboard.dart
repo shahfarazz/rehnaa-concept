@@ -484,7 +484,7 @@ Widget _sidebar(Size size) {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Container(
-  padding: const EdgeInsets.only(left: 16, top: 10, bottom: 16),
+  padding: const EdgeInsets.only(left: 16, top: 30, bottom: 16),
   child: Text(
     'Rehna',
     style: TextStyle(

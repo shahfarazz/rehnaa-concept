@@ -93,7 +93,7 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
             child: Stack(
               children: [
                 Transform.translate(
-                  offset: Offset(_isSidebarOpen ? size.width * 0.6 : 0, 0),
+                  offset: Offset(_isSidebarOpen ? size.width * 0.7 : 0, 0),
                   child: Column(
                     children: [
                       Expanded(
@@ -488,12 +488,12 @@ Widget _sidebar(Size size) {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Container(
-  padding: const EdgeInsets.only(left: 16, top: 10, bottom: 16),
+  padding: const EdgeInsets.only(left: 16, top: 30, bottom: 16),
   child: Text(
     'Rehna',
     style: TextStyle(
       fontSize: 24,
-      fontWeight: FontWeight.bold,
+      fontFamily: 'Montserrat',
       foreground: Paint()
         ..shader = LinearGradient(
           begin: Alignment.topLeft,
@@ -517,6 +517,7 @@ Widget _sidebar(Size size) {
                     title: const Text(
                       'Contract',
                       style: TextStyle(
+                        fontFamily: 'Montserrat',
                         fontSize: 18,
                       ),
                     ),
@@ -538,6 +539,7 @@ Widget _sidebar(Size size) {
                           child: const Text(
                             'Vouchers',
                             style: TextStyle(
+                              fontFamily: 'Montserrat',
                               fontSize: 18,
                             ),
                           ),
@@ -575,6 +577,7 @@ Widget _sidebar(Size size) {
                     title: const Text(
                       'Privacy Policy',
                       style: TextStyle(
+                        fontFamily: 'Montserrat',
                         fontSize: 18,
                       ),
                     ),
@@ -588,6 +591,7 @@ Widget _sidebar(Size size) {
                     title: const Text(
                       'FAQs',
                       style: TextStyle(
+                        fontFamily: 'Montserrat',
                         fontSize: 18,
                       ),
                     ),
