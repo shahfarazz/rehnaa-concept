@@ -7,6 +7,8 @@ import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:rehnaa/backend/models/tenantsmodel.dart';
 
+import '../Landlorddashboard_pages/landlord_dashboard_content.dart';
+
 class TenantDashboardContent extends StatefulWidget {
   final String uid; // UID of the tenant
 
@@ -226,11 +228,7 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           // Show a loading indicator while waiting for the data
-          return const Center(
-            child: CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
-            ),
-          );
+          return LandlordDashboardContentSkeleton();
         } else if (snapshot.hasError) {
           // Handle any error that occurred while fetching the data
           return Text('Error: ${snapshot.error}');

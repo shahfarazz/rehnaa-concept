@@ -6,6 +6,8 @@ import 'package:rehnaa/backend/models/rentpaymentmodel.dart';
 import 'package:rehnaa/backend/services/helperfunctions.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
+import '../Landlorddashboard_pages/skeleton.dart';
+
 class TenantRentHistoryPage extends StatefulWidget {
   final String uid; // UID of the landlord
 
@@ -21,6 +23,7 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
   List<RentPayment> _rentPayments = [];
   String firstName = '';
   String lastName = '';
+  bool shouldDisplay = false;
 
   @override
   bool get wantKeepAlive => true;
@@ -55,6 +58,9 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
         if (data != null) {
           RentPayment rentPayment = await RentPayment.fromJson(data);
           _rentPayments.add(rentPayment);
+          setState(() {
+            shouldDisplay = true;
+          });
         }
       }
 
@@ -235,6 +241,58 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
     }
   }
 
+  Widget _rentPaymentSelectorWidget(BuildContext context) {
+    final Size size = MediaQuery.of(context).size;
+
+    // if rentPayments is empty and shouldDisplay is true , show center widget
+    // if rentpayments is empty and shouldDisplay is true, show Skeleton
+    // if rentpayments is not empty and shouldDisplay is true, show Sizedbox
+
+    // print('_rentPayments.isEmpty: ${_rentPayments.isEmpty}');
+
+    if (_rentPayments.isEmpty && shouldDisplay) {
+      return Center(
+        child: Card(
+          elevation: 4.0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20.0),
+          ),
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20.0),
+              color: Colors.white,
+            ),
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.error_outline,
+                  size: 48.0,
+                  color: const Color(0xff33907c),
+                ),
+                const SizedBox(height: 16.0),
+                Text(
+                  'Oops! Nothing to show here...',
+                  style: GoogleFonts.montserrat(
+                    fontSize: 20.0,
+                    fontWeight: FontWeight.bold,
+                    color: const Color(0xff33907c),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    } else if (_rentPayments.isEmpty && !shouldDisplay) {
+      return Expanded(
+        child: TenantRentSkeleton(),
+      );
+    } else
+      return SizedBox(height: size.height * 0.02);
+  }
+
   @override
   Widget build(BuildContext context) {
     super.build(context); // Ensure the mixin's build method is called
@@ -264,69 +322,34 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
             ),
           ),
           SizedBox(height: size.height * 0.01),
-          _rentPayments.isEmpty
-              ? Center(
-                  child: Card(
-                    elevation: 4.0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20.0),
-                    ),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20.0),
-                        color: Colors.white,
-                      ),
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.error_outline,
-                            size: 48.0,
-                            color: const Color(0xff33907c),
-                          ),
-                          const SizedBox(height: 16.0),
-                          Text(
-                            'Oops! Nothing to show here...',
-                            style: GoogleFonts.montserrat(
-                              fontSize: 20.0,
-                              fontWeight: FontWeight.bold,
-                              color: const Color(0xff33907c),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+          Center(
+            child: Column(
+              children: [
+                SizedBox(height: size.height * 0.02),
+                Container(
+                  width: 300,
+                  height: 50,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    border:
+                        Border.all(width: 1, color: const Color(0xff33907c)),
+                    borderRadius: BorderRadius.circular(20),
                   ),
-                )
-              : Center(
-                  child: Column(
-                    children: [
-                      SizedBox(height: size.height * 0.02),
-                      Container(
-                        width: 300,
-                        height: 50,
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                              width: 1, color: const Color(0xff33907c)),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: TextFormField(
-                          decoration: const InputDecoration(
-                            labelText: "Search",
-                            suffixIcon: Icon(Icons.search),
-                            border: InputBorder.none,
-                            contentPadding: EdgeInsets.all(10),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: size.height * 0.02),
-                      _buildLatestMonthWidget(),
-                    ],
+                  child: TextFormField(
+                    decoration: const InputDecoration(
+                      labelText: "Search",
+                      suffixIcon: Icon(Icons.search),
+                      border: InputBorder.none,
+                      contentPadding: EdgeInsets.all(10),
+                    ),
                   ),
                 ),
-          SizedBox(height: size.height * 0.03),
+                SizedBox(height: size.height * 0.02),
+                _buildLatestMonthWidget(),
+              ],
+            ),
+          ),
+          _rentPaymentSelectorWidget(context),
           Expanded(
             child: SingleChildScrollView(
               child: Column(
@@ -355,5 +378,112 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
   void dispose() {
     _pageController.dispose();
     super.dispose();
+  }
+}
+
+class TenantRentSkeleton extends StatelessWidget {
+  const TenantRentSkeleton({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final Size size = MediaQuery.of(context).size;
+
+    return SingleChildScrollView(
+      child: Column(
+        children: <Widget>[
+          SizedBox(height: size.height * 0.03),
+          Container(
+            padding: const EdgeInsets.symmetric(vertical: 16.0),
+            alignment: Alignment.center,
+            child: Skeleton(
+              width: size.width * 0.5,
+              height: 30,
+            ),
+          ),
+          SizedBox(height: size.height * 0.02),
+          ListView.builder(
+            shrinkWrap: true,
+            physics: NeverScrollableScrollPhysics(),
+            itemCount: 4,
+            itemBuilder: (context, index) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                child: Card(
+                  elevation: 4.0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20.0),
+                  ),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20.0),
+                      color: Colors.white,
+                    ),
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Skeleton(
+                          width: size.width * 0.4,
+                          height: 20.0,
+                        ),
+                        SizedBox(height: 8.0),
+                        Skeleton(
+                          width: size.width * 0.7,
+                          height: 16.0,
+                        ),
+                        SizedBox(height: 16.0),
+                        Row(
+                          children: [
+                            Skeleton(
+                              width: size.width * 0.12,
+                              height: 20.0,
+                            ),
+                            SizedBox(width: size.width * 0.04),
+                            Skeleton(
+                              width: size.width * 0.6,
+                              height: 20.0,
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: size.height * 0.05),
+                        Padding(
+                          padding: EdgeInsets.only(bottom: size.height * 0.02),
+                          child: Row(
+                            children: [
+                              Skeleton(
+                                width: size.width * 0.04,
+                                height: 20.0,
+                              ),
+                              SizedBox(width: size.width * 0.02),
+                              Skeleton(
+                                width: size.width * 0.2,
+                                height: 20.0,
+                              ),
+                            ],
+                          ),
+                        ),
+                        Row(
+                          children: [
+                            Skeleton(
+                              width: size.width * 0.06,
+                              height: 20.0,
+                            ),
+                            SizedBox(width: size.width * 0.02),
+                            Skeleton(
+                              width: size.width * 0.2,
+                              height: 20.0,
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+    );
   }
 }

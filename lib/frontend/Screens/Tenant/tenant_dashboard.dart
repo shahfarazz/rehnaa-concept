@@ -82,7 +82,7 @@ class _DashboardPageState extends State<TenantDashboardPage>
     },
     // Add more notifications here
   ];
-  
+
   void _toggleSidebar() {
     setState(() {
       _isSidebarOpen = !_isSidebarOpen;
@@ -130,12 +130,11 @@ class _DashboardPageState extends State<TenantDashboardPage>
                             });
                           },
                           children: <Widget>[
-                             TenantDashboardContent(uid: widget.uid),
-                        TenantRentAccrualPage(),
-                        TenantPropertiesPage(uid: widget.uid),
-                        TenantMonthlyRentOffPage(),
-                        TenantRentHistoryPage(uid: widget.uid),
-                        TenantProfilePage(uid: widget.uid),
+                            TenantDashboardContent(uid: widget.uid),
+                            TenantRentAccrualPage(),
+                            TenantPropertiesPage(uid: widget.uid),
+                            TenantRentHistoryPage(uid: widget.uid),
+                            TenantProfilePage(uid: widget.uid),
                           ],
                         ),
                       ),
@@ -228,8 +227,8 @@ class _DashboardPageState extends State<TenantDashboardPage>
                     minWidth: 10,
                     minHeight: 10,
                   ),
-                  child: const Text(
-                    '9',
+                  child: Text(
+                    notifications.length.toString(),
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 10,
@@ -257,182 +256,193 @@ class _DashboardPageState extends State<TenantDashboardPage>
       ),
     );
   }
-Widget _buildSidebar(Size size) {
-  return GestureDetector(
-    onHorizontalDragUpdate: (details) {
-      if (details.delta.dx > 0) {
-        setState(() {
-          _isSidebarOpen = true;
-        });
-      } else if (details.delta.dx < 0) {
-        setState(() {
-          _isSidebarOpen = false;
-        });
-      }
-    },
-    child: Stack(
-      children: [
-        if (_isSidebarOpen)
-          GestureDetector(
-            onTap: () {
-              setState(() {
-                _isSidebarOpen = false;
-              });
-            },
-            child: Container(
-              color: Colors.black54,
+
+  Widget _buildSidebar(Size size) {
+    return GestureDetector(
+      onHorizontalDragUpdate: (details) {
+        if (details.delta.dx > 0) {
+          setState(() {
+            _isSidebarOpen = true;
+          });
+        } else if (details.delta.dx < 0) {
+          setState(() {
+            _isSidebarOpen = false;
+          });
+        }
+      },
+      child: Stack(
+        children: [
+          if (_isSidebarOpen)
+            GestureDetector(
+              onTap: () {
+                setState(() {
+                  _isSidebarOpen = false;
+                });
+              },
+              child: Container(
+                color: Colors.black54,
+              ),
             ),
-          ),
-        AnimatedContainer(
-          duration: const Duration(milliseconds: 300),
-          width: _isSidebarOpen ? size.width * 0.7 : 0,
-          height: _isSidebarOpen ? size.height : 0,
-          color: Colors.white,
-          child: SlideTransition(
-            position: Tween<Offset>(
-              begin: const Offset(-1, 0),
-              end: const Offset(0, 0),
-            ).animate(CurvedAnimation(
-              parent: _sidebarController,
-              curve: Curves.easeInOut,
-            )),
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Center(
-                          child: Container(
-                            padding: const EdgeInsets.only(
-                                left: 0, top: 30, bottom: 16),
-                            child: InkWell(
-                              onTap: () {
-                                // Add your onTap functionality here
-                              },
-                              child: ShaderMask(
-                                shaderCallback: (bounds) => LinearGradient(
-                                  colors: [
-                                    Color(0xFF0FA697),
-                                    Color(0xFF45BF7A),
-                                    Color(0xFF0DF205),
-                                  ],
-                                ).createShader(bounds),
-                                child: Text(
-                                  'Rehnaa',
-                                  style: TextStyle(
-                                    fontSize: 24,
-                                    fontFamily: 'Montserrat',
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 300),
+            width: _isSidebarOpen ? size.width * 0.7 : 0,
+            height: _isSidebarOpen ? size.height : 0,
+            color: Colors.white,
+            child: SlideTransition(
+              position: Tween<Offset>(
+                begin: const Offset(-1, 0),
+                end: const Offset(0, 0),
+              ).animate(CurvedAnimation(
+                parent: _sidebarController,
+                curve: Curves.easeInOut,
+              )),
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Center(
+                            child: Container(
+                              padding: const EdgeInsets.only(
+                                  left: 0, top: 30, bottom: 16),
+                              child: InkWell(
+                                onTap: () {
+                                  // Add your onTap functionality here
+                                },
+                                child: ShaderMask(
+                                  shaderCallback: (bounds) => LinearGradient(
+                                    colors: [
+                                      Color(0xFF0FA697),
+                                      Color(0xFF45BF7A),
+                                      Color(0xFF0DF205),
+                                    ],
+                                  ).createShader(bounds),
+                                  child: Text(
+                                    'Rehnaa',
+                                    style: TextStyle(
+                                      fontSize: 24,
+                                      fontFamily: 'Montserrat',
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
                                   ),
                                 ),
                               ),
                             ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                  Divider(
-                    color: Colors.grey[400],
-                    thickness: 0.5,
-                  ),
-                  _buildSidebarItem(
-                    icon: Icons.description,
-                    label: 'Contract',
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => ContractPage(),
-                        ),
-                      );
-                      // _closeSidebar();
-                    },
-                  ),
-                  _buildSidebarItem(
-                    icon: Icons.receipt,
-                    label: 'Vouchers',
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => VouchersPage(),
-                        ),
-                      );
-                      // _closeSidebar();
-                    },
-                    showBadge: true,
-                  ),
-                  _buildSidebarItem(
-                    icon: Icons.lock,
-                    label: 'Privacy Policy',
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => PrivacyPolicyPage(),
-                        ),
-                      );
-                      // _closeSidebar();
-                    },
-                  ),
-                  _buildSidebarItem(
-                    icon: Icons.question_answer,
-                    label: 'FAQs',
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => FAQPage(),
-                        ),
-                      );
-                      // _closeSidebar();
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  Divider(
-                    color: Colors.grey[400],
-                    thickness: 0.5,
-                  ),
-                  _buildSidebarItem(
-                    icon: Icons.logout,
-                    label: 'Logout',
-                    onTap: () {
-                      // Implement sign-out functionality here
-                      // For example, clear user session, navigate to login page, etc.
-                      _signOutUser();
-                    },
-                  ),
-                ],
+                      ],
+                    ),
+                    Divider(
+                      color: Colors.grey[400],
+                      thickness: 0.5,
+                    ),
+                    _buildSidebarItem(
+                      icon: Icons.description,
+                      label: 'Contract',
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ContractPage(),
+                          ),
+                        );
+                        // _closeSidebar();
+                      },
+                    ),
+                    _buildSidebarItem(
+                      icon: Icons.discount,
+                      label: 'Discounts',
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => TenantMonthlyRentOffPage(),
+                          ),
+                        );
+                        // _closeSidebar();
+                      },
+                    ),
+                    _buildSidebarItem(
+                      icon: Icons.receipt,
+                      label: 'Vouchers',
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => VouchersPage(),
+                          ),
+                        );
+                        // _closeSidebar();
+                      },
+                      showBadge: true,
+                    ),
+                    _buildSidebarItem(
+                      icon: Icons.lock,
+                      label: 'Privacy Policy',
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => PrivacyPolicyPage(),
+                          ),
+                        );
+                        // _closeSidebar();
+                      },
+                    ),
+                    _buildSidebarItem(
+                      icon: Icons.question_answer,
+                      label: 'FAQs',
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => FAQPage(),
+                          ),
+                        );
+                        // _closeSidebar();
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    Divider(
+                      color: Colors.grey[400],
+                      thickness: 0.5,
+                    ),
+                    _buildSidebarItem(
+                      icon: Icons.logout,
+                      label: 'Logout',
+                      onTap: () {
+                        // Implement sign-out functionality here
+                        // For example, clear user session, navigate to login page, etc.
+                        _signOutUser();
+                      },
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
-        ),
-      ],
-    ),
-  );
-}
+        ],
+      ),
+    );
+  }
 
+  void _signOutUser() async {
+    // Implement your sign-out logic here
+    // For example, clear user session, navigate to login page, etc.
+    // Sign out the user using Firebase Authentication
+    await FirebaseAuth.instance.signOut();
 
-void _signOutUser() async {
-  // Implement your sign-out logic here
-  // For example, clear user session, navigate to login page, etc.
-  // Sign out the user using Firebase Authentication
-  await FirebaseAuth.instance.signOut();
-  
-  // Navigate to login page
-  Navigator.pushReplacement(
-    context,
-    MaterialPageRoute(
-      builder: (context) => LoginPage(),
-    ),
-  );
-}
-
-
+    // Navigate to login page
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => LoginPage(),
+      ),
+    );
+  }
 
   Widget _buildSidebarItem({
     required IconData icon,
@@ -672,7 +682,8 @@ void _signOutUser() async {
         currentIndex: _currentIndex,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Tenant'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.real_estate_agent), label: 'Accrual'),
           BottomNavigationBarItem(
               icon: Icon(Icons.home_work), label: 'Property'),
           BottomNavigationBarItem(icon: Icon(Icons.history), label: 'History'),
@@ -683,7 +694,6 @@ void _signOutUser() async {
     );
   }
 }
-
 
 // Custom Clipper for hexagonal shape
 class HexagonClipper extends CustomClipper<Path> {

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../backend/models/propertymodel.dart';
 import '../Landlorddashboard_pages/landlord_propertyinfo.dart';
+import '../Landlorddashboard_pages/landlordproperties.dart';
 
 class TenantPropertiesPage extends StatefulWidget {
   final String uid; // UID of the landlord
@@ -19,6 +20,7 @@ class TenantPropertiesPage extends StatefulWidget {
 class _TenantPropertiesPageState extends State<TenantPropertiesPage>
     with AutomaticKeepAliveClientMixin<TenantPropertiesPage> {
   List<Property> properties = [];
+  bool shouldDisplay = false;
 
   @override
   void initState() {
@@ -40,6 +42,9 @@ class _TenantPropertiesPageState extends State<TenantPropertiesPage>
 
           Property property = await Property.fromJson(propertyData);
           property.landlord = await property.fetchLandlord();
+          setState(() {
+            shouldDisplay = true;
+          });
           fetchedProperties.add(property);
           print('Fetched property: ${property.landlord?.firstName}');
         }
@@ -70,7 +75,9 @@ class _TenantPropertiesPageState extends State<TenantPropertiesPage>
   Widget build(BuildContext context) {
     super.build(context); // Necessary for AutomaticKeepAliveClientMixin
 
-    if (properties.isEmpty) {
+    if (properties.isEmpty && !shouldDisplay) {
+      return LandlordPropertiesSkeleton();
+    } else if (properties.isEmpty && shouldDisplay) {
       return Center(
         child: Card(
           elevation: 4.0,
@@ -105,37 +112,37 @@ class _TenantPropertiesPageState extends State<TenantPropertiesPage>
           ),
         ),
       );
-    }
-
-    return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 255, 255, 255),
-      body: ListView.builder(
-        itemCount: properties.length,
-        itemBuilder: (context, index) {
-          return PropertyCard(
-            property: properties[index],
-            firstName: properties[index].landlord?.firstName ?? '',
-            lastName: properties[index].landlord?.lastName ?? '',
-            pathToImage: properties[index].landlord?.pathToImage ??
-                'assets/userimage.png',
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => PropertyPage(
-                    property: properties[index],
-                    firstName: properties[index].landlord?.firstName ?? '',
-                    lastName: properties[index].landlord?.lastName ?? '',
-                    pathToImage: properties[index].landlord?.pathToImage ??
-                        'assets/userimage.png',
+    } else {
+      return Scaffold(
+        backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+        body: ListView.builder(
+          itemCount: properties.length,
+          itemBuilder: (context, index) {
+            return PropertyCard(
+              property: properties[index],
+              firstName: properties[index].landlord?.firstName ?? '',
+              lastName: properties[index].landlord?.lastName ?? '',
+              pathToImage: properties[index].landlord?.pathToImage ??
+                  'assets/userimage.png',
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => PropertyPage(
+                      property: properties[index],
+                      firstName: properties[index].landlord?.firstName ?? '',
+                      lastName: properties[index].landlord?.lastName ?? '',
+                      pathToImage: properties[index].landlord?.pathToImage ??
+                          'assets/userimage.png',
+                    ),
                   ),
-                ),
-              );
-            },
-          );
-        },
-      ),
-    );
+                );
+              },
+            );
+          },
+        ),
+      );
+    }
   }
 }
 
