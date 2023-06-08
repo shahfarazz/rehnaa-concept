@@ -101,7 +101,7 @@ class LandlordTenantInfoPage extends StatelessWidget {
           ),
           Expanded(
             child: FractionallySizedBox(
-              widthFactor: 0.8,
+              widthFactor: 0.9,
               heightFactor: 1.2,
               child: Transform.translate(
                 offset: Offset(0, -40),
@@ -208,7 +208,8 @@ class WhiteBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 100.0,
+      height: 90.0,
+      width: 280,
       child: Container(
         width: MediaQuery.of(context).size.width,
         child: Card(
@@ -217,7 +218,7 @@ class WhiteBox extends StatelessWidget {
             borderRadius: BorderRadius.circular(20.0),
           ),
           child: Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(10.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
