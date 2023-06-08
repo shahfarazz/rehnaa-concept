@@ -509,6 +509,7 @@ class _DashboardPageState extends State<TenantDashboardPage>
                                       fontSize: 24,
                                       fontFamily: 'Montserrat',
                                       color: Colors.white,
+                                      fontWeight: FontWeight.bold,
                                     ),
                                   ),
                                 ),
