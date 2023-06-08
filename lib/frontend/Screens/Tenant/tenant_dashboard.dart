@@ -92,7 +92,7 @@ class _DashboardPageState extends State<TenantDashboardPage>
             child: Stack(
               children: [
                 Transform.translate(
-                  offset: Offset(_isSidebarOpen ? size.width * 0.6 : 0, 0),
+                  offset: Offset(_isSidebarOpen ? size.width * 0.7 : 0, 0),
                   child: Column(
                     children: [
                       Expanded(
@@ -513,6 +513,7 @@ Widget _sidebar(Size size) {
                     title: const Text(
                       'Contract',
                       style: TextStyle(
+                        fontFamily: 'Montserrat',
                         fontSize: 18,
                       ),
                     ),
@@ -533,7 +534,9 @@ Widget _sidebar(Size size) {
                         Expanded(
                           child: const Text(
                             'Vouchers',
+                            
                             style: TextStyle(
+                              fontFamily: 'Montserrat',
                               fontSize: 18,
                             ),
                           ),
@@ -571,6 +574,7 @@ Widget _sidebar(Size size) {
                     title: const Text(
                       'Privacy Policy',
                       style: TextStyle(
+                        fontFamily: 'Montserrat',
                         fontSize: 18,
                       ),
                     ),
@@ -584,6 +588,7 @@ Widget _sidebar(Size size) {
                     title: const Text(
                       'FAQs',
                       style: TextStyle(
+                        fontFamily: 'Montserrat',
                         fontSize: 18,
                       ),
                     ),
