@@ -512,6 +512,7 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
                                     style: TextStyle(
                                       fontSize: 24,
                                       fontFamily: 'Montserrat',
+                                      fontWeight: FontWeight.bold,
                                       color: Colors.white,
                                     ),
                                   ),
