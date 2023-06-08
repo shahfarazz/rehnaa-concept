@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:rehnaa/frontend/Screens/Landlord/contract.dart';
-import 'package:rehnaa/frontend/Screens/Landlord/vouchers.dart';
+import 'package:rehnaa/frontend/Screens/contract.dart';
+import 'package:rehnaa/frontend/Screens/vouchers.dart';
 import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenant_profile.dart';
 import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenant_properties.dart';
 import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenant_rentaccrual.dart';

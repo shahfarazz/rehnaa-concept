@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../../helper/Dealerdashboard_pages/landlordonboarded.dart';
-import '../../helper/Dealerdashboard_pages/landlordonboardedinfo.dart';
+import '../helper/Dealerdashboard_pages/landlordonboarded.dart';
+import '../helper/Dealerdashboard_pages/landlordonboardedinfo.dart';
 
 void main() {
   runApp(const MyApp());

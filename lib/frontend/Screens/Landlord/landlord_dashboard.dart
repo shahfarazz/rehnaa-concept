@@ -1,9 +1,10 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:rehnaa/frontend/Screens/Landlord/contract.dart';
+import 'package:rehnaa/frontend/Screens/contract.dart';
 import 'package:rehnaa/frontend/Screens/Landlord/privacypolicy.dart';
-import 'package:rehnaa/frontend/Screens/Landlord/vouchers.dart';
+import 'package:rehnaa/frontend/Screens/faq.dart';
+import 'package:rehnaa/frontend/Screens/vouchers.dart';
 import 'package:rehnaa/frontend/helper/Landlorddashboard_pages/landlord_dashboard_content.dart';
 import 'package:rehnaa/frontend/helper/Landlorddashboard_pages/landlord_profile.dart';
 
@@ -603,7 +604,12 @@ Widget _sidebar(Size size) {
                     ),
                     onTap: () {
                       // Handle FAQs button tap
-                      _closeSidebar(); // Close the sidebar after action
+                       Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => FAQPage(),
+                        ),
+                      ); // Close the sidebar after action
                     },
                   ),
                   const SizedBox(height: 16),
