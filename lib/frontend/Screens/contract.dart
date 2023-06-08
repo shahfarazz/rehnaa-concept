@@ -211,7 +211,7 @@ class ContractCard extends StatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(15.0), // rounded corners
       ),
-      elevation: 5, // shadow
+      elevation: 2, // shadow
       child: Padding(
         padding: const EdgeInsets.all(12),
         child: Row(

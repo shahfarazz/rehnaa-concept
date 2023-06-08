@@ -215,7 +215,7 @@ class WhiteBox extends StatelessWidget {
       width: MediaQuery.of(context).size.width,
        // Set the desired width of the outer card
       child: Card(
-        elevation: 4.0,
+        elevation: 2.0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20.0),
         ),
