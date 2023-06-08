@@ -121,6 +121,8 @@ class LandlordTenantInfoPage extends StatelessWidget {
             const SizedBox(height: 10.0),
             Center(
               child: WhiteBox(
+                icon: Icons.star,
+                iconColor: const Color(0xff33907c),
                 label: 'Rating',
                 value: '${tenant.rating}',
                 points: '${tenant.creditPoints}',
@@ -129,6 +131,8 @@ class LandlordTenantInfoPage extends StatelessWidget {
             const SizedBox(height: 10.0),
             Center(
               child: WhiteBox(
+                icon: Icons.home,
+                iconColor: const Color(0xff33907c),
                 label: 'Property Details',
                 value: tenant.propertyDetails,
               ),
@@ -136,6 +140,8 @@ class LandlordTenantInfoPage extends StatelessWidget {
             const SizedBox(height: 10.0),
             Center(
               child: WhiteBox(
+                icon: Icons.numbers,
+                iconColor: const Color(0xff33907c),
                 label: 'CNIC Number',
                 value: tenant.cnicNumber,
               ),
@@ -143,6 +149,8 @@ class LandlordTenantInfoPage extends StatelessWidget {
             const SizedBox(height: 10.0),
             Center(
               child: WhiteBox(
+                icon: Icons.email,
+                iconColor: const Color(0xff33907c),
                 label: 'Contact Number',
                 value: tenant.emailOrPhone,
               ),
@@ -150,13 +158,17 @@ class LandlordTenantInfoPage extends StatelessWidget {
             const SizedBox(height: 10.0),
             Center(
               child: WhiteBox(
+                icon: Icons.verified_user,
                 label: 'Tasdeeq Verification',
+                iconColor: const Color(0xff33907c),
                 value: tenant.tasdeeqVerification ? 'Verified' : 'Not Verified',
               ),
             ),
             const SizedBox(height: 10.0),
             Center(
               child: WhiteBox(
+                icon: Icons.family_restroom,
+                iconColor: const Color(0xff33907c),
                 label: 'Family Members',
                 value: tenant.familyMembers.toString(),
               ),
@@ -183,83 +195,97 @@ class WhiteBox extends StatelessWidget {
   final String label;
   final String value;
   final String? points;
+  final IconData? icon;
+  final Color? iconColor; // New iconColor property
 
   const WhiteBox({
     Key? key,
     required this.label,
     required this.value,
     this.points,
+    this.icon,
+    this.iconColor, // Initialize the iconColor property
   }) : super(key: key);
 
   @override
- Widget build(BuildContext context) {
-  return SizedBox(
-    height: 100.0, // Set the desired height of the white boxes
-    child: Container(
-      width: MediaQuery.of(context).size.width,
-       // Set the desired width of the outer card
-      child: Card(
-        elevation: 2.0,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20.0),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    label,
-                    style: GoogleFonts.montserrat(
-                      fontSize: 16.0,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 100.0, // Set the desired height of the white boxes
+      child: Container(
+        width: MediaQuery.of(context).size.width,
+        // Set the desired width of the outer card
+        child: Card(
+          elevation: 2.0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20.0),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        if (icon != null) // Render the icon if it is provided
+                          Icon(
+                            icon,
+                            color: iconColor, // Apply the iconColor to the icon
+                          ),
+                        const SizedBox(width: 8.0), // Add some spacing between icon and label
+                        Text(
+                          label,
+                          style: GoogleFonts.montserrat(
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.bold,
+                            color: const Color(0xff33907c),
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                  if (points != null)
+                    if (points != null)
+                      Text(
+                        'Points',
+                        style: GoogleFonts.montserrat(
+                          fontSize: 16.0,
+                          // fontWeight: FontWeight.bold,
+                          color:  const Color(0xff33907c),
+                        ),
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 10.0),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
                     Text(
-                      'Points',
+                      value,
                       style: GoogleFonts.montserrat(
-                        fontSize: 16.0,
-                        fontWeight: FontWeight.bold,
+                        fontSize: 14.0,
+                        // fontWeight: FontWeight.bold,
                         color: Colors.black,
                       ),
                     ),
-                ],
-              ),
-              const SizedBox(height: 10.0),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    value,
-                    style: GoogleFonts.montserrat(
-                      fontSize: 14.0,
-                      fontWeight: FontWeight.bold,
-                      color: const Color(0xff33907c),
+                    Text(
+                      points ?? '',
+                      style: GoogleFonts.montserrat(
+                        fontSize: 14.0,
+                        // fontWeight: FontWeight.bold,
+                        color: Colors.black,
+
+                      ),
                     ),
-                  ),
-                  Text(
-                    points ?? '',
-                    style: GoogleFonts.montserrat(
-                      fontSize: 14.0,
-                      fontWeight: FontWeight.bold,
-                      color: const Color(0xff33907c),
-                    ),
-                  ),
-                ],
-              ),
-            ],
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
-    ),
-  );
-}
-
+    );
+  }
 }
 
 class DiagonalClipper extends CustomClipper<Path> {
