@@ -12,7 +12,7 @@ import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenant_renthistory.
 import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenant_dashboard_content.dart';
 import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenantmonthlyrentoff.dart';
 
-import '../Landlord/privacypolicy.dart';
+import '../privacypolicy.dart';
 import '../login_page.dart';
 
 class TenantDashboardPage extends StatefulWidget {
