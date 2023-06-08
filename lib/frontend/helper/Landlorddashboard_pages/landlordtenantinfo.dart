@@ -105,81 +105,65 @@ class LandlordTenantInfoPage extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 20.0),
-                
-                Card(
-  color: Colors.grey[200],
-  elevation: 4.0,
-  shape: RoundedRectangleBorder(
-    borderRadius: BorderRadius.circular(25.0),
-  ),
-  child: SingleChildScrollView(
-    child: Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        children: [
-          const SizedBox(height: 10.0),
-          Center(
-            child: FractionallySizedBox(
-              widthFactor: 0.8,
+               FractionallySizedBox(
+  widthFactor: 0.8,
+  child: Card(
+    color: Colors.grey[200],
+    elevation: 4.0,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(25.0),
+    ),
+    child: SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            const SizedBox(height: 10.0),
+            Center(
               child: WhiteBox(
                 label: 'Rating',
                 value: '${tenant.rating}',
                 points: '${tenant.creditPoints}',
               ),
             ),
-          ),
-          const SizedBox(height: 10.0),
-          Center(
-            child: FractionallySizedBox(
-              widthFactor: 0.8,
+            const SizedBox(height: 10.0),
+            Center(
               child: WhiteBox(
                 label: 'Property Details',
                 value: tenant.propertyDetails,
               ),
             ),
-          ),
-          const SizedBox(height: 10.0),
-          Center(
-            child: FractionallySizedBox(
-              widthFactor: 0.8,
+            const SizedBox(height: 10.0),
+            Center(
               child: WhiteBox(
                 label: 'CNIC Number',
                 value: tenant.cnicNumber,
               ),
             ),
-          ),
-          const SizedBox(height: 10.0),
-          Center(
-            child: FractionallySizedBox(
-              widthFactor: 0.8,
+            const SizedBox(height: 10.0),
+            Center(
               child: WhiteBox(
                 label: 'Contact Number',
                 value: tenant.emailOrPhone,
               ),
             ),
-          ),
-          const SizedBox(height: 10.0),
-          Center(
-            child: FractionallySizedBox(
-              widthFactor: 0.8,
+            const SizedBox(height: 10.0),
+            Center(
               child: WhiteBox(
                 label: 'Tasdeeq Verification',
                 value: tenant.tasdeeqVerification ? 'Verified' : 'Not Verified',
               ),
             ),
-          ),
-          const SizedBox(height: 10.0),
-          Center(
-            child: FractionallySizedBox(
-              widthFactor: 0.8,
+            const SizedBox(height: 10.0),
+            Center(
               child: WhiteBox(
                 label: 'Family Members',
                 value: tenant.familyMembers.toString(),
               ),
             ),
-          ),
-          const SizedBox(height: 10.0),
-        ],
+            const SizedBox(height: 10.0),
+          ],
+        ),
       ),
     ),
   ),
