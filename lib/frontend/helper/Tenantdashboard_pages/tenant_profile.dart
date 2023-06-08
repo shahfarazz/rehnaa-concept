@@ -115,60 +115,90 @@ class _TenantProfilePageState extends State<TenantProfilePage> {
                         title: 'Change Password',
                         subtitle: 'Click to change your password',
                         onTap: () {
-                          // Handle password change logic here
-                          
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              String newPassword = '';
+
+                              return AlertDialog(
+                                title: Text('Change Password'),
+                                content: TextField(
+                                  onChanged: (value) {
+                                    newPassword = value;
+                                  },
+                                  decoration: InputDecoration(hintText: 'Enter new password'),
+                                ),
+                                actions: [
+                                  ElevatedButton(
+                                    
+                                    onPressed: () {
+                                      // Handle password change logic here
+                                      print('New password: $newPassword');
+                                      Navigator.of(context).pop();
+                                    },
+                                    child: Text('Save'),
+                                    
+                                  ),
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                    child: Text('Cancel'),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
                         },
                       ),
                     ],
                   ),
                 GestureDetector(
-  onTap: toggleChangePassword,
-  child: Row(
-    children: [
-      SizedBox(width: 17,height: 60),
-      Icon(
-        Icons.settings,
-        color: Colors.grey,
-      ),
-      SizedBox(width: 31),
-      Expanded(
-        child: Text(
-          'Additional Settings',
-          style: TextStyle(
-            fontSize: 16,
-            color: Colors.black,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
-      SizedBox(
-        height: 20,
-        child: AnimatedSwitcher(
-          duration: Duration(milliseconds: 200),
-          transitionBuilder: (child, animation) {
-            return ScaleTransition(
-              scale: animation,
-              child: child,
-            );
-          },
-          child: showChangePassword
-              ? Icon(
-                  Icons.arrow_drop_up,
-                  color: Colors.grey,
-                  key: UniqueKey(),
-                )
-              : Icon(
-                  Icons.arrow_drop_down,
-                  color: Colors.grey,
-                  key: UniqueKey(),
+                  onTap: toggleChangePassword,
+                  child: Row(
+                    children: [
+                      SizedBox(width: 17, height: 60),
+                      Icon(
+                        Icons.settings,
+                        color: Colors.grey,
+                      ),
+                      SizedBox(width: 31),
+                      Expanded(
+                        child: Text(
+                          'Additional Settings',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 20,
+                        child: AnimatedSwitcher(
+                          duration: Duration(milliseconds: 200),
+                          transitionBuilder: (child, animation) {
+                            return ScaleTransition(
+                              scale: animation,
+                              child: child,
+                            );
+                          },
+                          child: showChangePassword
+                              ? Icon(
+                                  Icons.arrow_drop_up,
+                                  color: Colors.grey,
+                                  key: UniqueKey(),
+                                )
+                              : Icon(
+                                  Icons.arrow_drop_down,
+                                  color: Colors.grey,
+                                  key: UniqueKey(),
+                                ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-        ),
-      ),
-    ],
-  ),
-),
-
-
               ],
             ),
           );
