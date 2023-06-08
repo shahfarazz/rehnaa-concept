@@ -35,26 +35,21 @@ class Tenant {
   });
 
   factory Tenant.fromJson(Map<String, dynamic> json) {
-    Tenant tenant = Tenant(
+    return Tenant(
       firstName: json['firstName'],
       lastName: json['lastName'],
-      description: json['description'],
-      rating: json['rating'],
-      rent: json['rent'],
-      creditPoints: json['creditPoints'],
-      propertyDetails: json['propertyDetails'],
-      cnicNumber: json['cnicNumber'],
-      emailOrPhone: json['emailOrPhone'],
-      tasdeeqVerification: json['tasdeeqVerification'],
-      familyMembers: json['familyMembers'],
+      description: json['description'] ?? 'No description',
+      rating: json['rating'] ?? 0.0,
+      rent: json['rent'] ?? 0.0,
+      creditPoints: json['creditPoints'] ?? 0,
+      propertyDetails: json['propertyDetails'] ?? 'No property details',
+      cnicNumber: json['cnicNumber'] ?? 'N/A',
+      emailOrPhone: json['emailOrPhone'] ?? 'N/A',
+      tasdeeqVerification: json['tasdeeqVerification'] ?? false,
+      familyMembers: json['familyMembers'] ?? [],
       landlordRef: json['landlordRef'],
-      pathToImage: json['pathToImage'],
+      pathToImage: json['pathToImage'] ?? 'assets/defaultimage.png',
     );
-
-    // tenant
-    //     .getLandlord(); // Call getLandlord method to fetch and populate landlord asynchronously
-
-    return tenant;
   }
 
   Future<void> getLandlord() async {

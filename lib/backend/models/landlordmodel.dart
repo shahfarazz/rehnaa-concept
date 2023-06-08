@@ -33,7 +33,7 @@ class Landlord {
     Landlord landlord = Landlord(
       firstName: json!['firstName'],
       lastName: json['lastName'],
-      balance: json['balance'].toDouble(),
+      balance: json['balance'] != null ? json['balance'].toDouble() : 0.0,
       tenantRef: json['tenantRef'] != null
           ? List<DocumentReference<Map<String, dynamic>>>.from(
               json['tenantRef'].map((ref) => ref as DocumentReference))
@@ -50,7 +50,9 @@ class Landlord {
           ? List<DocumentReference<Map<String, dynamic>>>.from(
               json['rentpaymentRef'].map((ref) => ref as DocumentReference))
           : null,
-      pathToImage: json['pathToImage'],
+      pathToImage: json['pathToImage'] != null
+          ? json['pathToImage']
+          : 'assets/defaulticon.png',
     );
 
     await landlord.fetchData();

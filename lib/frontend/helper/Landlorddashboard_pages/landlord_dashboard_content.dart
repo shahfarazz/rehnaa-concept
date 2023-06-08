@@ -41,7 +41,7 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
           .doc(uid)
           .get();
       if (kDebugMode) {
-        print('Fetched snapshot: $snapshot');
+        print('Fetched snapshot: ${snapshot.data()}');
       }
 
       // Convert the snapshot to JSON

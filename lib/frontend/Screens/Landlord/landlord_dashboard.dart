@@ -79,7 +79,7 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
   }
 
   @override
-   Widget build(BuildContext context) {
+  Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
     super.build(context); // Ensure the state is kept alive
     return Scaffold(
@@ -107,11 +107,11 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
                             });
                           },
                           children: <Widget>[
-                          LandlordDashboardContent(uid: widget.uid),
-                          LandlordTenantsPage(uid: widget.uid),
-                          LandlordPropertiesPage(uid: widget.uid),
-                          LandlordRentHistoryPage(uid: widget.uid),
-                          LandlordProfilePage(uid: widget.uid),
+                            LandlordDashboardContent(uid: widget.uid),
+                            LandlordTenantsPage(uid: widget.uid),
+                            LandlordPropertiesPage(uid: widget.uid),
+                            LandlordRentHistoryPage(uid: widget.uid),
+                            LandlordProfilePage(uid: widget.uid),
                           ],
                         ),
                       ),
@@ -127,8 +127,6 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
       ),
     );
   }
-
-
 
   List<Map<String, String>> notifications = [
     {
@@ -443,190 +441,205 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
 
 // Sidebar widget
 // Sidebar widget
-Widget _sidebar(Size size) {
-  return GestureDetector(
-    onHorizontalDragUpdate: (details) {
-      if (details.delta.dx > 0) {
-        // Swipe right, open the sidebar
-        setState(() {
-          _isSidebarOpen = true;
-        });
-      } else if (details.delta.dx < 0) {
-        // Swipe left, close the sidebar
-        setState(() {
-          _isSidebarOpen = false;
-        });
-      }
-    },
-    child: Stack(
-      children: [
-        if (_isSidebarOpen)
-          GestureDetector(
-            onTap: () {
-              // Close the sidebar when tapping on the shadow
-              setState(() {
-                _isSidebarOpen = false;
-              });
-            },
-            child: Container(
-              color: Colors.black54, // Adjust the color and opacity of the shadow here
+  Widget _sidebar(Size size) {
+    return GestureDetector(
+      onHorizontalDragUpdate: (details) {
+        if (details.delta.dx > 0) {
+          // Swipe right, open the sidebar
+          setState(() {
+            _isSidebarOpen = true;
+          });
+        } else if (details.delta.dx < 0) {
+          // Swipe left, close the sidebar
+          setState(() {
+            _isSidebarOpen = false;
+          });
+        }
+      },
+      child: Stack(
+        children: [
+          if (_isSidebarOpen)
+            GestureDetector(
+              onTap: () {
+                // Close the sidebar when tapping on the shadow
+                setState(() {
+                  _isSidebarOpen = false;
+                });
+              },
+              child: Container(
+                color: Colors
+                    .black54, // Adjust the color and opacity of the shadow here
+              ),
             ),
-          ),
-        AnimatedContainer(
-          duration: const Duration(milliseconds: 300),
-          width: _isSidebarOpen ? size.width * 0.7 : 0,
-          height: _isSidebarOpen ? size.height : 0,
-          color: Colors.white,
-          child: SlideTransition(
-            position: Tween<Offset>(
-              begin: const Offset(-1, 0),
-              end: const Offset(0, 0),
-            ).animate(CurvedAnimation(
-              parent: _sidebarController,
-              curve: Curves.easeInOut,
-            )),
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-  padding: const EdgeInsets.only(left: 16, top: 30, bottom: 16),
-  child: Text(
-    'Rehna',
-    style: TextStyle(
-      fontSize: 24,
-      fontFamily: 'Montserrat',
-      foreground: Paint()
-        ..shader = LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            Color(0xFF0FA697),
-            Color(0xFF45BF7A),
-            Color(0xFF0DF205),
-          ],
-        ).createShader(Rect.fromLTWH(0, 0, 200, 70)),
-    ),
-  ),
-),
-
-                  Divider(
-                    color: Colors.grey[400],
-                    thickness: 0.5,
-                  ),
-                  ListTile(
-                    leading: const Icon(Icons.description),
-                    title: const Text(
-                      'Contract',
-                      style: TextStyle(
-                        fontFamily: 'Montserrat',
-                        fontSize: 18,
-                      ),
-                    ),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const ContractPage(),
-                        ),
-                      );
-                      _closeSidebar(); // Close the sidebar after navigation
-                    },
-                  ),
-                  ListTile(
-                    leading: const Icon(Icons.receipt),
-                    title: Row(
-                      children: <Widget>[
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 300),
+            width: _isSidebarOpen ? size.width * 0.7 : 0,
+            height: _isSidebarOpen ? size.height : 0,
+            color: Colors.white,
+            child: SlideTransition(
+              position: Tween<Offset>(
+                begin: const Offset(-1, 0),
+                end: const Offset(0, 0),
+              ).animate(CurvedAnimation(
+                parent: _sidebarController,
+                curve: Curves.easeInOut,
+              )),
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
                         Expanded(
-                          child: const Text(
-                            'Vouchers',
-                            style: TextStyle(
-                              fontFamily: 'Montserrat',
-                              fontSize: 18,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 10.0), // add some spacing
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 6.0, vertical: 2.0),
-                          decoration: BoxDecoration(
-                            color: Colors.red,
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                          child: const Text(
-                            'new',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 12.0, // adjust the size to fit your needs
+                          child: Center(
+                            child: Container(
+                              padding: const EdgeInsets.only(
+                                  left: 0, top: 30, bottom: 16),
+                              child: InkWell(
+                                onTap: () {
+                                  // Add your onTap functionality here
+                                },
+                                child: ShaderMask(
+                                  shaderCallback: (bounds) => LinearGradient(
+                                    colors: [
+                                      Color(0xFF0FA697),
+                                      Color(0xFF45BF7A),
+                                      Color(0xFF0DF205),
+                                    ],
+                                  ).createShader(bounds),
+                                  child: Text(
+                                    'Rehnaa',
+                                    style: TextStyle(
+                                      fontSize: 24,
+                                      fontFamily: 'Montserrat',
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ),
                             ),
                           ),
                         ),
                       ],
                     ),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const VouchersPage(),
-                        ),
-                      );
-                      _closeSidebar(); // Close the sidebar after navigation
-                    },
-                  ),
-                  ListTile(
-                    leading: const Icon(Icons.lock),
-                    title: const Text(
-                      'Privacy Policy',
-                      style: TextStyle(
-                        fontFamily: 'Montserrat',
-                        fontSize: 18,
-                      ),
+                    Divider(
+                      color: Colors.grey[400],
+                      thickness: 0.5,
                     ),
-                    onTap: () {
-                      // Handle Privacy Policy button tap
-                      Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => PrivacyPolicyPage(),
-      ),
-    ); // Close the sidebar after action
-                    },
-                  ),
-                  ListTile(
-                    leading: const Icon(Icons.question_answer),
-                    title: const Text(
-                      'FAQs',
-                      style: TextStyle(
-                        fontFamily: 'Montserrat',
-                        fontSize: 18,
-                      ),
-                    ),
-                    onTap: () {
-                      // Handle FAQs button tap
-                       Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => FAQPage(),
+                    ListTile(
+                      leading: const Icon(Icons.description),
+                      title: const Text(
+                        'Contract',
+                        style: TextStyle(
+                          fontFamily: 'Montserrat',
+                          fontSize: 18,
                         ),
-                      ); // Close the sidebar after action
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  Divider(
-                    color: Colors.grey[400],
-                    thickness: 0.5,
-                  ),
-                  // Add any additional widgets or content at the bottom of the sidebar
-                ],
+                      ),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const ContractPage(),
+                          ),
+                        );
+                        _closeSidebar(); // Close the sidebar after navigation
+                      },
+                    ),
+                    ListTile(
+                      leading: const Icon(Icons.receipt),
+                      title: Row(
+                        children: <Widget>[
+                          Expanded(
+                            child: const Text(
+                              'Vouchers',
+                              style: TextStyle(
+                                fontFamily: 'Montserrat',
+                                fontSize: 18,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 10.0), // add some spacing
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 6.0, vertical: 2.0),
+                            decoration: BoxDecoration(
+                              color: Colors.red,
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
+                            child: const Text(
+                              'new',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize:
+                                    12.0, // adjust the size to fit your needs
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const VouchersPage(),
+                          ),
+                        );
+                        _closeSidebar(); // Close the sidebar after navigation
+                      },
+                    ),
+                    ListTile(
+                      leading: const Icon(Icons.lock),
+                      title: const Text(
+                        'Privacy Policy',
+                        style: TextStyle(
+                          fontFamily: 'Montserrat',
+                          fontSize: 18,
+                        ),
+                      ),
+                      onTap: () {
+                        // Handle Privacy Policy button tap
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => PrivacyPolicyPage(),
+                          ),
+                        ); // Close the sidebar after action
+                      },
+                    ),
+                    ListTile(
+                      leading: const Icon(Icons.question_answer),
+                      title: const Text(
+                        'FAQs',
+                        style: TextStyle(
+                          fontFamily: 'Montserrat',
+                          fontSize: 18,
+                        ),
+                      ),
+                      onTap: () {
+                        // Handle FAQs button tap
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => FAQPage(),
+                          ),
+                        ); // Close the sidebar after action
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    Divider(
+                      color: Colors.grey[400],
+                      thickness: 0.5,
+                    ),
+                    // Add any additional widgets or content at the bottom of the sidebar
+                  ],
+                ),
               ),
             ),
           ),
-        ),
-      ],
-    ),
-  );
-}
+        ],
+      ),
+    );
+  }
 
   // BottomNavigationBar widget
 
@@ -649,19 +662,19 @@ Widget _sidebar(Size size) {
         showUnselectedLabels: true,
         onTap: onTabTapped,
         currentIndex: _currentIndex,
-         items: const [
-        BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-        BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Tenant'),
-        BottomNavigationBarItem(icon: Icon(Icons.home_work), label: 'Property'),
-        BottomNavigationBarItem(icon: Icon(Icons.history), label: 'History'),
-        BottomNavigationBarItem(icon: Icon(Icons.person_pin), label: 'Profile'),
-      ],
-
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Tenant'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.home_work), label: 'Property'),
+          BottomNavigationBarItem(icon: Icon(Icons.history), label: 'History'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.person_pin), label: 'Profile'),
+        ],
       ),
     );
   }
 }
-
 
 // Custom Clipper for hexagonal shape
 class HexagonClipper extends CustomClipper<Path> {

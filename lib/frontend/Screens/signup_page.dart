@@ -1,11 +1,13 @@
 import 'dart:async';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 import 'Landlord/landlord_dashboard.dart';
+import 'Tenant/tenant_dashboard.dart';
 import 'login_page.dart';
 
 class SignUpPage extends StatefulWidget {
@@ -62,6 +64,54 @@ class _SignUpPageState extends State<SignUpPage> {
           timer.cancel();
           setState(() => isLoading = false);
           // ignore: use_build_context_synchronously
+          FirebaseFirestore.instance
+              .collection('users')
+              .doc(FirebaseAuth.instance.currentUser!.uid)
+              .set({
+            'firstName': firstName,
+            'lastName': lastName,
+            'emailOrPhone': emailOrPhone,
+            'type': selectedOption,
+          });
+
+          if (selectedOption == 'Landlord') {
+            FirebaseFirestore.instance
+                .collection('Landlords')
+                .doc(FirebaseAuth.instance.currentUser!.uid)
+                .set({
+              'firstName': firstName,
+              'lastName': lastName,
+              'emailOrPhone': emailOrPhone,
+              'type': selectedOption,
+              'balance': 0,
+              'pathToImage': 'assets/defaulticon.png',
+            });
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => LandlordDashboardPage(
+                      uid: FirebaseAuth.instance.currentUser!.uid)),
+            );
+          } else if (selectedOption == 'Tenant') {
+            FirebaseFirestore.instance
+                .collection('Tenants')
+                .doc(FirebaseAuth.instance.currentUser!.uid)
+                .set({
+              'firstName': firstName,
+              'lastName': lastName,
+              'emailOrPhone': emailOrPhone,
+              'type': selectedOption,
+              'balance': 0,
+              'pathToImage': 'assets/defaulticon.png',
+            });
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => TenantDashboardPage(
+                      uid: FirebaseAuth.instance.currentUser!.uid)),
+            );
+          }
+
           Navigator.push(
             context,
             MaterialPageRoute(
@@ -147,12 +197,54 @@ class _SignUpPageState extends State<SignUpPage> {
       _showToast('Phone number successfully verified and user signed in.',
           Colors.green);
       // ignore: use_build_context_synchronously
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => LandlordDashboardPage(
-                uid: FirebaseAuth.instance.currentUser!.uid)),
-      );
+
+      FirebaseFirestore.instance
+          .collection('users')
+          .doc(FirebaseAuth.instance.currentUser!.uid)
+          .set({
+        'firstName': firstName,
+        'lastName': lastName,
+        'emailOrPhone': emailOrPhone,
+        'type': selectedOption,
+      });
+
+      if (selectedOption == 'Landlord') {
+        FirebaseFirestore.instance
+            .collection('Landlords')
+            .doc(FirebaseAuth.instance.currentUser!.uid)
+            .set({
+          'firstName': firstName,
+          'lastName': lastName,
+          'emailOrPhone': emailOrPhone,
+          'type': selectedOption,
+          'balance': 0,
+          'pathToImage': 'assets/defaulticon.png',
+        });
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => LandlordDashboardPage(
+                  uid: FirebaseAuth.instance.currentUser!.uid)),
+        );
+      } else if (selectedOption == 'Tenant') {
+        FirebaseFirestore.instance
+            .collection('Tenants')
+            .doc(FirebaseAuth.instance.currentUser!.uid)
+            .set({
+          'firstName': firstName,
+          'lastName': lastName,
+          'emailOrPhone': emailOrPhone,
+          'type': selectedOption,
+          'balance': 0,
+          'pathToImage': 'assets/defaulticon.png',
+        });
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => TenantDashboardPage(
+                  uid: FirebaseAuth.instance.currentUser!.uid)),
+        );
+      }
     } catch (e) {
       _showToast('Failed to verify SMS code.', Colors.red);
     }
