@@ -12,113 +12,114 @@ class LandlordTenantInfoPage extends StatelessWidget {
     final Size size = MediaQuery.of(context).size;
 
     return Scaffold(
-      
-      body: SingleChildScrollView(
-        child: Stack(
-          children: [
-            
-            // Background gradient with diagonal clip
-            ClipPath(
-              clipper: DiagonalClipper(),
-              
-              child: Container(
-                height: size.height * 0.5,
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      Color(0xff0FA697),
-                      Color(0xff45BF7A),
-                      Color(0xff0DF205), // Change to F6F9FF
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            Positioned(
-            top: 40.0,
-            left: 10.0,
-            child: GestureDetector(
-              onTap: () {
-                Navigator.pop(context);
-              },
-              child: Container(
-                width: 40,
-                height: 40,
-                decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Color(0xFF33907C),
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      Color(0xff0FA697),
-                      Color(0xff45BF7A),
-                      Color(0xff0DF205),
-                    ],
-                  ),
-                ),
-                child: const Icon(
-                  Icons.arrow_back,
-                  size: 20,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-          ),
-            Column(
-              
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                
-                SizedBox(height: size.height * 0.08),
-                
-                // Display tenant's avatar
-                CircleAvatar(
-                  radius: size.width * 0.2,
-                  backgroundColor: Colors.white,
-                  backgroundImage: AssetImage(
-                    tenant.pathToImage ?? 'assets/defaulticon.png',
-                  ),
-                ),
-                const SizedBox(height: 20.0),
-                // Display tenant's name
-                Text(
-                  '${tenant.firstName} ${tenant.lastName}',
-                  style: GoogleFonts.montserrat(
-                    fontSize: 20.0,
-                    fontWeight: FontWeight.bold,
-                    color: const Color(0xff33907c),
-                  ),
-                ),
-                const SizedBox(height: 10.0),
-                // Display tenant's description
-                Center(
-                  child: Text(
-                    tenant.description,
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.montserrat(
-                      fontSize: 16.0,
-                      color: const Color(0xff33907c),
+      body: Column(
+        children: [
+          Stack(
+            children: [
+              ClipPath(
+                clipper: DiagonalClipper(),
+                child: Container(
+                  height: size.height * 0.5,
+                  decoration: const BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        Color(0xff0FA697),
+                        Color(0xff45BF7A),
+                        Color(0xff0DF205),
+                      ],
                     ),
                   ),
                 ),
-                const SizedBox(height: 20.0),
-               FractionallySizedBox(
-  widthFactor: 0.8,
-  child: Card(
-    color: Colors.grey[200],
-    elevation: 4.0,
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(25.0),
-    ),
-    child: SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            const SizedBox(height: 10.0),
+              ),
+              Positioned(
+                top: 40.0,
+                left: 10.0,
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.pop(context);
+                  },
+                  child: Container(
+                    width: 40,
+                    height: 40,
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Color(0xFF33907C),
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          Color(0xff0FA697),
+                          Color(0xff45BF7A),
+                          Color(0xff0DF205),
+                        ],
+                      ),
+                    ),
+                    child: const Icon(
+                      Icons.arrow_back,
+                      size: 20,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  SizedBox(height: size.height * 0.08),
+                  CircleAvatar(
+                    radius: size.width * 0.2,
+                    backgroundColor: Colors.white,
+                    backgroundImage: AssetImage(
+                      tenant.pathToImage ?? 'assets/defaulticon.png',
+                    ),
+                  ),
+                  const SizedBox(height: 20.0),
+                  Text(
+                    '${tenant.firstName} ${tenant.lastName}',
+                    style: GoogleFonts.montserrat(
+                      fontSize: 20.0,
+                      fontWeight: FontWeight.bold,
+                      color: const Color(0xff33907c),
+                    ),
+                  ),
+                  const SizedBox(height: 10.0),
+                  Center(
+                    child: Text(
+                      tenant.description,
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.montserrat(
+                        fontSize: 16.0,
+                        color: const Color(0xff33907c),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          Expanded(
+            child: FractionallySizedBox(
+              widthFactor: 0.8,
+              heightFactor: 1.2,
+              child: Transform.translate(
+                offset: Offset(0, -40),
+              child: Card(
+                color: Colors.grey[200],
+                elevation: 4.0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(25.0),
+                ),
+                child: SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      children: [
+                        const SizedBox(height: 10.0),
+                        // Rest of your card's content...
+
+                        
             Center(
               child: WhiteBox(
                 icon: Icons.star,
@@ -174,21 +175,18 @@ class LandlordTenantInfoPage extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 10.0),
-          ],
-        ),
-      ),
-    ),
-  ),
-)
-
-              ],
+                      ],
+                    ),
+                  ),
+                ),
+                ),
+              ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
-
 }
 
 class WhiteBox extends StatelessWidget {
@@ -196,7 +194,7 @@ class WhiteBox extends StatelessWidget {
   final String value;
   final String? points;
   final IconData? icon;
-  final Color? iconColor; // New iconColor property
+  final Color? iconColor; 
 
   const WhiteBox({
     Key? key,
@@ -204,16 +202,15 @@ class WhiteBox extends StatelessWidget {
     required this.value,
     this.points,
     this.icon,
-    this.iconColor, // Initialize the iconColor property
+    this.iconColor,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 100.0, // Set the desired height of the white boxes
+      height: 100.0,
       child: Container(
         width: MediaQuery.of(context).size.width,
-        // Set the desired width of the outer card
         child: Card(
           elevation: 2.0,
           shape: RoundedRectangleBorder(
@@ -229,12 +226,12 @@ class WhiteBox extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        if (icon != null) // Render the icon if it is provided
+                        if (icon != null)
                           Icon(
                             icon,
-                            color: iconColor, // Apply the iconColor to the icon
+                            color: iconColor,
                           ),
-                        const SizedBox(width: 8.0), // Add some spacing between icon and label
+                        const SizedBox(width: 8.0),
                         Text(
                           label,
                           style: GoogleFonts.montserrat(
@@ -250,8 +247,7 @@ class WhiteBox extends StatelessWidget {
                         'Points',
                         style: GoogleFonts.montserrat(
                           fontSize: 16.0,
-                          // fontWeight: FontWeight.bold,
-                          color:  const Color(0xff33907c),
+                          color: const Color(0xff33907c),
                         ),
                       ),
                   ],
@@ -264,7 +260,6 @@ class WhiteBox extends StatelessWidget {
                       value,
                       style: GoogleFonts.montserrat(
                         fontSize: 14.0,
-                        // fontWeight: FontWeight.bold,
                         color: Colors.black,
                       ),
                     ),
@@ -272,9 +267,7 @@ class WhiteBox extends StatelessWidget {
                       points ?? '',
                       style: GoogleFonts.montserrat(
                         fontSize: 14.0,
-                        // fontWeight: FontWeight.bold,
                         color: Colors.black,
-
                       ),
                     ),
                   ],
