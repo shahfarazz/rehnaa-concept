@@ -5,19 +5,22 @@ import 'package:rehnaa/backend/models/tenantsmodel.dart';
 class LandlordTenantInfoPage extends StatelessWidget {
   final Tenant tenant;
 
-  const LandlordTenantInfoPage({super.key, required this.tenant});
+  const LandlordTenantInfoPage({Key? key, required this.tenant}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
 
     return Scaffold(
+      
       body: SingleChildScrollView(
         child: Stack(
           children: [
+            
             // Background gradient with diagonal clip
             ClipPath(
               clipper: DiagonalClipper(),
+              
               child: Container(
                 height: size.height * 0.5,
                 decoration: const BoxDecoration(
@@ -33,10 +36,44 @@ class LandlordTenantInfoPage extends StatelessWidget {
                 ),
               ),
             ),
+            Positioned(
+            top: 40.0,
+            left: 10.0,
+            child: GestureDetector(
+              onTap: () {
+                Navigator.pop(context);
+              },
+              child: Container(
+                width: 40,
+                height: 40,
+                decoration: const BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Color(0xFF33907C),
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      Color(0xff0FA697),
+                      Color(0xff45BF7A),
+                      Color(0xff0DF205),
+                    ],
+                  ),
+                ),
+                child: const Icon(
+                  Icons.arrow_back,
+                  size: 20,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ),
             Column(
+              
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                SizedBox(height: size.height * 0.1),
+                
+                SizedBox(height: size.height * 0.08),
+                
                 // Display tenant's avatar
                 CircleAvatar(
                   radius: size.width * 0.2,
@@ -68,77 +105,86 @@ class LandlordTenantInfoPage extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 20.0),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Column(
-                    children: [
-                      const SizedBox(height: 10.0),
-                      Center(
-                        child: FractionallySizedBox(
-                          widthFactor: 0.8,
-                          child: WhiteBox(
-                            label: 'Rating',
-                            value: '${tenant.rating}',
-                            points: '${tenant.creditPoints}',
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 10.0),
-                      Center(
-                        child: FractionallySizedBox(
-                          widthFactor: 0.8,
-                          child: WhiteBox(
-                            label: 'Property Details',
-                            value: tenant.propertyDetails,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 10.0),
-                      Center(
-                        child: FractionallySizedBox(
-                          widthFactor: 0.8,
-                          child: WhiteBox(
-                            label: 'CNIC Number',
-                            value: tenant.cnicNumber,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 10.0),
-                      Center(
-                        child: FractionallySizedBox(
-                          widthFactor: 0.8,
-                          child: WhiteBox(
-                            label: 'Contact Number',
-                            value: tenant.emailOrPhone,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 10.0),
-                      Center(
-                        child: FractionallySizedBox(
-                          widthFactor: 0.8,
-                          child: WhiteBox(
-                            label: 'Tasdeeq Verification',
-                            value: tenant.tasdeeqVerification
-                                ? 'Verified'
-                                : 'Not Verified',
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 10.0),
-                      Center(
-                        child: FractionallySizedBox(
-                          widthFactor: 0.8,
-                          child: WhiteBox(
-                            label: 'Family Members',
-                            value: tenant.familyMembers.toString(),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 10.0),
-                    ],
-                  ),
-                ),
+                
+                Card(
+  color: Colors.grey[200],
+  elevation: 4.0,
+  shape: RoundedRectangleBorder(
+    borderRadius: BorderRadius.circular(25.0),
+  ),
+  child: SingleChildScrollView(
+    child: Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        children: [
+          const SizedBox(height: 10.0),
+          Center(
+            child: FractionallySizedBox(
+              widthFactor: 0.8,
+              child: WhiteBox(
+                label: 'Rating',
+                value: '${tenant.rating}',
+                points: '${tenant.creditPoints}',
+              ),
+            ),
+          ),
+          const SizedBox(height: 10.0),
+          Center(
+            child: FractionallySizedBox(
+              widthFactor: 0.8,
+              child: WhiteBox(
+                label: 'Property Details',
+                value: tenant.propertyDetails,
+              ),
+            ),
+          ),
+          const SizedBox(height: 10.0),
+          Center(
+            child: FractionallySizedBox(
+              widthFactor: 0.8,
+              child: WhiteBox(
+                label: 'CNIC Number',
+                value: tenant.cnicNumber,
+              ),
+            ),
+          ),
+          const SizedBox(height: 10.0),
+          Center(
+            child: FractionallySizedBox(
+              widthFactor: 0.8,
+              child: WhiteBox(
+                label: 'Contact Number',
+                value: tenant.emailOrPhone,
+              ),
+            ),
+          ),
+          const SizedBox(height: 10.0),
+          Center(
+            child: FractionallySizedBox(
+              widthFactor: 0.8,
+              child: WhiteBox(
+                label: 'Tasdeeq Verification',
+                value: tenant.tasdeeqVerification ? 'Verified' : 'Not Verified',
+              ),
+            ),
+          ),
+          const SizedBox(height: 10.0),
+          Center(
+            child: FractionallySizedBox(
+              widthFactor: 0.8,
+              child: WhiteBox(
+                label: 'Family Members',
+                value: tenant.familyMembers.toString(),
+              ),
+            ),
+          ),
+          const SizedBox(height: 10.0),
+        ],
+      ),
+    ),
+  ),
+)
+
               ],
             ),
           ],
@@ -146,6 +192,7 @@ class LandlordTenantInfoPage extends StatelessWidget {
       ),
     );
   }
+
 }
 
 class WhiteBox extends StatelessWidget {
@@ -153,13 +200,20 @@ class WhiteBox extends StatelessWidget {
   final String value;
   final String? points;
 
-  const WhiteBox(
-      {super.key, required this.label, required this.value, this.points});
+  const WhiteBox({
+    Key? key,
+    required this.label,
+    required this.value,
+    this.points,
+  }) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: 100.0, // Set the desired height of the white boxes
+ Widget build(BuildContext context) {
+  return SizedBox(
+    height: 100.0, // Set the desired height of the white boxes
+    child: Container(
+      width: MediaQuery.of(context).size.width,
+       // Set the desired width of the outer card
       child: Card(
         elevation: 4.0,
         shape: RoundedRectangleBorder(
@@ -218,8 +272,10 @@ class WhiteBox extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
+
 }
 
 class DiagonalClipper extends CustomClipper<Path> {
