@@ -231,12 +231,6 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
       future: _landlordFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          // Show a loading indicator while waiting for the data
-          // return const Center(
-          //   child: CircularProgressIndicator(
-          //     valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
-          //   ),
-          // );
           return LandlordDashboardContentSkeleton();
         } else if (snapshot.hasError) {
           // Handle any error that occurred while fetching the data
@@ -276,6 +270,7 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
                           landlord.pathToImage ?? 'assets/defaulticon.png',
                           width: 150,
                           height: 150,
+                          fit: BoxFit.cover,
                         ),
                       ),
                     ),

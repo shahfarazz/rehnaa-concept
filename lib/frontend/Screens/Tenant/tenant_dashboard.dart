@@ -190,6 +190,7 @@ class _DashboardPageState extends State<TenantDashboardPage>
                     'assets/mainlogo.png',
                     width: 60,
                     height: 60,
+                    fit: BoxFit.cover,
                   ),
                 ),
               ],

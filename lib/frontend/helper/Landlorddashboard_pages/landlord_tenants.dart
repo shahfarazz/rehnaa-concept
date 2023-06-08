@@ -24,7 +24,7 @@ class _LandlordTenantsPageState extends State<LandlordTenantsPage>
     with AutomaticKeepAliveClientMixin<LandlordTenantsPage> {
   final PageController _pageController = PageController(initialPage: 0);
   List<Tenant> _tenants = [];
-  bool shouldDisplayContent = true;
+  bool shouldDisplayContent = false;
 
   // int _currentPage = 0;
   final int _pageSize = 4; // Number of tenants to show per page
@@ -57,6 +57,10 @@ class _LandlordTenantsPageState extends State<LandlordTenantsPage>
             .get();
 
     if (landlordSnapshot.exists) {
+      setState(() {
+        shouldDisplayContent = true;
+      });
+      // print('reached here');
       Map<String, dynamic>? landlordData = landlordSnapshot.data();
       if (landlordData != null && landlordData['tenantRef'] != null) {
         // Extract tenant references from landlord data
@@ -85,7 +89,7 @@ class _LandlordTenantsPageState extends State<LandlordTenantsPage>
           }
         }
 
-        print('reached here');
+        // print('reached here');
 
         if (mounted) {
           setState(() {
@@ -207,42 +211,44 @@ class _LandlordTenantsPageState extends State<LandlordTenantsPage>
     final int pageCount = (_tenants.length / _pageSize).ceil();
 
     Widget buildTenantsList() {
-      if (_tenants.isEmpty && shouldDisplayContent) {
+      if (_tenants.isEmpty && !shouldDisplayContent) {
         return LandlordTenantSkeleton();
-      } else if (_tenants.isEmpty && !shouldDisplayContent) {
-        return Center(
-          child: Card(
-            elevation: 4.0,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20.0),
-            ),
-            child: Container(
-              decoration: BoxDecoration(
+      } else if (_tenants.isEmpty && shouldDisplayContent) {
+        return Column(
+          children: [
+            Card(
+              elevation: 4.0,
+              shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20.0),
-                color: Colors.white,
               ),
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    Icons.sentiment_dissatisfied,
-                    size: 48.0,
-                    color: const Color(0xff33907c),
-                  ),
-                  const SizedBox(height: 16.0),
-                  Text(
-                    'Oops! No Tenants yet...',
-                    style: GoogleFonts.montserrat(
-                      fontSize: 20.0,
-                      fontWeight: FontWeight.bold,
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20.0),
+                  color: Colors.white,
+                ),
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.sentiment_dissatisfied,
+                      size: 48.0,
                       color: const Color(0xff33907c),
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 16.0),
+                    Text(
+                      'Oops! No Tenants yet...',
+                      style: GoogleFonts.montserrat(
+                        fontSize: 20.0,
+                        // fontWeight: FontWeight.bold,
+                        color: const Color(0xff33907c),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ),
+            )
+          ],
         );
       } else {
         return PageView.builder(
@@ -268,7 +274,7 @@ class _LandlordTenantsPageState extends State<LandlordTenantsPage>
             child: Text(
               'Tenants',
               style: GoogleFonts.montserrat(
-                fontSize: 20.0,
+                fontSize: 24.0,
                 fontWeight: FontWeight.bold,
                 color: const Color(0xff33907c),
               ),

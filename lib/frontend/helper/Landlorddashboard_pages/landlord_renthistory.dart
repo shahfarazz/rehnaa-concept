@@ -252,7 +252,7 @@ class _LandlordRentHistoryPageState extends State<LandlordRentHistoryPage>
             'Payment History',
             style: GoogleFonts.montserrat(
               fontWeight: FontWeight.bold,
-              fontSize: size.width * 0.05,
+              fontSize: 24.0,
               color: const Color(0xff33907c),
             ),
           ),
@@ -320,7 +320,7 @@ class _LandlordRentHistoryPageState extends State<LandlordRentHistoryPage>
                             'Oops! Nothing to show here...',
                             style: GoogleFonts.montserrat(
                               fontSize: 20.0,
-                              fontWeight: FontWeight.bold,
+                              // fontWeight: FontWeight.bold,
                               color: const Color(0xff33907c),
                             ),
                           ),
