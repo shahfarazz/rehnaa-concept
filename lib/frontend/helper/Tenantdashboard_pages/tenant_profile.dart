@@ -4,17 +4,31 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../../backend/services/authentication_service.dart';
 import '../Landlorddashboard_pages/landlord_profile.dart';
 
-class TenantProfilePage extends StatelessWidget {
+class TenantProfilePage extends StatefulWidget {
   final String uid;
 
   const TenantProfilePage({Key? key, required this.uid}) : super(key: key);
 
   @override
+  _TenantProfilePageState createState() => _TenantProfilePageState();
+}
+
+class _TenantProfilePageState extends State<TenantProfilePage> {
+  bool showChangePassword = false;
+
+  @override
   Widget build(BuildContext context) {
     final authService = AuthenticationService();
+
+    void toggleChangePassword() {
+      setState(() {
+        showChangePassword = !showChangePassword;
+      });
+    }
+
     return Scaffold(
       body: FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-        future: FirebaseFirestore.instance.collection('Tenants').doc(uid).get(),
+        future: FirebaseFirestore.instance.collection('Tenants').doc(widget.uid).get(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             // While data is being fetched, show a loading indicator
@@ -92,11 +106,104 @@ class TenantProfilePage extends StatelessWidget {
                   title: 'Location',
                   subtitle: 'Lahore, Punjab',
                 ),
+                if (showChangePassword)
+                  Column(
+                    children: [
+                      SizedBox(height: 2),
+                      ProfileInfoItem(
+                        icon: Icons.lock,
+                        title: 'Change Password',
+                        subtitle: 'Click to change your password',
+                        onTap: () {
+                          // Handle password change logic here
+                          
+                        },
+                      ),
+                    ],
+                  ),
+                GestureDetector(
+  onTap: toggleChangePassword,
+  child: Row(
+    children: [
+      SizedBox(width: 17,height: 60),
+      Icon(
+        Icons.settings,
+        color: Colors.grey,
+      ),
+      SizedBox(width: 31),
+      Expanded(
+        child: Text(
+          'Additional Settings',
+          style: TextStyle(
+            fontSize: 16,
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+      SizedBox(
+        height: 20,
+        child: AnimatedSwitcher(
+          duration: Duration(milliseconds: 200),
+          transitionBuilder: (child, animation) {
+            return ScaleTransition(
+              scale: animation,
+              child: child,
+            );
+          },
+          child: showChangePassword
+              ? Icon(
+                  Icons.arrow_drop_up,
+                  color: Colors.grey,
+                  key: UniqueKey(),
+                )
+              : Icon(
+                  Icons.arrow_drop_down,
+                  color: Colors.grey,
+                  key: UniqueKey(),
+                ),
+        ),
+      ),
+    ],
+  ),
+),
+
+
               ],
             ),
           );
         },
       ),
+    );
+  }
+}
+
+class ProfileInfoItem extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final VoidCallback? onTap;
+
+  const ProfileInfoItem({
+    Key? key,
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    this.onTap,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      leading: Icon(icon),
+      title: Text(
+        title,
+        style: TextStyle(
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      subtitle: Text(subtitle),
+      onTap: onTap,
     );
   }
 }
