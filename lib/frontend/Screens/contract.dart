@@ -180,7 +180,7 @@ class MyScreen extends StatelessWidget {
                         const SizedBox(height: 16),
                         ContractCard(
                           icon: Icons.assignment,
-                          label: 'Notary Republic Stamp:',
+                          label: 'Notary Public Stamp:',
                           data: 'XYZ456',
                         ),
                         const SizedBox(height: 24),
@@ -197,13 +197,14 @@ class MyScreen extends StatelessWidget {
   }
 }
 
-
 class ContractCard extends StatelessWidget {
   final IconData icon;
   final String label;
   final String data;
 
-  const ContractCard({Key? key, required this.icon, required this.label, required this.data}) : super(key: key);
+  const ContractCard(
+      {Key? key, required this.icon, required this.label, required this.data})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
