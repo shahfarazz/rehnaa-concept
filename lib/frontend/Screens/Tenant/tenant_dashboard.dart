@@ -1,13 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:rehnaa/frontend/Screens/contract.dart';
+import 'package:rehnaa/frontend/Screens/faq.dart';
 import 'package:rehnaa/frontend/Screens/vouchers.dart';
 import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenant_profile.dart';
 import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenant_properties.dart';
 import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenant_rentaccrual.dart';
 import 'dart:ui';
+import 'package:firebase_auth/firebase_auth.dart';
+
 import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenant_renthistory.dart';
 import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenant_dashboard_content.dart';
 import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenantmonthlyrentoff.dart';
+
+import '../Landlord/privacypolicy.dart';
+import '../login_page.dart';
 
 class TenantDashboardPage extends StatefulWidget {
   final String uid; // UID of the tenant
@@ -76,55 +82,58 @@ class _DashboardPageState extends State<TenantDashboardPage>
   }
 
   @override
-  Widget build(BuildContext context) {
-    final Size size = MediaQuery.of(context).size;
-    super.build(context); // Ensure the state is kept alive
-    return Scaffold(
-      appBar: _appBar(size),
-      body: Stack(
-        children: [
-          GestureDetector(
-            onTap: () {
-              if (_isSidebarOpen) {
-                _closeSidebar();
-              }
-            },
-            child: Stack(
-              children: [
-                Transform.translate(
-                  offset: Offset(_isSidebarOpen ? size.width * 0.7 : 0, 0),
-                  child: Column(
-                    children: [
-                      Expanded(
-                        child: PageView(
-                          controller: _pageController,
-                          onPageChanged: (index) {
-                            setState(() {
-                              _currentIndex = index;
-                            });
-                          },
-                          children: <Widget>[
-                            TenantDashboardContent(uid: widget.uid),
-                            TenantRentAccrualPage(),
-                            TenantPropertiesPage(uid: widget.uid),
-                            TenantMonthlyRentOffPage(),
-                            TenantRentHistoryPage(uid: widget.uid),
-                            TenantProfilePage(uid: widget.uid),
-                          ],
-                        ),
-                      ),
-                      _bottomNavigationBar(),
-                    ],
+Widget build(BuildContext context) {
+  final Size size = MediaQuery.of(context).size;
+  super.build(context); // Ensure the state is kept alive
+  return Scaffold(
+    appBar: _appBar(size),
+    body: Stack(
+      children: [
+        GestureDetector(
+          onTap: () {
+            if (_isSidebarOpen) {
+              _closeSidebar();
+            }
+          },
+          child: Stack(
+            children: [
+              Column(
+                children: [
+                  Expanded(
+                    child: PageView(
+                      controller: _pageController,
+                      onPageChanged: (index) {
+                        setState(() {
+                          _currentIndex = index;
+                        });
+                      },
+                      children: <Widget>[
+                        TenantDashboardContent(uid: widget.uid),
+                        TenantRentAccrualPage(),
+                        TenantPropertiesPage(uid: widget.uid),
+                        TenantMonthlyRentOffPage(),
+                        TenantRentHistoryPage(uid: widget.uid),
+                        TenantProfilePage(uid: widget.uid),
+                      ],
+                    ),
                   ),
-                ),
-                if (_isSidebarOpen) _sidebar(size),
-              ],
-            ),
+                  _bottomNavigationBar(),
+                ],
+              ),
+              Positioned(
+                left: _isSidebarOpen ? 0 : null,
+                right: _isSidebarOpen ? null : 0,
+                top: 0,
+                bottom: 0,
+                child: _isSidebarOpen ? _buildSidebar(size) : Container(),
+              ),
+            ],
           ),
-        ],
-      ),
-    );
-  }
+        ),
+      ],
+    ),
+  );
+}
 
   List<Map<String, String>> notifications = [
     {
@@ -437,196 +446,224 @@ class _DashboardPageState extends State<TenantDashboardPage>
     );
   }
 
-  Widget _sidebar(Size size) {
-    return GestureDetector(
-      onHorizontalDragUpdate: (details) {
-        if (details.delta.dx > 0) {
-          // Swipe right, open the sidebar
-          setState(() {
-            _isSidebarOpen = true;
-          });
-        } else if (details.delta.dx < 0) {
-          // Swipe left, close the sidebar
-          setState(() {
-            _isSidebarOpen = false;
-          });
-        }
-      },
-      child: Stack(
-        children: [
-          if (_isSidebarOpen)
-            GestureDetector(
-              onTap: () {
-                // Close the sidebar when tapping on the shadow
-                setState(() {
-                  _isSidebarOpen = false;
-                });
-              },
-              child: Container(
-                color: Colors
-                    .black54, // Adjust the color and opacity of the shadow here
-              ),
+Widget _buildSidebar(Size size) {
+  return GestureDetector(
+    onHorizontalDragUpdate: (details) {
+      if (details.delta.dx > 0) {
+        setState(() {
+          _isSidebarOpen = true;
+        });
+      } else if (details.delta.dx < 0) {
+        setState(() {
+          _isSidebarOpen = false;
+        });
+      }
+    },
+    child: Stack(
+      children: [
+        if (_isSidebarOpen)
+          GestureDetector(
+            onTap: () {
+              setState(() {
+                _isSidebarOpen = false;
+              });
+            },
+            child: Container(
+              color: Colors.black54,
             ),
-          AnimatedContainer(
-            duration: const Duration(milliseconds: 300),
-            width: _isSidebarOpen ? size.width * 0.7 : 0,
-            height: _isSidebarOpen ? size.height : 0,
-            color: Colors.white,
-            child: SlideTransition(
-              position: Tween<Offset>(
-                begin: const Offset(-1, 0),
-                end: const Offset(0, 0),
-              ).animate(CurvedAnimation(
-                parent: _sidebarController,
-                curve: Curves.easeInOut,
-              )),
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Center(
-                            child: Container(
-                              padding: const EdgeInsets.only(
-                                  left: 0, top: 30, bottom: 16),
-                              child: InkWell(
-                                onTap: () {
-                                  // Add your onTap functionality here
-                                },
-                                child: ShaderMask(
-                                  shaderCallback: (bounds) => LinearGradient(
-                                    colors: [
-                                      Color(0xFF0FA697),
-                                      Color(0xFF45BF7A),
-                                      Color(0xFF0DF205),
-                                    ],
-                                  ).createShader(bounds),
-                                  child: Text(
-                                    'Rehnaa',
-                                    style: TextStyle(
-                                      fontSize: 24,
-                                      fontFamily: 'Montserrat',
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                    ),
+          ),
+        AnimatedContainer(
+          duration: const Duration(milliseconds: 300),
+          width: _isSidebarOpen ? size.width * 0.7 : 0,
+          height: _isSidebarOpen ? size.height : 0,
+          color: Colors.white,
+          child: SlideTransition(
+            position: Tween<Offset>(
+              begin: const Offset(-1, 0),
+              end: const Offset(0, 0),
+            ).animate(CurvedAnimation(
+              parent: _sidebarController,
+              curve: Curves.easeInOut,
+            )),
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Center(
+                          child: Container(
+                            padding: const EdgeInsets.only(
+                                left: 0, top: 30, bottom: 16),
+                            child: InkWell(
+                              onTap: () {
+                                // Add your onTap functionality here
+                              },
+                              child: ShaderMask(
+                                shaderCallback: (bounds) => LinearGradient(
+                                  colors: [
+                                    Color(0xFF0FA697),
+                                    Color(0xFF45BF7A),
+                                    Color(0xFF0DF205),
+                                  ],
+                                ).createShader(bounds),
+                                child: Text(
+                                  'Rehnaa',
+                                  style: TextStyle(
+                                    fontSize: 24,
+                                    fontFamily: 'Montserrat',
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
                                   ),
                                 ),
                               ),
                             ),
                           ),
                         ),
-                      ],
-                    ),
-                    Divider(
-                      color: Colors.grey[400],
-                      thickness: 0.5,
-                    ),
-                    ListTile(
-                      leading: const Icon(Icons.description),
-                      title: const Text(
-                        'Contract',
-                        style: TextStyle(
-                          fontFamily: 'Montserrat',
-                          fontSize: 18,
+                      ),
+                    ],
+                  ),
+                  Divider(
+                    color: Colors.grey[400],
+                    thickness: 0.5,
+                  ),
+                  _buildSidebarItem(
+                    icon: Icons.description,
+                    label: 'Contract',
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ContractPage(),
                         ),
-                      ),
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const ContractPage(),
-                          ),
-                        );
-                        _closeSidebar(); // Close the sidebar after navigation
-                      },
-                    ),
-                    ListTile(
-                      leading: const Icon(Icons.receipt),
-                      title: Row(
-                        children: <Widget>[
-                          Expanded(
-                            child: const Text(
-                              'Vouchers',
-                              style: TextStyle(
-                                fontFamily: 'Montserrat',
-                                fontSize: 18,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 10.0), // add some spacing
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 6.0, vertical: 2.0),
-                            decoration: BoxDecoration(
-                              color: Colors.red,
-                              borderRadius: BorderRadius.circular(8.0),
-                            ),
-                            child: const Text(
-                              'new',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize:
-                                    12.0, // adjust the size to fit your needs
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const VouchersPage(),
-                          ),
-                        );
-                        _closeSidebar(); // Close the sidebar after navigation
-                      },
-                    ),
-                    ListTile(
-                      leading: const Icon(Icons.lock),
-                      title: const Text(
-                        'Privacy Policy',
-                        style: TextStyle(
-                          fontFamily: 'Montserrat',
-                          fontSize: 18,
+                      );
+                      // _closeSidebar();
+                    },
+                  ),
+                  _buildSidebarItem(
+                    icon: Icons.receipt,
+                    label: 'Vouchers',
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => VouchersPage(),
                         ),
-                      ),
-                      onTap: () {
-                        // Handle Privacy Policy button tap
-                        _closeSidebar(); // Close the sidebar after action
-                      },
-                    ),
-                    ListTile(
-                      leading: const Icon(Icons.question_answer),
-                      title: const Text(
-                        'FAQs',
-                        style: TextStyle(
-                          fontFamily: 'Montserrat',
-                          fontSize: 18,
+                      );
+                      // _closeSidebar();
+                    },
+                    showBadge: true,
+                  ),
+                  _buildSidebarItem(
+                    icon: Icons.lock,
+                    label: 'Privacy Policy',
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => PrivacyPolicyPage(),
                         ),
-                      ),
-                      onTap: () {
-                        // Handle FAQs button tap
-                        _closeSidebar(); // Close the sidebar after action
-                      },
-                    ),
-                    const SizedBox(height: 16),
-                    Divider(
-                      color: Colors.grey[400],
-                      thickness: 0.5,
-                    ),
-                    // Add any additional widgets or content at the bottom of the sidebar
-                  ],
-                ),
+                      );
+                      // _closeSidebar();
+                    },
+                  ),
+                  _buildSidebarItem(
+                    icon: Icons.question_answer,
+                    label: 'FAQs',
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => FAQPage(),
+                        ),
+                      );
+                      // _closeSidebar();
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  Divider(
+                    color: Colors.grey[400],
+                    thickness: 0.5,
+                  ),
+                  _buildSidebarItem(
+                    icon: Icons.logout,
+                    label: 'Logout',
+                    onTap: () {
+                      // Implement sign-out functionality here
+                      // For example, clear user session, navigate to login page, etc.
+                      _signOutUser();
+                    },
+                  ),
+                ],
               ),
             ),
           ),
+        ),
+      ],
+    ),
+  );
+}
+
+
+void _signOutUser() async {
+  // Implement your sign-out logic here
+  // For example, clear user session, navigate to login page, etc.
+  // Sign out the user using Firebase Authentication
+  await FirebaseAuth.instance.signOut();
+  
+  // Navigate to login page
+  Navigator.pushReplacement(
+    context,
+    MaterialPageRoute(
+      builder: (context) => LoginPage(),
+    ),
+  );
+}
+
+
+
+  Widget _buildSidebarItem({
+    required IconData icon,
+    required String label,
+    required VoidCallback onTap,
+    bool showBadge = false,
+  }) {
+    return ListTile(
+      leading: Icon(icon),
+      title: Row(
+        children: <Widget>[
+          Expanded(
+            child: Text(
+              label,
+              style: TextStyle(
+                fontFamily: 'Montserrat',
+                fontSize: 18,
+              ),
+            ),
+          ),
+          if (showBadge)
+            Container(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 6.0, vertical: 2.0),
+              decoration: BoxDecoration(
+                color: Colors.red,
+                borderRadius: BorderRadius.circular(8.0),
+              ),
+              child: const Text(
+                'new',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 12.0,
+                ),
+              ),
+            ),
         ],
       ),
+      onTap: onTap,
     );
   }
+
 
   Widget _bottomNavigationBar() {
     return Container(

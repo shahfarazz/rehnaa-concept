@@ -343,7 +343,7 @@ Widget _buildSidebar(Size size) {
                           builder: (context) => ContractPage(),
                         ),
                       );
-                      _closeSidebar();
+                      // _closeSidebar();
                     },
                   ),
                   _buildSidebarItem(
@@ -356,7 +356,7 @@ Widget _buildSidebar(Size size) {
                           builder: (context) => VouchersPage(),
                         ),
                       );
-                      _closeSidebar();
+                      // _closeSidebar();
                     },
                     showBadge: true,
                   ),
@@ -370,7 +370,7 @@ Widget _buildSidebar(Size size) {
                           builder: (context) => PrivacyPolicyPage(),
                         ),
                       );
-                      _closeSidebar();
+                      // _closeSidebar();
                     },
                   ),
                   _buildSidebarItem(
@@ -383,7 +383,7 @@ Widget _buildSidebar(Size size) {
                           builder: (context) => FAQPage(),
                         ),
                       );
-                      _closeSidebar();
+                      // _closeSidebar();
                     },
                   ),
                   const SizedBox(height: 16),

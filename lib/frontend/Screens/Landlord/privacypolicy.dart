@@ -74,7 +74,7 @@ class PrivacyPolicyPage extends StatelessWidget {
                 child: SingleChildScrollView(
                   child: Center(
                     child: Padding(
-                      padding: const EdgeInsets.all(1.0),
+                      padding: const EdgeInsets.all(20.0),
                       child: Card(
                         color: const Color.fromARGB(255, 235, 235, 235),
                         shape: RoundedRectangleBorder(

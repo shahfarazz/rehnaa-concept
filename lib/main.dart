@@ -27,9 +27,9 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        home: const SplashScreen(),
-        // home: TenantDashboardPage(
-        //     uid: 'K55YzmkUXt09OgFwnDuT'), //TODO remove this Jugaar
+        // home: const SplashScreen(),
+        home: TenantDashboardPage(
+            uid: 'K55YzmkUXt09OgFwnDuT'), //TODO remove this Jugaar
         // home: LoginPage(),
       ),
     );
