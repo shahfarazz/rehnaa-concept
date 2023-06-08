@@ -441,124 +441,176 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
 
 // Sidebar widget
 // Sidebar widget
- Widget _sidebar(Size size) {
-    return GestureDetector(
-      onHorizontalDragUpdate: (details) {
-        if (details.delta.dx > 0) {
-          // Swipe right, open the sidebar
-          setState(() {
-            _isSidebarOpen = true;
-          });
-        } else if (details.delta.dx < 0) {
-          // Swipe left, close the sidebar
-          setState(() {
-            _isSidebarOpen = false;
-          });
-        }
-      },
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 300),
-        width: _isSidebarOpen ? size.width * 0.6 : 0,
-        height: _isSidebarOpen ? size.height : 0,
-        color: Colors.white,
-        child: SlideTransition(
-          position: Tween<Offset>(
-            begin: const Offset(-1, 0),
-            end: const Offset(0, 0),
-          ).animate(CurvedAnimation(
-            parent: _sidebarController,
-            curve: Curves.easeInOut,
-          )),
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  padding: const EdgeInsets.only(left: 16, top: 64, bottom: 16),
-                  child: const Text(
-                    'Menu',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
+Widget _sidebar(Size size) {
+  return GestureDetector(
+    onHorizontalDragUpdate: (details) {
+      if (details.delta.dx > 0) {
+        // Swipe right, open the sidebar
+        setState(() {
+          _isSidebarOpen = true;
+        });
+      } else if (details.delta.dx < 0) {
+        // Swipe left, close the sidebar
+        setState(() {
+          _isSidebarOpen = false;
+        });
+      }
+    },
+    child: Stack(
+      children: [
+        if (_isSidebarOpen)
+          GestureDetector(
+            onTap: () {
+              // Close the sidebar when tapping on the shadow
+              setState(() {
+                _isSidebarOpen = false;
+              });
+            },
+            child: Container(
+              color: Colors.black54, // Adjust the color and opacity of the shadow here
+            ),
+          ),
+        AnimatedContainer(
+          duration: const Duration(milliseconds: 300),
+          width: _isSidebarOpen ? size.width * 0.7 : 0,
+          height: _isSidebarOpen ? size.height : 0,
+          color: Colors.white,
+          child: SlideTransition(
+            position: Tween<Offset>(
+              begin: const Offset(-1, 0),
+              end: const Offset(0, 0),
+            ).animate(CurvedAnimation(
+              parent: _sidebarController,
+              curve: Curves.easeInOut,
+            )),
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+  padding: const EdgeInsets.only(left: 16, top: 30, bottom: 16),
+  child: Text(
+    'Rehna',
+    style: TextStyle(
+      fontSize: 24,
+      fontWeight: FontWeight.bold,
+      foreground: Paint()
+        ..shader = LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Color(0xFF0FA697),
+            Color(0xFF45BF7A),
+            Color(0xFF0DF205),
+          ],
+        ).createShader(Rect.fromLTWH(0, 0, 200, 70)),
+    ),
+  ),
+),
+
+                  Divider(
+                    color: Colors.grey[400],
+                    thickness: 0.5,
                   ),
-                ),
-                Divider(
-                  color: Colors.grey[400],
-                  thickness: 0.5,
-                ),
-                ListTile(
-                  leading: const Icon(Icons.description),
-                  title: const Text(
-                    'Contract',
-                    style: TextStyle(
-                      fontSize: 18,
-                    ),
-                  ),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const ContractPage(),
+                  ListTile(
+                    leading: const Icon(Icons.description),
+                    title: const Text(
+                      'Contract',
+                      style: TextStyle(
+                        fontSize: 18,
                       ),
-                    );
-                    _closeSidebar(); // Close the sidebar after navigation
-                  },
-                ),
-                ListTile(
-                  leading: const Icon(Icons.receipt),
-                  title: Row(
-                    children: <Widget>[
-                      Expanded(
-                        child: const Text(
-                          'Vouchers',
-                          style: TextStyle(
-                            fontSize: 18,
+                    ),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const ContractPage(),
+                        ),
+                      );
+                      _closeSidebar(); // Close the sidebar after navigation
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.receipt),
+                    title: Row(
+                      children: <Widget>[
+                        Expanded(
+                          child: const Text(
+                            'Vouchers',
+                            style: TextStyle(
+                              fontSize: 18,
+                            ),
                           ),
                         ),
-                      ),
-                      const SizedBox(width: 10.0), // add some spacing
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 6.0, vertical: 2.0),
-                        decoration: BoxDecoration(
-                          color: Colors.red,
-                          borderRadius: BorderRadius.circular(8.0),
-                        ),
-                        child: const Text(
-                          'new',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 12.0, // adjust the size to fit your needs
+                        const SizedBox(width: 10.0), // add some spacing
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 6.0, vertical: 2.0),
+                          decoration: BoxDecoration(
+                            color: Colors.red,
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                          child: const Text(
+                            'new',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 12.0, // adjust the size to fit your needs
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const VouchersPage(),
+                        ),
+                      );
+                      _closeSidebar(); // Close the sidebar after navigation
+                    },
                   ),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const VouchersPage(),
+                  ListTile(
+                    leading: const Icon(Icons.lock),
+                    title: const Text(
+                      'Privacy Policy',
+                      style: TextStyle(
+                        fontSize: 18,
                       ),
-                    );
-                    _closeSidebar(); // Close the sidebar after navigation
-                  },
-                ),
-                // Add more list items if needed
-                const SizedBox(height: 16),
-                Divider(
-                  color: Colors.grey[400],
-                  thickness: 0.5,
-                ),
-                // Add any additional widgets or content at the bottom of the sidebar
-              ],
+                    ),
+                    onTap: () {
+                      // Handle Privacy Policy button tap
+                      _closeSidebar(); // Close the sidebar after action
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.question_answer),
+                    title: const Text(
+                      'FAQs',
+                      style: TextStyle(
+                        fontSize: 18,
+                      ),
+                    ),
+                    onTap: () {
+                      // Handle FAQs button tap
+                      _closeSidebar(); // Close the sidebar after action
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  Divider(
+                    color: Colors.grey[400],
+                    thickness: 0.5,
+                  ),
+                  // Add any additional widgets or content at the bottom of the sidebar
+                ],
+              ),
             ),
           ),
         ),
-      ),
-    );
-  }
+      ],
+    ),
+  );
+}
 
   // BottomNavigationBar widget
 
