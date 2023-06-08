@@ -127,7 +127,7 @@ class _TenantMonthlyRentOffPageState extends State<TenantMonthlyRentOffPage>
                 Text(
                   'Monthly Rent OFF Winner',
                   style: GoogleFonts.montserrat(
-                    fontSize: 20.0,
+                    fontSize: 22.0,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
                   ),

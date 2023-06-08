@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -138,9 +139,12 @@ class PropertyCard extends StatelessWidget {
                 height: screenHeight *
                     0.2, // Adjust the height as a fraction of the card height
                 width: double.infinity,
-                child: Image.asset(
-                  property
+                child: CachedNetworkImage(
+                  imageUrl: property
                       .imagePath[0], // TODO define a new property.iconimagepath
+
+                  placeholder: (context, url) => CircularProgressIndicator(),
+                  errorWidget: (context, url, error) => Icon(Icons.error),
                   fit: BoxFit.cover,
                 ),
               ),

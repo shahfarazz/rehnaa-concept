@@ -5,7 +5,7 @@ class TenantRentAccrualPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        color: Colors.green[100], // Set the background color
+        color: Colors.grey[200], // Set the background color
         padding: EdgeInsets.symmetric(
             vertical: 100.0, horizontal: 16.0), // Updated padding
         child: Card(
@@ -21,9 +21,10 @@ class TenantRentAccrualPage extends StatelessWidget {
                     Text(
                       'Rent Accrual',
                       style: TextStyle(
-                        fontSize: 20,
+                        fontSize: 22,
                         fontWeight: FontWeight.bold,
                         fontFamily: 'Montserrat',
+                        color: Color(0xff45BF7A),
                       ),
                     ),
                   ],
@@ -118,6 +119,7 @@ class TenantRentAccrualPage extends StatelessWidget {
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                             fontFamily: 'Montserrat',
+                            color: Color(0xff45BF7A),
                           ),
                         ),
                       ],
