@@ -31,6 +31,7 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
   final _pageController = PageController();
   bool _isSidebarOpen = false;
   late AnimationController _sidebarController;
+  bool _isWithdraw = false;
 
   @override
   void initState() {
@@ -60,22 +61,22 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
   }
 
   List<Map<String, String>> notifications = [
-    {
-      'title': 'Rent paid by Tenant: Michelle',
-      'amount': '\$30000',
-    },
-    {
-      'title': 'Maintenance request by Tenant: John',
-      'amount': '',
-    },
-    {
-      'title': 'Contract renewal notice for Property: ABC Apartment',
-      'amount': '',
-    },
-    {
-      'title': 'Notification 4',
-      'amount': '',
-    },
+    // {
+    //   'title': 'Rent paid by Tenant: Michelle',
+    //   'amount': '\$30000',
+    // },
+    // {
+    //   'title': 'Maintenance request by Tenant: John',
+    //   'amount': '',
+    // },
+    // {
+    //   'title': 'Contract renewal notice for Property: ABC Apartment',
+    //   'amount': '',
+    // },
+    // {
+    //   'title': 'Notification 4',
+    //   'amount': '',
+    // },
     // Add more notifications here
   ];
 
@@ -94,6 +95,12 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
     setState(() {
       _isSidebarOpen = false;
       _sidebarController.reverse();
+    });
+  }
+
+  void updateWithdrawState(bool isWithdraw) {
+    setState(() {
+      _isWithdraw = isWithdraw;
     });
   }
 
@@ -126,7 +133,11 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
                             });
                           },
                           children: <Widget>[
-                            LandlordDashboardContent(uid: widget.uid),
+                            LandlordDashboardContent(
+                              uid: widget.uid,
+                              isWithdraw: _isWithdraw,
+                              onUpdateWithdrawState: updateWithdrawState,
+                            ),
                             LandlordTenantsPage(uid: widget.uid),
                             LandlordPropertiesPage(uid: widget.uid),
                             LandlordRentHistoryPage(uid: widget.uid),
@@ -215,7 +226,8 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
                 child: Container(
                   padding: const EdgeInsets.all(2),
                   decoration: BoxDecoration(
-                    color: Colors.red,
+                    color:
+                        notifications.isEmpty ? Colors.transparent : Colors.red,
                     borderRadius: BorderRadius.circular(6),
                   ),
                   constraints: const BoxConstraints(
@@ -223,7 +235,9 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
                     minHeight: 10,
                   ),
                   child: Text(
-                    notifications.length.toString(),
+                    notifications.isEmpty
+                        ? ''
+                        : notifications.length.toString(),
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 10,

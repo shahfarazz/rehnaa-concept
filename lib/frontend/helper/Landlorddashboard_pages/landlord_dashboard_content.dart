@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -9,10 +10,16 @@ import 'package:rehnaa/backend/models/landlordmodel.dart';
 import 'skeleton.dart';
 
 class LandlordDashboardContent extends StatefulWidget {
-  final String uid; // UID of the landlord
+  final String uid;
+  final bool isWithdraw;
+  final Function(bool) onUpdateWithdrawState;
 
-  const LandlordDashboardContent({Key? key, required this.uid})
-      : super(key: key);
+  const LandlordDashboardContent({
+    Key? key,
+    required this.uid,
+    required this.isWithdraw,
+    required this.onUpdateWithdrawState,
+  }) : super(key: key);
 
   @override
   // ignore: library_private_types_in_public_api
@@ -26,7 +33,7 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
 
   @override
   bool get wantKeepAlive => true;
-  bool _showContent = false;
+  bool isWithdraw = false;
 
   @override
   void initState() {
@@ -68,7 +75,7 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
     }
   }
 
-  void showOptionDialog() {
+  void showOptionDialog(Function callback) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -76,6 +83,7 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
 
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setState) {
+            // Your AlertDialog code goes here...
             return AlertDialog(
               title: const Padding(
                 padding:
@@ -106,26 +114,26 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
                       });
                     },
                   ),
-                  buildOptionTile(
-                    selectedOption: selectedOption,
-                    optionImage: 'assets/easypaisa.png',
-                    optionName: 'Easy Paisa',
-                    onTap: () {
-                      setState(() {
-                        selectedOption = 'Easy Paisa';
-                      });
-                    },
-                  ),
-                  buildOptionTile(
-                    selectedOption: selectedOption,
-                    optionImage: 'assets/jazzcash.png',
-                    optionName: 'Jazz Cash',
-                    onTap: () {
-                      setState(() {
-                        selectedOption = 'Jazz Cash';
-                      });
-                    },
-                  ),
+                  // buildOptionTile(
+                  //   selectedOption: selectedOption,
+                  //   optionImage: 'assets/easypaisa.png',
+                  //   optionName: 'Easy Paisa',
+                  //   onTap: () {
+                  //     setState(() {
+                  //       selectedOption = 'Easy Paisa';
+                  //     });
+                  //   },
+                  // ),
+                  // buildOptionTile(
+                  //   selectedOption: selectedOption,
+                  //   optionImage: 'assets/jazzcash.png',
+                  //   optionName: 'Jazz Cash',
+                  //   onTap: () {
+                  //     setState(() {
+                  //       selectedOption = 'Jazz Cash';
+                  //     });
+                  //   },
+                  // ),
                   buildOptionTile(
                     selectedOption: selectedOption,
                     optionImage: 'assets/banktransfer.png',
@@ -166,7 +174,7 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
                     ),
                   ),
                   child: const Text(
-                    'Submit',
+                    'Next',
                     style: TextStyle(
                       color: Colors.white,
                     ),
@@ -176,7 +184,19 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
                       if (kDebugMode) {
                         print('Selected option: $selectedOption');
                       }
+                      Fluttertoast.showToast(
+                        msg:
+                            'An admin will contact you soon regarding your payment via: $selectedOption',
+                        toastLength: Toast.LENGTH_SHORT,
+                        gravity: ToastGravity.BOTTOM,
+                        timeInSecForIosWeb: 3,
+                        backgroundColor: Color(0xff45BF7A),
+                      );
                       Navigator.pop(context);
+
+                      setState(() {
+                        isWithdraw = true;
+                      });
                     } else {
                       if (kDebugMode) {
                         print('Please select an option');
@@ -189,7 +209,16 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
           },
         );
       },
-    );
+    ).then((_) => callback());
+  }
+
+  void someFunction() {
+    showOptionDialog(() {
+      // setState(() {
+      //   isWithdraw = true;
+      // });
+      widget.onUpdateWithdrawState(isWithdraw);
+    });
   }
 
   Widget buildOptionTile({
@@ -238,13 +267,6 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
           // Handle any error that occurred while fetching the data
           return Text('Error: ${snapshot.error}');
         } else if (snapshot.hasData) {
-          WidgetsBinding.instance!.addPostFrameCallback((_) {
-            Future.delayed(Duration(milliseconds: 500), () {
-              setState(() {
-                _showContent = true;
-              });
-            });
-          });
           // Fetch landlord
           Landlord landlord = snapshot.data!;
 
@@ -345,14 +367,20 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
                                 height: size.height * 0.06,
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(20),
-                                  gradient: const LinearGradient(
+                                  gradient: LinearGradient(
                                     begin: Alignment.topLeft,
                                     end: Alignment.bottomRight,
-                                    colors: [
-                                      Color(0xff0FA697),
-                                      Color(0xff45BF7A),
-                                      Color(0xff0DF205),
-                                    ],
+                                    colors: isWithdraw
+                                        ? [
+                                            Colors.grey,
+                                            Colors.grey,
+                                            Colors.grey,
+                                          ]
+                                        : [
+                                            Color(0xff0FA697),
+                                            Color(0xff45BF7A),
+                                            Color(0xff0DF205),
+                                          ],
                                   ),
                                 ),
                                 child: Material(
@@ -360,11 +388,15 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
                                   child: InkWell(
                                     borderRadius: BorderRadius.circular(20),
                                     onTap: () {
-                                      showOptionDialog(); // Show the option dialog
+                                      isWithdraw
+                                          ? null
+                                          : someFunction(); // Show the option dialog
                                     },
                                     child: Center(
                                       child: Text(
-                                        "Withdraw",
+                                        isWithdraw
+                                            ? "Withdraw Requested"
+                                            : "Withdraw",
                                         style: GoogleFonts.montserrat(
                                           color: Colors.white,
                                           fontSize: 18,

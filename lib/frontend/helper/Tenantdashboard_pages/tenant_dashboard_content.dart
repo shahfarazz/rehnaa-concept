@@ -100,26 +100,26 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                       });
                     },
                   ),
-                  buildOptionTile(
-                    selectedOption: selectedOption,
-                    optionImage: 'assets/easypaisa.png',
-                    optionName: 'Easy Paisa',
-                    onTap: () {
-                      setState(() {
-                        selectedOption = 'Easy Paisa';
-                      });
-                    },
-                  ),
-                  buildOptionTile(
-                    selectedOption: selectedOption,
-                    optionImage: 'assets/jazzcash.png',
-                    optionName: 'Jazz Cash',
-                    onTap: () {
-                      setState(() {
-                        selectedOption = 'Jazz Cash';
-                      });
-                    },
-                  ),
+                  // buildOptionTile(
+                  //   selectedOption: selectedOption,
+                  //   optionImage: 'assets/easypaisa.png',
+                  //   optionName: 'Easy Paisa',
+                  //   onTap: () {
+                  //     setState(() {
+                  //       selectedOption = 'Easy Paisa';
+                  //     });
+                  //   },
+                  // ),
+                  // buildOptionTile(
+                  //   selectedOption: selectedOption,
+                  //   optionImage: 'assets/jazzcash.png',
+                  //   optionName: 'Jazz Cash',
+                  //   onTap: () {
+                  //     setState(() {
+                  //       selectedOption = 'Jazz Cash';
+                  //     });
+                  //   },
+                  // ),
                   buildOptionTile(
                     selectedOption: selectedOption,
                     optionImage: 'assets/banktransfer.png',
