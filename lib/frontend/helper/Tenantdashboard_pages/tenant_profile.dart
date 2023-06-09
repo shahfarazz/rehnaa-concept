@@ -15,6 +15,7 @@ class TenantProfilePage extends StatefulWidget {
 
 class _TenantProfilePageState extends State<TenantProfilePage> {
   bool showChangePassword = false;
+  bool showDeleteAccount = false;
 
   @override
   Widget build(BuildContext context) {
@@ -23,6 +24,12 @@ class _TenantProfilePageState extends State<TenantProfilePage> {
     void toggleChangePassword() {
       setState(() {
         showChangePassword = !showChangePassword;
+      });
+    }
+
+    void toggleDeleteAccount() {
+      setState(() {
+        showDeleteAccount = !showDeleteAccount;
       });
     }
 
@@ -106,53 +113,6 @@ class _TenantProfilePageState extends State<TenantProfilePage> {
                   title: 'Location',
                   subtitle: 'Lahore, Punjab',
                 ),
-                if (showChangePassword)
-                  Column(
-                    children: [
-                      SizedBox(height: 2),
-                      ProfileInfoItem(
-                        icon: Icons.lock,
-                        title: 'Change Password',
-                        subtitle: 'Click to change your password',
-                        onTap: () {
-                          showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              String newPassword = '';
-
-                              return AlertDialog(
-                                title: Text('Change Password'),
-                                content: TextField(
-                                  onChanged: (value) {
-                                    newPassword = value;
-                                  },
-                                  decoration: InputDecoration(hintText: 'Enter new password'),
-                                ),
-                                actions: [
-                                  ElevatedButton(
-                                    
-                                    onPressed: () {
-                                      // Handle password change logic here
-                                      print('New password: $newPassword');
-                                      Navigator.of(context).pop();
-                                    },
-                                    child: Text('Save'),
-                                    
-                                  ),
-                                  TextButton(
-                                    onPressed: () {
-                                      Navigator.of(context).pop();
-                                    },
-                                    child: Text('Cancel'),
-                                  ),
-                                ],
-                              );
-                            },
-                          );
-                        },
-                      ),
-                    ],
-                  ),
                 GestureDetector(
                   onTap: toggleChangePassword,
                   child: Row(
@@ -160,19 +120,35 @@ class _TenantProfilePageState extends State<TenantProfilePage> {
                       SizedBox(width: 17, height: 60),
                       Icon(
                         Icons.settings,
-                        color: Colors.grey,
+                        color: Colors.grey[600],
                       ),
                       SizedBox(width: 31),
                       Expanded(
-                        child: Text(
-                          'Additional Settings',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
+  child: Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      SizedBox(height: 18),
+
+      Text(
+        'Additional Settings',
+        style: TextStyle(
+          fontSize: 16,
+          color: Colors.black,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      SizedBox(height: 4),
+      Text(
+        'Click to access additional settings',
+        style: TextStyle(
+          fontSize: 14,
+          color: Colors.grey[700],
+        ),
+      ),
+    ],
+  ),
+),
+
                       SizedBox(
                         height: 20,
                         child: AnimatedSwitcher(
@@ -199,6 +175,104 @@ class _TenantProfilePageState extends State<TenantProfilePage> {
                     ],
                   ),
                 ),
+                if (showChangePassword)
+                  Column(
+                    children: [
+                      SizedBox(height: 17,width: 8,),
+                      ProfileInfoItem(
+                        icon: Icons.lock,
+                        title: 'Change Password',
+                        subtitle: 'Click to change your password',
+                        onTap: () {
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              String newPassword = '';
+
+                              return AlertDialog(
+                                title: Text('Change Password'),
+                                content: TextField(
+                                  onChanged: (value) {
+                                    newPassword = value;
+                                  },
+                                  decoration: InputDecoration(hintText: 'Enter new password'),
+                                ),
+                                actions: [
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      // Handle password change logic here
+                                      print('New password: $newPassword');
+                                      Navigator.of(context).pop();
+                                    },
+                                    child: Text('Save'),
+                                  ),
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                    child: Text('Cancel'),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        },
+                      ),
+                      ProfileInfoItem(
+                        icon: Icons.delete,
+                        title: 'Delete Account',
+                        subtitle: 'Click to delete your account',
+                        onTap: () {
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              String password = '';
+
+                              return AlertDialog(
+                                title: Text('Delete Account'),
+                                content: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text('Enter your password to confirm account deletion:'),
+                                    TextField(
+                                      onChanged: (value) {
+                                        password = value;
+                                      },
+                                      decoration: InputDecoration(hintText: 'Password'),
+                                      obscureText: true,
+                                    ),
+                                    if (password.isNotEmpty && password != 'correct_password')
+                                      Text(
+                                        'Incorrect password',
+                                        style: TextStyle(color: Colors.red),
+                                      ),
+                                  ],
+                                ),
+                                actions: [
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      if (password == 'correct_password') {
+                                        // Handle account deletion logic here
+                                        print('Deleting account...');
+                                        Navigator.of(context).pop();
+                                      }
+                                    },
+                                    child: Text('Delete'),
+                                  ),
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                    child: Text('Cancel'),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        },
+                      ),
+                    ],
+                  ),
               ],
             ),
           );
@@ -207,6 +281,7 @@ class _TenantProfilePageState extends State<TenantProfilePage> {
     );
   }
 }
+
 
 class ProfileInfoItem extends StatelessWidget {
   final IconData icon;

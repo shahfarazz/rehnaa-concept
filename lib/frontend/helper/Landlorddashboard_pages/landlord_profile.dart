@@ -119,31 +119,47 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
                   title: isEmail ? 'Email' : 'Contact',
                   subtitle: contactInfo,
                 ),
-                ProfileInfoItem(
+               ProfileInfoItem(
                   icon: Icons.location_on,
                   title: 'Location',
                   subtitle: 'Lahore, Punjab',
                 ),
                 GestureDetector(
-                  onTap: toggleAdditionalSettings,
+                  onTap: toggleChangePassword,
                   child: Row(
                     children: [
                       SizedBox(width: 17, height: 60),
                       Icon(
                         Icons.settings,
-                        color: Colors.grey,
+                        color: Colors.grey[600],
                       ),
                       SizedBox(width: 31),
                       Expanded(
-                        child: Text(
-                          'Additional Settings',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
+  child: Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      SizedBox(height: 18),
+
+      Text(
+        'Additional Settings',
+        style: TextStyle(
+          fontSize: 16,
+          color: Colors.black,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      SizedBox(height: 4),
+      Text(
+        'Click to access additional settings',
+        style: TextStyle(
+          fontSize: 14,
+          color: Colors.grey[700],
+        ),
+      ),
+    ],
+  ),
+),
+
                       SizedBox(
                         height: 20,
                         child: AnimatedSwitcher(
@@ -154,7 +170,7 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
                               child: child,
                             );
                           },
-                          child: showAdditionalSettings
+                          child: showChangePassword
                               ? Icon(
                                   Icons.arrow_drop_up,
                                   color: Colors.grey,
@@ -170,10 +186,10 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
                     ],
                   ),
                 ),
-                if (showAdditionalSettings)
+                if (showChangePassword)
                   Column(
                     children: [
-                      SizedBox(height: 2),
+                      SizedBox(height: 17,width: 8,),
                       ProfileInfoItem(
                         icon: Icons.lock,
                         title: 'Change Password',
@@ -213,6 +229,59 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
                           );
                         },
                       ),
+                      ProfileInfoItem(
+                        icon: Icons.delete,
+                        title: 'Delete Account',
+                        subtitle: 'Click to delete your account',
+                        onTap: () {
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              String password = '';
+
+                              return AlertDialog(
+                                title: Text('Delete Account'),
+                                content: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text('Enter your password to confirm account deletion:'),
+                                    TextField(
+                                      onChanged: (value) {
+                                        password = value;
+                                      },
+                                      decoration: InputDecoration(hintText: 'Password'),
+                                      obscureText: true,
+                                    ),
+                                    if (password.isNotEmpty && password != 'correct_password')
+                                      Text(
+                                        'Incorrect password',
+                                        style: TextStyle(color: Colors.red),
+                                      ),
+                                  ],
+                                ),
+                                actions: [
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      if (password == 'correct_password') {
+                                        // Handle account deletion logic here
+                                        print('Deleting account...');
+                                        Navigator.of(context).pop();
+                                      }
+                                    },
+                                    child: Text('Delete'),
+                                  ),
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                    child: Text('Cancel'),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        },
+                      ),
                     ],
                   ),
               ],
@@ -223,6 +292,7 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
     );
   }
 }
+
 
 class ProfileInfoItem extends StatelessWidget {
   final IconData icon;
