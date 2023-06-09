@@ -232,7 +232,7 @@ class PropertyDetails extends StatelessWidget {
                 style: GoogleFonts.montserrat(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: const Color(0xFF33907C),
+                  // color: const Color(0xFF33907C),
                 ),
               ),
               SizedBox(height: screenHeight * 0.01),
@@ -241,61 +241,97 @@ class PropertyDetails extends StatelessWidget {
                 style: GoogleFonts.montserrat(),
               ),
               SizedBox(height: screenHeight * 0.07),
-              Text(
-                'Specifications',
-                style: GoogleFonts.montserrat(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 15),
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                physics: const AlwaysScrollableScrollPhysics(),
-                child: Row(
-                  children: [
-                    if (property.beds > 0)
-                      PropertySpecs(
-                        icon: Icons.king_bed_outlined,
-                        text: '${property.beds} Bed',
-                      ),
-                    if (property.baths > 0)
-                      PropertySpecs(
-                        icon: Icons.bathtub_outlined,
-                        text: '${property.baths} Bath',
-                      ),
-                    if (property.garden)
-                      const PropertySpecs(
-                        icon: Icons.landscape_outlined,
-                        text: '1 Garden',
-                      ),
-                    if (property.living > 0)
-                      PropertySpecs(
-                        icon: Icons.weekend_outlined,
-                        text: '${property.living} Living',
-                      ),
-                    if (property.floors > 0)
-                      PropertySpecs(
-                        icon: Icons.house_outlined,
-                        text: '${property.floors} Floor',
-                      ),
-                    if (property.carspace > 0)
-                      PropertySpecs(
-                        icon: Icons.directions_car_outlined,
-                        text: '${property.carspace} Carspace',
-                      ),
-                  ],
-                ),
-              ),
-              SizedBox(height: screenHeight * 0.03),
-              Text(
-                'Owner Details',
-                style: GoogleFonts.montserrat(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 8),
+              Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+  children: [
+    
+    Text(
+      'Specifications',
+      style: GoogleFonts.montserrat(
+        fontSize: 18,
+        fontWeight: FontWeight.bold,
+      ),
+    ),
+              SizedBox(height: screenHeight * 0.02),
+
+    Row(
+      children: [
+        Icon(
+          Icons.arrow_back_ios, // Replace with your desired arrow icon
+          size: 20,
+        ),
+        
+        Expanded(
+          
+          child: SingleChildScrollView(
+
+            
+            scrollDirection: Axis.horizontal,
+            physics: const AlwaysScrollableScrollPhysics(),
+            child: Row(
+              children: [
+              SizedBox(width: screenWidth * 0.025),
+
+                if (property.beds > 0)
+                  PropertySpecs(
+                    icon: Icons.king_bed_outlined,
+                    text: '${property.beds} Bed',
+                    
+                  ),
+              SizedBox(width: screenWidth * 0.02),
+
+                if (property.baths > 0)
+                  PropertySpecs(
+                    icon: Icons.bathtub_outlined,
+                    text: '${property.baths} Bath',
+                  ),
+              SizedBox(width: screenWidth * 0.02),
+
+                if (property.garden)
+                  const PropertySpecs(
+                    icon: Icons.landscape_outlined,
+                    text: '1 Garden',
+                  ),
+                if (property.living > 0)
+                  PropertySpecs(
+                    icon: Icons.weekend_outlined,
+                    text: '${property.living} Living',
+                  ),
+                if (property.floors > 0)
+                  PropertySpecs(
+                    icon: Icons.house_outlined,
+                    text: '${property.floors} Floor',
+                  ),
+                if (property.carspace > 0)
+                  PropertySpecs(
+                    icon: Icons.directions_car_outlined,
+                    text: '${property.carspace} Carspace',
+                  ),
+              ],
+            ),
+          ),
+        ),
+        Icon(
+          Icons.arrow_forward_ios, // Replace with your desired arrow icon
+          size: 20,
+        ),
+      ],
+    ),
+    SizedBox(height: 25),
+
+    Text(
+      'Owner Details',
+      style: GoogleFonts.montserrat(
+        fontSize: 18,
+        fontWeight: FontWeight.bold,
+      ),
+    ),
+    SizedBox(height: 10),
+    
+  ],
+)
+,
+              const SizedBox(height: 12),
               Row(
                 children: [
                   Container(
@@ -318,33 +354,35 @@ class PropertyDetails extends StatelessWidget {
                         // 'hello',
                         '$firstName $lastName', // Replace with the owner's name fetched from Firebase
                         style: GoogleFonts.montserrat(
+                  color: Color(0xFF33907C),
+
                           fontWeight: FontWeight.bold,
-                          fontSize: 12,
+                          fontSize: 16,
                         ),
                       ),
                       Text(
                         '03333295546', // Replace with the owner's phone number fetched from Firebase
                         style: GoogleFonts.montserrat(
-                          fontSize: 10,
+                          fontSize: 13,
                         ),
                       ),
                     ],
                   ),
                   const Spacer(),
-                  GradientButton(
-                    onPressed: () {
-                      // handle request button press
-                    },
-                    text: 'Request',
-                    gradientColors: const [
-                      Color(0xff0FA697),
-                      Color(0xff45BF7A),
-                      Color(0xff0DF205),
-                    ],
-                  ),
+                  // GradientButton(
+                  //   onPressed: () {
+                  //     // handle request button press
+                  //   },
+                  //   text: 'Request',
+                  //   gradientColors: const [
+                  //     Color(0xff0FA697),
+                  //     Color(0xff45BF7A),
+                  //     Color(0xff0DF205),
+                  //   ],
+                  // ),
                 ],
               ),
-              SizedBox(height: screenHeight * 0.07),
+              SizedBox(height: screenHeight * 0.03),
               Text(
                 'Ratings',
                 style: GoogleFonts.montserrat(
@@ -352,7 +390,7 @@ class PropertyDetails extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              const SizedBox(height: 8),
+              // const SizedBox(height: 8),
               Card(
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
