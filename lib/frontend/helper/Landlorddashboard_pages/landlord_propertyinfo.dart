@@ -317,7 +317,16 @@ class PropertyDetails extends StatelessWidget {
         ),
       ],
     ),
-    SizedBox(height: 15),
+    SizedBox(height: 25),
+
+    Text(
+      'Owner Details',
+      style: GoogleFonts.montserrat(
+        fontSize: 18,
+        fontWeight: FontWeight.bold,
+      ),
+    ),
+    SizedBox(height: 10),
     
   ],
 )
