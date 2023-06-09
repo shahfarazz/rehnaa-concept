@@ -26,6 +26,7 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
 
   @override
   bool get wantKeepAlive => true;
+  bool _showContent = false;
 
   @override
   void initState() {
@@ -53,6 +54,7 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
 
       // Use the Landlord.fromJson method to create a Landlord instance
       Landlord landlord = await Landlord.fromJson(json);
+
       if (kDebugMode) {
         print('Created landlord: $landlord');
       }
@@ -236,6 +238,13 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
           // Handle any error that occurred while fetching the data
           return Text('Error: ${snapshot.error}');
         } else if (snapshot.hasData) {
+          WidgetsBinding.instance!.addPostFrameCallback((_) {
+            Future.delayed(Duration(milliseconds: 500), () {
+              setState(() {
+                _showContent = true;
+              });
+            });
+          });
           // Fetch landlord
           Landlord landlord = snapshot.data!;
 
@@ -244,7 +253,13 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
               NumberFormat('#,##0').format(landlord.balance);
 
           // Return the widget tree with the fetched data
+
           return SingleChildScrollView(
+              // child: AnimatedContainer(
+              //     duration: Duration(milliseconds: 500),
+              //     curve: Curves.easeInOut,
+              //     height:
+              //         _showContent ? size.height : 0, // Show/hide the content
               child: Column(
             children: <Widget>[
               SizedBox(height: size.height * 0.05),
@@ -369,6 +384,7 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
               ),
             ],
           ));
+          // )));
         }
 
         // By default, return an empty container if no data is available
