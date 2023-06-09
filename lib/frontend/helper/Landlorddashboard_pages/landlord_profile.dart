@@ -135,30 +135,29 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
                       ),
                       SizedBox(width: 31),
                       Expanded(
-  child: Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      SizedBox(height: 18),
-
-      Text(
-        'Additional Settings',
-        style: TextStyle(
-          fontSize: 16,
-          color: Colors.black,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-      SizedBox(height: 4),
-      Text(
-        'Click to access additional settings',
-        style: TextStyle(
-          fontSize: 14,
-          color: Colors.grey[700],
-        ),
-      ),
-    ],
-  ),
-),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(height: 18),
+                          Text(
+                            'Additional Settings',
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          SizedBox(height: 4),
+                          Text(
+                            'Click to access additional settings',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey[700],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
 
                       SizedBox(
                         height: 20,

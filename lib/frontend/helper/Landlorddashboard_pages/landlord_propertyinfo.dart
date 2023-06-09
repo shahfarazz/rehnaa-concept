@@ -232,7 +232,7 @@ class PropertyDetails extends StatelessWidget {
                 style: GoogleFonts.montserrat(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: const Color(0xFF33907C),
+                  // color: const Color(0xFF33907C),
                 ),
               ),
               SizedBox(height: screenHeight * 0.01),
@@ -243,6 +243,7 @@ class PropertyDetails extends StatelessWidget {
               SizedBox(height: screenHeight * 0.07),
               Text(
                 'Specifications',
+                
                 style: GoogleFonts.montserrat(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -295,7 +296,7 @@ class PropertyDetails extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 12),
               Row(
                 children: [
                   Container(
@@ -318,33 +319,35 @@ class PropertyDetails extends StatelessWidget {
                         // 'hello',
                         '$firstName $lastName', // Replace with the owner's name fetched from Firebase
                         style: GoogleFonts.montserrat(
+                  color: Color(0xFF33907C),
+
                           fontWeight: FontWeight.bold,
-                          fontSize: 12,
+                          fontSize: 16,
                         ),
                       ),
                       Text(
                         '03333295546', // Replace with the owner's phone number fetched from Firebase
                         style: GoogleFonts.montserrat(
-                          fontSize: 10,
+                          fontSize: 13,
                         ),
                       ),
                     ],
                   ),
                   const Spacer(),
-                  GradientButton(
-                    onPressed: () {
-                      // handle request button press
-                    },
-                    text: 'Request',
-                    gradientColors: const [
-                      Color(0xff0FA697),
-                      Color(0xff45BF7A),
-                      Color(0xff0DF205),
-                    ],
-                  ),
+                  // GradientButton(
+                  //   onPressed: () {
+                  //     // handle request button press
+                  //   },
+                  //   text: 'Request',
+                  //   gradientColors: const [
+                  //     Color(0xff0FA697),
+                  //     Color(0xff45BF7A),
+                  //     Color(0xff0DF205),
+                  //   ],
+                  // ),
                 ],
               ),
-              SizedBox(height: screenHeight * 0.07),
+              SizedBox(height: screenHeight * 0.03),
               Text(
                 'Ratings',
                 style: GoogleFonts.montserrat(
@@ -352,7 +355,7 @@ class PropertyDetails extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              const SizedBox(height: 8),
+              // const SizedBox(height: 8),
               Card(
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
