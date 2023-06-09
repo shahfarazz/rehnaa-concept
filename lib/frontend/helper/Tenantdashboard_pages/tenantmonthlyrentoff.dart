@@ -99,7 +99,37 @@ class _TenantMonthlyRentOffPageState extends State<TenantMonthlyRentOffPage>
                 ),
               ),
             ),
-
+            Positioned(
+                top: 40.0,
+                left: 10.0,
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.pop(context);
+                  },
+                  child: Container(
+                    width: 40,
+                    height: 40,
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Color(0xFF33907C),
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          Color(0xff0FA697),
+                          Color(0xff45BF7A),
+                          Color(0xff0DF205),
+                        ],
+                      ),
+                    ),
+                    child: const Icon(
+                      Icons.arrow_back,
+                      size: 20,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
             Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
@@ -124,6 +154,8 @@ class _TenantMonthlyRentOffPageState extends State<TenantMonthlyRentOffPage>
                     ],
                   ),
                 ),
+                SizedBox(height: size.height * 0.03),
+
                 Text(
                   'Monthly Rent OFF Winner',
                   style: GoogleFonts.montserrat(
