@@ -108,7 +108,10 @@ class _LandlordTenantsPageState extends State<LandlordTenantsPage>
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => LandlordTenantInfoPage(tenant: tenant),
+            builder: (context) => LandlordTenantInfoPage(
+              tenant: tenant,
+              uid: widget.uid,
+            ),
           ),
         );
       },

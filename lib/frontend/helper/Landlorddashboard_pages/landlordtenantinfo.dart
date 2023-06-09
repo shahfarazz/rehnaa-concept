@@ -1,11 +1,14 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:rehnaa/backend/models/tenantsmodel.dart';
 
 class LandlordTenantInfoPage extends StatelessWidget {
   final Tenant tenant;
+  final String uid;
 
-  const LandlordTenantInfoPage({Key? key, required this.tenant})
+  const LandlordTenantInfoPage(
+      {Key? key, required this.tenant, required this.uid})
       : super(key: key);
 
   @override
@@ -174,6 +177,17 @@ class LandlordTenantInfoPage extends StatelessWidget {
                               iconColor: const Color(0xff33907c),
                               label: 'Family Members',
                               value: tenant.familyMembers.toString(),
+                            ),
+                          ),
+                          const SizedBox(height: 10.0),
+                          Center(
+                            child: WhiteBox(
+                              icon: Icons.local_police,
+                              iconColor: const Color(0xff33907c),
+                              label: 'Police Verification',
+                              value: tenant.policeVerification
+                                  ? 'Verified'
+                                  : 'Not Verified',
                             ),
                           ),
                           const SizedBox(height: 10.0),

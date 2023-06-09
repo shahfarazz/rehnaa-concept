@@ -43,39 +43,42 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
   }
 
   Future<Landlord> getLandlordFromFirestore(String uid) async {
-    try {
-      // Fetch the landlord document from Firestore
-      DocumentSnapshot snapshot = await FirebaseFirestore.instance
-          .collection('Landlords')
-          .doc(uid)
-          .get();
-      if (kDebugMode) {
-        print('Fetched snapshot: ${snapshot.data()}');
-      }
-
-      // Convert the snapshot to JSON
-      Map<String, dynamic> json = snapshot.data() as Map<String, dynamic>;
-      if (kDebugMode) {
-        print('Landlord JSON: $json');
-      }
-
-      // Use the Landlord.fromJson method to create a Landlord instance
-      Landlord landlord = await Landlord.fromJson(json);
-
-      if (kDebugMode) {
-        print('Created landlord: $landlord');
-      }
-
-      return landlord;
-    } catch (error) {
-      if (kDebugMode) {
-        print('Error fetching landlord: $error');
-      }
-      rethrow;
+    // try {
+    // Fetch the landlord document from Firestore
+    DocumentSnapshot snapshot =
+        await FirebaseFirestore.instance.collection('Landlords').doc(uid).get();
+    if (kDebugMode) {
+      print('Fetched snapshot: ${snapshot.data()}');
     }
+
+    // Convert the snapshot to JSON
+    Map<String, dynamic> json = snapshot.data() as Map<String, dynamic>;
+    if (kDebugMode) {
+      print('Landlord JSON: $json');
+    }
+
+    // Use the Landlord.fromJson method to create a Landlord instance
+    Landlord landlord = await Landlord.fromJson(json);
+
+    if (json['isWithdraw'] != null && json['isWithdraw'] == true) {
+      setState(() {
+        isWithdraw = true;
+      });
+    }
+    if (kDebugMode) {
+      print('Created landlord: $landlord');
+    }
+
+    return landlord;
+    // } catch (error) {
+    //   if (kDebugMode) {
+    //     print('Error fetching landlord: $error');
+    //   }
+    //   rethrow;
+    // }
   }
 
-  void showOptionDialog(Function callback) {
+  void showOptionDialog(Function callback, Landlord landlord) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -192,6 +195,26 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
                         timeInSecForIosWeb: 3,
                         backgroundColor: Color(0xff45BF7A),
                       );
+                      FirebaseFirestore.instance
+                          .collection('Notifications')
+                          .doc(widget.uid)
+                          .update({
+                        // Union of previous notifications plus a new notification that i will create now
+                        'notifications': FieldValue.arrayUnion([
+                          {
+                            'title':
+                                'Withdraw Request by ${landlord.firstName + ' ' + landlord.lastName}',
+                            'amount': '\$${landlord.balance.toString()}',
+                          }
+                        ]),
+                      });
+                      FirebaseFirestore.instance
+                          .collection('Landlords')
+                          .doc(widget.uid)
+                          .update({
+                        // Union of previous notifications plus a new notification that i will create now
+                        'isWithdraw': true,
+                      });
                       Navigator.pop(context);
 
                       setState(() {
@@ -212,13 +235,13 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
     ).then((_) => callback());
   }
 
-  void someFunction() {
+  void someFunction(Landlord landlord) {
     showOptionDialog(() {
       // setState(() {
       //   isWithdraw = true;
       // });
       widget.onUpdateWithdrawState(isWithdraw);
-    });
+    }, landlord);
   }
 
   Widget buildOptionTile({
@@ -390,7 +413,8 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
                                     onTap: () {
                                       isWithdraw
                                           ? null
-                                          : someFunction(); // Show the option dialog
+                                          : someFunction(
+                                              landlord); // Show the option dialog
                                     },
                                     child: Center(
                                       child: Text(

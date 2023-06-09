@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 import 'package:rehnaa/frontend/Screens/contract.dart';
@@ -40,6 +41,7 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
       vsync: this,
       duration: const Duration(milliseconds: 300),
     );
+    _getNotifs();
   }
 
   @override
@@ -60,25 +62,59 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
     );
   }
 
-  List<Map<String, String>> notifications = [
-    // {
-    //   'title': 'Rent paid by Tenant: Michelle',
-    //   'amount': '\$30000',
-    // },
-    // {
-    //   'title': 'Maintenance request by Tenant: John',
-    //   'amount': '',
-    // },
-    // {
-    //   'title': 'Contract renewal notice for Property: ABC Apartment',
-    //   'amount': '',
-    // },
-    // {
-    //   'title': 'Notification 4',
-    //   'amount': '',
-    // },
-    // Add more notifications here
-  ];
+  // List<Map<String, String>> notifications =
+
+  // = [
+  //   // {
+  //   //   'title': 'Rent paid by Tenant: Michelle',
+  //   //   'amount': '\$30000',
+  //   // },
+  //   // {
+  //   //   'title': 'Maintenance request by Tenant: John',
+  //   //   'amount': '',
+  //   // },
+  //   // {
+  //   //   'title': 'Contract renewal notice for Property: ABC Apartment',
+  //   //   'amount': '',
+  //   // },
+  //   // {
+  //   //   'title': 'Notification 4',
+  //   //   'amount': '',
+  //   // },
+  //   // Add more notifications here
+  // ];
+
+  List<Map<String, String>> notifications = [];
+
+  Future<void> _getNotifs() async {
+    DocumentSnapshot snapshot = await FirebaseFirestore.instance
+        .collection('Notifications')
+        .doc(widget.uid)
+        .get();
+
+    if (snapshot.data() != null) {
+      Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
+
+      if (data.containsKey('notifications')) {
+        List<dynamic> notificationstemp = data['notifications'];
+
+        for (var i = 0; i < notificationstemp.length; i++) {
+          Map<String, dynamic> notification = notificationstemp[i];
+
+          String title = notification['title'] ?? '';
+          String amount = notification['amount'] ?? 0.0;
+
+          print('Title: $title');
+          print('Amount: $amount');
+
+          // Add the notification to a list or perform other operations
+          setState(() {
+            notifications.add({'title': title, 'amount': amount});
+          });
+        }
+      }
+    }
+  }
 
   void _toggleSidebar() {
     setState(() {
@@ -101,6 +137,7 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
   void updateWithdrawState(bool isWithdraw) {
     setState(() {
       _isWithdraw = isWithdraw;
+      _getNotifs();
     });
   }
 
