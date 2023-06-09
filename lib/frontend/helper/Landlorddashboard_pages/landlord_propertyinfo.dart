@@ -241,61 +241,87 @@ class PropertyDetails extends StatelessWidget {
                 style: GoogleFonts.montserrat(),
               ),
               SizedBox(height: screenHeight * 0.07),
-              Text(
-                'Specifications',
-                
-                style: GoogleFonts.montserrat(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 15),
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                physics: const AlwaysScrollableScrollPhysics(),
-                child: Row(
-                  children: [
-                    if (property.beds > 0)
-                      PropertySpecs(
-                        icon: Icons.king_bed_outlined,
-                        text: '${property.beds} Bed',
-                      ),
-                    if (property.baths > 0)
-                      PropertySpecs(
-                        icon: Icons.bathtub_outlined,
-                        text: '${property.baths} Bath',
-                      ),
-                    if (property.garden)
-                      const PropertySpecs(
-                        icon: Icons.landscape_outlined,
-                        text: '1 Garden',
-                      ),
-                    if (property.living > 0)
-                      PropertySpecs(
-                        icon: Icons.weekend_outlined,
-                        text: '${property.living} Living',
-                      ),
-                    if (property.floors > 0)
-                      PropertySpecs(
-                        icon: Icons.house_outlined,
-                        text: '${property.floors} Floor',
-                      ),
-                    if (property.carspace > 0)
-                      PropertySpecs(
-                        icon: Icons.directions_car_outlined,
-                        text: '${property.carspace} Carspace',
-                      ),
-                  ],
-                ),
-              ),
-              SizedBox(height: screenHeight * 0.03),
-              Text(
-                'Owner Details',
-                style: GoogleFonts.montserrat(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+              Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+  children: [
+    
+    Text(
+      'Specifications',
+      style: GoogleFonts.montserrat(
+        fontSize: 18,
+        fontWeight: FontWeight.bold,
+      ),
+    ),
+              SizedBox(height: screenHeight * 0.02),
+
+    Row(
+      children: [
+        Icon(
+          Icons.arrow_back_ios, // Replace with your desired arrow icon
+          size: 20,
+        ),
+        
+        Expanded(
+          
+          child: SingleChildScrollView(
+
+            
+            scrollDirection: Axis.horizontal,
+            physics: const AlwaysScrollableScrollPhysics(),
+            child: Row(
+              children: [
+              SizedBox(width: screenWidth * 0.025),
+
+                if (property.beds > 0)
+                  PropertySpecs(
+                    icon: Icons.king_bed_outlined,
+                    text: '${property.beds} Bed',
+                    
+                  ),
+              SizedBox(width: screenWidth * 0.02),
+
+                if (property.baths > 0)
+                  PropertySpecs(
+                    icon: Icons.bathtub_outlined,
+                    text: '${property.baths} Bath',
+                  ),
+              SizedBox(width: screenWidth * 0.02),
+
+                if (property.garden)
+                  const PropertySpecs(
+                    icon: Icons.landscape_outlined,
+                    text: '1 Garden',
+                  ),
+                if (property.living > 0)
+                  PropertySpecs(
+                    icon: Icons.weekend_outlined,
+                    text: '${property.living} Living',
+                  ),
+                if (property.floors > 0)
+                  PropertySpecs(
+                    icon: Icons.house_outlined,
+                    text: '${property.floors} Floor',
+                  ),
+                if (property.carspace > 0)
+                  PropertySpecs(
+                    icon: Icons.directions_car_outlined,
+                    text: '${property.carspace} Carspace',
+                  ),
+              ],
+            ),
+          ),
+        ),
+        Icon(
+          Icons.arrow_forward_ios, // Replace with your desired arrow icon
+          size: 20,
+        ),
+      ],
+    ),
+    SizedBox(height: 15),
+    
+  ],
+)
+,
               const SizedBox(height: 12),
               Row(
                 children: [
