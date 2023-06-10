@@ -41,18 +41,26 @@ dependencies:
     provider: ^6.0.1
     dots_indicator: ^3.0.0
     smooth_page_indicator: ^1.1.0
+    intl: ^0.17.0
+    cloud_firestore: ^4.8.0
+    confetti: ^0.7.0
+    firebase_storage: ^11.2.2
+    cached_network_image: ^3.0.0
 
 dev_dependencies:
     flutter_test:
         sdk: flutter
-
     # The "flutter_lints" package below contains a set of recommended lints to
     # encourage good coding practices. The lint set provided by the package is
     # activated in the `analysis_options.yaml` file located at the root of your
     # package. See that file for information about deactivating specific lint
     # rules and activating additional ones.
     flutter_lints: ^2.0.0
+    faker: ^2.0.2
+    carousel_slider: ^4.0.0
+    photo_view: ^0.14.0
 
+    # photo_view: ^latest_version
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 

@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:rehnaa/backend/models/tenantsmodel.dart';
 
-import 'landlord_tenants.dart';
-
-class LandlordTenantInfoPage extends StatelessWidget {
+class TenantLandlordInfoPage extends StatelessWidget {
   final Tenant tenant;
 
-  LandlordTenantInfoPage({required this.tenant});
+  const TenantLandlordInfoPage({super.key, required this.tenant});
 
   @override
   Widget build(BuildContext context) {
@@ -16,11 +15,12 @@ class LandlordTenantInfoPage extends StatelessWidget {
       body: SingleChildScrollView(
         child: Stack(
           children: [
+            // Background gradient with diagonal clip
             ClipPath(
               clipper: DiagonalClipper(),
               child: Container(
                 height: size.height * 0.5,
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
@@ -37,98 +37,105 @@ class LandlordTenantInfoPage extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 SizedBox(height: size.height * 0.1),
+                // Display tenant's avatar
                 CircleAvatar(
                   radius: size.width * 0.2,
                   backgroundColor: Colors.white,
-                  backgroundImage: AssetImage('assets/userimage.png'),
+                  backgroundImage: AssetImage(
+                    tenant.pathToImage ?? 'assets/defaulticon.png',
+                  ),
                 ),
-                SizedBox(height: 20.0),
+                const SizedBox(height: 20.0),
+                // Display tenant's name
                 Text(
-                  tenant.name,
+                  '${tenant.firstName} ${tenant.lastName}',
                   style: GoogleFonts.montserrat(
                     fontSize: 20.0,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xff33907c),
+                    color: const Color(0xff33907c),
                   ),
                 ),
-                SizedBox(height: 10.0),
+                const SizedBox(height: 10.0),
+                // Display tenant's description
                 Center(
                   child: Text(
-                    'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+                    tenant.description,
                     textAlign: TextAlign.center,
                     style: GoogleFonts.montserrat(
                       fontSize: 16.0,
-                      color: Color(0xff33907c),
+                      color: const Color(0xff33907c),
                     ),
                   ),
                 ),
-                SizedBox(height: 20.0),
+                const SizedBox(height: 20.0),
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
                   child: Column(
                     children: [
-                      SizedBox(height: 10.0),
+                      const SizedBox(height: 10.0),
                       Center(
                         child: FractionallySizedBox(
                           widthFactor: 0.8,
                           child: WhiteBox(
                             label: 'Rating',
                             value: '${tenant.rating}',
-                            points: '1140',
+                            points: '${tenant.creditPoints}',
                           ),
                         ),
                       ),
-                      SizedBox(height: 10.0),
+                      const SizedBox(height: 10.0),
                       Center(
                         child: FractionallySizedBox(
                           widthFactor: 0.8,
                           child: WhiteBox(
                             label: 'Property Details',
-                            value: 'Dummy Property Details',
+                            value: tenant.propertyDetails,
                           ),
                         ),
                       ),
-                      SizedBox(height: 10.0),
+                      const SizedBox(height: 10.0),
                       Center(
                         child: FractionallySizedBox(
                           widthFactor: 0.8,
                           child: WhiteBox(
                             label: 'CNIC Number',
-                            value: 'Dummy CNIC Number',
+                            value: tenant.cnicNumber,
                           ),
                         ),
                       ),
-                      SizedBox(height: 10.0),
+                      const SizedBox(height: 10.0),
                       Center(
                         child: FractionallySizedBox(
                           widthFactor: 0.8,
                           child: WhiteBox(
                             label: 'Contact Number',
-                            value: 'Dummy Contact Number',
+                            value: tenant.emailOrPhone,
                           ),
                         ),
                       ),
-                      SizedBox(height: 10.0),
+                      const SizedBox(height: 10.0),
                       Center(
                         child: FractionallySizedBox(
                           widthFactor: 0.8,
                           child: WhiteBox(
                             label: 'Tasdeeq Verification',
-                            value: 'Dummy Verification',
+                            value: tenant.tasdeeqVerification
+                                ? 'Verified'
+                                : 'Not Verified',
                           ),
                         ),
                       ),
-                      SizedBox(height: 10.0),
+                      const SizedBox(height: 10.0),
                       Center(
                         child: FractionallySizedBox(
                           widthFactor: 0.8,
                           child: WhiteBox(
                             label: 'Family Members',
-                            value: 'Dummy Family Members',
+                            value: tenant.familyMembers.toString(),
                           ),
                         ),
                       ),
-                      SizedBox(height: 10.0),
+                      const SizedBox(height: 10.0),
                     ],
                   ),
                 ),
@@ -146,7 +153,8 @@ class WhiteBox extends StatelessWidget {
   final String value;
   final String? points;
 
-  WhiteBox({required this.label, required this.value, this.points});
+  const WhiteBox(
+      {super.key, required this.label, required this.value, this.points});
 
   @override
   Widget build(BuildContext context) {
@@ -158,7 +166,7 @@ class WhiteBox extends StatelessWidget {
           borderRadius: BorderRadius.circular(20.0),
         ),
         child: Padding(
-          padding: EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -184,16 +192,16 @@ class WhiteBox extends StatelessWidget {
                     ),
                 ],
               ),
-              SizedBox(height: 10.0),
+              const SizedBox(height: 10.0),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    '$value',
+                    value,
                     style: GoogleFonts.montserrat(
                       fontSize: 14.0,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xff33907c),
+                      color: const Color(0xff33907c),
                     ),
                   ),
                   Text(
@@ -201,7 +209,7 @@ class WhiteBox extends StatelessWidget {
                     style: GoogleFonts.montserrat(
                       fontSize: 14.0,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xff33907c),
+                      color: const Color(0xff33907c),
                     ),
                   ),
                 ],
