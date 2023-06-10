@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:rehnaa/frontend/Screens/contract.dart';
 import 'package:rehnaa/frontend/Screens/faq.dart';
@@ -34,6 +35,7 @@ class _DashboardPageState extends State<TenantDashboardPage>
   bool _isSidebarOpen = false;
   // Declare the AnimationController
   late AnimationController _sidebarController;
+  bool _isWithdraw = false;
 
   @override
   void initState() {
@@ -43,6 +45,7 @@ class _DashboardPageState extends State<TenantDashboardPage>
       vsync: this,
       duration: const Duration(milliseconds: 300),
     );
+    _getNotifs();
   }
 
   @override
@@ -50,6 +53,7 @@ class _DashboardPageState extends State<TenantDashboardPage>
     _pageController.dispose();
     _sidebarController.dispose(); // Dispose the AnimationController
     super.dispose();
+    _getNotifs();
   }
 
   @override
@@ -64,24 +68,38 @@ class _DashboardPageState extends State<TenantDashboardPage>
   }
 
   List<Map<String, String>> notifications = [
-    {
-      'title': 'Rent paid by Tenant: Michelle',
-      'amount': '\$30000',
-    },
-    {
-      'title': 'Maintenance request by Tenant: John',
-      'amount': '',
-    },
-    {
-      'title': 'Contract renewal notice for Property: ABC Apartment',
-      'amount': '',
-    },
-    {
-      'title': 'Notification 4',
-      'amount': '',
-    },
     // Add more notifications here
   ];
+
+  Future<void> _getNotifs() async {
+    DocumentSnapshot snapshot = await FirebaseFirestore.instance
+        .collection('Notifications')
+        .doc(widget.uid)
+        .get();
+
+    if (snapshot.data() != null) {
+      Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
+
+      if (data.containsKey('notifications')) {
+        List<dynamic> notificationstemp = data['notifications'];
+
+        for (var i = 0; i < notificationstemp.length; i++) {
+          Map<String, dynamic> notification = notificationstemp[i];
+
+          String title = notification['title'] ?? '';
+          String amount = notification['amount'] ?? 0.0;
+
+          print('Title: $title');
+          print('Amount: $amount');
+
+          // Add the notification to a list or perform other operations
+          setState(() {
+            notifications.add({'title': title, 'amount': amount});
+          });
+        }
+      }
+    }
+  }
 
   void _toggleSidebar() {
     setState(() {
@@ -98,6 +116,13 @@ class _DashboardPageState extends State<TenantDashboardPage>
     setState(() {
       _isSidebarOpen = false;
       _sidebarController.reverse();
+    });
+  }
+
+  void updateWithdrawState(bool isWithdraw) {
+    setState(() {
+      _isWithdraw = isWithdraw;
+      _getNotifs();
     });
   }
 
@@ -130,7 +155,11 @@ class _DashboardPageState extends State<TenantDashboardPage>
                             });
                           },
                           children: <Widget>[
-                            TenantDashboardContent(uid: widget.uid),
+                            TenantDashboardContent(
+                              uid: widget.uid,
+                              isWithdraw: _isWithdraw,
+                              onUpdateWithdrawState: updateWithdrawState,
+                            ),
                             TenantRentAccrualPage(),
                             TenantPropertiesPage(uid: widget.uid),
                             TenantRentHistoryPage(uid: widget.uid),
@@ -220,7 +249,8 @@ class _DashboardPageState extends State<TenantDashboardPage>
                 child: Container(
                   padding: const EdgeInsets.all(2),
                   decoration: BoxDecoration(
-                    color: Colors.red,
+                    color:
+                        notifications.isEmpty ? Colors.transparent : Colors.red,
                     borderRadius: BorderRadius.circular(6),
                   ),
                   constraints: const BoxConstraints(
@@ -228,7 +258,9 @@ class _DashboardPageState extends State<TenantDashboardPage>
                     minHeight: 10,
                   ),
                   child: Text(
-                    notifications.length.toString(),
+                    notifications.isEmpty
+                        ? ''
+                        : notifications.length.toString(),
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 10,

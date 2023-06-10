@@ -11,8 +11,15 @@ import '../Landlorddashboard_pages/landlord_dashboard_content.dart';
 
 class TenantDashboardContent extends StatefulWidget {
   final String uid; // UID of the tenant
+  final bool isWithdraw;
+  final Function(bool) onUpdateWithdrawState;
 
-  const TenantDashboardContent({Key? key, required this.uid}) : super(key: key);
+  const TenantDashboardContent(
+      {Key? key,
+      required this.uid,
+      required this.isWithdraw,
+      required this.onUpdateWithdrawState})
+      : super(key: key);
 
   @override
   _TenantDashboardContentState createState() => _TenantDashboardContentState();
@@ -24,6 +31,7 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
 
   @override
   bool get wantKeepAlive => true;
+  bool isWithdraw = false;
 
   @override
   void initState() {
@@ -49,6 +57,11 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
 
       // Use the Tenant.fromJson method to create a Tenant instance
       Tenant tenant = await Tenant.fromJson(json);
+      if (json['isWithdraw'] != null && json['isWithdraw'] == true) {
+        setState(() {
+          isWithdraw = true;
+        });
+      }
       if (kDebugMode) {
         print('Created tenant: $tenant');
       }
@@ -62,7 +75,7 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
     }
   }
 
-  void showOptionDialog() {
+  void showOptionDialog(Function callback, Tenant tenant) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -171,6 +184,34 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                         print('Selected option: $selectedOption');
                       }
                       Navigator.pop(context);
+                      try {
+                        FirebaseFirestore.instance
+                            .collection('Notifications')
+                            .doc(widget.uid)
+                            .update({
+                          // Union of previous notifications plus a new notification that i will create now
+                          'notifications': FieldValue.arrayUnion([
+                            {
+                              'title':
+                                  'Withdraw Request by ${tenant.firstName + ' ' + tenant.lastName}',
+                              'amount': '\$${tenant.rent.toString()}',
+                            }
+                          ]),
+                        });
+                      } catch (e) {
+                        print('error is $e');
+                      }
+                      FirebaseFirestore.instance
+                          .collection('Tenants')
+                          .doc(widget.uid)
+                          .update({
+                        // Union of previous notifications plus a new notification that i will create now
+                        'isWithdraw': true,
+                      });
+
+                      setState(() {
+                        isWithdraw = true;
+                      });
                     } else {
                       if (kDebugMode) {
                         print('Please select an option');
@@ -183,7 +224,16 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
           },
         );
       },
-    );
+    ).then((_) => callback());
+  }
+
+  void someFunction(Tenant tenant) {
+    showOptionDialog(() {
+      // setState(() {
+      //   isWithdraw = true;
+      // });
+      widget.onUpdateWithdrawState(isWithdraw);
+    }, tenant);
   }
 
   Widget buildOptionTile({
@@ -325,14 +375,20 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                                   height: size.height * 0.06,
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(20),
-                                    gradient: const LinearGradient(
+                                    gradient: LinearGradient(
                                       begin: Alignment.topLeft,
                                       end: Alignment.bottomRight,
-                                      colors: [
-                                        Color(0xff0FA697),
-                                        Color(0xff45BF7A),
-                                        Color(0xff0DF205),
-                                      ],
+                                      colors: isWithdraw
+                                          ? [
+                                              Colors.grey,
+                                              Colors.grey,
+                                              Colors.grey,
+                                            ]
+                                          : [
+                                              Color(0xff0FA697),
+                                              Color(0xff45BF7A),
+                                              Color(0xff0DF205),
+                                            ],
                                     ),
                                   ),
                                   child: Material(
@@ -340,11 +396,16 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                                     child: InkWell(
                                       borderRadius: BorderRadius.circular(20),
                                       onTap: () {
-                                        showOptionDialog(); // Show the option dialog
+                                        isWithdraw
+                                            ? null
+                                            : someFunction(
+                                                tenant); // Show the option dialog
                                       },
                                       child: Center(
                                         child: Text(
-                                          "Pay",
+                                          isWithdraw
+                                              ? "Payment Requested"
+                                              : "Pay",
                                           style: GoogleFonts.montserrat(
                                             color: Colors.white,
                                             fontSize: 18,
