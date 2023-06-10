@@ -126,11 +126,11 @@ class _DealerDashboardPageState extends State<DealerDashboardPage>
                             });
                           },
                           children: <Widget>[
-                            LandlordDashboardContent(uid: widget.uid),
-                            LandlordTenantsPage(uid: widget.uid),
-                            LandlordPropertiesPage(uid: widget.uid),
-                            LandlordRentHistoryPage(uid: widget.uid),
-                            LandlordProfilePage(uid: widget.uid),
+                            // LandlordDashboardContent(uid: widget.uid),
+                            // LandlordTenantsPage(uid: widget.uid),
+                            // LandlordPropertiesPage(uid: widget.uid),
+                            // LandlordRentHistoryPage(uid: widget.uid),
+                            // LandlordProfilePage(uid: widget.uid),
                           ],
                         ),
                       ),
