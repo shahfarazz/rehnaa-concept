@@ -20,7 +20,7 @@ class DealerDashboardContent extends StatefulWidget {
 
 class _DealerDashboardContentState extends State<DealerDashboardContent>
     with AutomaticKeepAliveClientMixin<DealerDashboardContent> {
-  late Future<Tenant> _tenantFuture;
+  late Future<Tenant> _dealerFuture;
 
   @override
   bool get wantKeepAlive => true;
@@ -29,7 +29,7 @@ class _DealerDashboardContentState extends State<DealerDashboardContent>
   void initState() {
     super.initState();
     // Fetch tenant data from Firestore
-    _tenantFuture = getTenantFromFirestore(widget.uid);
+    _dealerFuture = getTenantFromFirestore(widget.uid);
   }
 
   Future<Tenant> getTenantFromFirestore(String uid) async {
@@ -224,7 +224,7 @@ class _DealerDashboardContentState extends State<DealerDashboardContent>
     }
 
     return FutureBuilder<Tenant>(
-      future: _tenantFuture,
+      future: _dealerFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           // Show a loading indicator while waiting for the data
