@@ -24,16 +24,16 @@ class MyApp extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (context) => AuthenticationService(),
       child: MaterialApp(
-          debugShowCheckedModeBanner: false,
-          title: 'Rehnaa',
-          theme: ThemeData(
-            primarySwatch: Colors.blue,
-          ),
-          home: const SplashScreen()
-          // home: TenantDashboardPage(
-          //     uid: 'K55YzmkUXt09OgFwnDuT'), //TODO remove this Jugaar
-          // home: TeanantsSignUpDetailsPage(),
-          ),
+        debugShowCheckedModeBanner: false,
+        title: 'Rehnaa',
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+        ),
+        // home: const SplashScreen(),
+        home: TenantDashboardPage(
+            uid: 'K55YzmkUXt09OgFwnDuT'), //TODO remove this Jugaar
+        // home: TeanantsSignUpDetailsPage(),
+      ),
     );
   }
 }
