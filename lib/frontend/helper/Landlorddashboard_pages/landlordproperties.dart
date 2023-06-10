@@ -38,9 +38,6 @@ class _LandlordPropertiesPageState extends State<LandlordPropertiesPage>
               .get();
 
       if (landlordSnapshot.exists) {
-        setState(() {
-          shouldDisplay = true;
-        });
         Map<String, dynamic> data = landlordSnapshot.data()!;
 
         List<DocumentReference<Map<String, dynamic>>> propertyDataList =
@@ -48,7 +45,10 @@ class _LandlordPropertiesPageState extends State<LandlordPropertiesPage>
                 .cast<DocumentReference<Map<String, dynamic>>>();
 
         // Fetch properties using the fetchProperties method
-        properties = await fetchProperties(propertyDataList);
+        properties = await fetchProperties(propertyDataList, context);
+        setState(() {
+          shouldDisplay = true;
+        });
 
         if (mounted) {
           setState(() {
@@ -69,7 +69,8 @@ class _LandlordPropertiesPageState extends State<LandlordPropertiesPage>
     }
   }
 
-  Future<List<Property>> fetchProperties(List<dynamic> propertyDataList) async {
+  Future<List<Property>> fetchProperties(
+      List<dynamic> propertyDataList, BuildContext context) async {
     List<Property> fetchedProperties = [];
 
     for (var propertyDataRef in propertyDataList) {
@@ -80,6 +81,8 @@ class _LandlordPropertiesPageState extends State<LandlordPropertiesPage>
       if (propertyData != null) {
         Property property = await Property.fromJson(propertyData);
         property.landlord = await property.fetchLandlord();
+        precacheImage(NetworkImage(property.imagePath[0]), context);
+
         fetchedProperties.add(property);
       }
     }

@@ -1,11 +1,15 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:rehnaa/backend/models/tenantsmodel.dart';
 
 class LandlordTenantInfoPage extends StatelessWidget {
   final Tenant tenant;
+  final String uid;
 
-  const LandlordTenantInfoPage({Key? key, required this.tenant}) : super(key: key);
+  const LandlordTenantInfoPage(
+      {Key? key, required this.tenant, required this.uid})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -105,80 +109,92 @@ class LandlordTenantInfoPage extends StatelessWidget {
               heightFactor: 1.2,
               child: Transform.translate(
                 offset: Offset(0, -40),
-              child: Card(
-                color: Colors.grey[200],
-                elevation: 4.0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(25.0),
-                ),
-                child: SingleChildScrollView(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      children: [
-                        const SizedBox(height: 10.0),
-                        // Rest of your card's content...
+                child: Card(
+                  color: Colors.grey[200],
+                  elevation: 4.0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(25.0),
+                  ),
+                  child: SingleChildScrollView(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        children: [
+                          const SizedBox(height: 10.0),
+                          // Rest of your card's content...
 
-                        
-            Center(
-              child: WhiteBox(
-                icon: Icons.star,
-                iconColor: const Color(0xff33907c),
-                label: 'Rating',
-                value: '${tenant.rating}',
-                points: '${tenant.creditPoints}',
-              ),
-            ),
-            const SizedBox(height: 10.0),
-            Center(
-              child: WhiteBox(
-                icon: Icons.home,
-                iconColor: const Color(0xff33907c),
-                label: 'Property Details',
-                value: tenant.propertyDetails,
-              ),
-            ),
-            const SizedBox(height: 10.0),
-            Center(
-              child: WhiteBox(
-                icon: Icons.numbers,
-                iconColor: const Color(0xff33907c),
-                label: 'CNIC Number',
-                value: tenant.cnicNumber,
-              ),
-            ),
-            const SizedBox(height: 10.0),
-            Center(
-              child: WhiteBox(
-                icon: Icons.email,
-                iconColor: const Color(0xff33907c),
-                label: 'Contact Number',
-                value: tenant.emailOrPhone,
-              ),
-            ),
-            const SizedBox(height: 10.0),
-            Center(
-              child: WhiteBox(
-                icon: Icons.verified_user,
-                label: 'Tasdeeq Verification',
-                iconColor: const Color(0xff33907c),
-                value: tenant.tasdeeqVerification ? 'Verified' : 'Not Verified',
-              ),
-            ),
-            const SizedBox(height: 10.0),
-            Center(
-              child: WhiteBox(
-                icon: Icons.family_restroom,
-                iconColor: const Color(0xff33907c),
-                label: 'Family Members',
-                value: tenant.familyMembers.toString(),
-              ),
-            ),
-            const SizedBox(height: 10.0),
-                      ],
+                          Center(
+                            child: WhiteBox(
+                              icon: Icons.star,
+                              iconColor: const Color(0xff33907c),
+                              label: 'Rating',
+                              value: '${tenant.rating}',
+                              points: '${tenant.creditPoints}',
+                            ),
+                          ),
+                          const SizedBox(height: 10.0),
+                          Center(
+                            child: WhiteBox(
+                              icon: Icons.home,
+                              iconColor: const Color(0xff33907c),
+                              label: 'Property Details',
+                              value: tenant.propertyDetails,
+                            ),
+                          ),
+                          const SizedBox(height: 10.0),
+                          Center(
+                            child: WhiteBox(
+                              icon: Icons.numbers,
+                              iconColor: const Color(0xff33907c),
+                              label: 'CNIC Number',
+                              value: tenant.cnicNumber,
+                            ),
+                          ),
+                          const SizedBox(height: 10.0),
+                          Center(
+                            child: WhiteBox(
+                              icon: Icons.email,
+                              iconColor: const Color(0xff33907c),
+                              label: 'Contact Number',
+                              value: tenant.emailOrPhone,
+                            ),
+                          ),
+                          const SizedBox(height: 10.0),
+                          Center(
+                            child: WhiteBox(
+                              icon: Icons.verified_user,
+                              label: 'Tasdeeq Verification',
+                              iconColor: const Color(0xff33907c),
+                              value: tenant.tasdeeqVerification
+                                  ? 'Verified'
+                                  : 'Not Verified',
+                            ),
+                          ),
+                          const SizedBox(height: 10.0),
+                          Center(
+                            child: WhiteBox(
+                              icon: Icons.family_restroom,
+                              iconColor: const Color(0xff33907c),
+                              label: 'Family Members',
+                              value: tenant.familyMembers.toString(),
+                            ),
+                          ),
+                          const SizedBox(height: 10.0),
+                          Center(
+                            child: WhiteBox(
+                              icon: Icons.local_police,
+                              iconColor: const Color(0xff33907c),
+                              label: 'Police Verification',
+                              value: tenant.policeVerification
+                                  ? 'Verified'
+                                  : 'Not Verified',
+                            ),
+                          ),
+                          const SizedBox(height: 10.0),
+                        ],
+                      ),
                     ),
                   ),
-                ),
                 ),
               ),
             ),
@@ -194,7 +210,7 @@ class WhiteBox extends StatelessWidget {
   final String value;
   final String? points;
   final IconData? icon;
-  final Color? iconColor; 
+  final Color? iconColor;
 
   const WhiteBox({
     Key? key,

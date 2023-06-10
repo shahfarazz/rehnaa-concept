@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -9,10 +10,16 @@ import 'package:rehnaa/backend/models/landlordmodel.dart';
 import 'skeleton.dart';
 
 class LandlordDashboardContent extends StatefulWidget {
-  final String uid; // UID of the landlord
+  final String uid;
+  final bool isWithdraw;
+  final Function(bool) onUpdateWithdrawState;
 
-  const LandlordDashboardContent({Key? key, required this.uid})
-      : super(key: key);
+  const LandlordDashboardContent({
+    Key? key,
+    required this.uid,
+    required this.isWithdraw,
+    required this.onUpdateWithdrawState,
+  }) : super(key: key);
 
   @override
   // ignore: library_private_types_in_public_api
@@ -26,6 +33,7 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
 
   @override
   bool get wantKeepAlive => true;
+  bool isWithdraw = false;
 
   @override
   void initState() {
@@ -35,38 +43,42 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
   }
 
   Future<Landlord> getLandlordFromFirestore(String uid) async {
-    try {
-      // Fetch the landlord document from Firestore
-      DocumentSnapshot snapshot = await FirebaseFirestore.instance
-          .collection('Landlords')
-          .doc(uid)
-          .get();
-      if (kDebugMode) {
-        print('Fetched snapshot: ${snapshot.data()}');
-      }
-
-      // Convert the snapshot to JSON
-      Map<String, dynamic> json = snapshot.data() as Map<String, dynamic>;
-      if (kDebugMode) {
-        print('Landlord JSON: $json');
-      }
-
-      // Use the Landlord.fromJson method to create a Landlord instance
-      Landlord landlord = await Landlord.fromJson(json);
-      if (kDebugMode) {
-        print('Created landlord: $landlord');
-      }
-
-      return landlord;
-    } catch (error) {
-      if (kDebugMode) {
-        print('Error fetching landlord: $error');
-      }
-      rethrow;
+    // try {
+    // Fetch the landlord document from Firestore
+    DocumentSnapshot snapshot =
+        await FirebaseFirestore.instance.collection('Landlords').doc(uid).get();
+    if (kDebugMode) {
+      print('Fetched snapshot: ${snapshot.data()}');
     }
+
+    // Convert the snapshot to JSON
+    Map<String, dynamic> json = snapshot.data() as Map<String, dynamic>;
+    if (kDebugMode) {
+      print('Landlord JSON: $json');
+    }
+
+    // Use the Landlord.fromJson method to create a Landlord instance
+    Landlord landlord = await Landlord.fromJson(json);
+
+    if (json['isWithdraw'] != null && json['isWithdraw'] == true) {
+      setState(() {
+        isWithdraw = true;
+      });
+    }
+    if (kDebugMode) {
+      print('Created landlord: $landlord');
+    }
+
+    return landlord;
+    // } catch (error) {
+    //   if (kDebugMode) {
+    //     print('Error fetching landlord: $error');
+    //   }
+    //   rethrow;
+    // }
   }
 
-  void showOptionDialog() {
+  void showOptionDialog(Function callback, Landlord landlord) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -74,6 +86,7 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
 
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setState) {
+            // Your AlertDialog code goes here...
             return AlertDialog(
               title: const Padding(
                 padding:
@@ -104,26 +117,26 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
                       });
                     },
                   ),
-                  buildOptionTile(
-                    selectedOption: selectedOption,
-                    optionImage: 'assets/easypaisa.png',
-                    optionName: 'Easy Paisa',
-                    onTap: () {
-                      setState(() {
-                        selectedOption = 'Easy Paisa';
-                      });
-                    },
-                  ),
-                  buildOptionTile(
-                    selectedOption: selectedOption,
-                    optionImage: 'assets/jazzcash.png',
-                    optionName: 'Jazz Cash',
-                    onTap: () {
-                      setState(() {
-                        selectedOption = 'Jazz Cash';
-                      });
-                    },
-                  ),
+                  // buildOptionTile(
+                  //   selectedOption: selectedOption,
+                  //   optionImage: 'assets/easypaisa.png',
+                  //   optionName: 'Easy Paisa',
+                  //   onTap: () {
+                  //     setState(() {
+                  //       selectedOption = 'Easy Paisa';
+                  //     });
+                  //   },
+                  // ),
+                  // buildOptionTile(
+                  //   selectedOption: selectedOption,
+                  //   optionImage: 'assets/jazzcash.png',
+                  //   optionName: 'Jazz Cash',
+                  //   onTap: () {
+                  //     setState(() {
+                  //       selectedOption = 'Jazz Cash';
+                  //     });
+                  //   },
+                  // ),
                   buildOptionTile(
                     selectedOption: selectedOption,
                     optionImage: 'assets/banktransfer.png',
@@ -164,7 +177,7 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
                     ),
                   ),
                   child: const Text(
-                    'Submit',
+                    'Next',
                     style: TextStyle(
                       color: Colors.white,
                     ),
@@ -174,7 +187,39 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
                       if (kDebugMode) {
                         print('Selected option: $selectedOption');
                       }
+                      Fluttertoast.showToast(
+                        msg:
+                            'An admin will contact you soon regarding your payment via: $selectedOption',
+                        toastLength: Toast.LENGTH_SHORT,
+                        gravity: ToastGravity.BOTTOM,
+                        timeInSecForIosWeb: 3,
+                        backgroundColor: Color(0xff45BF7A),
+                      );
+                      FirebaseFirestore.instance
+                          .collection('Notifications')
+                          .doc(widget.uid)
+                          .update({
+                        // Union of previous notifications plus a new notification that i will create now
+                        'notifications': FieldValue.arrayUnion([
+                          {
+                            'title':
+                                'Withdraw Request by ${landlord.firstName + ' ' + landlord.lastName}',
+                            'amount': '\$${landlord.balance.toString()}',
+                          }
+                        ]),
+                      });
+                      FirebaseFirestore.instance
+                          .collection('Landlords')
+                          .doc(widget.uid)
+                          .update({
+                        // Union of previous notifications plus a new notification that i will create now
+                        'isWithdraw': true,
+                      });
                       Navigator.pop(context);
+
+                      setState(() {
+                        isWithdraw = true;
+                      });
                     } else {
                       if (kDebugMode) {
                         print('Please select an option');
@@ -187,7 +232,16 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
           },
         );
       },
-    );
+    ).then((_) => callback());
+  }
+
+  void someFunction(Landlord landlord) {
+    showOptionDialog(() {
+      // setState(() {
+      //   isWithdraw = true;
+      // });
+      widget.onUpdateWithdrawState(isWithdraw);
+    }, landlord);
   }
 
   Widget buildOptionTile({
@@ -244,7 +298,13 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
               NumberFormat('#,##0').format(landlord.balance);
 
           // Return the widget tree with the fetched data
+
           return SingleChildScrollView(
+              // child: AnimatedContainer(
+              //     duration: Duration(milliseconds: 500),
+              //     curve: Curves.easeInOut,
+              //     height:
+              //         _showContent ? size.height : 0, // Show/hide the content
               child: Column(
             children: <Widget>[
               SizedBox(height: size.height * 0.05),
@@ -330,14 +390,20 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
                                 height: size.height * 0.06,
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(20),
-                                  gradient: const LinearGradient(
+                                  gradient: LinearGradient(
                                     begin: Alignment.topLeft,
                                     end: Alignment.bottomRight,
-                                    colors: [
-                                      Color(0xff0FA697),
-                                      Color(0xff45BF7A),
-                                      Color(0xff0DF205),
-                                    ],
+                                    colors: isWithdraw
+                                        ? [
+                                            Colors.grey,
+                                            Colors.grey,
+                                            Colors.grey,
+                                          ]
+                                        : [
+                                            Color(0xff0FA697),
+                                            Color(0xff45BF7A),
+                                            Color(0xff0DF205),
+                                          ],
                                   ),
                                 ),
                                 child: Material(
@@ -345,11 +411,16 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
                                   child: InkWell(
                                     borderRadius: BorderRadius.circular(20),
                                     onTap: () {
-                                      showOptionDialog(); // Show the option dialog
+                                      isWithdraw
+                                          ? null
+                                          : someFunction(
+                                              landlord); // Show the option dialog
                                     },
                                     child: Center(
                                       child: Text(
-                                        "Withdraw",
+                                        isWithdraw
+                                            ? "Withdraw Requested"
+                                            : "Withdraw",
                                         style: GoogleFonts.montserrat(
                                           color: Colors.white,
                                           fontSize: 18,
@@ -369,6 +440,7 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
               ),
             ],
           ));
+          // )));
         }
 
         // By default, return an empty container if no data is available

@@ -24,6 +24,7 @@ class MyApp extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (context) => AuthenticationService(),
       child: MaterialApp(
+<<<<<<< HEAD
         debugShowCheckedModeBanner: false,
         title: 'Rehnaa',
         theme: ThemeData(
@@ -34,6 +35,18 @@ class MyApp extends StatelessWidget {
             uid: 'K55YzmkUXt09OgFwnDuT'), //TODO remove this Jugaar
         // home: TeanantsSignUpDetailsPage(),
       ),
+=======
+          debugShowCheckedModeBanner: false,
+          title: 'Rehnaa',
+          theme: ThemeData(
+            primarySwatch: Colors.blue,
+          ),
+          home: const SplashScreen()
+          // home: TenantDashboardPage(
+          //     uid: 'K55YzmkUXt09OgFwnDuT'), //TODO remove this Jugaar
+          // home: TeanantsSignUpDetailsPage(),
+          ),
+>>>>>>> 8d8e44d1d473de82afee77eb5bee93b3d640a93a
     );
   }
 }

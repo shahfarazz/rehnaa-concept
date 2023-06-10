@@ -57,9 +57,6 @@ class _LandlordTenantsPageState extends State<LandlordTenantsPage>
             .get();
 
     if (landlordSnapshot.exists) {
-      setState(() {
-        shouldDisplayContent = true;
-      });
       // print('reached here');
       Map<String, dynamic>? landlordData = landlordSnapshot.data();
       if (landlordData != null && landlordData['tenantRef'] != null) {
@@ -76,6 +73,9 @@ class _LandlordTenantsPageState extends State<LandlordTenantsPage>
             await Future.wait(tenantSnapshots);
 
         List<Tenant> fetchedTenants = [];
+        setState(() {
+          shouldDisplayContent = true;
+        });
 
         // Convert tenant documents to Tenant objects
         for (var tenantSnapshot in tenantsSnapshots) {
@@ -108,7 +108,10 @@ class _LandlordTenantsPageState extends State<LandlordTenantsPage>
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => LandlordTenantInfoPage(tenant: tenant),
+            builder: (context) => LandlordTenantInfoPage(
+              tenant: tenant,
+              uid: widget.uid,
+            ),
           ),
         );
       },

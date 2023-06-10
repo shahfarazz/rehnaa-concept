@@ -12,6 +12,7 @@ class Tenant {
   final String cnicNumber;
   final String emailOrPhone;
   final bool tasdeeqVerification;
+  final bool policeVerification;
   final int familyMembers;
   final DocumentReference<Map<String, dynamic>>? landlordRef;
   Landlord? landlord;
@@ -29,6 +30,7 @@ class Tenant {
     required this.emailOrPhone,
     required this.tasdeeqVerification,
     required this.familyMembers,
+    required this.policeVerification,
     this.landlordRef,
     this.landlord,
     this.pathToImage,
@@ -49,6 +51,7 @@ class Tenant {
       familyMembers: json['familyMembers'] ?? [],
       landlordRef: json['landlordRef'],
       pathToImage: json['pathToImage'] ?? 'assets/defaultimage.png',
+      policeVerification: json['policeVerification'] ?? false,
     );
   }
 
@@ -67,6 +70,7 @@ class Tenant {
       'familyMembers': familyMembers,
       'landlordRef': landlordRef,
       'pathToImage': pathToImage,
+      'policeVerification': policeVerification,
     };
   }
 
@@ -96,6 +100,7 @@ class Tenant {
       tasdeeqVerification: true,
       familyMembers: 2,
       pathToImage: 'assets/defaulticon.png',
+      policeVerification: true,
     );
 
     try {
