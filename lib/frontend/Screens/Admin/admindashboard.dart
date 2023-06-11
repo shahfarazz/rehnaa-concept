@@ -9,19 +9,100 @@ class AdminDashboard extends StatelessWidget {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
+      appBar: AppBar(
+      // title:const Text(
+      //         'Admin Portal',
+      //         style: TextStyle(
+      //           fontSize: 34,
+      //           fontFamily: 'Montserrat',
+      //           fontWeight: FontWeight.bold,
+      //           color: Color.fromARGB(255, 255, 255, 255),
+      //         ),
+      //       ),
+      toolbarHeight: 70,
+
+      title: Padding(
+        padding: const EdgeInsets.only(
+          top: 2.0,
+          
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+
+          children: <Widget>[
+            Stack(
+              
+              children: [
+
+                ClipPath(
+                  
+                  clipper: HexagonClipper(),
+                  child: Transform.scale(
+                    
+                    scale: 0.96,
+                    child: Container(
+                      color: Colors.white,
+                      width: 60,
+                      height: 60,
+                    ),
+                  ),
+                ),
+                ClipPath(
+                  clipper: HexagonClipper(),
+                  child: Image.asset(
+                    'assets/mainlogo.png',
+                    width: 60,
+                    height: 60,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ],
+            ),
+            // const SizedBox(width:),
+          ],
+        ),
+      ),
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      
+      flexibleSpace: Container(
+        decoration: BoxDecoration(
+          // borderRadius: BorderRadius.circular(24),
+          gradient: const LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Color(0xff0FA697),
+              Color(0xff45BF7A),
+              Color(0xff0DF205),
+            ],
+          ),
+        ),
+      ),
+    ),
       body: SingleChildScrollView(
         child: Column(
           children: [
-            SizedBox(height: size.height * 0.2),
-            const Text(
-              'Admin Portal',
-              style: TextStyle(
-                fontSize: 34,
-                fontFamily: 'Montserrat',
-                fontWeight: FontWeight.bold,
-                color: Color.fromARGB(255, 105, 170, 0),
-              ),
-            ),
+            SizedBox(height: size.height * 0.1),
+            Text(
+  'Admin Portal',
+  style: TextStyle(
+    fontSize: 34,
+    fontFamily: 'Montserrat',
+    fontWeight: FontWeight.bold,
+    foreground: Paint()
+      ..shader = LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [
+          Color(0xff0FA697),
+          Color(0xff45BF7A),
+          Color(0xff0DF205),
+        ],
+      ).createShader(Rect.fromLTWH(0.0, 0.0, 200.0, 70.0)),
+  ),
+)
+,
             SizedBox(height: size.height * 0.1),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -402,3 +483,24 @@ class AdminDashboard extends StatelessWidget {
     );
   }
 }
+
+class HexagonClipper extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    final path = Path();
+    path.moveTo(size.width / 2, 0);
+    path.lineTo(size.width, size.height / 4);
+    path.lineTo(size.width, size.height * 3 / 4);
+    path.lineTo(size.width / 2, size.height);
+    path.lineTo(0, size.height * 3 / 4);
+    path.lineTo(0, size.height / 4);
+    path.close();
+    return path;
+  }
+
+  @override
+  bool shouldReclip(CustomClipper<Path> oldClipper) {
+    return false;
+  }
+}
+

@@ -298,10 +298,10 @@ class _DashboardPageState extends State<TenantDashboardPage>
           });
         } else if (details.delta.dx < 0) {
           setState(() {
-            _isSidebarOpen = false;
+           _isSidebarOpen = false;
           });
         }
-      },
+      }, 
       child: Stack(
         children: [
           if (_isSidebarOpen)

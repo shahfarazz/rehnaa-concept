@@ -142,28 +142,28 @@ class _AdminPropertyImagesPageState extends State<AdminPropertyImagesPage> {
               ElevatedButton(
                 onPressed: () async {
                   List<XFile>? pickedImages;
-                  if (kDebugMode) {
-                    // Load dummy images from assets
-                    List<Uint8List> imageBytes = await Future.wait([
-                      rootBundle
-                          .load('assets/image1.jpg')
-                          .then((data) => data.buffer.asUint8List()),
-                      rootBundle
-                          .load('assets/image2.jpg')
-                          .then((data) => data.buffer.asUint8List()),
-                    ]);
+                  // if (kDebugMode) {
+                  //   // Load dummy images from assets
+                  //   List<Uint8List> imageBytes = await Future.wait([
+                  //     rootBundle
+                  //         .load('assets/image1.jpg')
+                  //         .then((data) => data.buffer.asUint8List()),
+                  //     rootBundle
+                  //         .load('assets/image2.jpg')
+                  //         .then((data) => data.buffer.asUint8List()),
+                  //   ]);
 
-                    // Save dummy images to temporary files
-                    pickedImages = [];
-                    for (var i = 0; i < imageBytes.length; i++) {
-                      Directory tempDir = await getTemporaryDirectory();
-                      String tempPath = '${tempDir.path}/dummy_image$i.jpg';
-                      File(tempPath).writeAsBytesSync(imageBytes[i]);
-                      pickedImages.add(XFile(tempPath));
-                    }
-                  } else {
+                  //   // Save dummy images to temporary files
+                  //   pickedImages = [];
+                  //   for (var i = 0; i < imageBytes.length; i++) {
+                  //     Directory tempDir = await getTemporaryDirectory();
+                  //     String tempPath = '${tempDir.path}/dummy_image$i.jpg';
+                  //     File(tempPath).writeAsBytesSync(imageBytes[i]);
+                  //     pickedImages.add(XFile(tempPath));
+                  //   }
+                  // } else {
                     pickedImages = await ImagePicker().pickMultiImage();
-                  }
+                  // }
 
                   if (pickedImages != null && pickedImages.isNotEmpty) {
                     XFile firstImage = pickedImages[0]; // Get the first image
