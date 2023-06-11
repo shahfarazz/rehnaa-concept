@@ -162,6 +162,8 @@ class _LandlordPropertiesPageState extends State<LandlordPropertiesPage>
                       lastName: properties[index].landlord?.lastName ?? '',
                       pathToImage: properties[index].landlord?.pathToImage ??
                           'assets/userimage.png',
+                        location: properties[index].location,
+                        address: properties[index].address,
                     ),
                   ),
                 );
