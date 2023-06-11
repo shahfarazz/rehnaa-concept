@@ -10,23 +10,25 @@ class AdminDashboard extends StatelessWidget {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
-      toolbarHeight: 70,
-
-      title:
-       Container(
+        toolbarHeight: 70,
+        title: Container(
           alignment: Alignment.topLeft,
           child: Padding(
-            padding: EdgeInsets.only(left: 0.0), // Adjust the left padding as needed
-            child:Text(
-          'Rehnaa ',
-          style: TextStyle(
-            fontSize:30,
-            fontFamily: 'Montserrat',
-            // fontWeight: FontWeight.bold,
-            color: Colors.white,
-            // letterSpacing: 3.0, // Adjust the value as needed
+            padding:
+                EdgeInsets.only(left: 0.0), // Adjust the left padding as needed
+            child: Text(
+              'Rehnaa ',
+              style: TextStyle(
+                fontSize: 30,
+                fontFamily: 'Montserrat',
+                // fontWeight: FontWeight.bold,
+                color: Colors.white,
+                // letterSpacing: 3.0, // Adjust the value as needed
+              ),
+            ),
           ),
         ),
+<<<<<<< HEAD
   ),
 )
 ,
@@ -93,33 +95,86 @@ class AdminDashboard extends StatelessWidget {
                     fit: BoxFit.cover,
                   ),
                 ),
+=======
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            // borderRadius: BorderRadius.circular(24),
+            gradient: const LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Color(0xff0FA697),
+                Color(0xff45BF7A),
+                Color(0xff0DF205),
+>>>>>>> 26b9b6a8041ad2eb12d2e3084f53de04a75d9e4d
               ],
             ),
-            // const SizedBox(width:),
-          ],
+          ),
         ),
       ),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            SizedBox(height: size.height * 0.03),
+
+            Padding(
+              padding: const EdgeInsets.only(
+                top: 2.0,
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Stack(
+                    children: [
+                      ClipPath(
+                        clipper: HexagonClipper(),
+                        child: Transform.scale(
+                          scale: 0.96,
+                          child: Container(
+                            color: Colors.white,
+                            width: 120,
+                            height: 120,
+                          ),
+                        ),
+                      ),
+                      ClipPath(
+                        clipper: HexagonClipper(),
+                        child: Image.asset(
+                          'assets/mainlogo.png',
+                          width: 120,
+                          height: 120,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ],
+                  ),
+                  // const SizedBox(width:),
+                ],
+              ),
+            ),
 
             // SizedBox(height: size.height * 0.1),
             // Text(
-  // 'Rehnaa',
-  // style: TextStyle(
-  //   fontSize: 34,
-  //   fontFamily: 'Montserrat',
-  //   // color: Color.fromARGB(255, 0, 0, 0),
-  //   fontWeight: FontWeight.bold,
-  //   color: Color.fromARGB(255, 31, 27, 27),
-    // foreground: Paint()
-    //   ..shader = LinearGradient(
-    //     begin: Alignment.topLeft,
-    //     end: Alignment.bottomRight,
-    //     colors: [
-    //       Color(0xff0FA697),
-    //       Color(0xff45BF7A),
-    //       Color(0xff0DF205),
-    //     ],
-    //   ).createShader(Rect.fromLTWH(0.0, 0.0, 200.0, 70.0)),
-  // ),
+            // 'Rehnaa',
+            // style: TextStyle(
+            //   fontSize: 34,
+            //   fontFamily: 'Montserrat',
+            //   // color: Color.fromARGB(255, 0, 0, 0),
+            //   fontWeight: FontWeight.bold,
+            //   color: Color.fromARGB(255, 31, 27, 27),
+            // foreground: Paint()
+            //   ..shader = LinearGradient(
+            //     begin: Alignment.topLeft,
+            //     end: Alignment.bottomRight,
+            //     colors: [
+            //       Color(0xff0FA697),
+            //       Color(0xff45BF7A),
+            //       Color(0xff0DF205),
+            //     ],
+            //   ).createShader(Rect.fromLTWH(0.0, 0.0, 200.0, 70.0)),
+            // ),
 // )
 // ,
             SizedBox(height: size.height * 0.05),
@@ -181,7 +236,7 @@ class AdminDashboard extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => AdminPropertyImagesPage(),
+                          builder: (context) => AdminPropertyInputPage(),
                         ),
                       );
                     },
@@ -193,13 +248,13 @@ class AdminDashboard extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(
-                          Icons.photo_library,
+                          Icons.apartment,
                           size: 60,
                           color: Colors.white,
                         ),
                         SizedBox(height: 10),
                         Text(
-                          'Property Pictures',
+                          'Property Input',
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 18,
@@ -522,4 +577,3 @@ class HexagonClipper extends CustomClipper<Path> {
     return false;
   }
 }
-
