@@ -107,65 +107,82 @@ class _AdmninRequestsPageState extends State<AdmninRequestsPage> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: EdgeInsets.fromLTRB(
-            size.width * 0.0,
-            size.height * 0.1,
-            0,
-            0,
+      appBar: AppBar(
+        title: Text('Withdrawal Requests'),
+        flexibleSpace: Container(
+        decoration: BoxDecoration(
+          // borderRadius: BorderRadius.circular(24),
+          gradient: const LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Color(0xff0FA697),
+              Color(0xff45BF7A),
+              Color(0xff0DF205),
+            ],
           ),
+        ),
+      ),
+      ),
+      body: SingleChildScrollView(
+        // child: Padding(
+          // padding: EdgeInsets.fromLTRB(
+          //   // size.width * 0.0,
+          //   // size.height * 0.1,
+          //   0,
+          //   0,
+          // ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                children: [
-                  IconButton(
-                    icon: Icon(
-                      Icons.arrow_back,
-                      color: Colors.green,
-                    ),
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                  ),
-                ],
-              ),
-              Padding(
-                padding: EdgeInsets.fromLTRB(
-                  size.width * 0.1,
-                  size.height * 0.0,
-                  0,
-                  0,
-                ),
-                child: Text(
-                  'Requests',
-                  style: TextStyle(
-                    fontSize: 34,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: 'Montserrat',
-                    color: Colors.green,
-                  ),
-                ),
-              ),
-              SizedBox(height: size.height * 0.05),
-              Padding(
-                padding: EdgeInsets.fromLTRB(
-                  size.width * 0.1,
-                  size.height * 0.0,
-                  0,
-                  0,
-                ),
-                child: Text(
-                  'Withdrawal Requests:',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontFamily: 'Montserrat',
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                  ),
-                ),
-              ),
+              // Row(
+              //   children: [
+              //     IconButton(
+              //       icon: Icon(
+              //         Icons.arrow_back,
+              //         color: Colors.green,
+              //       ),
+              //       onPressed: () {
+              //         Navigator.pop(context);
+              //       },
+              //     ),
+              //   ],
+              // ),
+              // Padding(
+              //   padding: EdgeInsets.fromLTRB(
+              //     size.width * 0.1,
+              //     size.height * 0.0,
+              //     0,
+              //     0,
+              //   ),
+              //   child: Text(
+              //     'Requests',
+              //     style: TextStyle(
+              //       fontSize: 34,
+              //       fontWeight: FontWeight.bold,
+              //       fontFamily: 'Montserrat',
+              //       color: Colors.green,
+              //     ),
+              //   ),
+              // ),
+              // SizedBox(height: size.height * 0.07),
+              // Padding(
+              //   padding: EdgeInsets.fromLTRB(
+              //     size.width * 0.1,
+              //     size.height * 0.0,
+              //     0,
+              //     0,
+              //   ),
+              //   child: Text(
+              //     'Withdrawal Requests:',
+              //     style: TextStyle(
+              //       fontSize: 20,
+              //       fontFamily: 'Montserrat',
+              //       fontWeight: FontWeight.bold,
+              //       color: Colors.black,
+              //     ),
+              //   ),
+              // ),
               SizedBox(height: 10),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16),
@@ -228,7 +245,7 @@ class _AdmninRequestsPageState extends State<AdmninRequestsPage> {
             ],
           ),
         ),
-      ),
+      // ),
     );
   }
 }

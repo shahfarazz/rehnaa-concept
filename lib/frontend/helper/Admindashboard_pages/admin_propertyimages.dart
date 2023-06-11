@@ -199,6 +199,20 @@ class _AdminPropertyImagesPageState extends State<AdminPropertyImagesPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Property Images'),
+        flexibleSpace: Container(
+        decoration: BoxDecoration(
+          // borderRadius: BorderRadius.circular(24),
+          gradient: const LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Color(0xff0FA697),
+              Color(0xff45BF7A),
+              Color(0xff0DF205),
+            ],
+          ),
+        ),
+      ),
       ),
       body: Padding(
         padding: const EdgeInsets.only(top: 16.0),

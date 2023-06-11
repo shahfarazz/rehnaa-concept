@@ -177,6 +177,20 @@ class _AdminLandlordTenantInfoPageState
     return Scaffold(
       appBar: AppBar(
         title: Text('Landlord & Tenant Info'),
+        flexibleSpace: Container(
+        decoration: BoxDecoration(
+          // borderRadius: BorderRadius.circular(24),
+          gradient: const LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Color(0xff0FA697),
+              Color(0xff45BF7A),
+              Color(0xff0DF205),
+            ],
+          ),
+        ),
+      ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
