@@ -8,6 +8,7 @@ import 'package:rehnaa/frontend/Screens/login_page.dart';
 import 'package:rehnaa/frontend/Screens/vouchers.dart';
 import 'package:rehnaa/frontend/helper/Landlorddashboard_pages/landlord_dashboard_content.dart';
 import 'package:rehnaa/frontend/helper/Landlorddashboard_pages/landlord_profile.dart';
+import '../../helper/Dealerdashboard_pages/landlordonboarded.dart';
 import '../../helper/Landlorddashboard_pages/landlord_renthistory.dart';
 import '../../helper/Landlorddashboard_pages/landlord_tenants.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -131,6 +132,7 @@ class _DealerDashboardPageState extends State<DealerDashboardPage>
                             // LandlordPropertiesPage(uid: widget.uid),
                             // LandlordRentHistoryPage(uid: widget.uid),
                             // LandlordProfilePage(uid: widget.uid),
+                            LandlordOnboardedPage(),
                           ],
                         ),
                       ),

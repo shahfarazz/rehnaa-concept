@@ -1,259 +1,165 @@
-import 'dart:async';
-import 'dart:math';
-
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:rehnaa/backend/models/tenantsmodel.dart';
-import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+import 'package:rehnaa/frontend/helper/Dealerdashboard_pages/landlordonboardedinfo.dart';
 
-import 'landlordonboardedinfo.dart';
+class Landlord {
+  final String name;
+  final String date;
+  final String address;
+
+  Landlord({
+    required this.name,
+    required this.date,
+    required this.address,
+  });
+}
 
 class LandlordOnboardedPage extends StatefulWidget {
-  final String uid; // UID of the landlord
-
-  const LandlordOnboardedPage({super.key, required this.uid});
-
   @override
-  // ignore: library_private_types_in_public_api
   _LandlordOnboardedPageState createState() => _LandlordOnboardedPageState();
 }
 
-class _LandlordOnboardedPageState extends State<LandlordOnboardedPage>
-    with AutomaticKeepAliveClientMixin<LandlordOnboardedPage> {
-  final PageController _pageController = PageController(initialPage: 0);
-  List<Tenant> _tenants = [];
-  // int _currentPage = 0;
-  final int _pageSize = 4; // Number of tenants to show per page
-  final Completer<void> _loadTenantsCompleter =
-      Completer<void>(); // Completer for canceling the Future.delayed() call
+class _LandlordOnboardedPageState extends State<LandlordOnboardedPage> {
+  final List<Landlord> landlords = [
+    Landlord(
+      name: 'Arshad Ali',
+      date: '9 June 2022',
+      address: '26 J Johar Town',
+    ),
+    Landlord(
+      name: 'Akbar Khan',
+      date: '15 June 2022',
+      address: '21 H Johar Town',
+    ),
+    Landlord(
+      name: 'John Doe',
+      date: '20 June 2022',
+      address: '15 X Street',
+    ),
+    Landlord(
+      name: 'Jane Smith',
+      date: '30 June 2022',
+      address: '10 Y Avenue',
+    ),
+  ];
 
-  @override
-  bool get wantKeepAlive => true;
+  List<Landlord> filteredLandlords = [];
+  late FocusNode searchFocusNode;
+  final searchController = TextEditingController();
+  bool isTyping = false;
 
   @override
   void initState() {
     super.initState();
-    _loadTenants();
+    filteredLandlords = List.from(landlords);
+    searchFocusNode = FocusNode();
+    searchController.addListener(onSearchTextChanged);
+  }
+
+  void onSearchTextChanged() {
+    final query = searchController.text;
+    filterLandlords(query);
+  }
+
+  void filterLandlords(String query) {
+    setState(() {
+      filteredLandlords = landlords.where((landlord) {
+        final nameLower = landlord.name.toLowerCase();
+        final queryLower = query.toLowerCase();
+        return nameLower.contains(queryLower);
+      }).toList();
+      isTyping = query.isNotEmpty;
+    });
   }
 
   @override
   void dispose() {
-    _loadTenantsCompleter
-        .complete(); // Complete the Completer to cancel the Future.delayed() call
-    _pageController.dispose(); // Dispose the PageController
+    searchFocusNode.dispose();
+    searchController.dispose();
     super.dispose();
   }
 
-  // Fetch tenant data from Firestore
-  Future<void> _loadTenants() async {
-    DocumentSnapshot<Map<String, dynamic>> landlordSnapshot =
-        await FirebaseFirestore.instance
-            .collection('Landlords')
-            .doc(widget.uid)
-            .get();
-
-    if (landlordSnapshot.exists) {
-      Map<String, dynamic>? landlordData = landlordSnapshot.data();
-      if (landlordData != null && landlordData['tenantRef'] != null) {
-        // Extract tenant references from landlord data
-        List<DocumentReference<Map<String, dynamic>>> tenantRefs =
-            (landlordData['tenantRef'] as List<dynamic>)
-                .cast<DocumentReference<Map<String, dynamic>>>();
-
-        // Fetch tenant documents from Firestore
-        List<Future<DocumentSnapshot<Map<String, dynamic>>>> tenantSnapshots =
-            tenantRefs.map((ref) => ref.get()).toList();
-
-        List<DocumentSnapshot<Map<String, dynamic>>> tenantsSnapshots =
-            await Future.wait(tenantSnapshots);
-
-        List<Tenant> fetchedTenants = [];
-
-        // Convert tenant documents to Tenant objects
-        for (var tenantSnapshot in tenantsSnapshots) {
-          if (tenantSnapshot.exists) {
-            Map<String, dynamic>? tenantData = tenantSnapshot.data();
-
-            if (tenantData != null) {
-              fetchedTenants.add(Tenant.fromJson(
-                  tenantData)); // Create a TenantModel object from the tenantData
-            }
-          }
-        }
-
-        if (mounted) {
-          setState(() {
-            _tenants = fetchedTenants;
-          });
-        }
-      }
-    }
-  }
-
-  // // Navigate to a specific page
-  // void _goToPage(int page) {
-  //   if (mounted) {
-  //     _pageController.animateToPage(
-  //       page,
-  //       duration: const Duration(milliseconds: 500),
-  //       curve: Curves.easeInOut,
-  //     );
-  //   }
-  // }
-
-  // Build a card widget for a tenant
-  Widget _buildTenantCard(Tenant tenant) {
-    return GestureDetector(
-      onTap: () {
-        // Navigate to tenant info page
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => LandlordsOnboardedInfoPage(),
-          ),
-        );
-      },
-      child: Card(
-        elevation: 4.0,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20.0),
-        ),
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20.0),
-            color: Colors.white,
-          ),
-          padding: const EdgeInsets.all(16.0),
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Row(
-                children: [
-                  Text(
-                    'Tenant Name: ',
-                    style: GoogleFonts.montserrat(
-                      fontSize: 16.0,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black,
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(30.0),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      spreadRadius: 1,
+                      blurRadius: 7,
+                      offset: Offset(0, 3),
                     ),
+                  ],
+                ),
+                child: TextField(
+                  focusNode: searchFocusNode,
+                  controller: searchController,
+                  onChanged: (value) => setState(() {}),
+                  style: TextStyle(
+                    color:Colors.black,
                   ),
-                  Text(
-                    '${tenant.firstName} ${tenant.lastName}',
-                    style: GoogleFonts.montserrat(
-                      fontSize: 14.0,
-                      fontWeight: FontWeight.bold,
-                      color: const Color(0xff33907c),
-                    ),
+                  decoration: InputDecoration(
+                    prefixIcon: Icon(Icons.search),
+                    hintText: 'Search by name',
+                    border: InputBorder.none,
+                    contentPadding: EdgeInsets.all(20),
                   ),
-                ],
+                ),
               ),
-              const SizedBox(height: 10.0),
-              Row(
-                children: [
-                  Text(
-                    'Rating:',
-                    style: GoogleFonts.montserrat(
-                      fontSize: 14.0,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
+              SizedBox(height: 20),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: filteredLandlords.length,
+                  itemBuilder: (context, index) {
+                    final landlord = filteredLandlords[index];
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => LandlordsOnboardedInfoPage(),
+                          ),
+                        );
+                      },
+
+                      child: Card(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10.0),
+                      ),
+                      elevation: 5.0,
+                      child: ListTile(
+                        contentPadding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+                        title: Text(landlord.name, style: TextStyle(fontWeight: FontWeight.bold)),
+                        trailing: Text(landlord.date, style: TextStyle(color: Colors.grey)),
+                        subtitle: Text(landlord.address),
+                      ),
                     ),
-                  ),
-                  Text(
-                    ' ${tenant.rating}',
-                    style: GoogleFonts.montserrat(
-                      fontSize: 14.0,
-                      fontWeight: FontWeight.bold,
-                      color: const Color(0xff33907c),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 10.0),
-              Row(
-                children: [
-                  Text(
-                    'Monthly Rent:',
-                    style: GoogleFonts.montserrat(
-                      fontSize: 14.0,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
-                  ),
-                  Text(
-                    ' ${tenant.rent}',
-                    style: GoogleFonts.montserrat(
-                      fontSize: 14.0,
-                      fontWeight: FontWeight.bold,
-                      color: const Color(0xff33907c),
-                    ),
-                  ),
-                ],
-              )
+                  );
+                },
+              ),),
             ],
           ),
         ),
       ),
     );
   }
+}
 
-  // Build a list of tenant cards for a given starting index
-  List<Widget> _buildTenantCards(int startIndex) {
-    return _tenants
-        .skip(startIndex)
-        .take(_pageSize)
-        .map((tenant) => _buildTenantCard(tenant))
-        .toList();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    super.build(context); // Ensure the parent's build method is called
-    final Size size = MediaQuery.of(context).size;
-    final int pageCount = (_tenants.length / _pageSize).ceil();
-
-    return Scaffold(
-      body: Column(
-        children: [
-          SizedBox(height: size.height * 0.03),
-          Container(
-            padding: const EdgeInsets.symmetric(vertical: 16.0),
-            alignment: Alignment.center,
-            child: Text(
-              'Tenants',
-              style: GoogleFonts.montserrat(
-                fontSize: 20.0,
-                fontWeight: FontWeight.bold,
-                color: const Color(0xff33907c),
-              ),
-            ),
-          ),
-          Expanded(
-            child: PageView.builder(
-              controller: _pageController,
-              itemCount: pageCount,
-              itemBuilder: (context, index) {
-                int startIndex = index * _pageSize;
-                return Column(
-                  children: _buildTenantCards(startIndex),
-                );
-              },
-            ),
-          ),
-          SmoothPageIndicator(
-            controller: _pageController,
-            count: max(1, pageCount.isFinite ? pageCount.toInt() : 0),
-            effect: const WormEffect(
-              dotColor: Colors.grey,
-              activeDotColor: Color(0xff33907c),
-              dotHeight: 10.0,
-              dotWidth: 10.0,
-              spacing: 8.0,
-            ),
-          ),
-          SizedBox(height: size.height * 0.03),
-        ],
-      ),
-    );
-  }
+void main() {
+  runApp(MaterialApp(
+    home: LandlordOnboardedPage(),
+    theme: ThemeData(
+      primarySwatch: Colors.green,
+      visualDensity: VisualDensity.adaptivePlatformDensity,
+    ),
+  ));
 }
