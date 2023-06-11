@@ -10,58 +10,26 @@ class AdminDashboard extends StatelessWidget {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
-      // title:const Text(
-      //         'Admin Portal',
-      //         style: TextStyle(
-      //           fontSize: 34,
-      //           fontFamily: 'Montserrat',
-      //           fontWeight: FontWeight.bold,
-      //           color: Color.fromARGB(255, 255, 255, 255),
-      //         ),
-      //       ),
       toolbarHeight: 70,
 
-      title: Padding(
-        padding: const EdgeInsets.only(
-          top: 2.0,
-          
+      title:
+       Container(
+          alignment: Alignment.topLeft,
+          child: Padding(
+            padding: EdgeInsets.only(left: 0.0), // Adjust the left padding as needed
+            child:Text(
+          'Rehnaa ',
+          style: TextStyle(
+            fontSize:30,
+            fontFamily: 'Montserrat',
+            // fontWeight: FontWeight.bold,
+            color: Colors.white,
+            // letterSpacing: 3.0, // Adjust the value as needed
+          ),
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-
-          children: <Widget>[
-            Stack(
-              
-              children: [
-
-                ClipPath(
-                  
-                  clipper: HexagonClipper(),
-                  child: Transform.scale(
-                    
-                    scale: 0.96,
-                    child: Container(
-                      color: Colors.white,
-                      width: 60,
-                      height: 60,
-                    ),
-                  ),
-                ),
-                ClipPath(
-                  clipper: HexagonClipper(),
-                  child: Image.asset(
-                    'assets/mainlogo.png',
-                    width: 60,
-                    height: 60,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              ],
-            ),
-            // const SizedBox(width:),
-          ],
-        ),
-      ),
+  ),
+)
+,
       backgroundColor: Colors.transparent,
       elevation: 0,
       
@@ -82,28 +50,79 @@ class AdminDashboard extends StatelessWidget {
     ),
       body: SingleChildScrollView(
         child: Column(
+          
           children: [
-            SizedBox(height: size.height * 0.1),
-            Text(
-  'Admin Portal',
-  style: TextStyle(
-    fontSize: 34,
-    fontFamily: 'Montserrat',
-    fontWeight: FontWeight.bold,
-    foreground: Paint()
-      ..shader = LinearGradient(
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-        colors: [
-          Color(0xff0FA697),
-          Color(0xff45BF7A),
-          Color(0xff0DF205),
-        ],
-      ).createShader(Rect.fromLTWH(0.0, 0.0, 200.0, 70.0)),
-  ),
-)
-,
-            SizedBox(height: size.height * 0.1),
+
+            SizedBox(height: size.height * 0.03),
+
+           
+
+
+ Padding(
+        padding: const EdgeInsets.only(
+          top: 2.0,
+          
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+
+          children: <Widget>[
+            Stack(
+              
+              children: [
+
+                ClipPath(
+                  
+                  clipper: HexagonClipper(),
+                  child: Transform.scale(
+                    
+                    scale: 0.96,
+                    child: Container(
+                      color: Colors.white,
+                      width: 120,
+                      height: 120,
+                    ),
+                  ),
+                ),
+                ClipPath(
+                  clipper: HexagonClipper(),
+                  child: Image.asset(
+                    'assets/mainlogo.png',
+                    width: 120,
+                    height: 120,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ],
+            ),
+            // const SizedBox(width:),
+          ],
+        ),
+      ),
+
+            // SizedBox(height: size.height * 0.1),
+            // Text(
+  // 'Rehnaa',
+  // style: TextStyle(
+  //   fontSize: 34,
+  //   fontFamily: 'Montserrat',
+  //   // color: Color.fromARGB(255, 0, 0, 0),
+  //   fontWeight: FontWeight.bold,
+  //   color: Color.fromARGB(255, 31, 27, 27),
+    // foreground: Paint()
+    //   ..shader = LinearGradient(
+    //     begin: Alignment.topLeft,
+    //     end: Alignment.bottomRight,
+    //     colors: [
+    //       Color(0xff0FA697),
+    //       Color(0xff45BF7A),
+    //       Color(0xff0DF205),
+    //     ],
+    //   ).createShader(Rect.fromLTWH(0.0, 0.0, 200.0, 70.0)),
+  // ),
+// )
+// ,
+            SizedBox(height: size.height * 0.05),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
