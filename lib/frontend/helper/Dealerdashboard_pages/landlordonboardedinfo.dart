@@ -32,7 +32,7 @@ class ContractCard extends StatelessWidget {
       ),
       elevation: 5, // shadow
       child: Padding(
-        padding: const EdgeInsets.all(10),
+        padding: const EdgeInsets.all(20.0),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
@@ -132,7 +132,7 @@ class LandlordsOnboardedInfoPage extends StatelessWidget {
                 child: SingleChildScrollView(
                   child: Center(
                     child: Padding(
-                      padding: const EdgeInsets.all(1.0),
+                      padding: const EdgeInsets.all(20.0),
                       child: Card(
                         color: const Color.fromARGB(255, 235, 235, 235),
                         shape: RoundedRectangleBorder(
