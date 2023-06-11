@@ -10,6 +10,7 @@ import 'package:rehnaa/frontend/helper/Dealerdashboard_pages/dealer_profile.dart
 import 'package:rehnaa/frontend/helper/Landlorddashboard_pages/landlord_dashboard_content.dart';
 import 'package:rehnaa/frontend/helper/Landlorddashboard_pages/landlord_profile.dart';
 import '../../helper/Dealerdashboard_pages/dealer_dashboard_content.dart';
+import '../../helper/Dealerdashboard_pages/events.dart';
 import '../../helper/Dealerdashboard_pages/landlordonboarded.dart';
 import '../../helper/Landlorddashboard_pages/landlord_renthistory.dart';
 import '../../helper/Landlorddashboard_pages/landlord_tenants.dart';
@@ -363,6 +364,19 @@ class _DealerDashboardPageState extends State<DealerDashboardPage>
                         // _closeSidebar();
                       },
                       showBadge: true,
+                    ),
+                     _buildSidebarItem(
+                      icon: Icons.local_play,
+                      label: 'Events',
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => EventsPage(),
+                          ),
+                        );
+                        // _closeSidebar();
+                      },
                     ),
                     _buildSidebarItem(
                       icon: Icons.lock,
