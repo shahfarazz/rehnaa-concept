@@ -188,26 +188,45 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                         FirebaseFirestore.instance
                             .collection('Notifications')
                             .doc(widget.uid)
-                            .update({
-                          // Union of previous notifications plus a new notification that i will create now
-                          'notifications': FieldValue.arrayUnion([
-                            {
-                              'title':
-                                  'Withdraw Request by ${tenant.firstName + ' ' + tenant.lastName}',
-                              'amount': '\$${tenant.rent.toString()}',
-                            }
-                          ]),
-                        });
+                            .set(
+                          {
+                            // Union of previous notifications plus a new notification that i will create now
+                            'notifications': FieldValue.arrayUnion([
+                              {
+                                'title':
+                                    'Withdraw Request by ${tenant.firstName + ' ' + tenant.lastName}',
+                                'amount': 'Rs${tenant.rent}',
+                              }
+                            ]),
+                          },
+                          SetOptions(merge: true),
+                        );
                       } catch (e) {
                         print('error is $e');
                       }
                       FirebaseFirestore.instance
                           .collection('Tenants')
                           .doc(widget.uid)
-                          .update({
+                          .set({
                         // Union of previous notifications plus a new notification that i will create now
                         'isWithdraw': true,
-                      });
+                      }, SetOptions(merge: true));
+
+                      FirebaseFirestore.instance
+                          .collection('AdminRequests')
+                          .doc(widget.uid)
+                          .set({
+                        // Union of previous notifications plus a new notification that i will create now
+                        'paymentRequest': FieldValue.arrayUnion([
+                          {
+                            'fullname':
+                                '${tenant.firstName + ' ' + tenant.lastName}',
+                            'amount': tenant.rent,
+                            'paymentMethod': selectedOption,
+                            'uid': widget.uid,
+                          }
+                        ]),
+                      }, SetOptions(merge: true));
 
                       setState(() {
                         isWithdraw = true;

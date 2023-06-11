@@ -198,24 +198,39 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
                       FirebaseFirestore.instance
                           .collection('Notifications')
                           .doc(widget.uid)
-                          .update({
+                          .set({
                         // Union of previous notifications plus a new notification that i will create now
                         'notifications': FieldValue.arrayUnion([
                           {
                             'title':
                                 'Withdraw Request by ${landlord.firstName + ' ' + landlord.lastName}',
-                            'amount': '\$${landlord.balance.toString()}',
+                            'amount': 'Rs${landlord.balance.toString()}',
                           }
                         ]),
-                      });
+                      }, SetOptions(merge: true));
                       FirebaseFirestore.instance
                           .collection('Landlords')
                           .doc(widget.uid)
-                          .update({
+                          .set({
                         // Union of previous notifications plus a new notification that i will create now
                         'isWithdraw': true,
-                      });
+                      }, SetOptions(merge: true));
                       Navigator.pop(context);
+                      FirebaseFirestore.instance
+                          .collection('AdminRequests')
+                          .doc(widget.uid)
+                          .set({
+                        // Union of previous notifications plus a new notification that i will create now
+                        'withdrawRequest': FieldValue.arrayUnion([
+                          {
+                            'fullname':
+                                '${landlord.firstName + ' ' + landlord.lastName}',
+                            'amount': landlord.balance,
+                            'paymentMethod': selectedOption,
+                            'uid': widget.uid,
+                          }
+                        ]),
+                      }, SetOptions(merge: true));
 
                       setState(() {
                         isWithdraw = true;
