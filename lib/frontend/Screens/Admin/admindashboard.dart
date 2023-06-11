@@ -28,74 +28,6 @@ class AdminDashboard extends StatelessWidget {
             ),
           ),
         ),
-<<<<<<< HEAD
-  ),
-)
-,
-      backgroundColor: Colors.transparent,
-      elevation: 0,
-      
-      flexibleSpace: Container(
-        decoration: BoxDecoration(
-          // borderRadius: BorderRadius.circular(24),
-          gradient: const LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Color(0xff0FA697),
-              Color(0xff45BF7A),
-              Color(0xff0DF205),
-            ],
-          ),
-        ),
-      ),  
-    ),
-      body: SingleChildScrollView(
-        child: Column(
-          
-          children: [
-
-            SizedBox(height: size.height * 0.03),
-
-           
-
-
- Padding(
-        padding: const EdgeInsets.only(
-          top: 2.0,
-          
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-
-          children: <Widget>[
-            Stack(
-              
-              children: [
-
-                ClipPath(
-                  
-                  clipper: HexagonClipper(),
-                  child: Transform.scale(
-                    
-                    scale: 0.96,
-                    child: Container(
-                      color: Colors.white,
-                      width: 120,
-                      height: 120,
-                    ),
-                  ),
-                ),
-                ClipPath(
-                  clipper: HexagonClipper(),
-                  child: Image.asset(
-                    'assets/mainlogo.png',
-                    width: 120,
-                    height: 120,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-=======
         backgroundColor: Colors.transparent,
         elevation: 0,
         flexibleSpace: Container(
@@ -108,7 +40,6 @@ class AdminDashboard extends StatelessWidget {
                 Color(0xff0FA697),
                 Color(0xff45BF7A),
                 Color(0xff0DF205),
->>>>>>> 26b9b6a8041ad2eb12d2e3084f53de04a75d9e4d
               ],
             ),
           ),
