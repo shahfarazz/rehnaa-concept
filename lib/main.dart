@@ -8,13 +8,14 @@ import 'frontend/Screens/Admin/admindashboard.dart';
 import 'frontend/Screens/Tenant/tenant_dashboard.dart';
 import 'frontend/Screens/Tenant/tenantsignupdetails.dart';
 import 'frontend/Screens/splash.dart';
+import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
-  runApp(
-    const MyApp(),
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
   );
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -30,11 +31,12 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
+        home: LoginPage(),
         // home: const SplashScreen(),
         // home: TenantDashboardPage(
         //     uid: 'K55YzmkUXt09OgFwnDuT'), //TODO remove this Jugaar
         // home: TeanantsSignUpDetailsPage(),
-        home: AdminDashboard(),
+        // home: AdminDashboard(),
       ),
     );
   }

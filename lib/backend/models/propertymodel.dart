@@ -13,6 +13,7 @@ class Property {
   final String description;
   final String title;
   final String location;
+  final String address;
   final double price;
   final DocumentReference<Map<String, dynamic>>? landlordRef;
   Landlord? landlord;
@@ -32,6 +33,7 @@ class Property {
     required this.description,
     required this.title,
     required this.location,
+    required this.address,
     required this.price,
     this.landlordRef,
     this.landlord,
@@ -58,6 +60,7 @@ class Property {
       rehnaaRating: json['rehnaaRating'].toDouble(),
       tenantRating: json['tenantRating'].toDouble(),
       tenantReview: json['tenantReview'],
+      address: json['address'] ?? 'No address provided',
     );
 
     return property;
