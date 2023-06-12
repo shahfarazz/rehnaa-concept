@@ -6,8 +6,11 @@ import 'package:rehnaa/frontend/Screens/privacypolicy.dart';
 import 'package:rehnaa/frontend/Screens/faq.dart';
 import 'package:rehnaa/frontend/Screens/login_page.dart';
 import 'package:rehnaa/frontend/Screens/vouchers.dart';
+import 'package:rehnaa/frontend/helper/Dealerdashboard_pages/dealer_profile.dart';
 import 'package:rehnaa/frontend/helper/Landlorddashboard_pages/landlord_dashboard_content.dart';
 import 'package:rehnaa/frontend/helper/Landlorddashboard_pages/landlord_profile.dart';
+import '../../helper/Dealerdashboard_pages/dealer_dashboard_content.dart';
+import '../../helper/Dealerdashboard_pages/events.dart';
 import '../../helper/Dealerdashboard_pages/landlordonboarded.dart';
 import '../../helper/Landlorddashboard_pages/landlord_renthistory.dart';
 import '../../helper/Landlorddashboard_pages/landlord_tenants.dart';
@@ -127,12 +130,11 @@ class _DealerDashboardPageState extends State<DealerDashboardPage>
                             });
                           },
                           children: <Widget>[
-                            // LandlordDashboardContent(uid: widget.uid),
-                            // LandlordTenantsPage(uid: widget.uid),
-                            // LandlordPropertiesPage(uid: widget.uid),
-                            // LandlordRentHistoryPage(uid: widget.uid),
-                            // LandlordProfilePage(uid: widget.uid),
+                            // DealerDashboardContent(),
                             LandlordOnboardedPage(),
+                            // DealerRentHistoryPage(),
+                            // DealerProfilePage(uid: widget.uid),
+
                           ],
                         ),
                       ),
@@ -362,6 +364,19 @@ class _DealerDashboardPageState extends State<DealerDashboardPage>
                         // _closeSidebar();
                       },
                       showBadge: true,
+                    ),
+                     _buildSidebarItem(
+                      icon: Icons.local_play,
+                      label: 'Events',
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => EventsPage(),
+                          ),
+                        );
+                        // _closeSidebar();
+                      },
                     ),
                     _buildSidebarItem(
                       icon: Icons.lock,
@@ -666,9 +681,9 @@ class _DealerDashboardPageState extends State<DealerDashboardPage>
         currentIndex: _currentIndex,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Tenant'),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.home_work), label: 'Property'),
+          BottomNavigationBarItem(icon: Icon(Icons.people), label: 'Onboarding'),
+          // BottomNavigationBarItem(
+          //     icon: Icon(Icons.money), label: 'Withdraw'),
           BottomNavigationBarItem(icon: Icon(Icons.history), label: 'History'),
           BottomNavigationBarItem(
               icon: Icon(Icons.person_pin), label: 'Profile'),
@@ -676,6 +691,8 @@ class _DealerDashboardPageState extends State<DealerDashboardPage>
       ),
     );
   }
+
+
 }
 
 class HexagonClipper extends CustomClipper<Path> {

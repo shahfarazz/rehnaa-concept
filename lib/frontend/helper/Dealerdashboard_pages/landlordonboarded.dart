@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:rehnaa/frontend/helper/Dealerdashboard_pages/landlordonboardedinfo.dart';
 
 class Landlord {
@@ -115,9 +116,19 @@ class _LandlordOnboardedPageState extends State<LandlordOnboardedPage> {
                   ),
                 ),
               ),
-              SizedBox(height: 20),
+              SizedBox(height: 60),
+              
+              Container(child: Text("Landlords Onboarded", style: GoogleFonts.montserrat(
+                              fontSize: 24,
+                              color: const Color(0xff33907c),
+                              fontWeight: FontWeight.bold,)),),
+
+              SizedBox(height: 40),
+              
+
               Expanded(
                 child: ListView.builder(
+                  
                   itemCount: filteredLandlords.length,
                   itemBuilder: (context, index) {
                     final landlord = filteredLandlords[index];

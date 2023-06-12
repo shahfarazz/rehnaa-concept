@@ -6,7 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../backend/models/propertymodel.dart';
 
-class PropertyPage extends StatefulWidget {
+class TenantPropertyPage extends StatefulWidget {
   final Property property;
   final String firstName;
   final String lastName;
@@ -14,7 +14,7 @@ class PropertyPage extends StatefulWidget {
   final String location;
   final String address;
 
-  const PropertyPage(
+  const TenantPropertyPage(
       {super.key,
       required this.property,
       required this.firstName,
@@ -25,10 +25,10 @@ class PropertyPage extends StatefulWidget {
 
   @override
   // ignore: library_private_types_in_public_api
-  _PropertyPageState createState() => _PropertyPageState();
+  _TenantPropertyPageState createState() => _TenantPropertyPageState();
 }
 
-class _PropertyPageState extends State<PropertyPage> {
+class _TenantPropertyPageState extends State<TenantPropertyPage> {
   int currentIndex = 0;
 
   @override
@@ -241,6 +241,7 @@ class PropertyDetails extends StatelessWidget {
               ),
               SizedBox(height: screenHeight * 0.01),
               Text(
+                // "Fawazzz",
                 property.description,
                 style: GoogleFonts.montserrat(),
               ),
@@ -287,7 +288,7 @@ class PropertyDetails extends StatelessWidget {
                           physics: const AlwaysScrollableScrollPhysics(),
                           child: Row(
                             children: [
-                              SizedBox(width: screenWidth * 0.025),
+                              SizedBox(width: screenWidth * 0.035),
                               if (property.beds > 0)
                                 PropertySpecs(
                                   icon: Icons.king_bed_outlined,
@@ -379,17 +380,17 @@ class PropertyDetails extends StatelessWidget {
                     ],
                   ),
                   const Spacer(),
-                  // GradientButton(
-                  //   onPressed: () {
-                  //     // handle request button press
-                  //   },
-                  //   text: 'Request',
-                  //   gradientColors: const [
-                  //     Color(0xff0FA697),
-                  //     Color(0xff45BF7A),
-                  //     Color(0xff0DF205),
-                  //   ],
-                  // ),
+                  GradientButton(
+                    onPressed: () {
+                      // handle request button press
+                    },
+                    text: 'Request',
+                    gradientColors: const [
+                      Color(0xff0FA697),
+                      Color(0xff45BF7A),
+                      Color(0xff0DF205),
+                    ],
+                  ),
                 ],
               ),
               SizedBox(height: screenHeight * 0.03),

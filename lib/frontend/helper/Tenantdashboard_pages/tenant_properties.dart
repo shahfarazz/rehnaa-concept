@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/Tenant_propertyinfo.dart';
 import '../../../backend/models/propertymodel.dart';
 import '../Landlorddashboard_pages/landlord_propertyinfo.dart';
 import '../Landlorddashboard_pages/landlordproperties.dart';
@@ -128,12 +129,14 @@ class _TenantPropertiesPageState extends State<TenantPropertiesPage>
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => PropertyPage(
+                    builder: (_) => TenantPropertyPage(
                       property: properties[index],
                       firstName: properties[index].landlord?.firstName ?? '',
                       lastName: properties[index].landlord?.lastName ?? '',
                       pathToImage: properties[index].landlord?.pathToImage ??
                           'assets/userimage.png',
+                      location: properties[index].location,
+                      address: properties[index].address,
                     ),
                   ),
                 );
