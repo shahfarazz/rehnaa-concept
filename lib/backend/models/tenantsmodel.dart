@@ -48,7 +48,7 @@ class Tenant {
       cnicNumber: json['cnicNumber'] ?? 'N/A',
       emailOrPhone: json['emailOrPhone'] ?? 'N/A',
       tasdeeqVerification: json['tasdeeqVerification'] ?? false,
-      familyMembers: json['familyMembers'] ?? [],
+      familyMembers: json['familyMembers'] ?? 0,
       landlordRef: json['landlordRef'],
       pathToImage: json['pathToImage'] ?? 'assets/defaultimage.png',
       policeVerification: json['policeVerification'] ?? false,

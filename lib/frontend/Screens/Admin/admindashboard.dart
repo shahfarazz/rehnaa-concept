@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:rehnaa/frontend/helper/Admindashboard_pages/admin_landlord_requests.dart';
+import 'package:rehnaa/frontend/helper/Admindashboard_pages/admin_tenantinput.dart';
 
 import '../../helper/Admindashboard_pages/admin_landlord_tenant_info.dart';
 import '../../helper/Admindashboard_pages/admin_landlordinput.dart';
@@ -348,6 +349,12 @@ class AdminDashboard extends StatelessWidget {
                   child: ElevatedButton(
                     onPressed: () {
                       // Handle Create more unlimited user profiles button press
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => AdminTenantsInputPage(),
+                        ),
+                      );
                     },
                     style: ElevatedButton.styleFrom(
                       primary: Colors.transparent,
@@ -363,7 +370,7 @@ class AdminDashboard extends StatelessWidget {
                         ),
                         SizedBox(height: 10),
                         Text(
-                          'Create More\nUser Profiles',
+                          'More\nTenant Profiles',
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 14,
