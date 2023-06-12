@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:rehnaa/frontend/helper/Admindashboard_pages/admin_landlord_requests.dart';
 
 import '../../helper/Admindashboard_pages/admin_landlord_tenant_info.dart';
-import '../../helper/Admindashboard_pages/admin_propertyimages.dart';
+import '../../helper/Admindashboard_pages/admin_landlordinput.dart';
+import '../../helper/Admindashboard_pages/admin_propertyinput.dart';
 
 class AdminDashboard extends StatelessWidget {
   @override
@@ -254,6 +255,12 @@ class AdminDashboard extends StatelessWidget {
                   child: ElevatedButton(
                     onPressed: () {
                       // Handle Landlord input in Dealers dashboard button press
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => AdminLandlordInputPage(),
+                        ),
+                      );
                     },
                     style: ElevatedButton.styleFrom(
                       primary: Colors.transparent,

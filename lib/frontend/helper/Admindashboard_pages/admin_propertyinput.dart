@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -8,18 +11,9 @@ import 'dart:io';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter/services.dart';
+import 'dart:html' as html;
 
-class Property {
-  final String title;
-  final String location;
-  final DocumentReference<Map<String, dynamic>>? landlordRef;
-
-  Property({
-    required this.title,
-    required this.location,
-    required this.landlordRef,
-  });
-}
+import '../../../backend/models/propertymodel.dart';
 
 class AdminPropertyInputPage extends StatefulWidget {
   @override
@@ -43,14 +37,16 @@ class _AdminPropertyInputPageState extends State<AdminPropertyInputPage> {
     QuerySnapshot<Map<String, dynamic>> querySnapshot =
         await FirebaseFirestore.instance.collection('Properties').get();
 
+    List<Property> propertyList = [];
+
+    for (var doc in querySnapshot.docs) {
+      Property property =
+          await Property.fromJson(doc.data() as Map<String, dynamic>);
+      propertyList.add(property);
+    }
+
     setState(() {
-      properties = querySnapshot.docs.map((doc) {
-        return Property(
-          title: doc['title'],
-          location: doc['location'],
-          landlordRef: doc['landlordRef'],
-        );
-      }).toList();
+      properties = propertyList;
       filteredProperties = List.from(properties);
     });
   }
@@ -102,100 +98,188 @@ class _AdminPropertyInputPageState extends State<AdminPropertyInputPage> {
     showDialog(
       context: context,
       builder: (context) {
+        print('reached here');
+
         return Dialog(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                title: Text(
-                  property.title,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ListTile(
+                  title: Text(
+                    property.title,
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  subtitle: Text(
+                    'Landlord: $landlordName',
+                    style: TextStyle(
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+                ListTile(
+                  leading: Icon(Icons.location_on),
+                  title: Text(
+                    property.location,
+                    style: TextStyle(
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+                ListTile(
+                  leading: Icon(Icons.home),
+                  title: Text(
+                    'Type: ${property.type}',
+                    style: TextStyle(
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+                ListTile(
+                  leading: Icon(Icons.hotel),
+                  title: Text(
+                    'Beds: ${property.beds}',
+                    style: TextStyle(
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+                ListTile(
+                  leading: Icon(Icons.bathtub),
+                  title: Text(
+                    'Baths: ${property.baths}',
+                    style: TextStyle(
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+                ListTile(
+                  leading: Icon(Icons.spa),
+                  title: Text(
+                    'Garden: ${property.garden ? "Yes" : "No"}',
+                    style: TextStyle(
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+                ListTile(
+                  leading: Icon(Icons.living),
+                  title: Text(
+                    'Living: ${property.living}',
+                    style: TextStyle(
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+                ListTile(
+                  leading: Icon(Icons.layers),
+                  title: Text(
+                    'Floors: ${property.floors}',
+                    style: TextStyle(
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+                ListTile(
+                  leading: Icon(Icons.car_rental),
+                  title: Text(
+                    'Carspace: ${property.carspace}',
+                    style: TextStyle(
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+                ListTile(
+                  leading: Icon(Icons.description),
+                  title: Text(
+                    'Description: ${property.description}',
+                    style: TextStyle(
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+                ListTile(
+                  leading: Icon(Icons.attach_money),
+                  title: Text(
+                    'Price: \$${property.price.toStringAsFixed(2)}',
+                    style: TextStyle(
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+                ListTile(
+                  leading: Icon(Icons.star),
+                  title: Text(
+                    'Rehnaa Rating: ${property.rehnaaRating.toStringAsFixed(1)}',
+                    style: TextStyle(
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+                ListTile(
+                  leading: Icon(Icons.star),
+                  title: Text(
+                    'Tenant Rating: ${property.tenantRating.toStringAsFixed(1)}',
+                    style: TextStyle(
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+                ListTile(
+                  leading: Icon(Icons.rate_review),
+                  title: Text(
+                    'Tenant Review: ${property.tenantReview}',
+                    style: TextStyle(
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+                SizedBox(height: 10),
+                Text(
+                  'Images',
                   style: TextStyle(
-                    fontSize: 18,
+                    fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                subtitle: Text(
-                  'Landlord: $landlordName',
-                  style: TextStyle(
-                    fontSize: 16,
+                SizedBox(height: 10),
+                // Display the images with loading indicator
+                Container(
+                  height: 200.0, // Adjust this value according to your needs.
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: property.imagePath.length,
+                    itemBuilder: (context, index) {
+                      return Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 4.0),
+                        child: CachedNetworkImage(
+                          imageUrl: property.imagePath[index],
+                          errorWidget: (context, error, stackTrace) {
+                            return Icon(Icons.error);
+                          },
+                          progressIndicatorBuilder:
+                              (context, url, downloadProgress) {
+                            return CircularProgressIndicator(
+                              value: downloadProgress.progress,
+                            );
+                          },
+                        ),
+                      );
+                    },
                   ),
                 ),
-              ),
-              ListTile(
-                leading: Icon(Icons.location_on),
-                title: Text(
-                  property.location,
-                  style: TextStyle(
-                    fontSize: 16,
-                  ),
-                ),
-              ),
-              SizedBox(height: 10),
-              Text(
-                'Add Images',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              SizedBox(height: 10),
-              // Add image upload functionality here
-              ElevatedButton(
-                onPressed: () async {
-                  List<XFile>? pickedImages;
-                  // if (kDebugMode) {
-                  //   // Load dummy images from assets
-                  //   List<Uint8List> imageBytes = await Future.wait([
-                  //     rootBundle
-                  //         .load('assets/image1.jpg')
-                  //         .then((data) => data.buffer.asUint8List()),
-                  //     rootBundle
-                  //         .load('assets/image2.jpg')
-                  //         .then((data) => data.buffer.asUint8List()),
-                  //   ]);
-
-                  //   // Save dummy images to temporary files
-                  //   pickedImages = [];
-                  //   for (var i = 0; i < imageBytes.length; i++) {
-                  //     Directory tempDir = await getTemporaryDirectory();
-                  //     String tempPath = '${tempDir.path}/dummy_image$i.jpg';
-                  //     File(tempPath).writeAsBytesSync(imageBytes[i]);
-                  //     pickedImages.add(XFile(tempPath));
-                  //   }
-                  // } else {
-                  pickedImages = await ImagePicker().pickMultiImage();
-                  // }
-
-                  if (pickedImages != null && pickedImages.isNotEmpty) {
-                    XFile firstImage = pickedImages[0]; // Get the first image
-
-                    // Upload image to Firebase Storage
-                    // Replace 'images/properties/' with your desired storage path
-                    Reference storageReference = FirebaseStorage.instance
-                        .ref()
-                        .child(
-                            'images/properties/${DateTime.now().millisecondsSinceEpoch}');
-                    TaskSnapshot storageSnapshot =
-                        await storageReference.putFile(File(firstImage.path));
-                    String imageUrl =
-                        await storageSnapshot.ref.getDownloadURL();
-
-                    // Use the image URL as needed
-                    print(imageUrl);
-                  }
-                },
-                child: Text('Upload Image'),
-              ),
-
-              SizedBox(height: 10),
-            ],
+                SizedBox(height: 10),
+              ],
+            ),
           ),
         );
       },
     );
   }
 
-  @override
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -320,6 +404,7 @@ class _PropertyCardWidgetState extends State<PropertyCardWidget> {
   String description = '';
   String title = '';
   String location = '';
+  String address = '';
   double price = 0.0;
   DocumentReference<Map<String, dynamic>>? landlordRef;
   double rehnaaRating = 0.0;
@@ -345,8 +430,12 @@ class _PropertyCardWidgetState extends State<PropertyCardWidget> {
   String? imageCountError;
   String? imageTypeError;
   String? landlordRefError;
+  String? addressError;
+  String buttonLabel = 'Select Images';
+  bool uploading = false; // Track the uploading state
 
   List<DocumentSnapshot<Map<String, dynamic>>> landlordList = [];
+  List<html.File>? selectedImages = [];
 
   Future<void> fetchLandlords() async {
     QuerySnapshot<Map<String, dynamic>> querySnapshot =
@@ -368,21 +457,53 @@ class _PropertyCardWidgetState extends State<PropertyCardWidget> {
     return '$firstName $lastName';
   }
 
-  Future<void> uploadImages() async {
-    List<XFile>? pickedImages = await ImagePicker().pickMultiImage();
+  Future<void> selectImages() async {
+    final html.FileUploadInputElement input = html.FileUploadInputElement()
+      ..multiple = true;
+    input.click();
 
-    if (pickedImages != null && pickedImages.isNotEmpty) {
-      for (var image in pickedImages) {
-        // Upload image to Firebase Storage
+    await input.onChange.first;
+
+    if (input.files != null) {
+      setState(() {
+        selectedImages = input.files;
+        imagePath.add('dummy_image_path'); // Add a dummy image path
+        buttonLabel = 'Images Selected (${selectedImages!.length})';
+      });
+    }
+  }
+
+  Future<void> uploadImages() async {
+    if (selectedImages != null && selectedImages!.isNotEmpty) {
+      // Remove the dummy image path
+      setState(() {
+        imagePath.remove('dummy_image_path');
+      });
+
+      for (var file in selectedImages!) {
+        final reader = html.FileReader();
+        reader.readAsDataUrl(file);
+
+        final completer = Completer<String>();
+
+        reader.onLoad.first.then((_) {
+          completer.complete(reader.result.toString());
+        });
+
+        final encodedImage = await completer.future;
+
         Reference storageReference = FirebaseStorage.instance.ref().child(
             'images/properties/${DateTime.now().millisecondsSinceEpoch}');
-        TaskSnapshot storageSnapshot =
-            await storageReference.putFile(File(image.path));
+        UploadTask uploadTask = storageReference.putString(encodedImage,
+            format: PutStringFormat.dataUrl);
+        TaskSnapshot storageSnapshot = await uploadTask;
         String imageUrl = await storageSnapshot.ref.getDownloadURL();
 
         setState(() {
           imagePath.add(imageUrl);
         });
+
+        return;
       }
     }
   }
@@ -397,8 +518,9 @@ class _PropertyCardWidgetState extends State<PropertyCardWidget> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Card(
-      child: SingleChildScrollView(
-        child: Padding(
+        child: SingleChildScrollView(
+      child: Column(children: [
+        Padding(
           padding: EdgeInsets.fromLTRB(
             size.width * 0.15,
             0,
@@ -410,6 +532,19 @@ class _PropertyCardWidgetState extends State<PropertyCardWidget> {
               ListTile(
                 title: Text('Property Details'),
               ),
+              TextField(
+                decoration: InputDecoration(labelText: 'Title'),
+                onChanged: (value) {
+                  setState(() {
+                    title = value;
+                  });
+                },
+              ),
+              if (titleError != null)
+                Text(
+                  titleError!,
+                  style: TextStyle(color: Colors.red),
+                ),
               TextField(
                 decoration: InputDecoration(labelText: 'Type'),
                 onChanged: (value) {
@@ -521,19 +656,6 @@ class _PropertyCardWidgetState extends State<PropertyCardWidget> {
                   style: TextStyle(color: Colors.red),
                 ),
               TextField(
-                decoration: InputDecoration(labelText: 'Title'),
-                onChanged: (value) {
-                  setState(() {
-                    title = value;
-                  });
-                },
-              ),
-              if (titleError != null)
-                Text(
-                  titleError!,
-                  style: TextStyle(color: Colors.red),
-                ),
-              TextField(
                 decoration: InputDecoration(labelText: 'Location'),
                 onChanged: (value) {
                   setState(() {
@@ -544,6 +666,19 @@ class _PropertyCardWidgetState extends State<PropertyCardWidget> {
               if (locationError != null)
                 Text(
                   locationError!,
+                  style: TextStyle(color: Colors.red),
+                ),
+              TextField(
+                decoration: InputDecoration(labelText: 'Address'),
+                onChanged: (value) {
+                  setState(() {
+                    address = value;
+                  });
+                },
+              ),
+              if (addressError != null)
+                Text(
+                  addressError!,
                   style: TextStyle(color: Colors.red),
                 ),
               TextField(
@@ -632,51 +767,97 @@ class _PropertyCardWidgetState extends State<PropertyCardWidget> {
                   tenantReviewError!,
                   style: TextStyle(color: Colors.red),
                 ),
+              SizedBox(height: 20),
               ElevatedButton(
-                onPressed: uploadImages,
-                child: Text('Upload Images'),
+                onPressed: selectImages,
+                child: Text(buttonLabel),
+                style: ElevatedButton.styleFrom(
+                    // Add your button styles here
+                    ),
               ),
-              ElevatedButton(
-                onPressed: () {
-                  bool isValid = validateInputs();
-                  if (isValid) {
-                    // Perform actions with the gathered inputs
-                    // For example, you can print the values:
-                    print('Type: $type');
-                    print('Beds: $beds');
-                    print('Baths: $baths');
-                    print('Garden: $garden');
-                    print('Living: $living');
-                    print('Floors: $floors');
-                    print('Carspace: $carspace');
-                    print('Description: $description');
-                    print('Title: $title');
-                    print('Location: $location');
-                    print('Price: $price');
-                    print('Landlord Ref: $landlordRef');
-                    print('Rehnaa Rating: $rehnaaRating');
-                    print('Tenant Rating: $tenantRating');
-                    print('Tenant Review: $tenantReview');
-                    print('Image Paths: $imagePath');
-                  } else {
-                    // Show an error message
-                    Fluttertoast.showToast(
-                      msg:
-                          'Please fill in all the required fields with valid input.',
-                      toastLength: Toast.LENGTH_SHORT,
-                      gravity: ToastGravity.CENTER,
-                      backgroundColor: Colors.red,
-                      textColor: Colors.white,
-                    );
-                  }
-                },
-                child: Text('Submit'),
+              SizedBox(height: 20),
+              AbsorbPointer(
+                absorbing:
+                    uploading, // Disable the button when uploading is in progress
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () async {
+                        bool isValid = validateInputs();
+                        if (isValid) {
+                          setState(() {
+                            uploading = true; // Set the uploading state to true
+                          });
+
+                          // Perform actions with the gathered inputs
+                          // For example, you can print the values:
+
+                          // Upload selected images
+                          await uploadImages();
+
+                          //upload property details to firebase// random doc id
+                          await FirebaseFirestore.instance
+                              .collection('Properties')
+                              .doc()
+                              .set({
+                            'imagePath': imagePath,
+                            'type': type,
+                            'beds': beds,
+                            'baths': baths,
+                            'floors': floors,
+                            'carspace': carspace,
+                            'description': description,
+                            'garden': garden,
+                            'living': living,
+                            'title': title,
+                            'location': location,
+                            'address': address,
+                            'price': price,
+                            'landlordRef': landlordRef,
+                            'rehnaaRating': rehnaaRating,
+                            'tenantRating': tenantRating,
+                            'tenantReview': tenantReview,
+                          }, SetOptions(merge: true));
+
+                          setState(() {
+                            uploading =
+                                false; // Set the uploading state to false
+                          });
+
+                          // Navigate to the AdminPropertyInputPage
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => AdminPropertyInputPage(),
+                            ),
+                          );
+                        } else {
+                          // Show an error message
+                          Fluttertoast.showToast(
+                            msg:
+                                'Please fill in all the required fields with valid input.',
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.CENTER,
+                            backgroundColor: Colors.red,
+                            textColor: Colors.white,
+                          );
+                        }
+                      },
+                      child: Text('Submit'),
+                      style: ElevatedButton.styleFrom(
+                          // Add your button styles here
+                          ),
+                    ),
+                    if (uploading) CircularProgressIndicator(),
+                  ],
+                ),
               ),
             ],
           ),
         ),
-      ),
-    );
+      ]),
+    ));
   }
 
   bool validateInputs() {
@@ -778,6 +959,16 @@ class _PropertyCardWidgetState extends State<PropertyCardWidget> {
     } else {
       setState(() {
         locationError = null;
+      });
+    }
+    if (address.isEmpty) {
+      setState(() {
+        addressError = 'Location is required.';
+        isValid = false;
+      });
+    } else {
+      setState(() {
+        addressError = null;
       });
     }
 
