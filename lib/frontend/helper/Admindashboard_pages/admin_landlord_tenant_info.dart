@@ -114,7 +114,7 @@ class _AdminLandlordTenantInfoPageState
           tasdeeqVerification: doc['tasdeeqVerification'] ?? false,
           // policeVerification: doc['policeVerification'] ?? false,
           familyMembers: doc['familyMembers'] ?? 0,
-          landlordRef: doc['landlordRef'] ?? null,
+          landlordRef: doc['landlordRef'],
           pathToImage: doc['pathToImage'] ?? '',
         );
       }).toList();
@@ -176,11 +176,11 @@ class _AdminLandlordTenantInfoPageState
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Landlord & Tenant Info'),
+        title: const Text('Landlord & Tenant Info'),
         flexibleSpace: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           // borderRadius: BorderRadius.circular(24),
-          gradient: const LinearGradient(
+          gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
@@ -204,14 +204,14 @@ class _AdminLandlordTenantInfoPageState
                   filterLandlords(value);
                   filterTenants(value);
                 },
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'Search',
                   prefixIcon: Icon(Icons.search),
                   border: OutlineInputBorder(),
                 ),
               ),
             ),
-            SizedBox(height: 16.0),
+            const SizedBox(height: 16.0),
             Expanded(
               child: DefaultTabController(
                 length: 2,
@@ -219,7 +219,7 @@ class _AdminLandlordTenantInfoPageState
                   children: [
                     // ignore: prefer_const_constructors
                     TabBar(
-                      indicatorColor: Color(0xff0FA697),
+                      indicatorColor: const Color(0xff0FA697),
                       unselectedLabelColor: Colors.grey,
                       labelColor: Colors.lightBlue,
                       tabs: const [
@@ -231,7 +231,7 @@ class _AdminLandlordTenantInfoPageState
                         ),
                       ],
                     ),
-                    SizedBox(height: 16.0),
+                    const SizedBox(height: 16.0),
                     Expanded(
                       child: TabBarView(
                         children: [
@@ -252,14 +252,14 @@ class _AdminLandlordTenantInfoPageState
                                   ),
                                   title: Text(
                                     '${landlord.firstName} ${landlord.lastName}',
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                       fontSize: 18.0,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
                                   subtitle: Text(
                                     'Balance: ${landlord.balance}',
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                       fontSize: 16.0,
                                     ),
                                   ),
@@ -286,14 +286,14 @@ class _AdminLandlordTenantInfoPageState
                                   ),
                                   title: Text(
                                     '${tenant.firstName} ${tenant.lastName}',
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                       fontSize: 18.0,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
                                   subtitle: Text(
                                     'Rent: ${tenant.rent}',
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                       fontSize: 16.0,
                                     ),
                                   ),
@@ -315,7 +315,7 @@ class _AdminLandlordTenantInfoPageState
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 IconButton(
-                  icon: Icon(Icons.arrow_back),
+                  icon: const Icon(Icons.arrow_back),
                   onPressed: () {
                     setState(() {
                       if (currentPage > 1) {
@@ -326,13 +326,13 @@ class _AdminLandlordTenantInfoPageState
                 ),
                 Text(
                   'Page $currentPage',
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 IconButton(
-                  icon: Icon(Icons.arrow_forward),
+                  icon: const Icon(Icons.arrow_forward),
                   onPressed: () {
                     setState(() {
                       final maxPage =

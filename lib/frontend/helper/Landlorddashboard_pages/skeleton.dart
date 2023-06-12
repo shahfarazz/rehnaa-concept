@@ -45,7 +45,7 @@ class CardSkeleton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double defaultBorderRadius = 16.0;
+    const double defaultBorderRadius = 16.0;
     return Container(
       height: height,
       decoration: BoxDecoration(
@@ -59,16 +59,16 @@ class CardSkeleton extends StatelessWidget {
           ),
         ],
       ),
-      child: Column(
+      child: const Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Expanded(
             flex: 2,
             child: Skeleton(),
           ),
-          const SizedBox(height: defaultPadding / 2),
+          SizedBox(height: defaultPadding / 2),
           Skeleton(width: 80),
-          const SizedBox(height: defaultPadding / 2),
+          SizedBox(height: defaultPadding / 2),
           Skeleton(width: 120),
         ],
       ),

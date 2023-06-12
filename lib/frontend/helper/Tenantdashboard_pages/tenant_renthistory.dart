@@ -281,10 +281,10 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(
+                const Icon(
                   Icons.error_outline,
                   size: 48.0,
-                  color: const Color(0xff33907c),
+                  color: Color(0xff33907c),
                 ),
                 const SizedBox(height: 16.0),
                 Text(
@@ -301,11 +301,12 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
         ),
       );
     } else if (_rentPayments.isEmpty && !shouldDisplay) {
-      return Expanded(
+      return const Expanded(
         child: TenantRentSkeleton(),
       );
-    } else
+    } else {
       return SizedBox(height: size.height * 0.02);
+    }
   }
 
   @override
@@ -418,7 +419,7 @@ class TenantRentSkeleton extends StatelessWidget {
           SizedBox(height: size.height * 0.02),
           ListView.builder(
             shrinkWrap: true,
-            physics: NeverScrollableScrollPhysics(),
+            physics: const NeverScrollableScrollPhysics(),
             itemCount: 4,
             itemBuilder: (context, index) {
               return Padding(
@@ -441,12 +442,12 @@ class TenantRentSkeleton extends StatelessWidget {
                           width: size.width * 0.4,
                           height: 20.0,
                         ),
-                        SizedBox(height: 8.0),
+                        const SizedBox(height: 8.0),
                         Skeleton(
                           width: size.width * 0.7,
                           height: 16.0,
                         ),
-                        SizedBox(height: 16.0),
+                        const SizedBox(height: 16.0),
                         Row(
                           children: [
                             Skeleton(

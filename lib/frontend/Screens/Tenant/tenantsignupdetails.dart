@@ -30,7 +30,7 @@ class TeanantsSignUpDetailsPage extends StatelessWidget {
               SizedBox(height: MediaQuery.of(context).size.height * 0.02),
               buildnextButton(),
               SizedBox(height: MediaQuery.of(context).size.height * 0.02),
-              SizedBox(height: 50.0),
+              const SizedBox(height: 50.0),
             ],
           ),
         ),
@@ -162,8 +162,8 @@ class TeanantsSignUpDetailsPage extends StatelessWidget {
         child: Center(
           child: Text(
             text,
-            style: TextStyle(
-              color: const Color(0xff33907c),
+            style: const TextStyle(
+              color: Color(0xff33907c),
               fontSize: 16,
             ),
           ),

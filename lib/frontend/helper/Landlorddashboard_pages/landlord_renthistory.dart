@@ -283,10 +283,10 @@ class _LandlordRentHistoryPageState extends State<LandlordRentHistoryPage>
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(
+                const Icon(
                   Icons.error_outline,
                   size: 48.0,
-                  color: const Color(0xff33907c),
+                  color: Color(0xff33907c),
                 ),
                 const SizedBox(height: 16.0),
                 Text(
@@ -303,11 +303,12 @@ class _LandlordRentHistoryPageState extends State<LandlordRentHistoryPage>
         ),
       );
     } else if (_rentPayments.isEmpty && !shouldDisplay) {
-      return Expanded(
+      return const Expanded(
         child: TenantRentSkeleton(),
       );
-    } else
+    } else {
       return SizedBox(height: size.height * 0.02);
+    }
   }
 
   @override

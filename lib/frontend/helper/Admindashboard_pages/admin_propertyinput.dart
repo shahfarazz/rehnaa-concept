@@ -40,8 +40,7 @@ class _AdminPropertyInputPageState extends State<AdminPropertyInputPage> {
     List<Property> propertyList = [];
 
     for (var doc in querySnapshot.docs) {
-      Property property =
-          await Property.fromJson(doc.data() as Map<String, dynamic>);
+      Property property = await Property.fromJson(doc.data());
       propertyList.add(property);
     }
 
@@ -108,157 +107,157 @@ class _AdminPropertyInputPageState extends State<AdminPropertyInputPage> {
                 ListTile(
                   title: Text(
                     property.title,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   subtitle: Text(
                     'Landlord: $landlordName',
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 16,
                     ),
                   ),
                 ),
                 ListTile(
-                  leading: Icon(Icons.location_on),
+                  leading: const Icon(Icons.location_on),
                   title: Text(
                     property.location,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 16,
                     ),
                   ),
                 ),
                 ListTile(
-                  leading: Icon(Icons.home),
+                  leading: const Icon(Icons.home),
                   title: Text(
                     'Type: ${property.type}',
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 16,
                     ),
                   ),
                 ),
                 ListTile(
-                  leading: Icon(Icons.hotel),
+                  leading: const Icon(Icons.hotel),
                   title: Text(
                     'Beds: ${property.beds}',
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 16,
                     ),
                   ),
                 ),
                 ListTile(
-                  leading: Icon(Icons.bathtub),
+                  leading: const Icon(Icons.bathtub),
                   title: Text(
                     'Baths: ${property.baths}',
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 16,
                     ),
                   ),
                 ),
                 ListTile(
-                  leading: Icon(Icons.spa),
+                  leading: const Icon(Icons.spa),
                   title: Text(
                     'Garden: ${property.garden ? "Yes" : "No"}',
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 16,
                     ),
                   ),
                 ),
                 ListTile(
-                  leading: Icon(Icons.living),
+                  leading: const Icon(Icons.living),
                   title: Text(
                     'Living: ${property.living}',
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 16,
                     ),
                   ),
                 ),
                 ListTile(
-                  leading: Icon(Icons.layers),
+                  leading: const Icon(Icons.layers),
                   title: Text(
                     'Floors: ${property.floors}',
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 16,
                     ),
                   ),
                 ),
                 ListTile(
-                  leading: Icon(Icons.car_rental),
+                  leading: const Icon(Icons.car_rental),
                   title: Text(
                     'Carspace: ${property.carspace}',
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 16,
                     ),
                   ),
                 ),
                 ListTile(
-                  leading: Icon(Icons.description),
+                  leading: const Icon(Icons.description),
                   title: Text(
                     'Description: ${property.description}',
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 16,
                     ),
                   ),
                 ),
                 ListTile(
-                  leading: Icon(Icons.attach_money),
+                  leading: const Icon(Icons.attach_money),
                   title: Text(
                     'Price: \$${property.price.toStringAsFixed(2)}',
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 16,
                     ),
                   ),
                 ),
                 ListTile(
-                  leading: Icon(Icons.star),
+                  leading: const Icon(Icons.star),
                   title: Text(
                     'Rehnaa Rating: ${property.rehnaaRating.toStringAsFixed(1)}',
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 16,
                     ),
                   ),
                 ),
                 ListTile(
-                  leading: Icon(Icons.star),
+                  leading: const Icon(Icons.star),
                   title: Text(
                     'Tenant Rating: ${property.tenantRating.toStringAsFixed(1)}',
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 16,
                     ),
                   ),
                 ),
                 ListTile(
-                  leading: Icon(Icons.rate_review),
+                  leading: const Icon(Icons.rate_review),
                   title: Text(
                     'Tenant Review: ${property.tenantReview}',
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 16,
                     ),
                   ),
                 ),
-                SizedBox(height: 10),
-                Text(
+                const SizedBox(height: 10),
+                const Text(
                   'Images',
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 // Display the images with loading indicator
-                Container(
+                SizedBox(
                   height: 200.0, // Adjust this value according to your needs.
                   child: ListView.builder(
                     scrollDirection: Axis.horizontal,
                     itemCount: property.imagePath.length,
                     itemBuilder: (context, index) {
                       return Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 4.0),
+                        padding: const EdgeInsets.symmetric(horizontal: 4.0),
                         child: CachedNetworkImage(
                           imageUrl: property.imagePath[index],
                           errorWidget: (context, error, stackTrace) {
-                            return Icon(Icons.error);
+                            return const Icon(Icons.error);
                           },
                           progressIndicatorBuilder:
                               (context, url, downloadProgress) {
@@ -271,7 +270,7 @@ class _AdminPropertyInputPageState extends State<AdminPropertyInputPage> {
                     },
                   ),
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
               ],
             ),
           ),
@@ -284,10 +283,10 @@ class _AdminPropertyInputPageState extends State<AdminPropertyInputPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Property Images'),
+        title: const Text('Property Images'),
         flexibleSpace: Container(
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
@@ -310,7 +309,7 @@ class _AdminPropertyInputPageState extends State<AdminPropertyInputPage> {
                 onChanged: (value) {
                   filterProperties(value);
                 },
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'Search',
                   prefixIcon: Icon(Icons.search),
                   border: OutlineInputBorder(),
@@ -326,7 +325,7 @@ class _AdminPropertyInputPageState extends State<AdminPropertyInputPage> {
                   return ListTile(
                     title: Text(property.title),
                     subtitle: Text(property.location),
-                    leading: Icon(Icons.home),
+                    leading: const Icon(Icons.home),
                     onTap: () => openPropertyDetailsDialog(property),
                   );
                 },
@@ -336,7 +335,7 @@ class _AdminPropertyInputPageState extends State<AdminPropertyInputPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 IconButton(
-                  icon: Icon(Icons.arrow_back),
+                  icon: const Icon(Icons.arrow_back),
                   onPressed: () {
                     setState(() {
                       if (currentPage > 1) {
@@ -347,13 +346,13 @@ class _AdminPropertyInputPageState extends State<AdminPropertyInputPage> {
                 ),
                 Text(
                   'Page $currentPage',
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 IconButton(
-                  icon: Icon(Icons.arrow_forward),
+                  icon: const Icon(Icons.arrow_forward),
                   onPressed: () {
                     setState(() {
                       final maxPage =
@@ -381,8 +380,8 @@ class _AdminPropertyInputPageState extends State<AdminPropertyInputPage> {
           );
           // Add functionality for the + floating action button here
         },
-        child: Icon(Icons.add),
-        backgroundColor: Color(0xff0FA697),
+        backgroundColor: const Color(0xff0FA697),
+        child: const Icon(Icons.add),
       ),
     );
   }
@@ -529,11 +528,11 @@ class _PropertyCardWidgetState extends State<PropertyCardWidget> {
           ),
           child: Column(
             children: [
-              ListTile(
+              const ListTile(
                 title: Text('Property Details'),
               ),
               TextField(
-                decoration: InputDecoration(labelText: 'Title'),
+                decoration: const InputDecoration(labelText: 'Title'),
                 onChanged: (value) {
                   setState(() {
                     title = value;
@@ -543,10 +542,10 @@ class _PropertyCardWidgetState extends State<PropertyCardWidget> {
               if (titleError != null)
                 Text(
                   titleError!,
-                  style: TextStyle(color: Colors.red),
+                  style: const TextStyle(color: Colors.red),
                 ),
               TextField(
-                decoration: InputDecoration(labelText: 'Type'),
+                decoration: const InputDecoration(labelText: 'Type'),
                 onChanged: (value) {
                   setState(() {
                     type = value;
@@ -556,10 +555,10 @@ class _PropertyCardWidgetState extends State<PropertyCardWidget> {
               if (typeError != null)
                 Text(
                   typeError!,
-                  style: TextStyle(color: Colors.red),
+                  style: const TextStyle(color: Colors.red),
                 ),
               TextField(
-                decoration: InputDecoration(labelText: 'Beds'),
+                decoration: const InputDecoration(labelText: 'Beds'),
                 keyboardType: TextInputType.number,
                 inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                 onChanged: (value) {
@@ -571,10 +570,10 @@ class _PropertyCardWidgetState extends State<PropertyCardWidget> {
               if (bedsError != null)
                 Text(
                   bedsError!,
-                  style: TextStyle(color: Colors.red),
+                  style: const TextStyle(color: Colors.red),
                 ),
               TextField(
-                decoration: InputDecoration(labelText: 'Baths'),
+                decoration: const InputDecoration(labelText: 'Baths'),
                 keyboardType: TextInputType.number,
                 inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                 onChanged: (value) {
@@ -586,10 +585,10 @@ class _PropertyCardWidgetState extends State<PropertyCardWidget> {
               if (bathsError != null)
                 Text(
                   bathsError!,
-                  style: TextStyle(color: Colors.red),
+                  style: const TextStyle(color: Colors.red),
                 ),
               SwitchListTile(
-                title: Text('Garden'),
+                title: const Text('Garden'),
                 value: garden,
                 onChanged: (value) {
                   setState(() {
@@ -598,7 +597,7 @@ class _PropertyCardWidgetState extends State<PropertyCardWidget> {
                 },
               ),
               TextField(
-                decoration: InputDecoration(labelText: 'Living'),
+                decoration: const InputDecoration(labelText: 'Living'),
                 keyboardType: TextInputType.number,
                 inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                 onChanged: (value) {
@@ -610,10 +609,10 @@ class _PropertyCardWidgetState extends State<PropertyCardWidget> {
               if (livingError != null)
                 Text(
                   livingError!,
-                  style: TextStyle(color: Colors.red),
+                  style: const TextStyle(color: Colors.red),
                 ),
               TextField(
-                decoration: InputDecoration(labelText: 'Floors'),
+                decoration: const InputDecoration(labelText: 'Floors'),
                 keyboardType: TextInputType.number,
                 inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                 onChanged: (value) {
@@ -625,10 +624,10 @@ class _PropertyCardWidgetState extends State<PropertyCardWidget> {
               if (floorsError != null)
                 Text(
                   floorsError!,
-                  style: TextStyle(color: Colors.red),
+                  style: const TextStyle(color: Colors.red),
                 ),
               TextField(
-                decoration: InputDecoration(labelText: 'Carspace'),
+                decoration: const InputDecoration(labelText: 'Carspace'),
                 keyboardType: TextInputType.number,
                 inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                 onChanged: (value) {
@@ -640,10 +639,10 @@ class _PropertyCardWidgetState extends State<PropertyCardWidget> {
               if (carspaceError != null)
                 Text(
                   carspaceError!,
-                  style: TextStyle(color: Colors.red),
+                  style: const TextStyle(color: Colors.red),
                 ),
               TextField(
-                decoration: InputDecoration(labelText: 'Description'),
+                decoration: const InputDecoration(labelText: 'Description'),
                 onChanged: (value) {
                   setState(() {
                     description = value;
@@ -653,10 +652,10 @@ class _PropertyCardWidgetState extends State<PropertyCardWidget> {
               if (descriptionError != null)
                 Text(
                   descriptionError!,
-                  style: TextStyle(color: Colors.red),
+                  style: const TextStyle(color: Colors.red),
                 ),
               TextField(
-                decoration: InputDecoration(labelText: 'Location'),
+                decoration: const InputDecoration(labelText: 'Location'),
                 onChanged: (value) {
                   setState(() {
                     location = value;
@@ -666,10 +665,10 @@ class _PropertyCardWidgetState extends State<PropertyCardWidget> {
               if (locationError != null)
                 Text(
                   locationError!,
-                  style: TextStyle(color: Colors.red),
+                  style: const TextStyle(color: Colors.red),
                 ),
               TextField(
-                decoration: InputDecoration(labelText: 'Address'),
+                decoration: const InputDecoration(labelText: 'Address'),
                 onChanged: (value) {
                   setState(() {
                     address = value;
@@ -679,11 +678,12 @@ class _PropertyCardWidgetState extends State<PropertyCardWidget> {
               if (addressError != null)
                 Text(
                   addressError!,
-                  style: TextStyle(color: Colors.red),
+                  style: const TextStyle(color: Colors.red),
                 ),
               TextField(
-                decoration: InputDecoration(labelText: 'Price'),
-                keyboardType: TextInputType.numberWithOptions(decimal: true),
+                decoration: const InputDecoration(labelText: 'Price'),
+                keyboardType:
+                    const TextInputType.numberWithOptions(decimal: true),
                 inputFormatters: [
                   FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}'))
                 ],
@@ -696,10 +696,10 @@ class _PropertyCardWidgetState extends State<PropertyCardWidget> {
               if (priceError != null)
                 Text(
                   priceError!,
-                  style: TextStyle(color: Colors.red),
+                  style: const TextStyle(color: Colors.red),
                 ),
               DropdownButtonFormField<DocumentReference<Map<String, dynamic>>>(
-                decoration: InputDecoration(labelText: 'Landlord'),
+                decoration: const InputDecoration(labelText: 'Landlord'),
                 value: landlordRef,
                 items: landlordList.map((landlord) {
                   String landlordName =
@@ -718,11 +718,12 @@ class _PropertyCardWidgetState extends State<PropertyCardWidget> {
               if (landlordRefError != null)
                 Text(
                   landlordRefError!,
-                  style: TextStyle(color: Colors.red),
+                  style: const TextStyle(color: Colors.red),
                 ),
               TextField(
-                decoration: InputDecoration(labelText: 'Rehnaa Rating'),
-                keyboardType: TextInputType.numberWithOptions(decimal: true),
+                decoration: const InputDecoration(labelText: 'Rehnaa Rating'),
+                keyboardType:
+                    const TextInputType.numberWithOptions(decimal: true),
                 inputFormatters: [
                   FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}'))
                 ],
@@ -735,11 +736,12 @@ class _PropertyCardWidgetState extends State<PropertyCardWidget> {
               if (rehnaaRatingError != null)
                 Text(
                   rehnaaRatingError!,
-                  style: TextStyle(color: Colors.red),
+                  style: const TextStyle(color: Colors.red),
                 ),
               TextField(
-                decoration: InputDecoration(labelText: 'Tenant Rating'),
-                keyboardType: TextInputType.numberWithOptions(decimal: true),
+                decoration: const InputDecoration(labelText: 'Tenant Rating'),
+                keyboardType:
+                    const TextInputType.numberWithOptions(decimal: true),
                 inputFormatters: [
                   FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}'))
                 ],
@@ -752,10 +754,10 @@ class _PropertyCardWidgetState extends State<PropertyCardWidget> {
               if (tenantRatingError != null)
                 Text(
                   tenantRatingError!,
-                  style: TextStyle(color: Colors.red),
+                  style: const TextStyle(color: Colors.red),
                 ),
               TextField(
-                decoration: InputDecoration(labelText: 'Tenant Review'),
+                decoration: const InputDecoration(labelText: 'Tenant Review'),
                 onChanged: (value) {
                   setState(() {
                     tenantReview = value;
@@ -765,17 +767,17 @@ class _PropertyCardWidgetState extends State<PropertyCardWidget> {
               if (tenantReviewError != null)
                 Text(
                   tenantReviewError!,
-                  style: TextStyle(color: Colors.red),
+                  style: const TextStyle(color: Colors.red),
                 ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: selectImages,
-                child: Text(buttonLabel),
                 style: ElevatedButton.styleFrom(
                     // Add your button styles here
                     ),
+                child: Text(buttonLabel),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               AbsorbPointer(
                 absorbing:
                     uploading, // Disable the button when uploading is in progress
@@ -844,12 +846,12 @@ class _PropertyCardWidgetState extends State<PropertyCardWidget> {
                           );
                         }
                       },
-                      child: Text('Submit'),
                       style: ElevatedButton.styleFrom(
                           // Add your button styles here
                           ),
+                      child: const Text('Submit'),
                     ),
-                    if (uploading) CircularProgressIndicator(),
+                    if (uploading) const CircularProgressIndicator(),
                   ],
                 ),
               ),

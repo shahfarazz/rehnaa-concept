@@ -215,7 +215,7 @@ class _LandlordTenantsPageState extends State<LandlordTenantsPage>
 
     Widget buildTenantsList() {
       if (_tenants.isEmpty && !shouldDisplayContent) {
-        return LandlordTenantSkeleton();
+        return const LandlordTenantSkeleton();
       } else if (_tenants.isEmpty && shouldDisplayContent) {
         return Column(
           children: [
@@ -233,10 +233,10 @@ class _LandlordTenantsPageState extends State<LandlordTenantsPage>
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(
+                    const Icon(
                       Icons.sentiment_dissatisfied,
                       size: 48.0,
-                      color: const Color(0xff33907c),
+                      color: Color(0xff33907c),
                     ),
                     const SizedBox(height: 16.0),
                     Text(

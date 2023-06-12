@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
@@ -275,7 +274,7 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
                     notifications.isEmpty
                         ? ''
                         : notifications.length.toString(),
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 10,
                     ),
@@ -358,14 +357,15 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
                                   // Add your onTap functionality here
                                 },
                                 child: ShaderMask(
-                                  shaderCallback: (bounds) => LinearGradient(
+                                  shaderCallback: (bounds) =>
+                                      const LinearGradient(
                                     colors: [
                                       Color(0xFF0FA697),
                                       Color(0xFF45BF7A),
                                       Color(0xFF0DF205),
                                     ],
                                   ).createShader(bounds),
-                                  child: Text(
+                                  child: const Text(
                                     'Rehnaa',
                                     style: TextStyle(
                                       fontSize: 24,
@@ -392,7 +392,7 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => ContractPage(),
+                            builder: (context) => const ContractPage(),
                           ),
                         );
                         // _closeSidebar();
@@ -405,7 +405,7 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => VouchersPage(),
+                            builder: (context) => const VouchersPage(),
                           ),
                         );
                         // _closeSidebar();
@@ -419,7 +419,7 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => PrivacyPolicyPage(),
+                            builder: (context) => const PrivacyPolicyPage(),
                           ),
                         );
                         // _closeSidebar();
@@ -432,7 +432,7 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => FAQPage(),
+                            builder: (context) => const FAQPage(),
                           ),
                         );
                         // _closeSidebar();
@@ -490,7 +490,7 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
           Expanded(
             child: Text(
               label,
-              style: TextStyle(
+              style: const TextStyle(
                 fontFamily: 'Montserrat',
                 fontSize: 18,
               ),
@@ -536,7 +536,7 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
                 Positioned.fill(
                   child: Container(
                     decoration: BoxDecoration(
-                      gradient: LinearGradient(
+                      gradient: const LinearGradient(
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                         colors: [
@@ -556,7 +556,7 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
-                          Hero(
+                          const Hero(
                             tag: 'notificationTitle',
                             child: Text(
                               'Notifications',
@@ -569,7 +569,7 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
                             ),
                           ),
                           IconButton(
-                            icon: Icon(Icons.close),
+                            icon: const Icon(Icons.close),
                             onPressed: () {
                               Navigator.pop(context);
                             },
@@ -578,33 +578,33 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
                         ],
                       ),
                     ),
-                    Divider(
+                    const Divider(
                       height: 0,
                       color: Colors.grey,
                     ),
                     Expanded(
                       child: ClipRRect(
-                        borderRadius: BorderRadius.only(
+                        borderRadius: const BorderRadius.only(
                           bottomLeft: Radius.circular(20.0),
                           bottomRight: Radius.circular(20.0),
                         ),
                         child: Container(
-                          padding: EdgeInsets.only(bottom: 4.0),
+                          padding: const EdgeInsets.only(bottom: 4.0),
                           color: Colors.white,
                           child: Scrollbar(
-                            isAlwaysShown: true,
+                            thumbVisibility: true,
                             child: SingleChildScrollView(
                               child: Column(
                                 children: notifications
                                     .map(
                                       (notification) => Padding(
-                                        padding:
-                                            EdgeInsets.symmetric(vertical: 8.0),
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 8.0),
                                         child: Row(
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
                                           children: <Widget>[
-                                            SizedBox(
+                                            const SizedBox(
                                               width: 24.0,
                                               child: Padding(
                                                 padding:
@@ -619,7 +619,7 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
                                                 ),
                                               ),
                                             ),
-                                            SizedBox(width: 12.0),
+                                            const SizedBox(width: 12.0),
                                             Expanded(
                                               child: Column(
                                                 crossAxisAlignment:
@@ -627,7 +627,7 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
                                                 children: [
                                                   Text(
                                                     notification['title']!,
-                                                    style: TextStyle(
+                                                    style: const TextStyle(
                                                       fontSize: 18.0,
                                                       fontFamily: 'Montserrat',
                                                     ),
@@ -635,18 +635,20 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
                                                   if (notification['amount']!
                                                       .isNotEmpty)
                                                     Padding(
-                                                      padding: EdgeInsets.only(
-                                                          left: 24.0),
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              left: 24.0),
                                                       child: RichText(
                                                         text: TextSpan(
-                                                          style: TextStyle(
+                                                          style:
+                                                              const TextStyle(
                                                             fontSize: 16.0,
                                                             fontFamily:
                                                                 'Montserrat',
                                                             color: Colors.black,
                                                           ),
                                                           children: [
-                                                            TextSpan(
+                                                            const TextSpan(
                                                               text: 'Amount: ',
                                                               style: TextStyle(
                                                                 fontFamily:
@@ -656,7 +658,8 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
                                                             TextSpan(
                                                               text: notification[
                                                                   'amount']!,
-                                                              style: TextStyle(
+                                                              style:
+                                                                  const TextStyle(
                                                                 fontWeight:
                                                                     FontWeight
                                                                         .bold,

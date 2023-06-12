@@ -136,49 +136,49 @@ class MyScreen extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 24),
-                        ContractCard(
+                        const ContractCard(
                           icon: Icons.home,
                           label: 'Property:',
                           data: '123 Main St',
                         ),
                         const SizedBox(height: 16),
-                        ContractCard(
+                        const ContractCard(
                           icon: Icons.person,
                           label: 'Tenant Name:',
                           data: 'John Doe',
                         ),
                         const SizedBox(height: 16),
-                        ContractCard(
+                        const ContractCard(
                           icon: Icons.credit_card,
                           label: 'Tenant CNIC:',
                           data: '1234567890',
                         ),
                         const SizedBox(height: 16),
-                        ContractCard(
+                        const ContractCard(
                           icon: Icons.calendar_today,
                           label: 'Contract Start Date:',
                           data: '2023-06-01',
                         ),
                         const SizedBox(height: 16),
-                        ContractCard(
+                        const ContractCard(
                           icon: Icons.calendar_today,
                           label: 'Contract End Date:',
                           data: '2024-05-31',
                         ),
                         const SizedBox(height: 16),
-                        ContractCard(
+                        const ContractCard(
                           icon: Icons.verified_user,
                           label: 'Police Verified:',
                           data: 'Yes',
                         ),
                         const SizedBox(height: 16),
-                        ContractCard(
+                        const ContractCard(
                           icon: Icons.gavel,
                           label: 'Court Regulation:',
                           data: 'ABC123',
                         ),
                         const SizedBox(height: 16),
-                        ContractCard(
+                        const ContractCard(
                           icon: Icons.assignment,
                           label: 'Notary Republic Stamp:',
                           data: 'XYZ456',
@@ -208,7 +208,7 @@ class ContractCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
   return Center(
-    child: Container(
+    child: SizedBox(
       width: 300, // Set the desired width of the card
       child: Card(
         shape: RoundedRectangleBorder(
@@ -225,7 +225,7 @@ class ContractCard extends StatelessWidget {
                 size: 24,
                 color: const Color(0xff33907c),
               ),
-              SizedBox(width: 10),
+              const SizedBox(width: 10),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -238,7 +238,7 @@ class ContractCard extends StatelessWidget {
                         color: const Color(0xff33907c),
                       ),
                     ),
-                    SizedBox(height: 5),
+                    const SizedBox(height: 5),
                     Text(
                       data,
                       style: GoogleFonts.montserrat(

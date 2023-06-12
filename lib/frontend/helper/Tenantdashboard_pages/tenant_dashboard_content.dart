@@ -57,7 +57,7 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
       }
 
       // Use the Tenant.fromJson method to create a Tenant instance
-      Tenant tenant = await Tenant.fromJson(json);
+      Tenant tenant = Tenant.fromJson(json);
       if (json['isWithdraw'] != null && json['isWithdraw'] == true) {
         setState(() {
           isWithdraw = true;
@@ -206,7 +206,7 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                             'notifications': FieldValue.arrayUnion([
                               {
                                 'title':
-                                    'Withdraw Request by ${tenant.firstName + ' ' + tenant.lastName}',
+                                    'Withdraw Request by ${'${tenant.firstName} ${tenant.lastName}'}',
                                 'amount': 'Rs${tenant.rent}',
                               }
                             ]),
@@ -232,7 +232,7 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                         'paymentRequest': FieldValue.arrayUnion([
                           {
                             'fullname':
-                                '${tenant.firstName + ' ' + tenant.lastName}',
+                                '${tenant.firstName} ${tenant.lastName}',
                             'amount': tenant.rent,
                             'paymentMethod': selectedOption,
                             'uid': widget.uid,
@@ -309,7 +309,7 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           // Show a loading indicator while waiting for the data
-          return LandlordDashboardContentSkeleton();
+          return const LandlordDashboardContentSkeleton();
         } else if (snapshot.hasError) {
           // Handle any error that occurred while fetching the data
           return Text('Error: ${snapshot.error}');
@@ -416,9 +416,9 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                                               Colors.grey,
                                             ]
                                           : [
-                                              Color(0xff0FA697),
-                                              Color(0xff45BF7A),
-                                              Color(0xff0DF205),
+                                              const Color(0xff0FA697),
+                                              const Color(0xff45BF7A),
+                                              const Color(0xff0DF205),
                                             ],
                                     ),
                                   ),

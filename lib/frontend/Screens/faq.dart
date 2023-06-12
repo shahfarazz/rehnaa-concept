@@ -80,10 +80,10 @@ class FAQPage extends StatelessWidget {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20.0),
                         ),
-                        child: Column(
+                        child: const Column(
                           children: [
-                            const SizedBox(height: 10),
-                            const Text(
+                            SizedBox(height: 10),
+                            Text(
                               "FAQs",
                               style: TextStyle(
                                 fontSize: 24,
@@ -91,47 +91,47 @@ class FAQPage extends StatelessWidget {
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                            const SizedBox(height: 16),
+                            SizedBox(height: 16),
                             FAQCard(
                               question: 'What is Flutter?',
                               answer:
                                   'Flutter is a UI toolkit for building fast, natively compiled applications for mobile, web, and desktop from a single codebase.',
                             ),
-                            const SizedBox(height: 16),
+                            SizedBox(height: 16),
                             FAQCard(
                               question: 'How can I get started with Flutter?',
                               answer:
                                   'You can get started with Flutter by installing Flutter SDK, setting up your development environment, and creating a new Flutter project.',
                             ),
-                            const SizedBox(height: 16),
+                            SizedBox(height: 16),
                             FAQCard(
                               question:
                                   'Can I use Flutter for web development?',
                               answer:
                                   'Yes, you can use Flutter for web development. Flutter provides support for building web applications in addition to mobile and desktop platforms.',
                             ),
-                            const SizedBox(height: 16),
+                            SizedBox(height: 16),
                             FAQCard(
                               question:
                                   'Can I use Flutter for web development?',
                               answer:
                                   'Yes, you can use Flutter for web development. Flutter provides support for building web applications in addition to mobile and desktop platforms.',
                             ),
-                            const SizedBox(height: 16),
+                            SizedBox(height: 16),
                             FAQCard(
                               question:
                                   'Can I use Flutter for web development?',
                               answer:
                                   'Yes, you can use Flutter for web development. Flutter provides support for building web applications in addition to mobile and desktop platforms.',
                             ),
-                            const SizedBox(height: 16),
+                            SizedBox(height: 16),
                             FAQCard(
                               question:
                                   'Can I use Flutter for web development?',
                               answer:
                                   'Yes, you can use Flutter for web development. Flutter provides support for building web applications in addition to mobile and desktop platforms.',
                             ),
-                            const SizedBox(height: 30),
+                            SizedBox(height: 30),
 
                             // Add more FAQs
                           ],

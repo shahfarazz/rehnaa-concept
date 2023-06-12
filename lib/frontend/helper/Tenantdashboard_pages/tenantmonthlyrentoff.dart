@@ -170,7 +170,7 @@ class _TenantMonthlyRentOffPageState extends State<TenantMonthlyRentOffPage>
                     ? CircleAvatar(
                         radius: size.width * 0.2,
                         backgroundColor: Colors.white,
-                        backgroundImage: AssetImage('assets/defaulticon.png'),
+                        backgroundImage: const AssetImage('assets/defaulticon.png'),
                       )
                     : Transform.rotate(
                         angle: 3.14159,
@@ -224,11 +224,11 @@ class _TenantMonthlyRentOffPageState extends State<TenantMonthlyRentOffPage>
                   ),
                 ),
                 const SizedBox(height: 20.0),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16.0),
                   child: Column(
                     children: [
-                      const SizedBox(height: 10.0),
+                      SizedBox(height: 10.0),
                       Center(
                         child: FractionallySizedBox(
                           widthFactor: 0.8,
@@ -239,7 +239,7 @@ class _TenantMonthlyRentOffPageState extends State<TenantMonthlyRentOffPage>
                           ),
                         ),
                       ),
-                      const SizedBox(height: 10.0),
+                      SizedBox(height: 10.0),
                       Center(
                         child: FractionallySizedBox(
                           widthFactor: 0.8,
@@ -249,7 +249,7 @@ class _TenantMonthlyRentOffPageState extends State<TenantMonthlyRentOffPage>
                           ),
                         ),
                       ),
-                      const SizedBox(height: 10.0),
+                      SizedBox(height: 10.0),
                       Center(
                         child: FractionallySizedBox(
                           widthFactor: 0.8,
@@ -259,7 +259,7 @@ class _TenantMonthlyRentOffPageState extends State<TenantMonthlyRentOffPage>
                           ),
                         ),
                       ),
-                      const SizedBox(height: 10.0),
+                      SizedBox(height: 10.0),
                       Center(
                         child: FractionallySizedBox(
                           widthFactor: 0.8,
@@ -269,7 +269,7 @@ class _TenantMonthlyRentOffPageState extends State<TenantMonthlyRentOffPage>
                           ),
                         ),
                       ),
-                      const SizedBox(height: 10.0),
+                      SizedBox(height: 10.0),
                       Center(
                         child: FractionallySizedBox(
                           widthFactor: 0.8,
@@ -279,7 +279,7 @@ class _TenantMonthlyRentOffPageState extends State<TenantMonthlyRentOffPage>
                           ),
                         ),
                       ),
-                      const SizedBox(height: 10.0),
+                      SizedBox(height: 10.0),
                     ],
                   ),
                 ),

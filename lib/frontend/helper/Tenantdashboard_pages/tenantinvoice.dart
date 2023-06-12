@@ -5,7 +5,7 @@ class TenantInvoicePage extends StatelessWidget {
   final DateTime paymentDateTime;
   final int paymentAmount;
 
-  TenantInvoicePage({
+  const TenantInvoicePage({
     required this.tenantName,
     required this.paymentDateTime,
     required this.paymentAmount,
@@ -15,37 +15,37 @@ class TenantInvoicePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Payment Confirmation'),
+        title: const Text('Payment Confirmation'),
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
+            const Text(
               'Payment Confirmation Screen',
               style: TextStyle(fontSize: 24),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             Text(
               'Tenant Name: $tenantName',
-              style: TextStyle(fontSize: 18),
+              style: const TextStyle(fontSize: 18),
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             Text(
               'Payment Date: ${paymentDateTime.toString()}',
-              style: TextStyle(fontSize: 18),
+              style: const TextStyle(fontSize: 18),
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             Text(
               'Payment Amount: $paymentAmount',
-              style: TextStyle(fontSize: 18),
+              style: const TextStyle(fontSize: 18),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () {
                 Navigator.pop(context);
               },
-              child: Text('Go Back'),
+              child: const Text('Go Back'),
             ),
           ],
         ),

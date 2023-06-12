@@ -97,7 +97,7 @@ class _LandlordOnboardedPageState extends State<LandlordOnboardedPage> {
                       color: Colors.black.withOpacity(0.1),
                       spreadRadius: 1,
                       blurRadius: 7,
-                      offset: Offset(0, 3),
+                      offset: const Offset(0, 3),
                     ),
                   ],
                 ),
@@ -105,10 +105,10 @@ class _LandlordOnboardedPageState extends State<LandlordOnboardedPage> {
                   focusNode: searchFocusNode,
                   controller: searchController,
                   onChanged: (value) => setState(() {}),
-                  style: TextStyle(
+                  style: const TextStyle(
                     color:Colors.black,
                   ),
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     prefixIcon: Icon(Icons.search),
                     hintText: 'Search by name',
                     border: InputBorder.none,
@@ -116,14 +116,14 @@ class _LandlordOnboardedPageState extends State<LandlordOnboardedPage> {
                   ),
                 ),
               ),
-              SizedBox(height: 60),
+              const SizedBox(height: 60),
               
               Container(child: Text("Landlords Onboarded", style: GoogleFonts.montserrat(
                               fontSize: 24,
                               color: const Color(0xff33907c),
                               fontWeight: FontWeight.bold,)),),
 
-              SizedBox(height: 40),
+              const SizedBox(height: 40),
               
 
               Expanded(
@@ -137,7 +137,7 @@ class _LandlordOnboardedPageState extends State<LandlordOnboardedPage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => LandlordsOnboardedInfoPage(),
+                            builder: (context) => const LandlordsOnboardedInfoPage(),
                           ),
                         );
                       },
@@ -148,9 +148,9 @@ class _LandlordOnboardedPageState extends State<LandlordOnboardedPage> {
                       ),
                       elevation: 5.0,
                       child: ListTile(
-                        contentPadding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
-                        title: Text(landlord.name, style: TextStyle(fontWeight: FontWeight.bold)),
-                        trailing: Text(landlord.date, style: TextStyle(color: Colors.grey)),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+                        title: Text(landlord.name, style: const TextStyle(fontWeight: FontWeight.bold)),
+                        trailing: Text(landlord.date, style: const TextStyle(color: Colors.grey)),
                         subtitle: Text(landlord.address),
                       ),
                     ),
