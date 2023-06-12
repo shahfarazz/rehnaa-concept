@@ -4,6 +4,7 @@ import 'package:rehnaa/frontend/helper/Admindashboard_pages/admin_landlord_reque
 import '../../helper/Admindashboard_pages/admin_landlord_tenant_info.dart';
 import '../../helper/Admindashboard_pages/admin_landlordinput.dart';
 import '../../helper/Admindashboard_pages/admin_propertyinput.dart';
+import '../../helper/Admindashboard_pages/admin_rentoffwinner.dart';
 
 class AdminDashboard extends StatelessWidget {
   @override
@@ -450,7 +451,49 @@ class AdminDashboard extends StatelessWidget {
             SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: [
+              children: [Container(
+                  width: size.width * 0.4,
+                  height: size.height * 0.2,
+                  decoration: BoxDecoration(
+                    color: Color.fromARGB(255, 197, 79, 177),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: ElevatedButton(
+                    onPressed: () { Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => AdminRentOffWinnerPage(),
+                        ),
+                      );
+                      // Handle Add and Delete Vouchers button press
+                    },
+                    style: ElevatedButton.styleFrom(
+                      primary: Colors.transparent,
+                      elevation: 0,
+                    ),
+                    child: const Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.person,
+                          size: 60,
+                          color: Colors.white,
+                        ),
+                        SizedBox(height: 10),
+                        Text(
+                          'Monthly rent off winner\nDiscount',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                SizedBox(width: 20),
+
                 Container(
                   width: size.width * 0.4,
                   height: size.height * 0.2,
