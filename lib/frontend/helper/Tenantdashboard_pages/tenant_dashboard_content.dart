@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:rehnaa/backend/models/tenantsmodel.dart';
+import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenantinvoice.dart';
 
 import '../Landlorddashboard_pages/landlord_dashboard_content.dart';
 
@@ -141,6 +142,7 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                       setState(() {
                         selectedOption = 'Bank Transfer';
                       });
+                       
                     },
                   ),
                 ],
@@ -183,7 +185,17 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                       if (kDebugMode) {
                         print('Selected option: $selectedOption');
                       }
-                      Navigator.pop(context);
+                      Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => TenantInvoicePage(
+                          tenantName: '${tenant.firstName} ${tenant.lastName}',
+                          paymentDateTime: DateTime.now(),
+                          paymentAmount: tenant.rent,
+                        ),
+                      ),
+                    );
+
                       try {
                         FirebaseFirestore.instance
                             .collection('Notifications')
@@ -251,7 +263,7 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
       // setState(() {
       //   isWithdraw = true;
       // });
-      widget.onUpdateWithdrawState(isWithdraw);
+      widget.onUpdateWithdrawState(false);
     }, tenant);
   }
 
@@ -415,10 +427,11 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                                     child: InkWell(
                                       borderRadius: BorderRadius.circular(20),
                                       onTap: () {
-                                        isWithdraw
-                                            ? null
-                                            : someFunction(
-                                                tenant); // Show the option dialog
+                                        isWithdraw ///////// chnage thisssssssssssssssssssssssssssssssssss
+                                            ? someFunction(
+                                                tenant)
+                                            : null;
+                                              // Show the option dialog
                                       },
                                       child: Center(
                                         child: Text(
