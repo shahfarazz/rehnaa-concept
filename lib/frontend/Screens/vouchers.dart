@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
 void main() {
   runApp(const MyApp());
@@ -94,14 +95,7 @@ class VouchersPage extends StatelessWidget {
                                 ),
                               ),
                               const SizedBox(height: 16),
-                              buildRoundedImageCard(context, 'assets/image1.jpg'),
-                              const SizedBox(height: 10),
-                              buildRoundedImageCard(context, 'assets/image1.jpg'),
-                              const SizedBox(height: 10),
-                              buildRoundedImageCard(context, 'assets/image1.jpg'),
-                              const SizedBox(height: 10),
-                              buildRoundedImageCard(context, 'assets/image1.jpg'),
-                              const SizedBox(height: 16.0),
+                              buildRoundedImageCards(context),
                             ],
                           ),
                         ),
@@ -117,36 +111,60 @@ class VouchersPage extends StatelessWidget {
     );
   }
 
-  Widget buildRoundedImageCard(BuildContext context, String imagePath) {
-    return GestureDetector(
-      onTap: () {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return ExpandedImageDialog(imagePath: imagePath);
+  Future<int> getImageCount() async {
+    firebase_storage.ListResult result = await firebase_storage
+        .FirebaseStorage.instance
+        .ref('images/vouchers/')
+        .listAll();
+    return result.items.length;
+  }
+
+  Widget buildRoundedImageCards(BuildContext context) {
+    return FutureBuilder<int>(
+      future: getImageCount(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return CircularProgressIndicator(); // Show a loading indicator while fetching the image count
+        }
+        if (snapshot.hasError) {
+          return Text(
+              'Error: ${snapshot.error}'); // Show an error message if there's an issue fetching the image count
+        }
+        int imageCount =
+            snapshot.data ?? 0; // Get the image count from the snapshot
+
+        return ListView.builder(
+          scrollDirection: Axis.horizontal,
+          itemCount: imageCount,
+          itemBuilder: (context, index) {
+            return Padding(
+              padding: EdgeInsets.only(right: 16.0),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(20.0),
+                child: Card(
+                  child: SizedBox(
+                    width: 200,
+                    height: 200,
+                    child: Image.network(
+                      'https://firebasestorage.googleapis.com/v0/b/rehnaa-cd479.appspot.com/o/images%2Fvouchers%2Fimage$index.jpg?alt=media',
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+              ),
+            );
           },
         );
       },
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(20.0),
-        child: Card(
-          child: SizedBox(
-            width: double.infinity,
-            height: 200,
-            child: Image.asset(
-              imagePath,
-              fit: BoxFit.cover,
-            ),
-          ),
-        ),
-      ),
     );
   }
 }
+
 class ExpandedImageDialog extends StatelessWidget {
   final String imagePath;
 
-  const ExpandedImageDialog({Key? key, required this.imagePath}) : super(key: key);
+  const ExpandedImageDialog({Key? key, required this.imagePath})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {

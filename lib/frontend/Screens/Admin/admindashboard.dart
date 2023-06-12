@@ -5,6 +5,7 @@ import '../../helper/Admindashboard_pages/admin_landlord_tenant_info.dart';
 import '../../helper/Admindashboard_pages/admin_landlordinput.dart';
 import '../../helper/Admindashboard_pages/admin_propertyinput.dart';
 import '../../helper/Admindashboard_pages/admin_rentoffwinner.dart';
+import '../../helper/Admindashboard_pages/admin_vouchers.dart';
 
 class AdminDashboard extends StatelessWidget {
   @override
@@ -304,6 +305,12 @@ class AdminDashboard extends StatelessWidget {
                   child: ElevatedButton(
                     onPressed: () {
                       // Handle Add and Delete Vouchers button press
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => AdminVouchersPage(),
+                        ),
+                      );
                     },
                     style: ElevatedButton.styleFrom(
                       primary: Colors.transparent,
@@ -451,7 +458,8 @@ class AdminDashboard extends StatelessWidget {
             SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: [Container(
+              children: [
+                Container(
                   width: size.width * 0.4,
                   height: size.height * 0.2,
                   decoration: BoxDecoration(
@@ -459,7 +467,8 @@ class AdminDashboard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: ElevatedButton(
-                    onPressed: () { Navigator.push(
+                    onPressed: () {
+                      Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) => AdminRentOffWinnerPage(),
@@ -493,7 +502,6 @@ class AdminDashboard extends StatelessWidget {
                   ),
                 ),
                 SizedBox(width: 20),
-
                 Container(
                   width: size.width * 0.4,
                   height: size.height * 0.2,

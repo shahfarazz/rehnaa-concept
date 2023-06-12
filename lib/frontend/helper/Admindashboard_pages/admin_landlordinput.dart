@@ -12,6 +12,9 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter/services.dart';
 // ignore: avoid_web_libraries_in_flutter
+
+import 'package:crypto/crypto.dart';
+import 'dart:convert';
 import 'dart:html' as html;
 
 import '../../../backend/models/landlordmodel.dart';
@@ -99,7 +102,7 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
                     ),
                   ),
                   subtitle: Text(
-                    'Balance: \$${landlord.balance.toStringAsFixed(2)}',
+                    'Balance: Rs.${landlord.balance.toStringAsFixed(2)}',
                     style: TextStyle(
                       fontSize: 16,
                     ),
@@ -281,6 +284,7 @@ class LandlordCardWidget extends StatefulWidget {
 class _LandlordCardWidgetState extends State<LandlordCardWidget> {
   String firstName = '';
   String lastName = '';
+
   double balance = 0;
   String? pathToImage;
   List<DocumentReference<Map<String, dynamic>>>? tenantRef = [];
@@ -294,20 +298,180 @@ class _LandlordCardWidgetState extends State<LandlordCardWidget> {
   DocumentSnapshot<Map<String, dynamic>>? selectedDealer; // Selected dealer
   List<DocumentSnapshot<Map<String, dynamic>>> dealerList = [];
 
-  Future<void> fetchLandlords() async {
-    QuerySnapshot<Map<String, dynamic>> landlordsSnapshot =
-        await FirebaseFirestore.instance.collection('Landlords').get();
+  final TextEditingController cnicController = TextEditingController();
+  final TextEditingController creditPointsController = TextEditingController();
+  final TextEditingController creditScoreController = TextEditingController();
 
+  final TextEditingController bankNameController = TextEditingController();
+  final TextEditingController raastIdController = TextEditingController();
+  final TextEditingController accountNumberController = TextEditingController();
+  final TextEditingController ibanController = TextEditingController();
+
+  void validateInputs() {
+    // Validate input fields and perform necessary actions
+    if (firstName.isEmpty || lastName.isEmpty || balance <= 0) {
+      // Display error message or perform necessary actions for invalid inputs
+      // For example, show a snackbar or toast with an error message
+      Fluttertoast.showToast(
+        msg: 'Please enter valid first name, last name, and balance.',
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+      );
+      return;
+    }
+
+    if (selectedImages == null || selectedImages!.isEmpty) {
+      // Display error message or perform necessary actions for no selected images
+      // For example, show a snackbar or toast with an error message
+      Fluttertoast.showToast(
+        msg: 'Please select at least one image.',
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+      );
+      return;
+    }
+
+    // Perform necessary actions for valid inputs
+    if (creditPointsController.text.isEmpty ||
+        creditScoreController.text.isEmpty) {
+      // Display error message or perform necessary actions for invalid credit points or scoring
+      // For example, show a snackbar or toast with an error message
+      Fluttertoast.showToast(
+        msg: 'Please enter valid credit points and credit scoring.',
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+      );
+      return;
+    }
+
+    if (cnicController.text.length != 13) {
+      // Display error message or perform necessary actions for invalid CNIC number
+      // For example, show a snackbar or toast with an error message
+      Fluttertoast.showToast(
+        msg: 'Please enter a valid 13-digit CNIC number.',
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+      );
+      return;
+    }
+
+    if (bankNameController.text.isEmpty) {
+      // Display error message or perform necessary actions for empty bank name
+      // For example, show a snackbar or toast with an error message
+      Fluttertoast.showToast(
+        msg: 'Please select a bank name.',
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+      );
+      return;
+    }
+
+    if (!raastIdController.text.startsWith('03')) {
+      // Display error message or perform necessary actions for invalid Raast ID
+      // For example, show a snackbar or toast with an error message
+      Fluttertoast.showToast(
+        msg: 'Please enter a valid Raast ID starting with "03".',
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+      );
+      return;
+    }
+
+    if (accountNumberController.text.length != 16) {
+      // Display error message or perform necessary actions for invalid bank account number
+      // For example, show a snackbar or toast with an error message
+      Fluttertoast.showToast(
+        msg:
+            'Please enter a valid bank account number (20 alphanumeric characters).',
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+      );
+      return;
+    }
+
+    if (ibanController.text.length != 24) {
+      // Display error message or perform necessary actions for invalid IBAN
+      // For example, show a snackbar or toast with an error message
+      Fluttertoast.showToast(
+        msg: 'Please enter a valid IBAN (24 alphanumeric characters).',
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+      );
+      return;
+    }
+
+    // All inputs are valid, proceed with submission
+    handleSubmit();
+  }
+
+  Future<void> handleSubmit() async {
     setState(() {
-      landlordList = landlordsSnapshot.docs;
+      uploading = true;
     });
 
-    QuerySnapshot<Map<String, dynamic>> dealersSnapshot =
-        await FirebaseFirestore.instance.collection('Dealers').get();
+    await uploadImages();
+
+    // Hash sensitive information
+    final hashedCnic = hashString(cnicController.text);
+    final hashedBankName = hashString(bankNameController.text);
+    final hashedRaastId = hashString(raastIdController.text);
+    final hashedAccountNumber = hashString(accountNumberController.text);
+    final hashedIban = hashString(ibanController.text);
+
+    // Add landlord details to Firestore
+    DocumentReference<Map<String, dynamic>> landlordDocRef =
+        await FirebaseFirestore.instance.collection('Landlords').add({
+      'firstName': firstName,
+      'lastName': lastName,
+      'balance': balance,
+      'pathToImage': pathToImage,
+      'tenantRef': tenantRef,
+      'propertyRef': propertyRef,
+      'dealerRef': dealerRef,
+      'cnic': hashedCnic,
+      'bankName': hashedBankName,
+      'raastId': hashedRaastId,
+      'accountNumber': hashedAccountNumber,
+      'iban': hashedIban,
+    });
+
+    // Set landlord reference for the selected dealer
+    await setDealerRefForLandlord(landlordDocRef);
 
     setState(() {
-      dealerList = dealersSnapshot.docs;
+      uploading = false;
     });
+
+    Fluttertoast.showToast(
+      msg: 'Landlord added successfully!',
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.CENTER,
+      backgroundColor: Colors.green,
+      textColor: Colors.white,
+    );
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => AdminLandlordInputPage(),
+      ),
+    );
   }
 
   Future<void> selectImages() async {
@@ -370,12 +534,6 @@ class _LandlordCardWidgetState extends State<LandlordCardWidget> {
         SetOptions(merge: true),
       );
     }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    fetchLandlords();
   }
 
   @override
@@ -446,68 +604,43 @@ class _LandlordCardWidgetState extends State<LandlordCardWidget> {
                     },
                   ),
                   SizedBox(height: 20),
+                  TextField(
+                    controller: cnicController,
+                    decoration: InputDecoration(labelText: 'CNIC Number'),
+                  ),
+                  TextField(
+                    controller: bankNameController,
+                    decoration: InputDecoration(labelText: 'Bank Name'),
+                  ),
+                  TextField(
+                    controller: raastIdController,
+                    decoration: InputDecoration(labelText: 'Raast ID'),
+                  ),
+                  TextField(
+                    controller: accountNumberController,
+                    decoration:
+                        InputDecoration(labelText: 'Bank Account Number'),
+                  ),
+                  TextField(
+                    controller: ibanController,
+                    decoration: InputDecoration(labelText: 'IBAN'),
+                  ),
+                  TextField(
+                    controller: creditPointsController,
+                    decoration: InputDecoration(labelText: 'Credit Points'),
+                  ),
+                  TextField(
+                    controller: creditScoreController,
+                    decoration: InputDecoration(labelText: 'Credit Score'),
+                  ),
+                  SizedBox(height: 20),
                   AbsorbPointer(
                     absorbing: uploading,
                     child: Stack(
                       alignment: Alignment.center,
                       children: [
                         ElevatedButton(
-                          onPressed: () async {
-                            if (selectedImages != null &&
-                                selectedImages!.isNotEmpty) {
-                              setState(() {
-                                uploading = true;
-                              });
-
-                              await uploadImages();
-
-                              // Add landlord details to Firestore
-                              DocumentReference<Map<String, dynamic>>
-                                  landlordDocRef = await FirebaseFirestore
-                                      .instance
-                                      .collection('Landlords')
-                                      .add({
-                                'firstName': firstName,
-                                'lastName': lastName,
-                                'balance': balance,
-                                'pathToImage': pathToImage,
-                                'tenantRef': tenantRef,
-                                'propertyRef': propertyRef,
-                                'dealerRef': dealerRef,
-                              });
-
-                              // Set landlord reference for the selected dealer
-                              await setDealerRefForLandlord(landlordDocRef);
-
-                              setState(() {
-                                uploading = false;
-                              });
-
-                              Fluttertoast.showToast(
-                                msg: 'Landlord added successfully!',
-                                toastLength: Toast.LENGTH_SHORT,
-                                gravity: ToastGravity.CENTER,
-                                backgroundColor: Colors.green,
-                                textColor: Colors.white,
-                              );
-
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      AdminLandlordInputPage(),
-                                ),
-                              );
-                            } else {
-                              Fluttertoast.showToast(
-                                msg: 'Please select at least one image.',
-                                toastLength: Toast.LENGTH_SHORT,
-                                gravity: ToastGravity.CENTER,
-                                backgroundColor: Colors.red,
-                                textColor: Colors.white,
-                              );
-                            }
-                          },
+                          onPressed: validateInputs,
                           child: Text('Submit'),
                         ),
                         if (uploading) CircularProgressIndicator(),
@@ -522,4 +655,10 @@ class _LandlordCardWidgetState extends State<LandlordCardWidget> {
       ),
     );
   }
+}
+
+String hashString(String input) {
+  final bytes = utf8.encode(input);
+  final digest = sha256.convert(bytes);
+  return digest.toString();
 }
