@@ -6,6 +6,7 @@ import 'package:rehnaa/backend/models/rentpaymentmodel.dart';
 import 'package:rehnaa/backend/services/helperfunctions.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
+import '../../Screens/rentpayment_info.dart';
 import '../Landlorddashboard_pages/skeleton.dart';
 
 class TenantRentHistoryPage extends StatefulWidget {
@@ -112,63 +113,58 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
     return Padding(
       padding: EdgeInsets.symmetric(
           horizontal: size.width * 0.02, vertical: size.height * 0.015),
-      child: Card(
-        elevation: 4.0,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(size.width * 0.04),
-        ),
-        child: Container(
-          height: whiteBoxHeight,
-          width: whiteBoxWidth,
-          decoration: BoxDecoration(
+      child: GestureDetector(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => RentPaymentInfoPage(
+                rentPayment: rentPayment,
+                firstName: firstName,
+                lastName: lastName,
+              ),
+            ),
+          );
+        },
+        child: Card(
+          elevation: 4.0,
+          shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(size.width * 0.04),
-            color: Colors.white,
           ),
-          padding: EdgeInsets.all(size.width * 0.04),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Image.asset(
-                    iconAsset,
-                    width: size.width * 0.2,
-                  ),
-                  SizedBox(width: size.width * 0.04),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          '$firstName $lastName',
-                          style: GoogleFonts.montserrat(
-                            fontSize: size.width * 0.04,
-                            fontWeight: FontWeight.bold,
-                            color: const Color(0xff33907c),
-                          ),
-                        ),
-                        SizedBox(height: size.height * 0.01),
-                        Text(
-                          rentPayment.property!.location,
-                          style: GoogleFonts.montserrat(
-                            fontSize: size.width * 0.03,
-                            color: const Color(0xff33907c),
-                          ),
-                        ),
-                      ],
+          child: Container(
+            height: whiteBoxHeight,
+            width: whiteBoxWidth,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(size.width * 0.04),
+              color: Colors.white,
+            ),
+            padding: EdgeInsets.all(size.width * 0.04),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Image.asset(
+                      iconAsset,
+                      width: size.width * 0.2,
                     ),
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
+                    SizedBox(width: size.width * 0.04),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            //display in format day/month/year
-                            '${rentPayment.date.day}/${rentPayment.date.month}/${rentPayment.date.year}',
+                            '$firstName $lastName',
+                            style: GoogleFonts.montserrat(
+                              fontSize: size.width * 0.04,
+                              fontWeight: FontWeight.bold,
+                              color: const Color(0xff33907c),
+                            ),
+                          ),
+                          SizedBox(height: size.height * 0.01),
+                          Text(
+                            rentPayment.property!.location,
                             style: GoogleFonts.montserrat(
                               fontSize: size.width * 0.03,
                               color: const Color(0xff33907c),
@@ -176,37 +172,56 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
                           ),
                         ],
                       ),
-                      SizedBox(height: size.height * 0.05),
-                      //add a padding so that the next row is pushed further down
-                      Padding(
-                        padding: EdgeInsets.only(bottom: size.height * 0.02),
-                      ),
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            '-',
-                            style: GoogleFonts.montserrat(
-                              fontSize: size.width * 0.04,
-                              fontWeight: FontWeight.bold,
-                              color: const Color(0xff33907c),
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              //display in format day/month/year
+                              '${rentPayment.date.day}/${rentPayment.date.month}/${rentPayment.date.year}',
+                              style: GoogleFonts.montserrat(
+                                fontSize: size.width * 0.03,
+                                color: const Color(0xff33907c),
+                              ),
                             ),
-                          ),
-                          Text(
-                            formatNumber(rentPayment.amount),
-                            style: GoogleFonts.montserrat(
-                              fontSize: size.width * 0.035,
-                              fontWeight: FontWeight.bold,
-                              color: const Color(0xff33907c),
+                          ],
+                        ),
+                        SizedBox(height: size.height * 0.05),
+                        //add a padding so that the next row is pushed further down
+                        Padding(
+                          padding: EdgeInsets.only(bottom: size.height * 0.02),
+                        ),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              firstName == 'Withdraw' ? '-' : '+',
+                              style: GoogleFonts.montserrat(
+                                fontSize: size.width * 0.04,
+                                fontWeight: FontWeight.bold,
+                                color: const Color(0xff33907c),
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ],
+                            Text(
+                              formatNumber(rentPayment.amount),
+                              style: GoogleFonts.montserrat(
+                                fontSize: size.width * 0.035,
+                                fontWeight: FontWeight.bold,
+                                color: const Color(0xff33907c),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),

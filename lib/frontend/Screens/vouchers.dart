@@ -6,7 +6,7 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -16,8 +16,34 @@ class MyApp extends StatelessWidget {
   }
 }
 
+class Voucher {
+  final String url;
+  final firebase_storage.Reference ref;
+
+  Voucher(this.url, this.ref);
+}
+
 class VouchersPage extends StatelessWidget {
-  const VouchersPage({super.key});
+  const VouchersPage({Key? key}) : super(key: key);
+
+  Future<List<Voucher>> fetchVouchers() async {
+    try {
+      firebase_storage.ListResult listResult = await firebase_storage
+          .FirebaseStorage.instance
+          .ref('images/vouchers/')
+          .listAll();
+      List<Voucher> vouchersList = [];
+      for (var ref in listResult.items) {
+        String url = await ref.getDownloadURL();
+        vouchersList.add(Voucher(url, ref));
+      }
+      return vouchersList;
+    } catch (error) {
+      print('Error fetching vouchers: $error');
+
+      return [];
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -120,40 +146,45 @@ class VouchersPage extends StatelessWidget {
   }
 
   Widget buildRoundedImageCards(BuildContext context) {
-    return FutureBuilder<int>(
-      future: getImageCount(),
+    return FutureBuilder<List<Voucher>>(
+      future: fetchVouchers(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return CircularProgressIndicator(); // Show a loading indicator while fetching the image count
+          return CircularProgressIndicator();
         }
         if (snapshot.hasError) {
-          return Text(
-              'Error: ${snapshot.error}'); // Show an error message if there's an issue fetching the image count
+          return Text('Error: ${snapshot.error}');
         }
-        int imageCount =
-            snapshot.data ?? 0; // Get the image count from the snapshot
+        List<Voucher> vouchersList = snapshot.data ?? [];
 
-        return ListView.builder(
-          scrollDirection: Axis.horizontal,
-          itemCount: imageCount,
-          itemBuilder: (context, index) {
-            return Padding(
-              padding: EdgeInsets.only(right: 16.0),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(20.0),
-                child: Card(
-                  child: SizedBox(
-                    width: 200,
-                    height: 200,
-                    child: Image.network(
-                      'https://firebasestorage.googleapis.com/v0/b/rehnaa-cd479.appspot.com/o/images%2Fvouchers%2Fimage$index.jpg?alt=media',
-                      fit: BoxFit.cover,
+        Size size = MediaQuery.of(context).size;
+
+        return SizedBox(
+          height: size.height * 0.8,
+          child: ListView.builder(
+            scrollDirection: Axis.vertical,
+            itemCount: vouchersList.length,
+            shrinkWrap: true, // Add this line
+            itemBuilder: (context, index) {
+              Voucher voucher = vouchersList[index];
+              return Padding(
+                padding: EdgeInsets.only(right: 16.0),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(20.0),
+                  child: Card(
+                    child: SizedBox(
+                      width: 200,
+                      height: 200,
+                      child: Image.network(
+                        voucher.url,
+                        fit: BoxFit.cover,
+                      ),
                     ),
                   ),
                 ),
-              ),
-            );
-          },
+              );
+            },
+          ),
         );
       },
     );
