@@ -33,8 +33,8 @@ class MyApp extends StatelessWidget {
         ),
         // home: LoginPage(),
         // home: const SplashScreen(),
-        // home: TenantDashboardPage(
-        //     uid: 'K55YzmkUXt09OgFwnDuT'), //TODO remove this Jugaar
+        home: TenantDashboardPage(
+            uid: 'K55YzmkUXt09OgFwnDuT'), //TODO remove this Jugaar
         // home: TenantsSignUpDetailsPage(),
       ),
     );

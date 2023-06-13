@@ -25,6 +25,7 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
   String firstName = '';
   String lastName = '';
   bool shouldDisplay = false;
+  String searchText = ''; // Variable to store the search query
 
   @override
   bool get wantKeepAlive => true;
@@ -229,10 +230,22 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
   }
 
   List<Widget> _buildRentPaymentCards(int startIndex) {
-    return _rentPayments
+    final List<RentPayment> filteredRentPayments = _filteredRentPayments();
+
+    return filteredRentPayments
         .skip(startIndex)
         .take(_pageSize)
         .map((rentPayment) => _buildRentPaymentCard(rentPayment))
+        .toList();
+  }
+
+  List<RentPayment> _filteredRentPayments() {
+    // Filter rent payments based on search query
+    return _rentPayments
+        .where((rentPayment) =>
+            '${firstName} ${lastName}'
+                .toLowerCase()
+                .contains(searchText.toLowerCase()))
         .toList();
   }
 
@@ -258,12 +271,6 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
 
   Widget _rentPaymentSelectorWidget(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
-
-    // if rentPayments is empty and shouldDisplay is true , show center widget
-    // if rentpayments is empty and shouldDisplay is true, show Skeleton
-    // if rentpayments is not empty and shouldDisplay is true, show Sizedbox
-
-    // print('_rentPayments.isEmpty: ${_rentPayments.isEmpty}');
 
     if (_rentPayments.isEmpty && shouldDisplay) {
       return Center(
@@ -314,7 +321,7 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
     super.build(context); // Ensure the mixin's build method is called
 
     final Size size = MediaQuery.of(context).size;
-    final int pageCount = (_rentPayments.length / _pageSize).ceil();
+    final int pageCount = (_filteredRentPayments().length / _pageSize).ceil();
 
     return Scaffold(
       body: Column(
@@ -358,6 +365,11 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
                       border: InputBorder.none,
                       contentPadding: EdgeInsets.all(10),
                     ),
+                    onChanged: (value) {
+                      setState(() {
+                        searchText = value; // Update the search query
+                      });
+                    },
                   ),
                 ),
                 SizedBox(height: size.height * 0.02),

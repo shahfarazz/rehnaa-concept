@@ -86,7 +86,7 @@ class _DashboardPageState extends State<TenantDashboardPage>
           Map<String, dynamic> notification = notificationstemp[i];
 
           String title = notification['title'] ?? '';
-          String amount = notification['amount'] ?? 0.0;
+          String amount = notification['amount']?.toString() ?? '0.0';
 
           print('Title: $title');
           print('Amount: $amount');
