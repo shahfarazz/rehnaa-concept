@@ -7,7 +7,7 @@ class TenantRentAccrualPage extends StatelessWidget {
       body: SingleChildScrollView(
         child: Container(
           color: Colors.grey[200], // Set the background color
-          padding: EdgeInsets.symmetric(
+          padding: const EdgeInsets.symmetric(
               vertical: 100.0, horizontal: 16.0), // Updated padding
           child: Card(
             shape: RoundedRectangleBorder(
@@ -15,8 +15,8 @@ class TenantRentAccrualPage extends StatelessWidget {
             ),
             child: Column(
               children: [
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
+                const Padding(
+                  padding: EdgeInsets.all(16.0),
                   child: Column(
                     children: [
                       Text(
@@ -31,14 +31,14 @@ class TenantRentAccrualPage extends StatelessWidget {
                     ],
                   ),
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 Card(
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20.0),
-                    side: BorderSide(color: Colors.grey, width: 0.1),
+                    side: const BorderSide(color: Colors.grey, width: 0.1),
                   ),
                   child: Container(
-                    padding: EdgeInsets.all(16.0),
+                    padding: const EdgeInsets.all(16.0),
                     child: Column(
                       children: [
                         const Text(
@@ -49,12 +49,12 @@ class TenantRentAccrualPage extends StatelessWidget {
                           ),
                           textAlign: TextAlign.center,
                         ),
-                        SizedBox(height: 20),
+                        const SizedBox(height: 20),
                         Container(
                           width: MediaQuery.of(context).size.width * 0.6,
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(30.0),
-                            gradient: LinearGradient(
+                            gradient: const LinearGradient(
                               begin: Alignment.topLeft,
                               end: Alignment.bottomRight,
                               colors: [
@@ -72,11 +72,11 @@ class TenantRentAccrualPage extends StatelessWidget {
                                 // Handle button press
                               },
                               child: Ink(
-                                padding: EdgeInsets.symmetric(
+                                padding: const EdgeInsets.symmetric(
                                   vertical: 16.0,
                                   horizontal: 32.0,
                                 ),
-                                child: Center(
+                                child: const Center(
                                   child: Text(
                                     'Apply',
                                     style: TextStyle(
@@ -95,9 +95,9 @@ class TenantRentAccrualPage extends StatelessWidget {
                     ),
                   ),
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 Container(
-                  padding: EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.all(16.0),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(20.0),
@@ -106,11 +106,11 @@ class TenantRentAccrualPage extends StatelessWidget {
                         color: Colors.grey.withOpacity(0.3),
                         spreadRadius: 2,
                         blurRadius: 5,
-                        offset: Offset(0, 3),
+                        offset: const Offset(0, 3),
                       ),
                     ],
                   ),
-                  child: Column(
+                  child: const Column(
                     children: [
                       Row(
                         children: [

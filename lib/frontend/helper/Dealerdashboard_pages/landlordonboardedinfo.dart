@@ -41,7 +41,7 @@ class ContractCard extends StatelessWidget {
               size: 24,
               color: const Color(0xff33907c),
             ),
-            SizedBox(width: 10),
+            const SizedBox(width: 10),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -54,7 +54,7 @@ class ContractCard extends StatelessWidget {
                       color: const Color(0xff33907c),
                     ),
                   ),
-                  SizedBox(height: 5),
+                  const SizedBox(height: 5),
                   Text(
                     data,
                     style: GoogleFonts.montserrat(
@@ -140,10 +140,10 @@ class LandlordsOnboardedInfoPage extends StatelessWidget {
                         ),
                         child: Container(
                           padding: const EdgeInsets.all(8.0),
-                          child: Column(
+                          child: const Column(
                             children: [
-                              const SizedBox(height: 10),
-                              const Text(
+                              SizedBox(height: 10),
+                              Text(
                                 "LandLord",
                                 style: TextStyle(
                                   fontSize: 28,
@@ -151,9 +151,9 @@ class LandlordsOnboardedInfoPage extends StatelessWidget {
                                   // fontWeight: FontWeight.bold,
                                 ),
                               ),
-                              const SizedBox(height: 16),
+                              SizedBox(height: 16),
 
-                              const Text(
+                              Text(
                                 "Arshad Ali",
                                 style: TextStyle(
                                   fontSize: 24,
@@ -161,51 +161,51 @@ class LandlordsOnboardedInfoPage extends StatelessWidget {
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
-  const SizedBox(height: 20),
+  SizedBox(height: 20),
 
                                ContractCard(
     icon: Icons.person,
     label: 'LandLords Name:',
     data: 'Arshad Ali',
   ),
-  const SizedBox(height: 16),
+  SizedBox(height: 16),
   ContractCard(
     icon: Icons.person,
     label: 'Tenant Name:',
     data: 'Umer Sheikh',
   ),
-  const SizedBox(height: 16),
+  SizedBox(height: 16),
   ContractCard(
     icon: Icons.calendar_today,
     label: 'Contract Start Date:',
     data: '2023-06-01',
   ),
-  const SizedBox(height: 16),
+  SizedBox(height: 16),
   ContractCard(
     icon: Icons.calendar_today,
     label: 'Contract End Date:',
     data: '2024-05-31',
   ),
-  const SizedBox(height: 16),
+  SizedBox(height: 16),
   ContractCard(
     icon: Icons.place,
     label: 'Property Address:',
     data: 'DHA Phase 5, 23 st',
   ),
-  const SizedBox(height: 16),
+  SizedBox(height: 16),
   ContractCard(
     icon: Icons.request_page,
     label: 'Upfront Bonus:',
     data: '5000',
   ),
-  const SizedBox(height: 16),
+  SizedBox(height: 16),
   ContractCard(
     icon: Icons.request_page,
     label: 'Monthly Profit:',
     data: '500',
   ),
  
-  const SizedBox(height: 24),
+  SizedBox(height: 24),
                             ],
                           ),
                         ),

@@ -42,7 +42,7 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
     List<Tenant> tenantList = [];
 
     for (var doc in querySnapshot.docs) {
-      Tenant tenant = Tenant.fromJson(doc.data() as Map<String, dynamic>);
+      Tenant tenant = Tenant.fromJson(doc.data());
       tenantList.add(tenant);
     }
 
@@ -88,53 +88,53 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
               children: [
                 ListTile(
                   title: Text(
-                    tenant.firstName + ' ' + tenant.lastName,
-                    style: TextStyle(
+                    '${tenant.firstName} ${tenant.lastName}',
+                    style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   subtitle: Text(
                     'Rent: \$${tenant.rent.toStringAsFixed(2)}',
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 16,
                     ),
                   ),
                 ),
                 ListTile(
-                  leading: Icon(Icons.person),
+                  leading: const Icon(Icons.person),
                   title: Text(
                     'Description: ${tenant.description}',
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 16,
                     ),
                   ),
                 ),
                 ListTile(
-                  leading: Icon(Icons.star),
+                  leading: const Icon(Icons.star),
                   title: Text(
                     'Rating: ${tenant.rating.toStringAsFixed(1)}',
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 16,
                     ),
                   ),
                 ),
-                SizedBox(height: 10),
-                Text(
+                const SizedBox(height: 10),
+                const Text(
                   'Image:',
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 // Display the images with loading indicator
-                Container(
+                SizedBox(
                   height: 200.0, // Adjust this value according to your needs.
                   child: CachedNetworkImage(
                     imageUrl: tenant.pathToImage ?? '',
                     errorWidget: (context, error, stackTrace) {
-                      return Icon(Icons.error);
+                      return const Icon(Icons.error);
                     },
                     progressIndicatorBuilder: (context, url, downloadProgress) {
                       return CircularProgressIndicator(
@@ -143,7 +143,7 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
                     },
                   ),
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
               ],
             ),
           ),
@@ -156,10 +156,10 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Tenants Input'),
+        title: const Text('Tenants Input'),
         flexibleSpace: Container(
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
@@ -182,7 +182,7 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
                 onChanged: (value) {
                   filterTenants(value);
                 },
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'Search',
                   prefixIcon: Icon(Icons.search),
                   border: OutlineInputBorder(),
@@ -196,9 +196,9 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
                   Tenant tenant = getPaginatedTenants()[index];
 
                   return ListTile(
-                    title: Text(tenant.firstName + ' ' + tenant.lastName),
+                    title: Text('${tenant.firstName} ${tenant.lastName}'),
                     subtitle: Text(tenant.rent.toString()),
-                    leading: Icon(Icons.person),
+                    leading: const Icon(Icons.person),
                     onTap: () => openTenantDetailsDialog(tenant),
                   );
                 },
@@ -208,7 +208,7 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 IconButton(
-                  icon: Icon(Icons.arrow_back),
+                  icon: const Icon(Icons.arrow_back),
                   onPressed: () {
                     setState(() {
                       if (currentPage > 1) {
@@ -219,13 +219,13 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
                 ),
                 Text(
                   'Page $currentPage',
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 IconButton(
-                  icon: Icon(Icons.arrow_forward),
+                  icon: const Icon(Icons.arrow_forward),
                   onPressed: () {
                     setState(() {
                       final maxPage =
@@ -252,8 +252,8 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
             },
           );
         },
-        child: Icon(Icons.add),
-        backgroundColor: Color(0xff0FA697),
+        backgroundColor: const Color(0xff0FA697),
+        child: const Icon(Icons.add),
       ),
     );
   }
@@ -295,7 +295,7 @@ class _TenantCardWidgetState extends State<TenantCardWidget> {
     List<Tenant> tenants = [];
 
     for (var doc in querySnapshot.docs) {
-      Tenant tenant = Tenant.fromJson(doc.data() as Map<String, dynamic>);
+      Tenant tenant = Tenant.fromJson(doc.data());
       tenants.add(tenant);
     }
 
@@ -427,11 +427,11 @@ class _TenantCardWidgetState extends State<TenantCardWidget> {
               ),
               child: Column(
                 children: [
-                  ListTile(
+                  const ListTile(
                     title: Text('Tenant Details'),
                   ),
                   TextField(
-                    decoration: InputDecoration(labelText: 'First Name'),
+                    decoration: const InputDecoration(labelText: 'First Name'),
                     onChanged: (value) {
                       setState(() {
                         firstName = value;
@@ -439,7 +439,7 @@ class _TenantCardWidgetState extends State<TenantCardWidget> {
                     },
                   ),
                   TextField(
-                    decoration: InputDecoration(labelText: 'Last Name'),
+                    decoration: const InputDecoration(labelText: 'Last Name'),
                     onChanged: (value) {
                       setState(() {
                         lastName = value;
@@ -447,7 +447,7 @@ class _TenantCardWidgetState extends State<TenantCardWidget> {
                     },
                   ),
                   TextField(
-                    decoration: InputDecoration(labelText: 'Description'),
+                    decoration: const InputDecoration(labelText: 'Description'),
                     onChanged: (value) {
                       setState(() {
                         description = value;
@@ -455,7 +455,7 @@ class _TenantCardWidgetState extends State<TenantCardWidget> {
                     },
                   ),
                   TextField(
-                    decoration: InputDecoration(labelText: 'Rating'),
+                    decoration: const InputDecoration(labelText: 'Rating'),
                     keyboardType: TextInputType.number,
                     onChanged: (value) {
                       setState(() {
@@ -464,7 +464,7 @@ class _TenantCardWidgetState extends State<TenantCardWidget> {
                     },
                   ),
                   TextField(
-                    decoration: InputDecoration(labelText: 'Rent'),
+                    decoration: const InputDecoration(labelText: 'Rent'),
                     keyboardType: TextInputType.number,
                     onChanged: (value) {
                       setState(() {
@@ -472,12 +472,12 @@ class _TenantCardWidgetState extends State<TenantCardWidget> {
                       });
                     },
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   ElevatedButton(
                     onPressed: selectImages,
-                    child: Text('Select Images'),
+                    child: const Text('Select Images'),
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   AbsorbPointer(
                     absorbing: uploading,
                     child: Stack(
@@ -485,9 +485,9 @@ class _TenantCardWidgetState extends State<TenantCardWidget> {
                       children: [
                         ElevatedButton(
                           onPressed: validateInputs,
-                          child: Text('Submit'),
+                          child: const Text('Submit'),
                         ),
-                        if (uploading) CircularProgressIndicator(),
+                        if (uploading) const CircularProgressIndicator(),
                       ],
                     ),
                   ),

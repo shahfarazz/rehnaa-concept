@@ -193,7 +193,7 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
                         toastLength: Toast.LENGTH_SHORT,
                         gravity: ToastGravity.BOTTOM,
                         timeInSecForIosWeb: 3,
-                        backgroundColor: Color(0xff45BF7A),
+                        backgroundColor: const Color(0xff45BF7A),
                       );
                       FirebaseFirestore.instance
                           .collection('Notifications')
@@ -203,7 +203,7 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
                         'notifications': FieldValue.arrayUnion([
                           {
                             'title':
-                                'Withdraw Request by ${landlord.firstName + ' ' + landlord.lastName}',
+                                'Withdraw Request by ${'${landlord.firstName} ${landlord.lastName}'}',
                             'amount': 'Rs${landlord.balance.toString()}',
                           }
                         ]),
@@ -224,7 +224,7 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
                         'withdrawRequest': FieldValue.arrayUnion([
                           {
                             'fullname':
-                                '${landlord.firstName + ' ' + landlord.lastName}',
+                                '${landlord.firstName} ${landlord.lastName}',
                             'amount': landlord.balance,
                             'paymentMethod': selectedOption,
                             'uid': widget.uid,
@@ -300,7 +300,7 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
       future: _landlordFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return LandlordDashboardContentSkeleton();
+          return const LandlordDashboardContentSkeleton();
         } else if (snapshot.hasError) {
           // Handle any error that occurred while fetching the data
           return Text('Error: ${snapshot.error}');
@@ -415,9 +415,9 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
                                             Colors.grey,
                                           ]
                                         : [
-                                            Color(0xff0FA697),
-                                            Color(0xff45BF7A),
-                                            Color(0xff0DF205),
+                                            const Color(0xff0FA697),
+                                            const Color(0xff45BF7A),
+                                            const Color(0xff0DF205),
                                           ],
                                   ),
                                 ),
@@ -483,8 +483,8 @@ class LandlordDashboardContentSkeleton extends StatelessWidget {
                 padding: const EdgeInsets.all(16.0),
                 child: Skeleton(width: size.width * 0.5, height: 30),
               ),
-              Padding(
-                padding: const EdgeInsets.only(bottom: 8.0),
+              const Padding(
+                padding: EdgeInsets.only(bottom: 8.0),
                 child: CircleSkeleton(
                   size: 150,
                 ),
@@ -519,7 +519,7 @@ class LandlordDashboardContentSkeleton extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
                         Skeleton(width: size.width * 0.5, height: 20),
-                        SizedBox(height: 16),
+                        const SizedBox(height: 16),
                         Skeleton(width: size.width * 0.5, height: 30),
                         SizedBox(height: size.height * 0.05),
                         Skeleton(width: size.width * 0.5, height: 50),

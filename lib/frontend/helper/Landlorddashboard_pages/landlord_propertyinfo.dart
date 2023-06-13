@@ -115,8 +115,8 @@ class PropertyCarousel extends StatelessWidget {
                           imagePath, // TODO define a new property.iconimagepath
 
                       placeholder: (context, url) =>
-                          CircularProgressIndicator(),
-                      errorWidget: (context, url, error) => Icon(Icons.error),
+                          const CircularProgressIndicator(),
+                      errorWidget: (context, url, error) => const Icon(Icons.error),
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -276,7 +276,7 @@ class PropertyDetails extends StatelessWidget {
                   SizedBox(height: screenHeight * 0.02),
                   Row(
                     children: [
-                      Icon(
+                      const Icon(
                         Icons
                             .arrow_back_ios, // Replace with your desired arrow icon
                         size: 20,
@@ -324,14 +324,14 @@ class PropertyDetails extends StatelessWidget {
                           ),
                         ),
                       ),
-                      Icon(
+                      const Icon(
                         Icons
                             .arrow_forward_ios, // Replace with your desired arrow icon
                         size: 20,
                       ),
                     ],
                   ),
-                  SizedBox(height: 25),
+                  const SizedBox(height: 25),
                   Text(
                     'Owner Details',
                     style: GoogleFonts.montserrat(
@@ -339,7 +339,7 @@ class PropertyDetails extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
                 ],
               ),
               const SizedBox(height: 12),
@@ -365,7 +365,7 @@ class PropertyDetails extends StatelessWidget {
                         // 'hello',
                         '$firstName $lastName', // Replace with the owner's name fetched from Firebase
                         style: GoogleFonts.montserrat(
-                          color: Color(0xFF33907C),
+                          color: const Color(0xFF33907C),
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
                         ),
@@ -616,8 +616,8 @@ class _ExpandedImagePageState extends State<ExpandedImagePage> {
                     imageUrl: widget
                         .imagePath, // TODO define a new property.iconimagepath
 
-                    placeholder: (context, url) => CircularProgressIndicator(),
-                    errorWidget: (context, url, error) => Icon(Icons.error),
+                    placeholder: (context, url) => const CircularProgressIndicator(),
+                    errorWidget: (context, url, error) => const Icon(Icons.error),
                     fit: BoxFit.cover,
                   ),
                 ),

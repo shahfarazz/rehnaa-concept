@@ -150,7 +150,7 @@ class VouchersPage extends StatelessWidget {
       future: fetchVouchers(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return CircularProgressIndicator();
+          return const CircularProgressIndicator();
         }
         if (snapshot.hasError) {
           return Text('Error: ${snapshot.error}');
@@ -168,7 +168,7 @@ class VouchersPage extends StatelessWidget {
             itemBuilder: (context, index) {
               Voucher voucher = vouchersList[index];
               return Padding(
-                padding: EdgeInsets.only(right: 16.0),
+                padding: const EdgeInsets.only(right: 16.0),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(20.0),
                   child: Card(

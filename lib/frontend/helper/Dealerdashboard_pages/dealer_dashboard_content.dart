@@ -48,7 +48,7 @@ class _DealerDashboardContentState extends State<DealerDashboardContent>
       }
 
       // Use the Tenant.fromJson method to create a Tenant instance
-      Tenant tenant = await Tenant.fromJson(json);
+      Tenant tenant = Tenant.fromJson(json);
       if (kDebugMode) {
         print('Created tenant: $tenant');
       }
@@ -228,7 +228,7 @@ class _DealerDashboardContentState extends State<DealerDashboardContent>
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           // Show a loading indicator while waiting for the data
-          return LandlordDashboardContentSkeleton();
+          return const LandlordDashboardContentSkeleton();
         } else if (snapshot.hasError) {
           // Handle any error that occurred while fetching the data
           return Text('Error: ${snapshot.error}');

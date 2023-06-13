@@ -50,9 +50,7 @@ class Landlord {
           ? List<DocumentReference<Map<String, dynamic>>>.from(
               json['rentpaymentRef'].map((ref) => ref as DocumentReference))
           : null,
-      pathToImage: json['pathToImage'] != null
-          ? json['pathToImage']
-          : 'assets/defaulticon.png',
+      pathToImage: json['pathToImage'] ?? 'assets/defaulticon.png',
     );
 
     await landlord.fetchData();

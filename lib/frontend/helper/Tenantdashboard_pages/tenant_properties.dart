@@ -77,7 +77,7 @@ class _TenantPropertiesPageState extends State<TenantPropertiesPage>
     super.build(context); // Necessary for AutomaticKeepAliveClientMixin
 
     if (properties.isEmpty && !shouldDisplay) {
-      return LandlordPropertiesSkeleton();
+      return const LandlordPropertiesSkeleton();
     } else if (properties.isEmpty && shouldDisplay) {
       return Center(
         child: Card(
@@ -94,10 +94,10 @@ class _TenantPropertiesPageState extends State<TenantPropertiesPage>
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(
+                const Icon(
                   Icons.house,
                   size: 48.0,
-                  color: const Color(0xff33907c),
+                  color: Color(0xff33907c),
                 ),
                 const SizedBox(height: 16.0),
                 Text(
@@ -190,8 +190,8 @@ class PropertyCard extends StatelessWidget {
                   imageUrl: property
                       .imagePath[0], // TODO define a new property.iconimagepath
 
-                  placeholder: (context, url) => CircularProgressIndicator(),
-                  errorWidget: (context, url, error) => Icon(Icons.error),
+                  placeholder: (context, url) => const CircularProgressIndicator(),
+                  errorWidget: (context, url, error) => const Icon(Icons.error),
                   fit: BoxFit.cover,
                 ),
               ),

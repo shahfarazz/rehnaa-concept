@@ -45,7 +45,7 @@ class _AdminVouchersPageState extends State<AdminVouchersPage> {
     input.click();
 
     await input.onChange.first;
-    late var pickedFile;
+    late List<html.File>? pickedFile;
 
     if (input.files != null) {
       setState(() {
@@ -80,7 +80,7 @@ class _AdminVouchersPageState extends State<AdminVouchersPage> {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-              builder: (context) => AdminVouchersPage(),
+              builder: (context) => const AdminVouchersPage(),
             ),
           );
         });
@@ -158,7 +158,7 @@ class _AdminVouchersPageState extends State<AdminVouchersPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Admin Vouchers'),
+        title: const Text('Admin Vouchers'),
       ),
       body: Center(
         child: Column(
@@ -169,13 +169,13 @@ class _AdminVouchersPageState extends State<AdminVouchersPage> {
                   onPressed: () {
                     addVoucher();
                   },
-                  child: Text('Add Voucher'),
+                  child: const Text('Add Voucher'),
                 ),
                 if (isLoading)
                   Positioned.fill(
                     child: Container(
                       color: Colors.black54,
-                      child: Center(
+                      child: const Center(
                         child: CircularProgressIndicator(),
                       ),
                     ),
@@ -191,7 +191,7 @@ class _AdminVouchersPageState extends State<AdminVouchersPage> {
                     leading: Image.network(vouchers[index].url),
                     trailing: IconButton(
                       onPressed: () => deleteVoucher(index),
-                      icon: Icon(Icons.delete),
+                      icon: const Icon(Icons.delete),
                     ),
                   );
                 },

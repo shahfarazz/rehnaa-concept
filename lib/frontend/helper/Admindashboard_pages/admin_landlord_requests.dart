@@ -13,7 +13,7 @@ class _AdmninRequestsPageState extends State<AdmninRequestsPage> {
         .collection('AdminRequests')
         .get()
         .then((QuerySnapshot querySnapshot) {
-      querySnapshot.docs.forEach((doc) {
+      for (var doc in querySnapshot.docs) {
         try {
           if (doc["withdrawRequest"] != null) {
             // if yes, then loop through the array
@@ -61,7 +61,7 @@ class _AdmninRequestsPageState extends State<AdmninRequestsPage> {
             print('Error: $e');
           }
         }
-      });
+      }
       setState(() {
         displayedRequests.addAll(adminRequests);
       });
@@ -108,11 +108,11 @@ class _AdmninRequestsPageState extends State<AdmninRequestsPage> {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
-        title: Text('Withdrawal Requests'),
+        title: const Text('Withdrawal Requests'),
         flexibleSpace: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           // borderRadius: BorderRadius.circular(24),
-          gradient: const LinearGradient(
+          gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
@@ -183,22 +183,22 @@ class _AdmninRequestsPageState extends State<AdmninRequestsPage> {
               //     ),
               //   ),
               // ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16),
+                padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: TextField(
                   controller: searchController,
                   onChanged: filterRequests,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     labelText: 'Search(name)',
                     prefixIcon: Icon(Icons.search),
                   ),
                 ),
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               ListView.builder(
                 shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
+                physics: const NeverScrollableScrollPhysics(),
                 itemCount: getPaginatedRequests().length,
                 itemBuilder: (context, index) {
                   final request = getPaginatedRequests()[index];
@@ -210,7 +210,7 @@ class _AdmninRequestsPageState extends State<AdmninRequestsPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   IconButton(
-                    icon: Icon(Icons.arrow_back),
+                    icon: const Icon(Icons.arrow_back),
                     onPressed: () {
                       setState(() {
                         if (currentPage > 1) {
@@ -221,7 +221,7 @@ class _AdmninRequestsPageState extends State<AdmninRequestsPage> {
                   ),
                   Text(
                     'Page $currentPage',
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 16,
                       fontFamily: 'Montserrat',
                       fontWeight: FontWeight.bold,
@@ -229,7 +229,7 @@ class _AdmninRequestsPageState extends State<AdmninRequestsPage> {
                     ),
                   ),
                   IconButton(
-                    icon: Icon(Icons.arrow_forward),
+                    icon: const Icon(Icons.arrow_forward),
                     onPressed: () {
                       setState(() {
                         final maxPage =
@@ -276,7 +276,7 @@ class LandlordWithdrawalCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: EdgeInsets.all(16),
+      margin: const EdgeInsets.all(16),
       color: Colors.grey[200],
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -284,54 +284,54 @@ class LandlordWithdrawalCard extends StatelessWidget {
         children: [
           Text(
             'Request Type: ${data.requestType}',
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 16,
               fontFamily: 'Montserrat',
               fontWeight: FontWeight.bold,
               color: Colors.black,
             ),
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           Text(
             'Name: ${data.name}',
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 16,
               fontFamily: 'Montserrat',
               fontWeight: FontWeight.bold,
               color: Colors.black,
             ),
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           Text(
             'Requested Amount: ${data.requestedAmount}',
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 16,
               fontFamily: 'Montserrat',
               fontWeight: FontWeight.bold,
               color: Colors.black,
             ),
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           Text(
             'UID: ${data.uid}',
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 16,
               fontFamily: 'Montserrat',
               fontWeight: FontWeight.bold,
               color: Colors.black,
             ),
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           Text(
             'Cash/BankTransfer: ${data.cashOrBankTransfer}',
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 16,
               fontFamily: 'Montserrat',
               fontWeight: FontWeight.bold,
               color: Colors.black,
             ),
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -340,9 +340,9 @@ class LandlordWithdrawalCard extends StatelessWidget {
                   // Handle accept button press
                 },
                 style: ElevatedButton.styleFrom(
-                  primary: Colors.green,
+                  backgroundColor: Colors.green,
                 ),
-                child: Text(
+                child: const Text(
                   'Accept',
                   style: TextStyle(
                     fontSize: 16,
@@ -352,15 +352,15 @@ class LandlordWithdrawalCard extends StatelessWidget {
                   ),
                 ),
               ),
-              SizedBox(width: 10),
+              const SizedBox(width: 10),
               ElevatedButton(
                 onPressed: () {
                   // Handle deny button press
                 },
                 style: ElevatedButton.styleFrom(
-                  primary: Colors.red,
+                  backgroundColor: Colors.red,
                 ),
-                child: Text(
+                child: const Text(
                   'Deny',
                   style: TextStyle(
                     fontSize: 16,

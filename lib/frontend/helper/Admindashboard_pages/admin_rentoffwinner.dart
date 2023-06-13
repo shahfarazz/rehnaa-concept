@@ -177,7 +177,7 @@ class _AdminRentOffWinnerPageState extends State<AdminRentOffWinnerPage> {
                               title: const Text('Enter Discount'),
                               content: TextField(
                                 controller: controller,
-                                keyboardType: TextInputType.numberWithOptions(
+                                keyboardType: const TextInputType.numberWithOptions(
                                     decimal: true),
                                 inputFormatters: <TextInputFormatter>[
                                   FilteringTextInputFormatter.allow(

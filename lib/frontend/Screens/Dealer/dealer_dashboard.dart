@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 
 import 'package:rehnaa/frontend/Screens/contract.dart';
@@ -228,7 +227,7 @@ class _DealerDashboardPageState extends State<DealerDashboardPage>
                   ),
                   child: Text(
                     notifications.length.toString(),
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 10,
                     ),
@@ -311,14 +310,14 @@ class _DealerDashboardPageState extends State<DealerDashboardPage>
                                   // Add your onTap functionality here
                                 },
                                 child: ShaderMask(
-                                  shaderCallback: (bounds) => LinearGradient(
+                                  shaderCallback: (bounds) => const LinearGradient(
                                     colors: [
                                       Color(0xFF0FA697),
                                       Color(0xFF45BF7A),
                                       Color(0xFF0DF205),
                                     ],
                                   ).createShader(bounds),
-                                  child: Text(
+                                  child: const Text(
                                     'Rehnaa',
                                     style: TextStyle(
                                       fontSize: 24,
@@ -345,7 +344,7 @@ class _DealerDashboardPageState extends State<DealerDashboardPage>
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => ContractPage(),
+                            builder: (context) => const ContractPage(),
                           ),
                         );
                         // _closeSidebar();
@@ -358,7 +357,7 @@ class _DealerDashboardPageState extends State<DealerDashboardPage>
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => VouchersPage(),
+                            builder: (context) => const VouchersPage(),
                           ),
                         );
                         // _closeSidebar();
@@ -372,7 +371,7 @@ class _DealerDashboardPageState extends State<DealerDashboardPage>
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => EventsPage(),
+                            builder: (context) => const EventsPage(),
                           ),
                         );
                         // _closeSidebar();
@@ -385,7 +384,7 @@ class _DealerDashboardPageState extends State<DealerDashboardPage>
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => PrivacyPolicyPage(),
+                            builder: (context) => const PrivacyPolicyPage(),
                           ),
                         );
                         // _closeSidebar();
@@ -398,7 +397,7 @@ class _DealerDashboardPageState extends State<DealerDashboardPage>
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => FAQPage(),
+                            builder: (context) => const FAQPage(),
                           ),
                         );
                         // _closeSidebar();
@@ -456,7 +455,7 @@ class _DealerDashboardPageState extends State<DealerDashboardPage>
           Expanded(
             child: Text(
               label,
-              style: TextStyle(
+              style: const TextStyle(
                 fontFamily: 'Montserrat',
                 fontSize: 18,
               ),
@@ -502,7 +501,7 @@ class _DealerDashboardPageState extends State<DealerDashboardPage>
                 Positioned.fill(
                   child: Container(
                     decoration: BoxDecoration(
-                      gradient: LinearGradient(
+                      gradient: const LinearGradient(
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                         colors: [
@@ -522,7 +521,7 @@ class _DealerDashboardPageState extends State<DealerDashboardPage>
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
-                          Hero(
+                          const Hero(
                             tag: 'notificationTitle',
                             child: Text(
                               'Notifications',
@@ -535,7 +534,7 @@ class _DealerDashboardPageState extends State<DealerDashboardPage>
                             ),
                           ),
                           IconButton(
-                            icon: Icon(Icons.close),
+                            icon: const Icon(Icons.close),
                             onPressed: () {
                               Navigator.pop(context);
                             },
@@ -544,33 +543,33 @@ class _DealerDashboardPageState extends State<DealerDashboardPage>
                         ],
                       ),
                     ),
-                    Divider(
+                    const Divider(
                       height: 0,
                       color: Colors.grey,
                     ),
                     Expanded(
                       child: ClipRRect(
-                        borderRadius: BorderRadius.only(
+                        borderRadius: const BorderRadius.only(
                           bottomLeft: Radius.circular(20.0),
                           bottomRight: Radius.circular(20.0),
                         ),
                         child: Container(
-                          padding: EdgeInsets.only(bottom: 4.0),
+                          padding: const EdgeInsets.only(bottom: 4.0),
                           color: Colors.white,
                           child: Scrollbar(
-                            isAlwaysShown: true,
+                            thumbVisibility: true,
                             child: SingleChildScrollView(
                               child: Column(
                                 children: notifications
                                     .map(
                                       (notification) => Padding(
                                         padding:
-                                            EdgeInsets.symmetric(vertical: 8.0),
+                                            const EdgeInsets.symmetric(vertical: 8.0),
                                         child: Row(
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
                                           children: <Widget>[
-                                            SizedBox(
+                                            const SizedBox(
                                               width: 24.0,
                                               child: Padding(
                                                 padding:
@@ -585,7 +584,7 @@ class _DealerDashboardPageState extends State<DealerDashboardPage>
                                                 ),
                                               ),
                                             ),
-                                            SizedBox(width: 12.0),
+                                            const SizedBox(width: 12.0),
                                             Expanded(
                                               child: Column(
                                                 crossAxisAlignment:
@@ -593,7 +592,7 @@ class _DealerDashboardPageState extends State<DealerDashboardPage>
                                                 children: [
                                                   Text(
                                                     notification['title']!,
-                                                    style: TextStyle(
+                                                    style: const TextStyle(
                                                       fontSize: 18.0,
                                                       fontFamily: 'Montserrat',
                                                     ),
@@ -601,18 +600,18 @@ class _DealerDashboardPageState extends State<DealerDashboardPage>
                                                   if (notification['amount']!
                                                       .isNotEmpty)
                                                     Padding(
-                                                      padding: EdgeInsets.only(
+                                                      padding: const EdgeInsets.only(
                                                           left: 24.0),
                                                       child: RichText(
                                                         text: TextSpan(
-                                                          style: TextStyle(
+                                                          style: const TextStyle(
                                                             fontSize: 16.0,
                                                             fontFamily:
                                                                 'Montserrat',
                                                             color: Colors.black,
                                                           ),
                                                           children: [
-                                                            TextSpan(
+                                                            const TextSpan(
                                                               text: 'Amount: ',
                                                               style: TextStyle(
                                                                 fontFamily:
@@ -622,7 +621,7 @@ class _DealerDashboardPageState extends State<DealerDashboardPage>
                                                             TextSpan(
                                                               text: notification[
                                                                   'amount']!,
-                                                              style: TextStyle(
+                                                              style: const TextStyle(
                                                                 fontWeight:
                                                                     FontWeight
                                                                         .bold,

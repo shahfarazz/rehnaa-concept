@@ -10,7 +10,6 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'dart:io';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:path_provider/path_provider.dart';
-import 'package:flutter/services.dart';
 // ignore: avoid_web_libraries_in_flutter
 
 import 'package:crypto/crypto.dart';
@@ -45,8 +44,7 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
     List<Landlord> landlordList = [];
 
     for (var doc in querySnapshot.docs) {
-      Landlord landlord =
-          await Landlord.fromJson(doc.data() as Map<String, dynamic>);
+      Landlord landlord = await Landlord.fromJson(doc.data());
       landlordList.add(landlord);
     }
 
@@ -95,62 +93,62 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
               children: [
                 ListTile(
                   title: Text(
-                    landlord.firstName + ' ' + landlord.lastName,
-                    style: TextStyle(
+                    '${landlord.firstName} ${landlord.lastName}',
+                    style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   subtitle: Text(
                     'Balance: Rs.${landlord.balance.toStringAsFixed(2)}',
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 16,
                     ),
                   ),
                 ),
                 ListTile(
-                  leading: Icon(Icons.person_2),
+                  leading: const Icon(Icons.person_2),
                   title: Text(
                     'tenantRef: ${landlord.tenantRef}',
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 16,
                     ),
                   ),
                 ),
                 ListTile(
-                  leading: Icon(Icons.home),
+                  leading: const Icon(Icons.home),
                   title: Text(
                     'PropertyRef: ${landlord.propertyRef}',
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 16,
                     ),
                   ),
                 ),
                 ListTile(
-                  leading: Icon(Icons.receipt),
+                  leading: const Icon(Icons.receipt),
                   title: Text(
                     'Rentpaymentref: ${landlord.rentpaymentRef}',
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 16,
                     ),
                   ),
                 ),
-                SizedBox(height: 10),
-                Text(
+                const SizedBox(height: 10),
+                const Text(
                   'Image:',
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 // Display the images with loading indicator
-                Container(
+                SizedBox(
                   height: 200.0, // Adjust this value according to your needs.
                   child: CachedNetworkImage(
                     imageUrl: landlord.pathToImage ?? '',
                     errorWidget: (context, error, stackTrace) {
-                      return Icon(Icons.error);
+                      return const Icon(Icons.error);
                     },
                     progressIndicatorBuilder: (context, url, downloadProgress) {
                       return CircularProgressIndicator(
@@ -159,7 +157,7 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
                     },
                   ),
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
               ],
             ),
           ),
@@ -172,10 +170,10 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Landlord Input'),
+        title: const Text('Landlord Input'),
         flexibleSpace: Container(
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
@@ -198,7 +196,7 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
                 onChanged: (value) {
                   filterLandlords(value);
                 },
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'Search',
                   prefixIcon: Icon(Icons.search),
                   border: OutlineInputBorder(),
@@ -212,9 +210,9 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
                   Landlord landlord = getPaginatedProperties()[index];
 
                   return ListTile(
-                    title: Text(landlord.firstName + ' ' + landlord.lastName),
+                    title: Text('${landlord.firstName} ${landlord.lastName}'),
                     subtitle: Text(landlord.balance.toString()),
-                    leading: Icon(Icons.person),
+                    leading: const Icon(Icons.person),
                     onTap: () => openPropertyDetailsDialog(landlord),
                   );
                 },
@@ -224,7 +222,7 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 IconButton(
-                  icon: Icon(Icons.arrow_back),
+                  icon: const Icon(Icons.arrow_back),
                   onPressed: () {
                     setState(() {
                       if (currentPage > 1) {
@@ -235,13 +233,13 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
                 ),
                 Text(
                   'Page $currentPage',
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 IconButton(
-                  icon: Icon(Icons.arrow_forward),
+                  icon: const Icon(Icons.arrow_forward),
                   onPressed: () {
                     setState(() {
                       final maxPage =
@@ -269,8 +267,8 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
           );
           // Add functionality for the + floating action button here
         },
-        child: Icon(Icons.add),
-        backgroundColor: Color(0xff0FA697),
+        backgroundColor: const Color(0xff0FA697),
+        child: const Icon(Icons.add),
       ),
     );
   }
@@ -552,11 +550,11 @@ class _LandlordCardWidgetState extends State<LandlordCardWidget> {
               ),
               child: Column(
                 children: [
-                  ListTile(
+                  const ListTile(
                     title: Text('Landlord Details'),
                   ),
                   TextField(
-                    decoration: InputDecoration(labelText: 'First Name'),
+                    decoration: const InputDecoration(labelText: 'First Name'),
                     onChanged: (value) {
                       setState(() {
                         firstName = value;
@@ -564,7 +562,7 @@ class _LandlordCardWidgetState extends State<LandlordCardWidget> {
                     },
                   ),
                   TextField(
-                    decoration: InputDecoration(labelText: 'Last Name'),
+                    decoration: const InputDecoration(labelText: 'Last Name'),
                     onChanged: (value) {
                       setState(() {
                         lastName = value;
@@ -572,7 +570,7 @@ class _LandlordCardWidgetState extends State<LandlordCardWidget> {
                     },
                   ),
                   TextField(
-                    decoration: InputDecoration(labelText: 'Balance'),
+                    decoration: const InputDecoration(labelText: 'Balance'),
                     keyboardType: TextInputType.number,
                     onChanged: (value) {
                       setState(() {
@@ -580,15 +578,15 @@ class _LandlordCardWidgetState extends State<LandlordCardWidget> {
                       });
                     },
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   ElevatedButton(
                     onPressed: selectImages,
                     child: Text(buttonLabel),
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   DropdownButton<DocumentSnapshot<Map<String, dynamic>>>(
                     value: selectedDealer,
-                    hint: Text('Select Dealer'),
+                    hint: const Text('Select Dealer'),
                     items: dealerList.map((dealer) {
                       String dealerName =
                           '${dealer.data()!['firstName']} ${dealer.data()!['lastName']}';
@@ -603,37 +601,39 @@ class _LandlordCardWidgetState extends State<LandlordCardWidget> {
                       });
                     },
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   TextField(
                     controller: cnicController,
-                    decoration: InputDecoration(labelText: 'CNIC Number'),
+                    decoration: const InputDecoration(labelText: 'CNIC Number'),
                   ),
                   TextField(
                     controller: bankNameController,
-                    decoration: InputDecoration(labelText: 'Bank Name'),
+                    decoration: const InputDecoration(labelText: 'Bank Name'),
                   ),
                   TextField(
                     controller: raastIdController,
-                    decoration: InputDecoration(labelText: 'Raast ID'),
+                    decoration: const InputDecoration(labelText: 'Raast ID'),
                   ),
                   TextField(
                     controller: accountNumberController,
                     decoration:
-                        InputDecoration(labelText: 'Bank Account Number'),
+                        const InputDecoration(labelText: 'Bank Account Number'),
                   ),
                   TextField(
                     controller: ibanController,
-                    decoration: InputDecoration(labelText: 'IBAN'),
+                    decoration: const InputDecoration(labelText: 'IBAN'),
                   ),
                   TextField(
                     controller: creditPointsController,
-                    decoration: InputDecoration(labelText: 'Credit Points'),
+                    decoration:
+                        const InputDecoration(labelText: 'Credit Points'),
                   ),
                   TextField(
                     controller: creditScoreController,
-                    decoration: InputDecoration(labelText: 'Credit Score'),
+                    decoration:
+                        const InputDecoration(labelText: 'Credit Score'),
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   AbsorbPointer(
                     absorbing: uploading,
                     child: Stack(
@@ -641,9 +641,9 @@ class _LandlordCardWidgetState extends State<LandlordCardWidget> {
                       children: [
                         ElevatedButton(
                           onPressed: validateInputs,
-                          child: Text('Submit'),
+                          child: const Text('Submit'),
                         ),
-                        if (uploading) CircularProgressIndicator(),
+                        if (uploading) const CircularProgressIndicator(),
                       ],
                     ),
                   ),
