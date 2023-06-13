@@ -31,19 +31,19 @@ class _DealerRentHistoryPageState extends State<DealerRentHistoryPage>
   @override
   void initState() {
     super.initState();
-    _tenantRentPayments(); // Call method to load rent payments when the state is initialized
+    _dealerRentPayments(); // Call method to load rent payments when the state is initialized
   }
 
-  Future<void> _tenantRentPayments() async {
+  Future<void> _dealerRentPayments() async {
     try {
       // Fetch landlord data from Firestore
-      DocumentSnapshot<Map<String, dynamic>> landlordSnapshot =
+      DocumentSnapshot<Map<String, dynamic>> dealerSnapshot =
           await FirebaseFirestore.instance
-              .collection('Tenants')
+              .collection('Dealers')
               .doc(widget.uid)
               .get();
 
-      Map<String, dynamic>? data = landlordSnapshot.data();
+      Map<String, dynamic>? data = dealerSnapshot.data();
       List<dynamic> rentPaymentRefs = data!['rentPaymentRef'] ?? [];
       firstName = data['firstName'];
       lastName = data['lastName'];
@@ -63,6 +63,10 @@ class _DealerRentHistoryPageState extends State<DealerRentHistoryPage>
           });
         }
       }
+
+      setState(() {
+        shouldDisplay = true;
+      });
 
       if (kDebugMode) {
         print('Rent payments: $_rentPayments');

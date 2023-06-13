@@ -3,15 +3,20 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/Tenant_propertyinfo.dart';
+import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenant_propertyinfo.dart';
 import '../../../backend/models/propertymodel.dart';
 import '../Landlorddashboard_pages/landlord_propertyinfo.dart';
 import '../Landlorddashboard_pages/landlordproperties.dart';
 
 class TenantPropertiesPage extends StatefulWidget {
   final String uid; // UID of the landlord
+  final bool isWithdraw;
 
-  const TenantPropertiesPage({Key? key, required this.uid}) : super(key: key);
+  const TenantPropertiesPage({
+    Key? key,
+    required this.uid,
+    required this.isWithdraw,
+  }) : super(key: key);
 
   @override
   // ignore: library_private_types_in_public_api
@@ -43,17 +48,17 @@ class _TenantPropertiesPageState extends State<TenantPropertiesPage>
 
           Property property = await Property.fromJson(propertyData);
           property.landlord = await property.fetchLandlord();
-          setState(() {
-            shouldDisplay = true;
-          });
+          property.propertyID = docSnapshot.id;
+
           fetchedProperties.add(property);
-          print('Fetched property: ${property.landlord?.firstName}');
+          // print('Fetched property: ${property.landlord?.firstName}');
         }
 
         if (mounted) {
           setState(() {
             // Update the state with the fetched properties
             properties = fetchedProperties;
+            shouldDisplay = true;
           });
         }
       } else {
@@ -137,6 +142,9 @@ class _TenantPropertiesPageState extends State<TenantPropertiesPage>
                           'assets/userimage.png',
                       location: properties[index].location,
                       address: properties[index].address,
+                      propertyID: properties[index].propertyID ?? '',
+                      uid: widget.uid,
+                      isWithdraw: widget.isWithdraw,
                     ),
                   ),
                 );
@@ -190,7 +198,8 @@ class PropertyCard extends StatelessWidget {
                   imageUrl: property
                       .imagePath[0], // TODO define a new property.iconimagepath
 
-                  placeholder: (context, url) => const CircularProgressIndicator(),
+                  placeholder: (context, url) =>
+                      const CircularProgressIndicator(),
                   errorWidget: (context, url, error) => const Icon(Icons.error),
                   fit: BoxFit.cover,
                 ),

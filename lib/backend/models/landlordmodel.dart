@@ -12,9 +12,9 @@ class Landlord {
   final List<DocumentReference<Map<String, dynamic>>>? tenantRef;
   final List<DocumentReference<Map<String, dynamic>>> propertyRef;
   final List<DocumentReference<Map<String, dynamic>>>? rentpaymentRef;
-  List<Tenant>? tenant;
-  List<Property> property;
-  List<RentPayment>? rentpayment;
+  List<Tenant>? tenant = [];
+  List<Property> property = [];
+  List<RentPayment>? rentpayment = [];
 
   Landlord({
     required this.firstName,

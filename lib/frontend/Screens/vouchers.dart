@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
@@ -175,8 +176,17 @@ class VouchersPage extends StatelessWidget {
                     child: SizedBox(
                       width: 200,
                       height: 200,
-                      child: Image.network(
-                        voucher.url,
+                      child: CachedNetworkImage(
+                        //add a progress indicator here not circular
+                        progressIndicatorBuilder: (context, url, progress) =>
+                            Center(
+                          child: progress == null
+                              ? CircularProgressIndicator()
+                              : LinearProgressIndicator(
+                                  value: progress.progress,
+                                ),
+                        ),
+                        imageUrl: voucher.url,
                         fit: BoxFit.cover,
                       ),
                     ),

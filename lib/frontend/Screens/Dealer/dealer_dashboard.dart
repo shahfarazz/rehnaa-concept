@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 import 'package:rehnaa/frontend/Screens/contract.dart';
@@ -9,8 +10,9 @@ import 'package:rehnaa/frontend/helper/Dealerdashboard_pages/dealer_profile.dart
 import 'package:rehnaa/frontend/helper/Landlorddashboard_pages/landlord_dashboard_content.dart';
 import 'package:rehnaa/frontend/helper/Landlorddashboard_pages/landlord_profile.dart';
 import '../../helper/Dealerdashboard_pages/dealer_dashboard_content.dart';
+import '../../helper/Dealerdashboard_pages/dealer_renthistory.dart';
 import '../../helper/Dealerdashboard_pages/events.dart';
-import '../../helper/Dealerdashboard_pages/landlordonboarded.dart';
+import '../../helper/Dealerdashboard_pages/dealerlandlordonboarded.dart';
 import '../../helper/Landlorddashboard_pages/landlord_renthistory.dart';
 import '../../helper/Landlorddashboard_pages/landlord_tenants.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -42,6 +44,7 @@ class _DealerDashboardPageState extends State<DealerDashboardPage>
       vsync: this,
       duration: const Duration(milliseconds: 300),
     );
+    _getNotifs();
   }
 
   @override
@@ -62,25 +65,37 @@ class _DealerDashboardPageState extends State<DealerDashboardPage>
     );
   }
 
-  List<Map<String, String>> notifications = [
-    {
-      'title': 'Rent paid by Tenant: Michelle',
-      'amount': '\$30000',
-    },
-    {
-      'title': 'Maintenance request by Tenant: John',
-      'amount': '',
-    },
-    {
-      'title': 'Contract renewal notice for Property: ABC Apartment',
-      'amount': '',
-    },
-    {
-      'title': 'Notification 4',
-      'amount': '',
-    },
-    // Add more notifications here
-  ];
+  List<Map<String, String>> notifications = [];
+
+  Future<void> _getNotifs() async {
+    DocumentSnapshot snapshot = await FirebaseFirestore.instance
+        .collection('Notifications')
+        .doc(widget.uid)
+        .get();
+
+    if (snapshot.data() != null) {
+      Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
+
+      if (data.containsKey('notifications')) {
+        List<dynamic> notificationstemp = data['notifications'];
+
+        for (var i = 0; i < notificationstemp.length; i++) {
+          Map<String, dynamic> notification = notificationstemp[i];
+
+          String title = notification['title'] ?? '';
+          String amount = notification['amount'] ?? 0.0;
+
+          print('Title: $title');
+          print('Amount: $amount');
+
+          // Add the notification to a list or perform other operations
+          setState(() {
+            notifications.add({'title': title, 'amount': amount});
+          });
+        }
+      }
+    }
+  }
 
   void _toggleSidebar() {
     setState(() {
@@ -129,11 +144,16 @@ class _DealerDashboardPageState extends State<DealerDashboardPage>
                             });
                           },
                           children: <Widget>[
-                            // DealerDashboardContent(),
-                            LandlordOnboardedPage(),
-                            // DealerRentHistoryPage(),
-                            // DealerProfilePage(uid: widget.uid),
-
+                            DealerDashboardContent(
+                              uid: widget.uid,
+                            ),
+                            DealerLandlordOnboardedPage(
+                              uid: widget.uid,
+                            ),
+                            DealerRentHistoryPage(
+                              uid: widget.uid,
+                            ),
+                            DealerProfilePage(uid: widget.uid),
                           ],
                         ),
                       ),
@@ -218,7 +238,8 @@ class _DealerDashboardPageState extends State<DealerDashboardPage>
                 child: Container(
                   padding: const EdgeInsets.all(2),
                   decoration: BoxDecoration(
-                    color: Colors.red,
+                    color:
+                        notifications.isEmpty ? Colors.transparent : Colors.red,
                     borderRadius: BorderRadius.circular(6),
                   ),
                   constraints: const BoxConstraints(
@@ -226,7 +247,9 @@ class _DealerDashboardPageState extends State<DealerDashboardPage>
                     minHeight: 10,
                   ),
                   child: Text(
-                    notifications.length.toString(),
+                    notifications.isEmpty
+                        ? ''
+                        : notifications.length.toString(),
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 10,
@@ -310,7 +333,8 @@ class _DealerDashboardPageState extends State<DealerDashboardPage>
                                   // Add your onTap functionality here
                                 },
                                 child: ShaderMask(
-                                  shaderCallback: (bounds) => const LinearGradient(
+                                  shaderCallback: (bounds) =>
+                                      const LinearGradient(
                                     colors: [
                                       Color(0xFF0FA697),
                                       Color(0xFF45BF7A),
@@ -364,7 +388,7 @@ class _DealerDashboardPageState extends State<DealerDashboardPage>
                       },
                       showBadge: true,
                     ),
-                     _buildSidebarItem(
+                    _buildSidebarItem(
                       icon: Icons.local_play,
                       label: 'Events',
                       onTap: () {
@@ -563,8 +587,8 @@ class _DealerDashboardPageState extends State<DealerDashboardPage>
                                 children: notifications
                                     .map(
                                       (notification) => Padding(
-                                        padding:
-                                            const EdgeInsets.symmetric(vertical: 8.0),
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 8.0),
                                         child: Row(
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
@@ -600,11 +624,13 @@ class _DealerDashboardPageState extends State<DealerDashboardPage>
                                                   if (notification['amount']!
                                                       .isNotEmpty)
                                                     Padding(
-                                                      padding: const EdgeInsets.only(
-                                                          left: 24.0),
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              left: 24.0),
                                                       child: RichText(
                                                         text: TextSpan(
-                                                          style: const TextStyle(
+                                                          style:
+                                                              const TextStyle(
                                                             fontSize: 16.0,
                                                             fontFamily:
                                                                 'Montserrat',
@@ -621,7 +647,8 @@ class _DealerDashboardPageState extends State<DealerDashboardPage>
                                                             TextSpan(
                                                               text: notification[
                                                                   'amount']!,
-                                                              style: const TextStyle(
+                                                              style:
+                                                                  const TextStyle(
                                                                 fontWeight:
                                                                     FontWeight
                                                                         .bold,
@@ -680,7 +707,8 @@ class _DealerDashboardPageState extends State<DealerDashboardPage>
         currentIndex: _currentIndex,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.people), label: 'Onboarding'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.people), label: 'Onboarding'),
           // BottomNavigationBarItem(
           //     icon: Icon(Icons.money), label: 'Withdraw'),
           BottomNavigationBarItem(icon: Icon(Icons.history), label: 'History'),
@@ -690,8 +718,6 @@ class _DealerDashboardPageState extends State<DealerDashboardPage>
       ),
     );
   }
-
-
 }
 
 class HexagonClipper extends CustomClipper<Path> {
