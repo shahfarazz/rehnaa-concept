@@ -9,9 +9,6 @@ import 'frontend/Screens/Tenant/tenant_dashboard.dart';
 import 'frontend/Screens/Tenant/tenantsignupdetails.dart';
 import 'frontend/Screens/splash.dart';
 import 'firebase_options.dart';
-import 'frontend/Screens/Admin/admindashboard.dart';
-
-// UID OF ADMIN FOR NOTIFICATIONS: N2biafhIEbHd7w3qc9Dv
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -35,11 +32,10 @@ class MyApp extends StatelessWidget {
           primarySwatch: Colors.blue,
         ),
         // home: LoginPage(),
-        home: const SplashScreen(),
+        // home: const SplashScreen(),
         // home: TenantDashboardPage(
         //     uid: 'K55YzmkUXt09OgFwnDuT'), //TODO remove this Jugaar
-        // home: TeanantsSignUpDetailsPage(),
-        // home: AdminDashboard(),
+        // home: TenantsSignUpDetailsPage(),
       ),
     );
   }
