@@ -52,7 +52,7 @@ class _DashboardPageState extends State<TenantDashboardPage>
     _pageController.dispose();
     _sidebarController.dispose(); // Dispose the AnimationController
     super.dispose();
-    _getNotifs();
+    // _getNotifs();
   }
 
   @override

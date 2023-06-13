@@ -29,7 +29,7 @@ class Landlord {
     this.rentpaymentRef,
   });
 
-  static Future<Landlord> fromJson(Map<String, dynamic>? json) async {
+  static Landlord fromJson(Map<String, dynamic>? json) {
     Landlord landlord = Landlord(
       firstName: json!['firstName'],
       lastName: json['lastName'],
@@ -53,7 +53,7 @@ class Landlord {
       pathToImage: json['pathToImage'] ?? 'assets/defaulticon.png',
     );
 
-    await landlord.fetchData();
+    // await landlord.fetchData();
 
     return landlord;
   }

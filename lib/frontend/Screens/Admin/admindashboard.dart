@@ -201,10 +201,22 @@ class _AdminDashboardState extends State<AdminDashboard> {
                       // letterSpacing: 3.0, // Adjust the value as needed
                     ),
                   ),
-                  IconButton(
-                    icon: Icon(Icons.notifications_active),
-                    onPressed: _showNotificationsDialog,
-                  ),
+                  Row(
+                    children: [
+                      IconButton(
+                        icon: Icon(Icons.notifications_active),
+                        onPressed: _showNotificationsDialog,
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.refresh),
+                        onPressed: () {
+                          setState(() {
+                            _getNotifs();
+                          });
+                        },
+                      ),
+                    ],
+                  )
                 ],
               )),
         ),
