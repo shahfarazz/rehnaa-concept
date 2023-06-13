@@ -425,11 +425,11 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
                                   color: Colors.transparent,
                                   child: InkWell(
                                     borderRadius: BorderRadius.circular(20),
-                                    onTap: () {
+                                    onTap: () {//changeeeeeeeeeeeeeeeeeeeeeeeeee
                                       isWithdraw
-                                          ? null
-                                          : someFunction(
-                                              landlord); // Show the option dialog
+                                          ? someFunction(
+                                              landlord)
+                                          :  null;// Show the option dialog
                                     },
                                     child: Center(
                                       child: Text(

@@ -426,31 +426,13 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                                     color: Colors.transparent,
                                     child: InkWell(
                                       borderRadius: BorderRadius.circular(20),
-                                     onTap: () {
-  if (isWithdraw) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text("Payment Already Requested"),
-          content: Text("Please wait before making another request"),
-          actions: [
-            ElevatedButton(
-              child: Text("OK"),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  } else {
-    someFunction(tenant);
-    // Continue with the rest of the logic
-  }
-},
-
+                                      onTap: () {
+                                        isWithdraw ///////// chnage thisssssssssssssssssssssssssssssssssss
+                                            ? someFunction(
+                                                tenant)
+                                            : null;
+                                              // Show the option dialog
+                                      },
                                       child: Center(
                                         child: Text(
                                           isWithdraw
