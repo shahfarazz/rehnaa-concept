@@ -26,7 +26,7 @@ class _TenantInvoicePageState extends State<TenantInvoicePage> {
     });
 
     // Simulating a delay of 2 seconds for payment processing
-    Future.delayed(Duration(seconds: 2), () {
+    Future.delayed(Duration(seconds: 1), () {
       setState(() {
         showInvoice = true;
         paymentAmount = amount;

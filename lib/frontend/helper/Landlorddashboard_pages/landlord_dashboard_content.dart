@@ -7,6 +7,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:rehnaa/backend/models/landlordmodel.dart';
+import 'package:rehnaa/frontend/Screens/faq.dart';
+import 'package:rehnaa/frontend/helper/Landlorddashboard_pages/landlordinvoice.dart';
 import 'skeleton.dart';
 
 class LandlordDashboardContent extends StatefulWidget {
@@ -183,63 +185,94 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
                     ),
                   ),
                   onPressed: () {
-                    if (selectedOption.isNotEmpty) {
-                      if (kDebugMode) {
-                        print('Selected option: $selectedOption');
-                      }
-                      Fluttertoast.showToast(
-                        msg:
-                            'An admin will contact you soon regarding your payment via: $selectedOption',
-                        toastLength: Toast.LENGTH_SHORT,
-                        gravity: ToastGravity.BOTTOM,
-                        timeInSecForIosWeb: 3,
-                        backgroundColor: const Color(0xff45BF7A),
-                      );
-                      FirebaseFirestore.instance
-                          .collection('Notifications')
-                          .doc(widget.uid)
-                          .set({
-                        // Union of previous notifications plus a new notification that i will create now
-                        'notifications': FieldValue.arrayUnion([
-                          {
-                            'title':
-                                'Withdraw Request by ${'${landlord.firstName} ${landlord.lastName}'}',
-                            'amount': 'Rs${landlord.balance.toString()}',
-                          }
-                        ]),
-                      }, SetOptions(merge: true));
-                      FirebaseFirestore.instance
-                          .collection('Landlords')
-                          .doc(widget.uid)
-                          .set({
-                        // Union of previous notifications plus a new notification that i will create now
-                        'isWithdraw': true,
-                      }, SetOptions(merge: true));
-                      Navigator.pop(context);
-                      FirebaseFirestore.instance
-                          .collection('AdminRequests')
-                          .doc(widget.uid)
-                          .set({
-                        // Union of previous notifications plus a new notification that i will create now
-                        'withdrawRequest': FieldValue.arrayUnion([
-                          {
-                            'fullname':
-                                '${landlord.firstName} ${landlord.lastName}',
-                            'amount': landlord.balance,
-                            'paymentMethod': selectedOption,
-                            'uid': widget.uid,
-                          }
-                        ]),
-                      }, SetOptions(merge: true));
+                   if (selectedOption.isNotEmpty) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      double withdrawalAmount = 0.0;
 
-                      setState(() {
-                        isWithdraw = true;
-                      });
-                    } else {
-                      if (kDebugMode) {
-                        print('Please select an option');
-                      }
+      return AlertDialog(
+        title: Text('Enter Withdrawal Amount'),
+        content: TextField(
+          keyboardType: TextInputType.number,
+          onChanged: (value) {
+            withdrawalAmount = double.tryParse(value) ?? 0.0;
+          },
+        ),
+        actions: <Widget>[
+          TextButton(
+            child: Text('Cancel'),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+          TextButton(
+            child: Text('Submit'),
+            onPressed: () {
+              if (withdrawalAmount > 0 && withdrawalAmount <= landlord.balance) {
+                Fluttertoast.showToast(
+                  msg: 'An admin will contact you soon regarding your payment via: $selectedOption',
+                  toastLength: Toast.LENGTH_SHORT,
+                  gravity: ToastGravity.BOTTOM,
+                  timeInSecForIosWeb: 3,
+                  backgroundColor: const Color(0xff45BF7A),
+                );
+                FirebaseFirestore.instance.collection('Notifications').doc(widget.uid).set({
+                  'notifications': FieldValue.arrayUnion([
+                    {
+                      'title': 'Withdraw Request by ${'${landlord.firstName} ${landlord.lastName}'}',
+                      'amount': 'Rs${landlord.balance.toString()}',
                     }
+                  ]),
+                }, SetOptions(merge: true));
+                FirebaseFirestore.instance.collection('Landlords').doc(widget.uid).set({
+                  'isWithdraw': true,
+                }, SetOptions(merge: true));
+                FirebaseFirestore.instance.collection('AdminRequests').doc(widget.uid).set({
+                  'withdrawRequest': FieldValue.arrayUnion([
+                    {
+                      'fullname': '${landlord.firstName} ${landlord.lastName}',
+                      'amount': withdrawalAmount,
+                      'paymentMethod': selectedOption,
+                      'uid': widget.uid,
+                    }
+                  ]),
+                }, SetOptions(merge: true));
+
+                setState(() {
+                  isWithdraw = true;
+                });
+
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => LandlordInvoicePage(landlordName: '${landlord.firstName} ${landlord.lastName}',
+                          // paymentDateTime: DateTime.now(),
+                          balance: landlord.balance,
+                          amount: withdrawalAmount,
+                          transactionMode: selectedOption,
+                          )),
+                );
+              } else {
+                Fluttertoast.showToast(
+                  msg: 'Invalid withdrawal amount',
+                  toastLength: Toast.LENGTH_SHORT,
+                  gravity: ToastGravity.BOTTOM,
+                  timeInSecForIosWeb: 3,
+                  backgroundColor: Colors.red,
+                );
+              }
+            },
+          ),
+        ],
+      );
+    },
+  );
+} else {
+  if (kDebugMode) {
+    print('Please select an option');
+  }
+}
+
                   },
                 ),
               ],
