@@ -345,7 +345,11 @@ class _TenantCardWidgetState extends State<TenantCardWidget> {
       'rating': rating,
       'rent': rent,
       'pathToImage': pathToImage,
-      // Add other fields as per your requirements
+      'creditPoints': 0,
+      'cnicNumber': cnicController.text,
+      'emailOrPhone': emailOrPhoneController.text,
+      'familyMembers': 0,
+      'landlordRef': null,
     });
 
     setState(() {

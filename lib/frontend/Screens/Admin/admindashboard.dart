@@ -45,6 +45,16 @@ class _AdminDashboardState extends State<AdminDashboard> {
               };
               tempNotifications.add(notification);
             });
+          } else if (key == 'rentalRequest') {
+            value.forEach((item) {
+              Map<String, String> notification = {
+                'title': key,
+                'fullname': item['fullname'],
+                'uid': item['uid'],
+                'property name': item['property']['title'],
+              };
+              tempNotifications.add(notification);
+            });
           } else {
             // Leave other cases blank for now
             Map<String, String> notification = {
@@ -71,199 +81,96 @@ class _AdminDashboardState extends State<AdminDashboard> {
         builder: (BuildContext context) {
           return Dialog(
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(25.0),
+              borderRadius: BorderRadius.circular(8.0),
             ),
             child: Container(
-              height: MediaQuery.of(context).size.height * 0.3,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(25.0),
-              ),
-              child: Stack(
+              width: 400.0,
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  Positioned.fill(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            Color(0xFF0FA697),
-                            Color(0xFF45BF7A),
-                            Color(0xFF0DF205),
-                          ],
-                        ),
-                        borderRadius: BorderRadius.circular(25.0),
-                      ),
+                  const Text(
+                    'Notifications',
+                    style: TextStyle(
+                      fontSize: 20.0,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-                  Column(
-                    children: <Widget>[
-                      Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: <Widget>[
-                            const Hero(
-                              tag: 'notificationTitle',
-                              child: Text(
-                                'Notifications',
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                  fontFamily: 'Montserrat',
-                                ),
-                              ),
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.close),
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-                              color: Colors.white,
-                            ),
-                          ],
-                        ),
-                      ),
-                      const Divider(
-                        height: 0,
-                        color: Colors.grey,
-                      ),
-                      Expanded(
-                        child: ClipRRect(
-                          borderRadius: const BorderRadius.only(
-                            bottomLeft: Radius.circular(20.0),
-                            bottomRight: Radius.circular(20.0),
-                          ),
-                          child: Container(
-                            padding: const EdgeInsets.only(bottom: 4.0),
-                            color: Colors.white,
-                            child: Scrollbar(
-                              child: Scrollable(
-                                axisDirection: AxisDirection.down,
-                                controller: ScrollController(), // Add this line
-                                viewportBuilder: (BuildContext context,
-                                    ViewportOffset offset) {
-                                  return SingleChildScrollView(
-                                    controller:
-                                        ScrollController(), // Add this line
-                                    physics:
-                                        const AlwaysScrollableScrollPhysics(), // Add this line
-                                    child: Column(
-                                      children: notifications
-                                          .map(
-                                            (notification) => Padding(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      vertical: 8.0),
-                                              child: Row(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: <Widget>[
-                                                  const SizedBox(
-                                                    width: 24.0,
-                                                    child: Padding(
-                                                      padding: EdgeInsets.only(
-                                                          left: 8.0),
-                                                      child: Text(
-                                                        '\u2022',
-                                                        style: TextStyle(
-                                                          fontSize: 24.0,
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          color:
-                                                              Color(0xFF45BF7A),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  const SizedBox(width: 12.0),
-                                                  Expanded(
-                                                    child: Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-                                                      children: [
-                                                        Text(
-                                                          notification[
-                                                                  'title']! +
-                                                              ' ' +
-                                                              notification[
-                                                                  'fullname']! +
-                                                              ' ' +
-                                                              notification[
-                                                                  'paymentMethod']!,
-                                                          style:
-                                                              const TextStyle(
-                                                            fontSize: 18.0,
-                                                            fontFamily:
-                                                                'Montserrat',
-                                                          ),
-                                                        ),
-                                                        if (notification[
-                                                                'amount']!
-                                                            .isNotEmpty)
-                                                          Padding(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                        .only(
-                                                                    left: 24.0),
-                                                            child: RichText(
-                                                              text: TextSpan(
-                                                                style:
-                                                                    const TextStyle(
-                                                                  fontSize:
-                                                                      16.0,
-                                                                  fontFamily:
-                                                                      'Montserrat',
-                                                                  color: Colors
-                                                                      .black,
-                                                                ),
-                                                                children: [
-                                                                  const TextSpan(
-                                                                    text:
-                                                                        'Amount: ',
-                                                                    style:
-                                                                        TextStyle(
-                                                                      fontFamily:
-                                                                          'Montserrat',
-                                                                    ),
-                                                                  ),
-                                                                  TextSpan(
-                                                                    text: notification[
-                                                                        'amount']!,
-                                                                    style:
-                                                                        const TextStyle(
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .bold,
-                                                                      color: Color(
-                                                                          0xFF45BF7A),
-                                                                      fontFamily:
-                                                                          'Montserrat',
-                                                                    ),
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                            ),
-                                                          ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          )
-                                          .toList(),
+                  const SizedBox(height: 16.0),
+                  Expanded(
+                    child: ListView(
+                      children: notifications.reversed.map(
+                        (notification) {
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 8.0),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                const SizedBox(
+                                  width: 24.0,
+                                  child: Padding(
+                                    padding: EdgeInsets.only(left: 8.0),
+                                    child: Text(
+                                      '\u2022',
+                                      style: TextStyle(
+                                        fontSize: 24.0,
+                                        fontWeight: FontWeight.bold,
+                                        color: Color(0xFF45BF7A),
+                                      ),
                                     ),
-                                  );
-                                },
-                              ),
+                                  ),
+                                ),
+                                const SizedBox(width: 12.0),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: notification.entries.map(
+                                      (entry) {
+                                        return Padding(
+                                          padding:
+                                              const EdgeInsets.only(left: 24.0),
+                                          child: RichText(
+                                            text: TextSpan(
+                                              style: const TextStyle(
+                                                fontSize: 14.0,
+                                                color: Colors.black,
+                                              ),
+                                              children: [
+                                                TextSpan(
+                                                  text: '${entry.key}: ',
+                                                  style: const TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                                TextSpan(
+                                                  text: entry.value,
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    ).toList(),
+                                  ),
+                                ),
+                              ],
                             ),
-                          ),
-                        ),
-                      ),
-                    ],
+                          );
+                        },
+                      ).toList(),
+                    ),
+                  ),
+                  const SizedBox(height: 16.0),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: const Text('Close'),
+                    ),
                   ),
                 ],
               ),

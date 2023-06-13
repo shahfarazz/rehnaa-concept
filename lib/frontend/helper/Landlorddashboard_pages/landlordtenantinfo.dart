@@ -132,15 +132,7 @@ class LandlordTenantInfoPage extends StatelessWidget {
                               points: '${tenant.creditPoints}',
                             ),
                           ),
-                          const SizedBox(height: 10.0),
-                          Center(
-                            child: WhiteBox(
-                              icon: Icons.home,
-                              iconColor: const Color(0xff33907c),
-                              label: 'Property Details',
-                              value: tenant.propertyDetails,
-                            ),
-                          ),
+
                           const SizedBox(height: 10.0),
                           Center(
                             child: WhiteBox(

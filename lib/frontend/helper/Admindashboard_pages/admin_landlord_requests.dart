@@ -1,3 +1,5 @@
+import 'dart:js_interop';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -61,6 +63,31 @@ class _AdmninRequestsPageState extends State<AdmninRequestsPage> {
             print('Error: $e');
           }
         }
+
+        try {
+          if (doc['rentalRequest'] != null) {
+            print('rental request found');
+            for (var i = 0; i < doc["rentalRequest"].length; i++) {
+              // add each request to the adminRequests list
+
+              adminRequests.add(
+                AdminRequestData(
+                  name: doc["rentalRequest"][i]["fullname"],
+                  requestedAmount: doc["rentalRequest"][i]["amount"].toString(),
+                  uid: doc["rentalRequest"][i]["uid"],
+                  requestType: 'Rental  Request',
+                  propertyTitle: doc["rentalRequest"][i]["property"]["title"],
+                  propertyLocation: doc["rentalRequest"][i]["property"]
+                      ["location"],
+                ),
+              );
+            }
+          }
+        } catch (e) {
+          if (kDebugMode) {
+            print('Error: $e');
+          }
+        }
       }
       setState(() {
         displayedRequests.addAll(adminRequests);
@@ -110,141 +137,141 @@ class _AdmninRequestsPageState extends State<AdmninRequestsPage> {
       appBar: AppBar(
         title: const Text('Withdrawal Requests'),
         flexibleSpace: Container(
-        decoration: const BoxDecoration(
-          // borderRadius: BorderRadius.circular(24),
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Color(0xff0FA697),
-              Color(0xff45BF7A),
-              Color(0xff0DF205),
-            ],
+          decoration: const BoxDecoration(
+            // borderRadius: BorderRadius.circular(24),
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Color(0xff0FA697),
+                Color(0xff45BF7A),
+                Color(0xff0DF205),
+              ],
+            ),
           ),
         ),
-      ),
       ),
       body: SingleChildScrollView(
         // child: Padding(
-          // padding: EdgeInsets.fromLTRB(
-          //   // size.width * 0.0,
-          //   // size.height * 0.1,
-          //   0,
-          //   0,
-          // ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Row(
-              //   children: [
-              //     IconButton(
-              //       icon: Icon(
-              //         Icons.arrow_back,
-              //         color: Colors.green,
-              //       ),
-              //       onPressed: () {
-              //         Navigator.pop(context);
-              //       },
-              //     ),
-              //   ],
-              // ),
-              // Padding(
-              //   padding: EdgeInsets.fromLTRB(
-              //     size.width * 0.1,
-              //     size.height * 0.0,
-              //     0,
-              //     0,
-              //   ),
-              //   child: Text(
-              //     'Requests',
-              //     style: TextStyle(
-              //       fontSize: 34,
-              //       fontWeight: FontWeight.bold,
-              //       fontFamily: 'Montserrat',
-              //       color: Colors.green,*
-              //     ),
-              //   ),
-              // ),
-              // SizedBox(height: size.height * 0.07),
-              // Padding(
-              //   padding: EdgeInsets.fromLTRB(
-              //     size.width * 0.1,
-              //     size.height * 0.0,
-              //     0,
-              //     0,
-              //   ),
-              //   child: Text(
-              //     'Withdrawal Requests:',
-              //     style: TextStyle(
-              //       fontSize: 20,
-              //       fontFamily: 'Montserrat',
-              //       fontWeight: FontWeight.bold,
-              //       color: Colors.black,
-              //     ),
-              //   ),
-              // ),
-              const SizedBox(height: 10),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: TextField(
-                  controller: searchController,
-                  onChanged: filterRequests,
-                  decoration: const InputDecoration(
-                    labelText: 'Search(name)',
-                    prefixIcon: Icon(Icons.search),
-                  ),
+        // padding: EdgeInsets.fromLTRB(
+        //   // size.width * 0.0,
+        //   // size.height * 0.1,
+        //   0,
+        //   0,
+        // ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Row(
+            //   children: [
+            //     IconButton(
+            //       icon: Icon(
+            //         Icons.arrow_back,
+            //         color: Colors.green,
+            //       ),
+            //       onPressed: () {
+            //         Navigator.pop(context);
+            //       },
+            //     ),
+            //   ],
+            // ),
+            // Padding(
+            //   padding: EdgeInsets.fromLTRB(
+            //     size.width * 0.1,
+            //     size.height * 0.0,
+            //     0,
+            //     0,
+            //   ),
+            //   child: Text(
+            //     'Requests',
+            //     style: TextStyle(
+            //       fontSize: 34,
+            //       fontWeight: FontWeight.bold,
+            //       fontFamily: 'Montserrat',
+            //       color: Colors.green,*
+            //     ),
+            //   ),
+            // ),
+            // SizedBox(height: size.height * 0.07),
+            // Padding(
+            //   padding: EdgeInsets.fromLTRB(
+            //     size.width * 0.1,
+            //     size.height * 0.0,
+            //     0,
+            //     0,
+            //   ),
+            //   child: Text(
+            //     'Withdrawal Requests:',
+            //     style: TextStyle(
+            //       fontSize: 20,
+            //       fontFamily: 'Montserrat',
+            //       fontWeight: FontWeight.bold,
+            //       color: Colors.black,
+            //     ),
+            //   ),
+            // ),
+            const SizedBox(height: 10),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: TextField(
+                controller: searchController,
+                onChanged: filterRequests,
+                decoration: const InputDecoration(
+                  labelText: 'Search(name)',
+                  prefixIcon: Icon(Icons.search),
                 ),
               ),
-              const SizedBox(height: 10),
-              ListView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: getPaginatedRequests().length,
-                itemBuilder: (context, index) {
-                  final request = getPaginatedRequests()[index];
-                  return LandlordWithdrawalCard(data: request);
-                },
-              ),
-              SizedBox(height: size.height * 0.05),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.arrow_back),
-                    onPressed: () {
-                      setState(() {
-                        if (currentPage > 1) {
-                          currentPage--;
-                        }
-                      });
-                    },
+            ),
+            const SizedBox(height: 10),
+            ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: getPaginatedRequests().length,
+              itemBuilder: (context, index) {
+                final request = getPaginatedRequests()[index];
+                return LandlordWithdrawalCard(data: request);
+              },
+            ),
+            SizedBox(height: size.height * 0.05),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.arrow_back),
+                  onPressed: () {
+                    setState(() {
+                      if (currentPage > 1) {
+                        currentPage--;
+                      }
+                    });
+                  },
+                ),
+                Text(
+                  'Page $currentPage',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontFamily: 'Montserrat',
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
                   ),
-                  Text(
-                    'Page $currentPage',
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontFamily: 'Montserrat',
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.arrow_forward),
-                    onPressed: () {
-                      setState(() {
-                        final maxPage =
-                            (displayedRequests.length / itemsPerPage).ceil();
-                        if (currentPage < maxPage) {
-                          currentPage++;
-                        }
-                      });
-                    },
-                  ),
-                ],
-              ),
-            ],
-          ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.arrow_forward),
+                  onPressed: () {
+                    setState(() {
+                      final maxPage =
+                          (displayedRequests.length / itemsPerPage).ceil();
+                      if (currentPage < maxPage) {
+                        currentPage++;
+                      }
+                    });
+                  },
+                ),
+              ],
+            ),
+          ],
         ),
+      ),
       // ),
     );
   }
@@ -252,17 +279,21 @@ class _AdmninRequestsPageState extends State<AdmninRequestsPage> {
 
 class AdminRequestData {
   final String name;
-  final String requestedAmount;
+  String? requestedAmount;
   final String uid;
-  final String cashOrBankTransfer;
-  final String requestType;
+  String? cashOrBankTransfer;
+  String? requestType;
+  String? propertyTitle;
+  String? propertyLocation;
 
   AdminRequestData({
     required this.name,
-    required this.requestedAmount,
+    this.requestedAmount,
     required this.uid,
-    required this.cashOrBankTransfer,
-    required this.requestType,
+    this.cashOrBankTransfer,
+    this.requestType,
+    this.propertyTitle,
+    this.propertyLocation,
   });
 }
 
@@ -332,6 +363,30 @@ class LandlordWithdrawalCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 10),
+          data.propertyTitle.isNull
+              ? const SizedBox()
+              : Text(
+                  'Property Title: ${data.propertyTitle}',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontFamily: 'Montserrat',
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                ),
+          const SizedBox(height: 10),
+          data.propertyLocation.isNull
+              ? const SizedBox()
+              : Text(
+                  'Property Location: ${data.propertyLocation}',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontFamily: 'Montserrat',
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                ),
+          const SizedBox(height: 5),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
