@@ -4,21 +4,18 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:rehnaa/backend/models/rentpaymentmodel.dart';
 import 'package:rehnaa/backend/services/helperfunctions.dart';
+import 'package:rehnaa/frontend/helper/Dealerdashboard_pages/dealer_renthistory.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 import '../../Screens/rentpayment_info.dart';
-import '../Tenantdashboard_pages/tenant_renthistory.dart';
 
 class LandlordRentHistoryPage extends StatefulWidget {
   final String uid; // UID of the landlord
 
-  const LandlordRentHistoryPage({Key? key, required this.uid})
-      : super(key: key);
+  const LandlordRentHistoryPage({Key? key, required this.uid}) : super(key: key);
 
   @override
-  // ignore: library_private_types_in_public_api
-  _LandlordRentHistoryPageState createState() =>
-      _LandlordRentHistoryPageState();
+  _LandlordRentHistoryPageState createState() => _LandlordRentHistoryPageState();
 }
 
 class _LandlordRentHistoryPageState extends State<LandlordRentHistoryPage>
@@ -27,6 +24,7 @@ class _LandlordRentHistoryPageState extends State<LandlordRentHistoryPage>
   String firstName = '';
   String lastName = '';
   bool shouldDisplay = false;
+  String searchText = '';
 
   @override
   bool get wantKeepAlive => true;
@@ -52,10 +50,8 @@ class _LandlordRentHistoryPageState extends State<LandlordRentHistoryPage>
       lastName = data['lastName'];
 
       // Fetch each rent payment document using the document references
-      for (DocumentReference<Map<String, dynamic>> rentPaymentRef
-          in rentPaymentRefs) {
-        DocumentSnapshot<Map<String, dynamic>> rentPaymentSnapshot =
-            await rentPaymentRef.get();
+      for (DocumentReference<Map<String, dynamic>> rentPaymentRef in rentPaymentRefs) {
+        DocumentSnapshot<Map<String, dynamic>> rentPaymentSnapshot = await rentPaymentRef.get();
 
         Map<String, dynamic>? data = rentPaymentSnapshot.data();
         if (data != null) {
@@ -113,8 +109,7 @@ class _LandlordRentHistoryPageState extends State<LandlordRentHistoryPage>
     }
 
     return Padding(
-      padding: EdgeInsets.symmetric(
-          horizontal: size.width * 0.02, vertical: size.height * 0.015),
+      padding: EdgeInsets.symmetric(horizontal: size.width * 0.02, vertical: size.height * 0.015),
       child: GestureDetector(
         onTap: () {
           Navigator.push(
@@ -231,11 +226,25 @@ class _LandlordRentHistoryPageState extends State<LandlordRentHistoryPage>
   }
 
   List<Widget> _buildRentPaymentCards(int startIndex) {
-    return _rentPayments
+    final List<RentPayment> filteredRentPayments = _filteredRentPayments();
+
+    return filteredRentPayments
         .skip(startIndex)
         .take(_pageSize)
         .map((rentPayment) => _buildRentPaymentCard(rentPayment))
         .toList();
+  }
+
+  List<RentPayment> _filteredRentPayments() {
+    if (searchText.isEmpty) {
+      return _rentPayments;
+    } else {
+      final String query = searchText.toLowerCase();
+      return _rentPayments.where((rentPayment) {
+        final String fullName = '${firstName} ${lastName}'.toLowerCase();
+        return fullName.contains(query);
+      }).toList();
+    }
   }
 
   Widget _buildLatestMonthWidget() {
@@ -316,7 +325,7 @@ class _LandlordRentHistoryPageState extends State<LandlordRentHistoryPage>
     super.build(context); // Ensure the mixin's build method is called
 
     final Size size = MediaQuery.of(context).size;
-    final int pageCount = (_rentPayments.length / _pageSize).ceil();
+    final int pageCount = (_filteredRentPayments().length / _pageSize).ceil();
 
     return Scaffold(
       body: Column(
@@ -339,7 +348,6 @@ class _LandlordRentHistoryPageState extends State<LandlordRentHistoryPage>
               color: const Color(0xff33907c),
             ),
           ),
-          // check if rent payments is empty in the build widget
           SizedBox(height: size.height * 0.01),
           Center(
             child: Column(
@@ -350,8 +358,7 @@ class _LandlordRentHistoryPageState extends State<LandlordRentHistoryPage>
                   height: 50,
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
-                    border:
-                        Border.all(width: 1, color: const Color(0xff33907c)),
+                    border: Border.all(width: 1, color: const Color(0xff33907c)),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: TextFormField(
@@ -361,6 +368,11 @@ class _LandlordRentHistoryPageState extends State<LandlordRentHistoryPage>
                       border: InputBorder.none,
                       contentPadding: EdgeInsets.all(10),
                     ),
+                    onChanged: (value) {
+                      setState(() {
+                        searchText = value;
+                      });
+                    },
                   ),
                 ),
                 SizedBox(height: size.height * 0.02),
