@@ -8,7 +8,7 @@ class Tenant {
   final double rating;
   final int rent;
   final int creditPoints;
-  final String propertyDetails;
+  // final String propertyDetails;
   final String cnicNumber;
   final String emailOrPhone;
   final bool tasdeeqVerification;
@@ -25,7 +25,7 @@ class Tenant {
     required this.rating,
     required this.rent,
     required this.creditPoints,
-    required this.propertyDetails,
+    // required this.propertyDetails,
     required this.cnicNumber,
     required this.emailOrPhone,
     required this.tasdeeqVerification,
@@ -44,7 +44,7 @@ class Tenant {
       rating: json['rating'] ?? 0.0,
       rent: json['rent'] ?? 0.0,
       creditPoints: json['creditPoints'] ?? 0,
-      propertyDetails: json['propertyDetails'] ?? 'No property details',
+      // propertyDetails: json['propertyDetails'] ?? 'No property details',
       cnicNumber: json['cnicNumber'] ?? 'N/A',
       emailOrPhone: json['emailOrPhone'] ?? 'N/A',
       tasdeeqVerification: json['tasdeeqVerification'] ?? false,
@@ -63,7 +63,7 @@ class Tenant {
       'rating': rating,
       'rent': rent,
       'creditPoints': creditPoints,
-      'propertyDetails': propertyDetails,
+      // 'propertyDetails': propertyDetails,
       'cnicNumber': cnicNumber,
       'emailOrPhone': emailOrPhone,
       'tasdeeqVerification': tasdeeqVerification,
@@ -94,7 +94,7 @@ class Tenant {
       rating: 4.5,
       rent: 1000,
       creditPoints: 100,
-      propertyDetails: 'Dummy property',
+      // propertyDetails: 'Dummy property',
       cnicNumber: '123456789',
       emailOrPhone: 'dummy@example.com',
       tasdeeqVerification: true,

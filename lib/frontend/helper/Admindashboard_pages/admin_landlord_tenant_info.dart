@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import '../../../backend/models/tenantsmodel.dart';
+
 class Landlord {
   final String firstName;
   final String lastName;
@@ -19,39 +21,39 @@ class Landlord {
   });
 }
 
-class Tenant {
-  final String firstName;
-  final String lastName;
-  final String description;
-  final double rating;
-  final int rent;
-  final int creditPoints;
-  final String propertyDetails;
-  final String cnicNumber;
-  final String emailOrPhone;
-  final bool tasdeeqVerification;
-  // final bool policeVerification;
-  final int familyMembers;
-  final DocumentReference<Map<String, dynamic>>? landlordRef;
-  final String? pathToImage;
+// class Tenant {
+//   final String firstName;
+//   final String lastName;
+//   final String description;
+//   final double rating;
+//   final int rent;
+//   final int creditPoints;
+//   final String propertyDetails;
+//   final String cnicNumber;
+//   final String emailOrPhone;
+//   final bool tasdeeqVerification;
+//   // final bool policeVerification;
+//   final int familyMembers;
+//   final DocumentReference<Map<String, dynamic>>? landlordRef;
+//   final String? pathToImage;
 
-  Tenant({
-    required this.firstName,
-    required this.lastName,
-    required this.description,
-    required this.rating,
-    required this.rent,
-    required this.creditPoints,
-    required this.propertyDetails,
-    required this.cnicNumber,
-    required this.emailOrPhone,
-    required this.tasdeeqVerification,
-    // required this.policeVerification,
-    required this.familyMembers,
-    required this.landlordRef,
-    required this.pathToImage,
-  });
-}
+//   Tenant({
+//     required this.firstName,
+//     required this.lastName,
+//     required this.description,
+//     required this.rating,
+//     required this.rent,
+//     required this.creditPoints,
+//     required this.propertyDetails,
+//     required this.cnicNumber,
+//     required this.emailOrPhone,
+//     required this.tasdeeqVerification,
+//     // required this.policeVerification,
+//     required this.familyMembers,
+//     required this.landlordRef,
+//     required this.pathToImage,
+//   });
+// }
 
 class AdminLandlordTenantInfoPage extends StatefulWidget {
   @override
@@ -108,11 +110,11 @@ class _AdminLandlordTenantInfoPageState
           rating: doc['rating'] ?? 0.0,
           rent: doc['rent'] ?? 0,
           creditPoints: doc['creditPoints'] ?? 0,
-          propertyDetails: doc['propertyDetails'] ?? '',
+          // propertyDetails: doc['propertyDetails'] ?? '',
           cnicNumber: doc['cnicNumber'] ?? '',
           emailOrPhone: doc['emailOrPhone'] ?? '',
           tasdeeqVerification: doc['tasdeeqVerification'] ?? false,
-          // policeVerification: doc['policeVerification'] ?? false,
+          policeVerification: false, //TODO remove fake false when db is clean
           familyMembers: doc['familyMembers'] ?? 0,
           landlordRef: doc['landlordRef'],
           pathToImage: doc['pathToImage'] ?? '',
@@ -178,19 +180,19 @@ class _AdminLandlordTenantInfoPageState
       appBar: AppBar(
         title: const Text('Landlord & Tenant Info'),
         flexibleSpace: Container(
-        decoration: const BoxDecoration(
-          // borderRadius: BorderRadius.circular(24),
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Color(0xff0FA697),
-              Color(0xff45BF7A),
-              Color(0xff0DF205),
-            ],
+          decoration: const BoxDecoration(
+            // borderRadius: BorderRadius.circular(24),
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Color(0xff0FA697),
+                Color(0xff45BF7A),
+                Color(0xff0DF205),
+              ],
+            ),
           ),
         ),
-      ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
