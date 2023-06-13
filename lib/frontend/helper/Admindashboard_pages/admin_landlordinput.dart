@@ -37,7 +37,7 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
     fetchLandlords();
   }
 
-  Future<void> fetchLandlords() async {
+  Future<List<Landlord>> fetchLandlords() async {
     QuerySnapshot<Map<String, dynamic>> querySnapshot =
         await FirebaseFirestore.instance.collection('Landlords').get();
 
@@ -52,6 +52,7 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
       landlords = landlordList;
       filteredLandlords = List.from(landlords);
     });
+    return landlords;
   }
 
   void filterLandlords(String query) {

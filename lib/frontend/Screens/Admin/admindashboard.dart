@@ -4,6 +4,7 @@ import 'package:flutter/rendering.dart';
 import 'package:rehnaa/frontend/helper/Admindashboard_pages/admin_landlord_requests.dart';
 import 'package:rehnaa/frontend/helper/Admindashboard_pages/admin_tenantinput.dart';
 
+import '../../helper/Admindashboard_pages/admin_analytics.dart';
 import '../../helper/Admindashboard_pages/admin_landlord_tenant_info.dart';
 import '../../helper/Admindashboard_pages/admin_landlordinput.dart';
 import '../../helper/Admindashboard_pages/admin_propertyinput.dart';
@@ -641,6 +642,12 @@ class _AdminDashboardState extends State<AdminDashboard> {
                   child: ElevatedButton(
                     onPressed: () {
                       // Handle Data storage of everything for trend and analytics button press
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => AdminAnalyticsPage(),
+                        ),
+                      );
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.transparent,

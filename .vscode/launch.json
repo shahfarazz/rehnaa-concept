@@ -13,7 +13,8 @@
 			"name": "Flutter",
 			"request": "launch",
 			"type": "dart",
-			"args": ["--web-port", "54253"]
+			"args": ["--web-port", "54253"],
+			"program": "lib/main_web.dart"
 		},
 
 		{

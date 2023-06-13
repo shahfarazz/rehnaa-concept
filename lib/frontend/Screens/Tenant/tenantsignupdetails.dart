@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class TeanantsSignUpDetailsPage extends StatelessWidget {
+class TenantsSignUpDetailsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -206,11 +206,10 @@ class TeanantsSignUpDetailsPage extends StatelessWidget {
       ),
     );
   }
-
 }
 
 void main() {
   runApp(MaterialApp(
-    home: TeanantsSignUpDetailsPage(),
+    home: TenantsSignUpDetailsPage(),
   ));
 }

@@ -63,7 +63,7 @@ dev_dependencies:
     photo_view: ^0.14.0
     pdf: ^3.6.0
     printing: ^5.6.0
-    modal_progress_hud: ^0.1.3
+    modal_progress_hud_nsn: ^0.4.0
     screenshot: ^2.1.0
 
     # photo_view: ^latest_version
