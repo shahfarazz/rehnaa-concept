@@ -381,16 +381,49 @@ class PropertyDetails extends StatelessWidget {
                   ),
                   const Spacer(),
                   GradientButton(
-                    onPressed: () {
-                      // handle request button press
-                    },
-                    text: 'Request',
-                    gradientColors: const [
-                      Color(0xff0FA697),
-                      Color(0xff45BF7A),
-                      Color(0xff0DF205),
-                    ],
-                  ),
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: Text('Confirmation'),
+                          content: Text('Are you sure you want to request?'),
+                          actions: [
+                            ElevatedButton(
+                              onPressed: () {
+                                Navigator.of(context).pop(); // Close the dialog
+                              },
+                              style: ButtonStyle(
+                                backgroundColor:
+                                    MaterialStateProperty.all<Color>(Colors.red),
+                              ),
+                              child: Text('No'),
+                            ),
+                            ElevatedButton(
+                              onPressed: () {
+                                Navigator.of(context).pop(); // Close the dialog
+                                // Handle request button press
+                              },
+                              style: ButtonStyle(
+                                backgroundColor:
+                                    MaterialStateProperty.all<Color>(Colors.green),
+                              ),
+                              child: Text('Yes'),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  },
+                  text: 'Request',
+                  gradientColors: const [
+                    Color(0xff0FA697),
+                    Color(0xff45BF7A),
+                    Color(0xff0DF205),
+                  ],
+                ),
+
+
                 ],
               ),
               SizedBox(height: screenHeight * 0.03),
@@ -478,7 +511,9 @@ class PropertyDetails extends StatelessWidget {
       ),
     );
   }
+
 }
+
 
 class PropertySpecs extends StatelessWidget {
   final IconData icon;
