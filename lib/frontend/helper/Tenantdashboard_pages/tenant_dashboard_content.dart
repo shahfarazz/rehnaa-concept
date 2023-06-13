@@ -142,7 +142,6 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                       setState(() {
                         selectedOption = 'Bank Transfer';
                       });
-                       
                     },
                   ),
                 ],
@@ -186,15 +185,16 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                         print('Selected option: $selectedOption');
                       }
                       Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => TenantInvoicePage(
-                          tenantName: '${tenant.firstName} ${tenant.lastName}',
-                          // paymentDateTime: DateTime.now(),
-                          rent: tenant.rent,
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => TenantInvoicePage(
+                            tenantName:
+                                '${tenant.firstName} ${tenant.lastName}',
+                            // paymentDateTime: DateTime.now(),
+                            rent: tenant.rent,
+                          ),
                         ),
-                      ),
-                    );
+                      );
 
                       try {
                         FirebaseFirestore.instance
@@ -427,11 +427,10 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                                     child: InkWell(
                                       borderRadius: BorderRadius.circular(20),
                                       onTap: () {
-                                        isWithdraw ///////// chnage thisssssssssssssssssssssssssssssssssss
-                                            ? someFunction(
-                                                tenant)
-                                            : null;
-                                              // Show the option dialog
+                                        isWithdraw
+                                            ? null
+                                            : someFunction(tenant);
+                                        // Show the option dialog
                                       },
                                       child: Center(
                                         child: Text(

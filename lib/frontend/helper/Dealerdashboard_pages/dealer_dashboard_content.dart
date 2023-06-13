@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:rehnaa/backend/models/tenantsmodel.dart';
 
+import '../../../backend/models/dealermodel.dart';
 import '../Landlorddashboard_pages/landlord_dashboard_content.dart';
 
 class DealerDashboardContent extends StatefulWidget {
@@ -20,7 +21,7 @@ class DealerDashboardContent extends StatefulWidget {
 
 class _DealerDashboardContentState extends State<DealerDashboardContent>
     with AutomaticKeepAliveClientMixin<DealerDashboardContent> {
-  late Future<Tenant> _dealerFuture;
+  late Future<Dealer> _dealerFuture;
 
   @override
   bool get wantKeepAlive => true;
@@ -29,14 +30,14 @@ class _DealerDashboardContentState extends State<DealerDashboardContent>
   void initState() {
     super.initState();
     // Fetch tenant data from Firestore
-    _dealerFuture = getTenantFromFirestore(widget.uid);
+    _dealerFuture = getDealerFromFirestore(widget.uid);
   }
 
-  Future<Tenant> getTenantFromFirestore(String uid) async {
+  Future<Dealer> getDealerFromFirestore(String uid) async {
     try {
       // Fetch the tenant document from Firestore
       DocumentSnapshot snapshot =
-          await FirebaseFirestore.instance.collection('Tenants').doc(uid).get();
+          await FirebaseFirestore.instance.collection('Dealers').doc(uid).get();
       if (kDebugMode) {
         print('Fetched snapshot: $snapshot');
       }
@@ -44,19 +45,19 @@ class _DealerDashboardContentState extends State<DealerDashboardContent>
       // Convert the snapshot to JSON
       Map<String, dynamic> json = snapshot.data() as Map<String, dynamic>;
       if (kDebugMode) {
-        print('Tenant JSON: $json');
+        print('Dealer JSON: $json');
       }
 
-      // Use the Tenant.fromJson method to create a Tenant instance
-      Tenant tenant = Tenant.fromJson(json);
+      // Use the Dealer.fromJson method to create a Dealer instance
+      Dealer dealer = Dealer.fromJson(json);
       if (kDebugMode) {
-        print('Created tenant: $tenant');
+        print('Created dealer: $dealer');
       }
 
-      return tenant;
+      return dealer;
     } catch (error) {
       if (kDebugMode) {
-        print('Error fetching tenant: $error');
+        print('Error fetching dealer: $error');
       }
       rethrow;
     }
@@ -100,26 +101,26 @@ class _DealerDashboardContentState extends State<DealerDashboardContent>
                       });
                     },
                   ),
-                  buildOptionTile(
-                    selectedOption: selectedOption,
-                    optionImage: 'assets/easypaisa.png',
-                    optionName: 'Easy Paisa',
-                    onTap: () {
-                      setState(() {
-                        selectedOption = 'Easy Paisa';
-                      });
-                    },
-                  ),
-                  buildOptionTile(
-                    selectedOption: selectedOption,
-                    optionImage: 'assets/jazzcash.png',
-                    optionName: 'Jazz Cash',
-                    onTap: () {
-                      setState(() {
-                        selectedOption = 'Jazz Cash';
-                      });
-                    },
-                  ),
+                  // buildOptionTile(
+                  //   selectedOption: selectedOption,
+                  //   optionImage: 'assets/easypaisa.png',
+                  //   optionName: 'Easy Paisa',
+                  //   onTap: () {
+                  //     setState(() {
+                  //       selectedOption = 'Easy Paisa';
+                  //     });
+                  //   },
+                  // ),
+                  // buildOptionTile(
+                  //   selectedOption: selectedOption,
+                  //   optionImage: 'assets/jazzcash.png',
+                  //   optionName: 'Jazz Cash',
+                  //   onTap: () {
+                  //     setState(() {
+                  //       selectedOption = 'Jazz Cash';
+                  //     });
+                  //   },
+                  // ),
                   buildOptionTile(
                     selectedOption: selectedOption,
                     optionImage: 'assets/banktransfer.png',
@@ -223,7 +224,7 @@ class _DealerDashboardContentState extends State<DealerDashboardContent>
       print('UID: ${widget.uid}');
     }
 
-    return FutureBuilder<Tenant>(
+    return FutureBuilder<Dealer>(
       future: _dealerFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
@@ -234,10 +235,10 @@ class _DealerDashboardContentState extends State<DealerDashboardContent>
           return Text('Error: ${snapshot.error}');
         } else if (snapshot.hasData) {
           // Fetch tenant
-          Tenant tenant = snapshot.data!;
+          Dealer dealer = snapshot.data!;
 
           // Format the rent for display
-          String formattedRent = NumberFormat('#,##0').format(tenant.rent);
+          String formattedRent = '199';
 
           // Return the widget tree with the fetched data
           return SingleChildScrollView(
@@ -250,7 +251,7 @@ class _DealerDashboardContentState extends State<DealerDashboardContent>
                     Padding(
                       padding: const EdgeInsets.all(16.0),
                       child: Text(
-                        'Welcome ${tenant.firstName}!',
+                        'Welcome ${dealer.firstName}!',
                         style: GoogleFonts.montserrat(
                           fontSize: 26,
                           color: Colors.black,
@@ -263,9 +264,10 @@ class _DealerDashboardContentState extends State<DealerDashboardContent>
                         radius: 75,
                         child: ClipOval(
                           child: Image.asset(
-                            tenant.pathToImage ?? 'assets/defaulticon.png',
+                            'assets/defaulticon.png',
                             width: 150,
                             height: 150,
+                            fit: BoxFit.cover,
                           ),
                         ),
                       ),

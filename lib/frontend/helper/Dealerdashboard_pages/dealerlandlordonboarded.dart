@@ -1,47 +1,52 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:rehnaa/frontend/helper/Dealerdashboard_pages/landlordonboardedinfo.dart';
 
-class Landlord {
-  final String name;
-  final String date;
-  final String address;
+import '../../../backend/models/landlordmodel.dart';
 
-  Landlord({
-    required this.name,
-    required this.date,
-    required this.address,
-  });
-}
+class DealerLandlordOnboardedPage extends StatefulWidget {
+  final String uid;
 
-class LandlordOnboardedPage extends StatefulWidget {
+  const DealerLandlordOnboardedPage({Key? key, required this.uid})
+      : super(key: key);
   @override
-  _LandlordOnboardedPageState createState() => _LandlordOnboardedPageState();
+  _DealerLandlordOnboardedPageState createState() =>
+      _DealerLandlordOnboardedPageState();
 }
 
-class _LandlordOnboardedPageState extends State<LandlordOnboardedPage> {
-  final List<Landlord> landlords = [
-    Landlord(
-      name: 'Arshad Ali',
-      date: '9 June 2022',
-      address: '26 J Johar Town',
-    ),
-    Landlord(
-      name: 'Akbar Khan',
-      date: '15 June 2022',
-      address: '21 H Johar Town',
-    ),
-    Landlord(
-      name: 'John Doe',
-      date: '20 June 2022',
-      address: '15 X Street',
-    ),
-    Landlord(
-      name: 'Jane Smith',
-      date: '30 June 2022',
-      address: '10 Y Avenue',
-    ),
-  ];
+class _DealerLandlordOnboardedPageState
+    extends State<DealerLandlordOnboardedPage> {
+  List<Landlord> landlords = [];
+
+  bool isLoading = true;
+
+  Future<List<Landlord>> fetchLandlords() async {
+    DocumentSnapshot<Map<String, dynamic>> documentSnapshot =
+        await FirebaseFirestore.instance
+            .collection('Dealers')
+            .doc(widget.uid)
+            .get();
+
+    Map<String, dynamic>? data = documentSnapshot.data()!;
+    List<dynamic>? landlordRef = data['landlordRef'];
+
+    List<Landlord> landlordList = [];
+
+    for (var landlordID in landlordRef!) {
+      DocumentSnapshot<Map<String, dynamic>> documentSnapshot =
+          await landlordID.get();
+      Landlord landlord = await Landlord.fromJson(documentSnapshot.data());
+      landlordList.add(landlord);
+    }
+
+    setState(() {
+      landlords = landlordList;
+      filteredLandlords = List.from(landlords);
+      isLoading = false;
+    });
+    return landlords;
+  }
 
   List<Landlord> filteredLandlords = [];
   late FocusNode searchFocusNode;
@@ -54,6 +59,7 @@ class _LandlordOnboardedPageState extends State<LandlordOnboardedPage> {
     filteredLandlords = List.from(landlords);
     searchFocusNode = FocusNode();
     searchController.addListener(onSearchTextChanged);
+    fetchLandlords();
   }
 
   void onSearchTextChanged() {
@@ -64,7 +70,7 @@ class _LandlordOnboardedPageState extends State<LandlordOnboardedPage> {
   void filterLandlords(String query) {
     setState(() {
       filteredLandlords = landlords.where((landlord) {
-        final nameLower = landlord.name.toLowerCase();
+        final nameLower = landlord.firstName.toLowerCase();
         final queryLower = query.toLowerCase();
         return nameLower.contains(queryLower);
       }).toList();
@@ -82,7 +88,6 @@ class _LandlordOnboardedPageState extends State<LandlordOnboardedPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
@@ -106,7 +111,7 @@ class _LandlordOnboardedPageState extends State<LandlordOnboardedPage> {
                   controller: searchController,
                   onChanged: (value) => setState(() {}),
                   style: const TextStyle(
-                    color:Colors.black,
+                    color: Colors.black,
                   ),
                   decoration: const InputDecoration(
                     prefixIcon: Icon(Icons.search),
@@ -117,18 +122,21 @@ class _LandlordOnboardedPageState extends State<LandlordOnboardedPage> {
                 ),
               ),
               const SizedBox(height: 60),
-              
-              Container(child: Text("Landlords Onboarded", style: GoogleFonts.montserrat(
-                              fontSize: 24,
-                              color: const Color(0xff33907c),
-                              fontWeight: FontWeight.bold,)),),
-
+              Container(
+                child: Text("Landlords Onboarded",
+                    style: GoogleFonts.montserrat(
+                      fontSize: 24,
+                      color: const Color(0xff33907c),
+                      fontWeight: FontWeight.bold,
+                    )),
+              ),
               const SizedBox(height: 40),
-              
-
+              if (isLoading)
+                const Center(
+                  child: CircularProgressIndicator(),
+                ),
               Expanded(
                 child: ListView.builder(
-                  
                   itemCount: filteredLandlords.length,
                   itemBuilder: (context, index) {
                     final landlord = filteredLandlords[index];
@@ -137,40 +145,37 @@ class _LandlordOnboardedPageState extends State<LandlordOnboardedPage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const LandlordsOnboardedInfoPage(),
+                            builder: (context) => LandlordsOnboardedInfoPage(
+                              landlord: landlord,
+                            ),
                           ),
                         );
                       },
-
                       child: Card(
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10.0),
+                        ),
+                        elevation: 5.0,
+                        child: ListTile(
+                          contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 20.0, vertical: 10.0),
+                          title: Text(
+                              landlord.firstName + " " + landlord.lastName,
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.bold)),
+                          trailing: Text(landlord.balance.toString(),
+                              style: const TextStyle(color: Colors.grey)),
+                          subtitle: Text('dummy'),
+                        ),
                       ),
-                      elevation: 5.0,
-                      child: ListTile(
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
-                        title: Text(landlord.name, style: const TextStyle(fontWeight: FontWeight.bold)),
-                        trailing: Text(landlord.date, style: const TextStyle(color: Colors.grey)),
-                        subtitle: Text(landlord.address),
-                      ),
-                    ),
-                  );
-                },
-              ),),
+                    );
+                  },
+                ),
+              ),
             ],
           ),
         ),
       ),
     );
   }
-}
-
-void main() {
-  runApp(MaterialApp(
-    home: LandlordOnboardedPage(),
-    theme: ThemeData(
-      primarySwatch: Colors.green,
-      visualDensity: VisualDensity.adaptivePlatformDensity,
-    ),
-  ));
 }

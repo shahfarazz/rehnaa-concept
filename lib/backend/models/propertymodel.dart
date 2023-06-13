@@ -20,6 +20,7 @@ class Property {
   final double rehnaaRating;
   final double tenantRating;
   final String tenantReview;
+  String? propertyID;
 
   Property({
     required this.imagePath,
@@ -40,6 +41,7 @@ class Property {
     required this.rehnaaRating,
     required this.tenantRating,
     required this.tenantReview,
+    this.propertyID,
   });
 
   static Future<Property> fromJson(Map<String, dynamic> json) async {
@@ -75,5 +77,27 @@ class Property {
     }
 
     throw Exception('Landlord reference is null');
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'imagePath': imagePath,
+      'type': type,
+      'beds': beds,
+      'baths': baths,
+      'garden': garden,
+      'living': living,
+      'floors': floors,
+      'carspace': carspace,
+      'description': description,
+      'title': title,
+      'location': location,
+      'address': address,
+      'price': price,
+      'landlordRef': landlordRef,
+      'rehnaaRating': rehnaaRating,
+      'tenantRating': tenantRating,
+      'tenantReview': tenantReview,
+    };
   }
 }

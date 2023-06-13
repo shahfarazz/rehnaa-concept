@@ -86,7 +86,7 @@ class _DashboardPageState extends State<TenantDashboardPage>
           Map<String, dynamic> notification = notificationstemp[i];
 
           String title = notification['title'] ?? '';
-          String amount = notification['amount'] ?? 0.0;
+          var amount = notification['amount'] ?? '';
 
           print('Title: $title');
           print('Amount: $amount');
@@ -160,7 +160,10 @@ class _DashboardPageState extends State<TenantDashboardPage>
                               onUpdateWithdrawState: updateWithdrawState,
                             ),
                             TenantRentAccrualPage(),
-                            TenantPropertiesPage(uid: widget.uid),
+                            TenantPropertiesPage(
+                              uid: widget.uid,
+                              isWithdraw: _isWithdraw,
+                            ),
                             TenantRentHistoryPage(uid: widget.uid),
                             TenantProfilePage(uid: widget.uid),
                           ],
@@ -297,10 +300,10 @@ class _DashboardPageState extends State<TenantDashboardPage>
           });
         } else if (details.delta.dx < 0) {
           setState(() {
-           _isSidebarOpen = false;
+            _isSidebarOpen = false;
           });
         }
-      }, 
+      },
       child: Stack(
         children: [
           if (_isSidebarOpen)
@@ -343,7 +346,8 @@ class _DashboardPageState extends State<TenantDashboardPage>
                                   // Add your onTap functionality here
                                 },
                                 child: ShaderMask(
-                                  shaderCallback: (bounds) => const LinearGradient(
+                                  shaderCallback: (bounds) =>
+                                      const LinearGradient(
                                     colors: [
                                       Color(0xFF0FA697),
                                       Color(0xFF45BF7A),
@@ -593,89 +597,88 @@ class _DashboardPageState extends State<TenantDashboardPage>
                             thumbVisibility: true,
                             child: SingleChildScrollView(
                               child: Column(
-                                children: notifications
-                                    .map(
-                                      (notification) => Padding(
-                                        padding:
-                                            const EdgeInsets.symmetric(vertical: 8.0),
-                                        child: Row(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: <Widget>[
-                                            const SizedBox(
-                                              width: 24.0,
-                                              child: Padding(
-                                                padding:
-                                                    EdgeInsets.only(left: 8.0),
-                                                child: Text(
-                                                  '\u2022',
-                                                  style: TextStyle(
-                                                    fontSize: 24.0,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Color(0xFF45BF7A),
-                                                  ),
+                                children:
+                                    notifications.reversed.map((notification) {
+                                  return Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 8.0),
+                                    child: Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: <Widget>[
+                                        const SizedBox(
+                                          width: 24.0,
+                                          child: Padding(
+                                            padding: EdgeInsets.only(left: 8.0),
+                                            child: Text(
+                                              '\u2022',
+                                              style: TextStyle(
+                                                fontSize: 24.0,
+                                                fontWeight: FontWeight.bold,
+                                                color: Color(0xFF45BF7A),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(width: 12.0),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                notification['title']!,
+                                                style: const TextStyle(
+                                                  fontSize: 18.0,
+                                                  fontFamily: 'Montserrat',
                                                 ),
                                               ),
-                                            ),
-                                            const SizedBox(width: 12.0),
-                                            Expanded(
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Text(
-                                                    notification['title']!,
-                                                    style: const TextStyle(
-                                                      fontSize: 18.0,
-                                                      fontFamily: 'Montserrat',
-                                                    ),
-                                                  ),
-                                                  if (notification['amount']!
-                                                      .isNotEmpty)
-                                                    Padding(
-                                                      padding: const EdgeInsets.only(
+                                              if (notification['amount']!
+                                                  .isNotEmpty)
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
                                                           left: 24.0),
-                                                      child: RichText(
-                                                        text: TextSpan(
-                                                          style: const TextStyle(
-                                                            fontSize: 16.0,
+                                                  child: RichText(
+                                                    text: TextSpan(
+                                                      style: const TextStyle(
+                                                        fontSize: 16.0,
+                                                        fontFamily:
+                                                            'Montserrat',
+                                                        color: Colors.black,
+                                                      ),
+                                                      children: [
+                                                        const TextSpan(
+                                                          text: 'Amount: ',
+                                                          style: TextStyle(
                                                             fontFamily:
                                                                 'Montserrat',
-                                                            color: Colors.black,
                                                           ),
-                                                          children: [
-                                                            const TextSpan(
-                                                              text: 'Amount: ',
-                                                              style: TextStyle(
-                                                                fontFamily:
-                                                                    'Montserrat',
-                                                              ),
-                                                            ),
-                                                            TextSpan(
-                                                              text: notification[
-                                                                  'amount']!,
-                                                              style: const TextStyle(
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                                color: Color(
-                                                                    0xFF45BF7A),
-                                                                fontFamily:
-                                                                    'Montserrat',
-                                                              ),
-                                                            ),
-                                                          ],
                                                         ),
-                                                      ),
+                                                        TextSpan(
+                                                          text: notification[
+                                                              'amount']!,
+                                                          style:
+                                                              const TextStyle(
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            color: Color(
+                                                                0xFF45BF7A),
+                                                            fontFamily:
+                                                                'Montserrat',
+                                                          ),
+                                                        ),
+                                                      ],
                                                     ),
-                                                ],
-                                              ),
-                                            ),
-                                          ],
+                                                  ),
+                                                ),
+                                            ],
+                                          ),
                                         ),
-                                      ),
-                                    )
-                                    .toList(),
+                                      ],
+                                    ),
+                                  );
+                                }).toList(),
                               ),
                             ),
                           ),

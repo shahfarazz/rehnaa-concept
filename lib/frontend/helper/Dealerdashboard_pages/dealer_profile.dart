@@ -35,7 +35,10 @@ class _DealerProfilePageState extends State<DealerProfilePage> {
 
     return Scaffold(
       body: FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-        future: FirebaseFirestore.instance.collection('Tenants').doc(widget.uid).get(),
+        future: FirebaseFirestore.instance
+            .collection('Dealers')
+            .doc(widget.uid)
+            .get(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             // While data is being fetched, show a loading indicator
@@ -63,7 +66,8 @@ class _DealerProfilePageState extends State<DealerProfilePage> {
 
           final firstName = docData['firstName'] as String? ?? '';
           final lastName = docData['lastName'] as String? ?? '';
-          final pathToImage = docData['pathToImage'] as String? ?? '';
+          final pathToImage =
+              docData['pathToImage'] as String? ?? 'assets/defaulticon.png';
           final description = docData['description'] as String? ?? '';
 
           final isEmail = authService.isEmail(emailOrPhone);
@@ -124,31 +128,29 @@ class _DealerProfilePageState extends State<DealerProfilePage> {
                       ),
                       const SizedBox(width: 31),
                       Expanded(
-  child: Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      const SizedBox(height: 18),
-
-      const Text(
-        'Additional Settings',
-        style: TextStyle(
-          fontSize: 16,
-          color: Colors.black,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-      const SizedBox(height: 4),
-      Text(
-        'Click to access additional settings',
-        style: TextStyle(
-          fontSize: 14,
-          color: Colors.grey[700],
-        ),
-      ),
-    ],
-  ),
-),
-
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const SizedBox(height: 18),
+                            const Text(
+                              'Additional Settings',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              'Click to access additional settings',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey[700],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                       SizedBox(
                         height: 20,
                         child: AnimatedSwitcher(
@@ -178,7 +180,10 @@ class _DealerProfilePageState extends State<DealerProfilePage> {
                 if (showChangePassword)
                   Column(
                     children: [
-                      const SizedBox(height: 17,width: 8,),
+                      const SizedBox(
+                        height: 17,
+                        width: 8,
+                      ),
                       ProfileInfoItem(
                         icon: Icons.lock,
                         title: 'Change Password',
@@ -195,7 +200,8 @@ class _DealerProfilePageState extends State<DealerProfilePage> {
                                   onChanged: (value) {
                                     newPassword = value;
                                   },
-                                  decoration: const InputDecoration(hintText: 'Enter new password'),
+                                  decoration: const InputDecoration(
+                                      hintText: 'Enter new password'),
                                 ),
                                 actions: [
                                   ElevatedButton(
@@ -233,15 +239,18 @@ class _DealerProfilePageState extends State<DealerProfilePage> {
                                 content: Column(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    const Text('Enter your password to confirm account deletion:'),
+                                    const Text(
+                                        'Enter your password to confirm account deletion:'),
                                     TextField(
                                       onChanged: (value) {
                                         password = value;
                                       },
-                                      decoration: const InputDecoration(hintText: 'Password'),
+                                      decoration: const InputDecoration(
+                                          hintText: 'Password'),
                                       obscureText: true,
                                     ),
-                                    if (password.isNotEmpty && password != 'correct_password')
+                                    if (password.isNotEmpty &&
+                                        password != 'correct_password')
                                       const Text(
                                         'Incorrect password',
                                         style: TextStyle(color: Colors.red),
@@ -281,7 +290,6 @@ class _DealerProfilePageState extends State<DealerProfilePage> {
     );
   }
 }
-
 
 class ProfileInfoItem extends StatelessWidget {
   final IconData icon;

@@ -595,7 +595,7 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
                             thumbVisibility: true,
                             child: SingleChildScrollView(
                               child: Column(
-                                children: notifications
+                                children: notifications.reversed
                                     .map(
                                       (notification) => Padding(
                                         padding: const EdgeInsets.symmetric(
