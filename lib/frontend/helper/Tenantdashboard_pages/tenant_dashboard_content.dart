@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -76,7 +77,7 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
     }
   }
 
-  void showOptionDialog(Function callback, Tenant tenant) {
+ void showOptionDialog(Function callback, Tenant tenant) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -84,12 +85,13 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
 
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setState) {
+            // Your AlertDialog code goes here...
             return AlertDialog(
               title: const Padding(
                 padding:
                     EdgeInsets.only(top: 16.0), // Adjust the value as needed
                 child: Text(
-                  'Payment Options',
+                  'Withdraw Options',
                   style:
                       TextStyle(fontSize: 20.0, fontWeight: FontWeight.normal),
                 ),
@@ -180,74 +182,94 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                     ),
                   ),
                   onPressed: () {
-                    if (selectedOption.isNotEmpty) {
-                      if (kDebugMode) {
-                        print('Selected option: $selectedOption');
-                      }
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => TenantInvoicePage(
-                            tenantName:
-                                '${tenant.firstName} ${tenant.lastName}',
-                            // paymentDateTime: DateTime.now(),
-                            rent: tenant.rent,
-                          ),
-                        ),
-                      );
+                   if (selectedOption.isNotEmpty) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      double amount = 0.0;
 
-                      try {
-                        FirebaseFirestore.instance
-                            .collection('Notifications')
-                            .doc(widget.uid)
-                            .set(
-                          {
-                            // Union of previous notifications plus a new notification that i will create now
-                            'notifications': FieldValue.arrayUnion([
-                              {
-                                'title':
-                                    'Withdraw Request by ${'${tenant.firstName} ${tenant.lastName}'}',
-                                'amount': 'Rs${tenant.rent}',
-                              }
-                            ]),
-                          },
-                          SetOptions(merge: true),
-                        );
-                      } catch (e) {
-                        print('error is $e');
-                      }
-                      FirebaseFirestore.instance
-                          .collection('Tenants')
-                          .doc(widget.uid)
-                          .set({
-                        // Union of previous notifications plus a new notification that i will create now
-                        'isWithdraw': true,
-                      }, SetOptions(merge: true));
-
-                      FirebaseFirestore.instance
-                          .collection('AdminRequests')
-                          .doc(widget.uid)
-                          .set({
-                        // Union of previous notifications plus a new notification that i will create now
-                        'paymentRequest': FieldValue.arrayUnion([
-                          {
-                            'fullname':
-                                '${tenant.firstName} ${tenant.lastName}',
-                            'amount': tenant.rent,
-                            'paymentMethod': selectedOption,
-                            'uid': widget.uid,
-                          }
-                        ]),
-                      }, SetOptions(merge: true));
-
-                      setState(() {
-                        isWithdraw = true;
-                      });
-                    } else {
-                      if (kDebugMode) {
-                        print('Please select an option');
-                      }
+      return AlertDialog(
+        title: Text('Enter Payment Amount'),
+        content: TextField(
+          keyboardType: TextInputType.number,
+          onChanged: (value) {
+            amount = double.tryParse(value) ?? 0.0;
+          },
+        ),
+        actions: <Widget>[
+          TextButton(
+            child: Text('Cancel'),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+          TextButton(
+            child: Text('Submit'),
+            onPressed: () {
+              if (amount > 0 && amount <= tenant.rent) {
+                Fluttertoast.showToast(
+                  msg: 'An admin will contact you soon regarding your payment via: $selectedOption',
+                  toastLength: Toast.LENGTH_SHORT,
+                  gravity: ToastGravity.BOTTOM,
+                  timeInSecForIosWeb: 3,
+                  backgroundColor: const Color(0xff45BF7A),
+                );
+                FirebaseFirestore.instance.collection('Notifications').doc(widget.uid).set({
+                  'notifications': FieldValue.arrayUnion([
+                    {
+                      'title': 'Payment Request by ${'${tenant.firstName} ${tenant.lastName}'}',
+                      'amount': 'Rs${tenant.rent.toString()}',
                     }
+                  ]),
+                }, SetOptions(merge: true));
+                FirebaseFirestore.instance.collection('Tenants').doc(widget.uid).set({
+                  'isWithdraw': true,
+                }, SetOptions(merge: true));
+                FirebaseFirestore.instance.collection('AdminRequests').doc(widget.uid).set({
+                  'paymentRequest': FieldValue.arrayUnion([
+                    {
+                      'fullname': '${tenant.firstName} ${tenant.lastName}',
+                      'amount': amount,
+                      'paymentMethod': selectedOption,
+                      'uid': widget.uid,
+                    }
+                  ]),
+                }, SetOptions(merge: true));
+
+                setState(() {
+                  isWithdraw = true;
+                });
+
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => TenantInvoicePage(tenantName: '${tenant.firstName} ${tenant.lastName}',
+                          // paymentDateTime: DateTime.now(),
+                          rent: tenant.rent,
+                          amount: amount,
+                          selectedOption: selectedOption,
+                          )),
+                );
+              } else {
+                Fluttertoast.showToast(
+                  msg: 'Invalid withdrawal amount',
+                  toastLength: Toast.LENGTH_SHORT,
+                  gravity: ToastGravity.BOTTOM,
+                  timeInSecForIosWeb: 3,
+                  backgroundColor: Colors.red,
+                );
+              }
+            },
+          ),
+        ],
+      );
+    },
+  );
+} else {
+  if (kDebugMode) {
+    print('Please select an option');
+  }
+}
+
                   },
                 ),
               ],
@@ -257,7 +279,6 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
       },
     ).then((_) => callback());
   }
-
   void someFunction(Tenant tenant) {
     showOptionDialog(() {
       // setState(() {

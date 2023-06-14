@@ -500,10 +500,10 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
                                   child: InkWell(
                                     borderRadius: BorderRadius.circular(20),
                                     onTap: () {
-                                      //changeeeeeeeeeeeeeeeeeeeeeeeeee
                                       isWithdraw
-                                          ? someFunction(landlord)
-                                          : null; // Show the option dialog
+                                          ? null
+                                          : someFunction(
+                                              landlord); // Show the option dialog
                                     },
                                     child: Center(
                                       child: Text(
