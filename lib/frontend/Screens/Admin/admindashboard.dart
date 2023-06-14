@@ -29,7 +29,12 @@ class _AdminDashboardState extends State<AdminDashboard> {
 
   Future<void> _getNotifs() async {
     QuerySnapshot<Map<String, dynamic>> propertiesSnapshot =
-        await FirebaseFirestore.instance.collection('AdminRequests').get();
+        await FirebaseFirestore.instance
+            .collection('AdminRequests')
+            .orderBy('timestamp', descending: true)
+            .get();
+
+    print('propertiesSnapshot is ${propertiesSnapshot.size}');
 
     if (propertiesSnapshot.size > 0) {
       List<Map<String, String>> tempNotifications = [];
@@ -55,6 +60,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
               };
               tempNotifications.add(notification);
             });
+          } else if (key == 'timestamp') {
+            //do nothing
           } else {
             // Leave other cases blank for now
             Map<String, String> notification = {
@@ -576,13 +583,13 @@ class _AdminDashboardState extends State<AdminDashboard> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(
-                          Icons.storage,
+                          Icons.analytics,
                           size: 60,
                           color: Colors.white,
                         ),
                         SizedBox(height: 10),
                         Text(
-                          'Data Storage of\nEverything',
+                          'Data Analytics',
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 14,

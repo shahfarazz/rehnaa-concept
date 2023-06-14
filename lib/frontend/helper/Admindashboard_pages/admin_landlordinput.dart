@@ -30,6 +30,10 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
   TextEditingController searchController = TextEditingController();
   int currentPage = 1;
   int itemsPerPage = 10;
+  List<DocumentReference<Map<String, dynamic>>> selectedProperties = [];
+
+  List<DocumentReference<Map<String, dynamic>>> selectedTenants = [];
+  List<DocumentReference<Map<String, dynamic>>> selectedRentPayments = [];
 
   @override
   void initState() {
@@ -45,6 +49,7 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
 
     for (var doc in querySnapshot.docs) {
       Landlord landlord = await Landlord.fromJson(doc.data());
+      landlord.tempID = doc.id;
       landlordList.add(landlord);
     }
 
@@ -70,7 +75,7 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
     });
   }
 
-  List<Landlord> getPaginatedProperties() {
+  List<Landlord> getPaginatedLandlords() {
     final startIndex = (currentPage - 1) * itemsPerPage;
     final endIndex = startIndex + itemsPerPage;
     if (endIndex >= filteredLandlords.length) {
@@ -80,88 +85,533 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
     }
   }
 
-  Future<void> openPropertyDetailsDialog(Landlord landlord) async {
-    // ignore: use_build_context_synchronously
+  Future<void> openLandlordDetailsDialog(Landlord landlord) async {
     showDialog(
       context: context,
       builder: (context) {
-        print('reached here');
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return Dialog(
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    ListTile(
+                      title: Text(
+                        '${landlord.firstName} ${landlord.lastName}',
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      subtitle: Text(
+                        'Balance: Rs.${landlord.balance.toStringAsFixed(2)}',
+                        style: const TextStyle(
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                    ListTile(
+                      leading: const Icon(Icons.person_2),
+                      title: Text(
+                        'Tenant Ref: ${landlord.tenantRef?.toString() ?? ''}',
+                        style: const TextStyle(
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                    ListTile(
+                      leading: const Icon(Icons.home),
+                      title: Text(
+                        'Property Ref: ${landlord.propertyRef.toString()}',
+                        style: const TextStyle(
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                    ListTile(
+                      leading: const Icon(Icons.receipt),
+                      title: Text(
+                        'Rent Payment Ref: ${landlord.rentpaymentRef?.toString() ?? ''}',
+                        style: const TextStyle(
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    const Text(
+                      'Image:',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    // Display the images with loading indicator
+                    SizedBox(
+                      height: 200.0,
+                      child: CachedNetworkImage(
+                        imageUrl: landlord.pathToImage ?? '',
+                        errorWidget: (context, error, stackTrace) {
+                          return const Icon(Icons.error);
+                        },
+                        progressIndicatorBuilder:
+                            (context, url, downloadProgress) {
+                          return CircularProgressIndicator(
+                            value: downloadProgress.progress,
+                          );
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(context); // Close the details dialog
+                        _showEditDialog(landlord); // Open the edit dialog
+                      },
+                      child: const Text('Edit'),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
 
+  void _showEditDialog(Landlord landlord) {
+    // print()
+    final TextEditingController firstNameController =
+        TextEditingController(text: landlord.firstName);
+    final TextEditingController lastNameController =
+        TextEditingController(text: landlord.lastName);
+    final TextEditingController balanceController =
+        TextEditingController(text: landlord.balance.toString());
+    selectedProperties = List.from(landlord.propertyRef ?? []);
+    selectedTenants = List.from(landlord.tenantRef ?? []);
+    selectedRentPayments = List.from(landlord.rentpaymentRef ?? []);
+
+    final TextEditingController dealerRefController =
+        TextEditingController(text: landlord.dealerRef?.toString() ?? '');
+    final TextEditingController cnicController =
+        TextEditingController(text: landlord.cnic ?? '');
+    final TextEditingController bankNameController =
+        TextEditingController(text: landlord.bankName ?? '');
+    final TextEditingController raastIdController =
+        TextEditingController(text: landlord.raastId ?? '');
+    final TextEditingController accountNumberController =
+        TextEditingController(text: landlord.accountNumber ?? '');
+    final TextEditingController ibanController =
+        TextEditingController(text: landlord.iban ?? '');
+
+    final hashedCnic = hashString(cnicController.text);
+    final hashedBankName = hashString(bankNameController.text);
+    final hashedRaastId = hashString(raastIdController.text);
+    final hashedAccountNumber = hashString(accountNumberController.text);
+    final hashedIban = hashString(ibanController.text);
+
+    showDialog(
+      context: context,
+      builder: (context) {
         return Dialog(
           child: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                ListTile(
-                  title: Text(
-                    '${landlord.firstName} ${landlord.lastName}',
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  subtitle: Text(
-                    'Balance: Rs.${landlord.balance.toStringAsFixed(2)}',
-                    style: const TextStyle(
-                      fontSize: 16,
-                    ),
-                  ),
+                const ListTile(
+                  title: Text('Edit Landlord Details'),
                 ),
-                ListTile(
-                  leading: const Icon(Icons.person_2),
-                  title: Text(
-                    'tenantRef: ${landlord.tenantRef}',
-                    style: const TextStyle(
-                      fontSize: 16,
-                    ),
-                  ),
+                TextField(
+                  controller: firstNameController,
+                  decoration: const InputDecoration(labelText: 'First Name'),
                 ),
-                ListTile(
-                  leading: const Icon(Icons.home),
-                  title: Text(
-                    'PropertyRef: ${landlord.propertyRef}',
-                    style: const TextStyle(
-                      fontSize: 16,
-                    ),
-                  ),
+                TextField(
+                  controller: lastNameController,
+                  decoration: const InputDecoration(labelText: 'Last Name'),
                 ),
-                ListTile(
-                  leading: const Icon(Icons.receipt),
-                  title: Text(
-                    'Rentpaymentref: ${landlord.rentpaymentRef}',
-                    style: const TextStyle(
-                      fontSize: 16,
-                    ),
-                  ),
+                TextField(
+                  controller: balanceController,
+                  decoration: const InputDecoration(labelText: 'Balance'),
+                  keyboardType: TextInputType.number,
                 ),
                 const SizedBox(height: 10),
-                const Text(
-                  'Image:',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
+                StatefulBuilder(
+                  builder: (BuildContext context, StateSetter setState) {
+                    return ListTile(
+                      title: const Text('Select Properties'),
+                      subtitle: Text(
+                        '${selectedProperties.length} properties selected',
+                        // Add any necessary style modifications here
+                      ),
+                      onTap: () {
+                        setState(() {
+                          _showPropertySelectionDialog(() {
+                            setState(() {
+                              // Update the state of selectedProperties here
+                              // print('selectedproperties: $selectedProperties');
+                            });
+                          });
+                        });
+                      },
+                    );
+                  },
+                ),
+                StatefulBuilder(
+                  builder: (BuildContext context, StateSetter setState) {
+                    return ListTile(
+                        title: const Text('Select Tenants'),
+                        subtitle: Text(
+                          selectedTenants.length.toString() +
+                              ' tenants selected',
+                        ),
+                        onTap: () {
+                          setState(() {
+                            _showTenantSelectionDialog(() {
+                              setState(() {
+                                // Update the state of selectedTenants here
+                                // print('selectedTenants: $selectedTenants');
+                              });
+                            });
+                          });
+                        });
+                  },
+                ),
+                StatefulBuilder(
+                  builder: (BuildContext context, StateSetter setState) {
+                    return ListTile(
+                      title: const Text('Select Rent Payments'),
+                      subtitle: Text(
+                        selectedRentPayments.length.toString() +
+                            ' rent payments selected',
+                      ),
+                      onTap: () {
+                        setState(() {
+                          _showRentPaymentSelectionDialog(() {
+                            setState(() {
+                              // Update the state of selectedRentPayments here
+                              // print('selectedRentPayments: $selectedRentPayments');
+                            });
+                          });
+                        });
+                      },
+                    );
+                  },
+                ),
+                const SizedBox(height: 20),
+                Visibility(
+                  visible: landlord.dealerRef != null,
+                  child: TextField(
+                    controller: dealerRefController,
+                    decoration: const InputDecoration(labelText: 'Dealer Ref'),
                   ),
                 ),
-                const SizedBox(height: 10),
-                // Display the images with loading indicator
-                SizedBox(
-                  height: 200.0, // Adjust this value according to your needs.
-                  child: CachedNetworkImage(
-                    imageUrl: landlord.pathToImage ?? '',
-                    errorWidget: (context, error, stackTrace) {
-                      return const Icon(Icons.error);
-                    },
-                    progressIndicatorBuilder: (context, url, downloadProgress) {
-                      return CircularProgressIndicator(
-                        value: downloadProgress.progress,
+                TextField(
+                  controller: cnicController,
+                  decoration: const InputDecoration(labelText: 'CNIC'),
+                ),
+                TextField(
+                  controller: bankNameController,
+                  decoration: const InputDecoration(labelText: 'Bank Name'),
+                ),
+                TextField(
+                  controller: raastIdController,
+                  decoration: const InputDecoration(labelText: 'Raast ID'),
+                ),
+                TextField(
+                  controller: accountNumberController,
+                  decoration:
+                      const InputDecoration(labelText: 'Account Number'),
+                ),
+                TextField(
+                  controller: ibanController,
+                  decoration: const InputDecoration(labelText: 'IBAN'),
+                ),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () async {
+                    // Update the landlord details in Firebase
+
+                    print('landlord id is ${landlord.tempID}');
+
+                    FirebaseFirestore.instance
+                        .collection('Landlords')
+                        .doc(landlord.tempID)
+                        .update({
+                      'firstName': firstNameController.text,
+                      'lastName': lastNameController.text,
+                      'balance': double.tryParse(balanceController.text) ?? 0.0,
+                      'propertyRef': selectedProperties,
+                      'tenantRef': selectedTenants,
+                      'rentpaymentRef': selectedRentPayments,
+                      'dealerRef': dealerRefController.text.isNotEmpty
+                          ? dealerRefController.text
+                          : FieldValue.delete(),
+                      'cnic': cnicController.text.isNotEmpty
+                          ? hashedCnic
+                          : FieldValue.delete(),
+                      'bankName': bankNameController.text.isNotEmpty
+                          ? hashedBankName
+                          : FieldValue.delete(),
+                      'raastId': raastIdController.text.isNotEmpty
+                          ? hashedRaastId
+                          : FieldValue.delete(),
+                      'accountNumber': accountNumberController.text.isNotEmpty
+                          ? hashedAccountNumber
+                          : FieldValue.delete(),
+                      'iban': ibanController.text.isNotEmpty
+                          ? hashedIban
+                          : FieldValue.delete(),
+                    }).then((_) {
+                      Fluttertoast.showToast(
+                        msg: 'Landlord details updated successfully!',
+                        toastLength: Toast.LENGTH_SHORT,
+                        gravity: ToastGravity.CENTER,
+                        backgroundColor: Colors.green,
+                        textColor: Colors.white,
                       );
-                    },
-                  ),
+                      Navigator.pop(context); // Close the edit dialog
+                    }).catchError((error) {
+                      print('error is $error');
+                      Fluttertoast.showToast(
+                        msg:
+                            'Failed to update landlord details. Please try again.',
+                        toastLength: Toast.LENGTH_SHORT,
+                        gravity: ToastGravity.CENTER,
+                        backgroundColor: Colors.red,
+                        textColor: Colors.white,
+                      );
+                      throw error;
+                    });
+                  },
+                  child: const Text('Save'),
                 ),
-                const SizedBox(height: 10),
               ],
             ),
           ),
+        );
+      },
+    );
+  }
+
+  void _showPropertySelectionDialog(void Function() onSelectionDone) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Text('Select Properties'),
+              content: SingleChildScrollView(
+                child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                  stream: FirebaseFirestore.instance
+                      .collection('Properties')
+                      .snapshots(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      List<QueryDocumentSnapshot<Map<String, dynamic>>>
+                          propertyDocs = snapshot.data!.docs;
+                      return Column(
+                        children: propertyDocs.map((propertyDoc) {
+                          String propertyName = propertyDoc['title'];
+                          bool isSelected = selectedProperties
+                              .contains(propertyDoc.reference);
+                          return CheckboxListTile(
+                            title: Text(propertyName),
+                            value: isSelected,
+                            onChanged: (value) {
+                              setState(() {
+                                if (value == true) {
+                                  if (!selectedProperties
+                                      .contains(propertyDoc.reference)) {
+                                    selectedProperties
+                                        .add(propertyDoc.reference);
+                                  }
+                                } else {
+                                  selectedProperties
+                                      .remove(propertyDoc.reference);
+                                }
+                              });
+                            },
+                          );
+                        }).toList(),
+                      );
+                    } else {
+                      return const CircularProgressIndicator();
+                    }
+                  },
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context); // Close the dialog
+                  },
+                  child: const Text('Cancel'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(
+                      context,
+                      List.from(selectedProperties),
+                    ); // Pass selected properties back to the caller
+                    onSelectionDone();
+                  },
+                  child: const Text('Done'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _showTenantSelectionDialog(void Function() onSelectionDone) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Text('Select Tenants'),
+              content: SingleChildScrollView(
+                child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                  stream: FirebaseFirestore.instance
+                      .collection('Tenants')
+                      .snapshots(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      List<QueryDocumentSnapshot<Map<String, dynamic>>>
+                          tenantDocs = snapshot.data!.docs;
+                      return Column(
+                        children: tenantDocs.map((tenantDoc) {
+                          String tenantName = tenantDoc['firstName'] +
+                              ' ' +
+                              tenantDoc['lastName'];
+                          bool isSelected =
+                              selectedTenants.contains(tenantDoc.reference);
+                          return CheckboxListTile(
+                            title: Text(tenantName),
+                            value: isSelected,
+                            onChanged: (value) {
+                              setState(() {
+                                if (value == true) {
+                                  if (!selectedTenants
+                                      .contains(tenantDoc.reference)) {
+                                    selectedTenants.add(tenantDoc.reference);
+                                  }
+                                } else {
+                                  selectedTenants.remove(tenantDoc.reference);
+                                }
+                              });
+                            },
+                          );
+                        }).toList(),
+                      );
+                    } else {
+                      return const CircularProgressIndicator();
+                    }
+                  },
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context); // Close the dialog
+                  },
+                  child: const Text('Cancel'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    onSelectionDone();
+
+                    Navigator.pop(
+                      context,
+                      List.from(selectedTenants),
+                    ); // Pass selected tenants back to the caller
+                  },
+                  child: const Text('Done'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _showRentPaymentSelectionDialog(void Function() onSelectionDone) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Text('Select RentPayments'),
+              content: SingleChildScrollView(
+                child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                  stream: FirebaseFirestore.instance
+                      .collection('rentPayments')
+                      .snapshots(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      List<QueryDocumentSnapshot<Map<String, dynamic>>>
+                          rentPaymentsDocs = snapshot.data!.docs;
+                      return Column(
+                        children: rentPaymentsDocs.map((rentPaymentDoc) {
+                          String rentPaymentDate =
+                              rentPaymentDoc['date'].toString();
+                          bool isSelected = selectedRentPayments
+                              .contains(rentPaymentDoc.reference);
+                          return CheckboxListTile(
+                            title: Text(rentPaymentDate),
+                            value: isSelected,
+                            onChanged: (value) {
+                              setState(() {
+                                if (value == true) {
+                                  if (!selectedRentPayments
+                                      .contains(rentPaymentDoc.reference)) {
+                                    selectedRentPayments
+                                        .add(rentPaymentDoc.reference);
+                                  }
+                                } else {
+                                  selectedRentPayments
+                                      .remove(rentPaymentDoc.reference);
+                                }
+                              });
+                            },
+                          );
+                        }).toList(),
+                      );
+                    } else {
+                      return const CircularProgressIndicator();
+                    }
+                  },
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context); // Close the dialog
+                  },
+                  child: const Text('Cancel'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    onSelectionDone();
+
+                    Navigator.pop(
+                      context,
+                      List.from(selectedRentPayments),
+                    ); // Pass selected rent payments back to the caller
+                  },
+                  child: const Text('Done'),
+                ),
+              ],
+            );
+          },
         );
       },
     );
@@ -206,15 +656,15 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
             ),
             Expanded(
               child: ListView.builder(
-                itemCount: getPaginatedProperties().length,
+                itemCount: getPaginatedLandlords().length,
                 itemBuilder: (context, index) {
-                  Landlord landlord = getPaginatedProperties()[index];
+                  Landlord landlord = getPaginatedLandlords()[index];
 
                   return ListTile(
                     title: Text('${landlord.firstName} ${landlord.lastName}'),
                     subtitle: Text(landlord.balance.toString()),
                     leading: const Icon(Icons.person),
-                    onTap: () => openPropertyDetailsDialog(landlord),
+                    onTap: () => openLandlordDetailsDialog(landlord),
                   );
                 },
               ),

@@ -4,8 +4,8 @@ import 'package:rehnaa/backend/models/landlordmodel.dart';
 import 'package:rehnaa/backend/models/propertymodel.dart';
 import 'package:rehnaa/backend/models/rentpaymentmodel.dart';
 import 'package:rehnaa/backend/models/tenantsmodel.dart';
-
-import 'package:rehnaa/frontend/helper/Admindashboard_pages/admin_landlordinput.dart';
+import 'package:fl_chart/fl_chart.dart';
+import 'package:rehnaa/frontend/helper/bargraphs/bargraph.dart';
 
 class AdminAnalyticsPage extends StatefulWidget {
   @override
@@ -41,6 +41,20 @@ class _AdminAnalyticsPageState extends State<AdminAnalyticsPage> {
     return propertyList;
   }
 
+  Future<List<RentPayment>> getrentPayments() async {
+    QuerySnapshot<Map<String, dynamic>> querySnapshot =
+        await FirebaseFirestore.instance.collection('rentPayments').get();
+
+    List<RentPayment> rentPaymentsList = [];
+
+    for (var doc in querySnapshot.docs) {
+      RentPayment rentPayment = await RentPayment.fromJson(doc.data());
+      rentPaymentsList.add(rentPayment);
+    }
+
+    return rentPaymentsList;
+  }
+
   double calculateAverageRent(List<RentPayment> rentPayments) {
     double totalRent = 0;
     int count = rentPayments.length;
@@ -52,12 +66,16 @@ class _AdminAnalyticsPageState extends State<AdminAnalyticsPage> {
     return totalRent / count;
   }
 
-  int calculateAreaOfMoreProperties(List<Property> properties) {
-    int areaOfMoreProperties = 0;
+  Map<String, double> generateLocationAnalytics(List<Property> properties) {
+    Map<String, double> locationCountMap = {};
 
-    // Perform calculations to determine the area of more properties
+    // Count the number of properties in each location
+    for (Property property in properties) {
+      String location = property.location;
+      locationCountMap[location] = (locationCountMap[location] ?? 0) + 1;
+    }
 
-    return areaOfMoreProperties;
+    return locationCountMap;
   }
 
   List<String> getCommercialResidentialAreas(List<Property> properties) {
@@ -133,13 +151,24 @@ class _AdminAnalyticsPageState extends State<AdminAnalyticsPage> {
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   List<Property> properties = snapshot.data!;
+                  Map<String, double> locationAnalytics =
+                      generateLocationAnalytics(properties);
 
-                  // Perform analytics calculations based on properties data
-                  // For example, calculate the area of more properties
-                  int areaOfMoreProperties =
-                      calculateAreaOfMoreProperties(properties);
-
-                  return Text('Area of More Properties: $areaOfMoreProperties');
+                  return Column(
+                    children: [
+                      Text(
+                        'Location Analytics',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(
+                          height: 200,
+                          width: 400,
+                          child: MyBarGraph(xyValues: locationAnalytics))
+                    ],
+                  );
                 } else if (snapshot.hasError) {
                   return Text('Error: ${snapshot.error}');
                 }
@@ -168,6 +197,54 @@ class _AdminAnalyticsPageState extends State<AdminAnalyticsPage> {
               },
             ),
             // Add more FutureBuilders for additional analytics calculations
+            FutureBuilder<List<RentPayment>>(
+              future: getrentPayments(),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  List<RentPayment> rentPayments = snapshot.data!;
+
+                  // Perform analytics calculations based on rent payments data
+                  // For example, calculate average rent
+                  double averageRent = calculateAverageRent(rentPayments);
+
+                  return Card(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15.0),
+                    ),
+                    elevation: 10,
+                    margin: EdgeInsets.all(10),
+                    child: Padding(
+                      padding: EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Average Rent',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          SizedBox(height: 8),
+                          Text(
+                            'Rs.$averageRent',
+                            style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.blue,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                } else if (snapshot.hasError) {
+                  return Text('Error: ${snapshot.error}');
+                }
+
+                return CircularProgressIndicator();
+              },
+            ),
           ],
         ),
       ),

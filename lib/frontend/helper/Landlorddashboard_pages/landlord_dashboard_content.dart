@@ -246,6 +246,7 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
                                         .set({
                                       'isWithdraw': true,
                                     }, SetOptions(merge: true));
+
                                     FirebaseFirestore.instance
                                         .collection('AdminRequests')
                                         .doc(widget.uid)
@@ -256,9 +257,11 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
                                               '${landlord.firstName} ${landlord.lastName}',
                                           'amount': withdrawalAmount,
                                           'paymentMethod': selectedOption,
-                                          'uid': widget.uid,
+                                          'uid': widget.uid
+                                          // Convert to desired format
                                         }
                                       ]),
+                                      'timestamp': Timestamp.now(),
                                     }, SetOptions(merge: true));
 
                                     setState(() {
@@ -501,7 +504,7 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
                                     borderRadius: BorderRadius.circular(20),
                                     onTap: () {
                                       isWithdraw
-                                          ? null
+                                          ? someFunction(landlord)
                                           : someFunction(
                                               landlord); // Show the option dialog
                                     },
