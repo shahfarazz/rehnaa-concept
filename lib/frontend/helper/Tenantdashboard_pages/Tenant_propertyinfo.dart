@@ -310,6 +310,28 @@ class PropertyDetails extends StatelessWidget {
                         // color: const Color(0xFF33907C),
                       ),
                     ),
+                    SizedBox(height: screenHeight * 0.02),
+                    Text.rich(
+                    TextSpan(
+                      text: "Type: ",
+                      style: GoogleFonts.montserrat(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                        // color: const Color(0xFF33907C),
+                      ),
+                      children: [
+                        TextSpan(
+                          text: "${property.type}",
+                          style: GoogleFonts.montserrat(
+                            fontWeight: FontWeight.normal,
+                            fontSize: 14,
+                            // color: const Color(0xFF33907C),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
                     SizedBox(height: screenHeight * 0.04),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,

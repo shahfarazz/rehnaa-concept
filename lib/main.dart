@@ -31,10 +31,10 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        // home: LoginPage(),
-        home: const SplashScreen(),
-        // home: TenantDashboardPage(
-        //     uid: 'K55YzmkUXt09OgFwnDuT'), //TODO remove this Jugaar
+        // home: SignUpPage(),
+        // home: const SplashScreen(),
+        home: TenantDashboardPage(
+            uid: 'K55YzmkUXt09OgFwnDuT'), //TODO remove this Jugaar
         // home: DealerDashboardPage(
         //   uid: 'fUuFmW7bNaweyP5xkc4c',
         // ),
