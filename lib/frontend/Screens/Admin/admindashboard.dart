@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:rehnaa/frontend/helper/Admindashboard_pages/admin_landlord_requests.dart';
+import 'package:rehnaa/frontend/helper/Admindashboard_pages/admin_requests.dart';
 import 'package:rehnaa/frontend/helper/Admindashboard_pages/admin_tenantinput.dart';
 
 import '../../helper/Admindashboard_pages/admin_analytics.dart';
