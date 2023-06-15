@@ -440,17 +440,105 @@ class LandlordWithdrawalCard extends StatelessWidget {
                         'isWithdraw': false,
                       });
                       //create a rentPayment firebase document that will be used to track the payment
+                      // rentpayment will have fields amount date paymenttype propertyRef and tenantRef and landlordRef
+                      // with a random id and store this id in a local variable
+
+                      final rentPaymentRef = FirebaseFirestore.instance
+                          .collection('rentPayments')
+                          .doc();
+
+                      //go to rentPayments firebase collection and create a document with the id stored in the local variable
+                      // and set the fields amount date paymenttype propertyRef and tenantRef and landlordRef
+                      // with the values from the data object
+                      rentPaymentRef.set({
+                        //convert requestedAmount to an integer
+                        //date should be a firebase timestamp
+                        // if payment type is cash set paymenttype to "cash" on "Bank Transfer" make it "banktransfer"
+                        'amount': int.parse(data.requestedAmount!),
+                        'date': DateTime.now(),
+                        'paymentType': data.cashOrBankTransfer == 'Cash'
+                            ? 'cash'
+                            : 'banktransfer',
+                        'propertyRef': null,
+                        'tenantRef': null,
+                        //landlord ref has to be a document reference to data.uid in Landlord doc
+                        'landlordRef': FirebaseFirestore.instance
+                            .collection('Landlords')
+                            .doc(data.uid),
+                      });
+
+                      //reset the state of the page
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const AdminRequestsPage(),
+                        ),
+                      );
+
+                      // append the landlord's rentPaymentRef whic is a list of documentreferences to the rentPaymentRef
+                      // in the Landlord's document
                       FirebaseFirestore.instance
-                          .collection('RentPayment')
+                          .collection('Landlords')
                           .doc(data.uid)
+                          .update({
+                        'rentpaymentRef': FieldValue.arrayUnion([
+                          rentPaymentRef,
+                        ])
+                      });
+                    } else if (data.requestType == 'Tenant Payment Request') {
+                      //payment request
+                      //update the tenant's balance
+                      FirebaseFirestore.instance
+                          .collection('Tenants')
+                          .doc(data.uid)
+                          .update({
+                        'balance': FieldValue.increment(
+                            int.parse(data.requestedAmount!)),
+                      });
+                      //remove the payment request
+                      FirebaseFirestore.instance
+                          .collection('AdminRequests')
+                          .doc(data.requestID)
+                          .delete();
+                      //send a notification to the tenant by accessing the tenant's uid on Collection 'Notifications'
+                      // and appending to the array called 'notifications' which has fields amount and title
+                      FirebaseFirestore.instance
+                          .collection('Notifications')
+                          .doc(data.uid)
+                          .update({
+                        'notifications': FieldValue.arrayUnion([
+                          {
+                            'amount': data.requestedAmount,
+                            'title': 'Payment Request Accepted',
+                          }
+                        ])
+                      });
+                      // set isWithdraw in Tenant's document to false
+                      FirebaseFirestore.instance
+                          .collection('Tenants')
+                          .doc(data.uid)
+                          .update({
+                        'isWithdraw': false,
+                      });
+                      //create a rentPayment firebase document that will be used to track the payment
+                      // rentpayment will have fields amount date paymenttype propertyRef and tenantRef and landlordRef
+                      FirebaseFirestore.instance
+                          .collection('rentPayments')
+                          .doc(data.requestID)
                           .set({
                         'amount': data.requestedAmount,
                         'date': DateTime.now(),
-                        'isPaid': false,
-                        'isWithdraw': true,
-                        'landlordUID': data.uid,
-                        'tenantUID': '',
+                        'paymentType': data.cashOrBankTransfer,
+                        'tenantRef': data.requestID,
                       });
+
+                      // set the tenant's rentPaymentRef to tenant's own id reference which is data.requestID
+                      FirebaseFirestore.instance
+                          .collection('Tenants')
+                          .doc(data.requestID)
+                          .set({
+                        'rentPaymentRef': data.requestID,
+                      }, SetOptions(merge: true));
                     }
                   }
                 },

@@ -47,7 +47,7 @@ class _LandlordRentHistoryPageState extends State<LandlordRentHistoryPage>
               .get();
 
       Map<String, dynamic>? data = landlordSnapshot.data();
-      List<dynamic> rentPaymentRefs = data!['rentPaymentRef'] ?? [];
+      List<dynamic> rentPaymentRefs = data!['rentpaymentRef'] ?? [];
       firstName = data['firstName'];
       lastName = data['lastName'];
 
@@ -58,14 +58,15 @@ class _LandlordRentHistoryPageState extends State<LandlordRentHistoryPage>
             await rentPaymentRef.get();
 
         Map<String, dynamic>? data = rentPaymentSnapshot.data();
+
         if (data != null) {
           RentPayment rentPayment = await RentPayment.fromJson(data);
           _rentPayments.add(rentPayment);
-          setState(() {
-            shouldDisplay = true;
-          });
         }
       }
+      setState(() {
+        shouldDisplay = true;
+      });
 
       if (kDebugMode) {
         print('Rent payments: $_rentPayments');
@@ -73,6 +74,7 @@ class _LandlordRentHistoryPageState extends State<LandlordRentHistoryPage>
     } catch (e) {
       if (kDebugMode) {
         print('Error fetching rent payments: $e');
+        rethrow;
       }
     }
 
@@ -166,7 +168,7 @@ class _LandlordRentHistoryPageState extends State<LandlordRentHistoryPage>
                           ),
                           SizedBox(height: size.height * 0.01),
                           Text(
-                            rentPayment.property!.location,
+                            rentPayment.property?.title ?? 'Withdrawal',
                             style: GoogleFonts.montserrat(
                               fontSize: size.width * 0.03,
                               color: const Color(0xff33907c),

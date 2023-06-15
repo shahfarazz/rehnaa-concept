@@ -86,7 +86,7 @@ class RentPaymentInfoPage extends StatelessWidget {
                     const SizedBox(height: 10.0),
                     Center(
                       child: Text(
-                        rentPayment.property!.location,
+                        rentPayment.property?.title ?? 'Withdrawal',
                         textAlign: TextAlign.center,
                         style: GoogleFonts.montserrat(
                           fontSize: 16.0,
