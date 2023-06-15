@@ -15,6 +15,7 @@ class Tenant {
   bool policeVerification;
   int familyMembers;
   DocumentReference<Map<String, dynamic>>? landlordRef;
+  DocumentReference<Map<String, dynamic>>? propertyRef;
   Landlord? landlord;
   String? pathToImage;
   String? tempID;
@@ -35,7 +36,8 @@ class Tenant {
       this.landlordRef,
       this.landlord,
       this.pathToImage,
-      this.tempID});
+      this.tempID,
+      this.propertyRef});
 
   factory Tenant.fromJson(Map<String, dynamic> json) {
     return Tenant(

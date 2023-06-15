@@ -453,8 +453,10 @@ class PropertyDetails extends StatelessWidget {
                                             '${tenant.firstName} ${tenant.lastName}',
                                         'uid': uid,
                                         'property': propertyMap,
+                                        'propertyID': propertyID,
                                       }
                                     ]),
+                                    'timestamp': Timestamp.now(),
                                   }, SetOptions(merge: true));
 
                                   // Create a notification for the tenant

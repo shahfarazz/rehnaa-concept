@@ -16,6 +16,7 @@ class Property {
   final String address;
   final double price;
   final DocumentReference<Map<String, dynamic>>? landlordRef;
+  DocumentReference<Map<String, dynamic>>? tenantRef;
   Landlord? landlord;
   final double rehnaaRating;
   final double tenantRating;
@@ -42,6 +43,7 @@ class Property {
     required this.tenantRating,
     required this.tenantReview,
     this.propertyID,
+    this.tenantRef,
   });
 
   static Property fromJson(Map<String, dynamic> json) {

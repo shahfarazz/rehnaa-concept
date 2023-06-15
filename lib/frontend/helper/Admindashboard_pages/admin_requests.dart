@@ -3,6 +3,7 @@ import 'dart:js_interop';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:rehnaa/frontend/helper/Admindashboard_pages/admin_requests_property_contracts.dart';
 
 class AdminRequestsPage extends StatefulWidget {
   const AdminRequestsPage({super.key});
@@ -32,8 +33,8 @@ class _AdminRequestsPageState extends State<AdminRequestsPage> {
                   uid: doc["withdrawRequest"][i]["uid"],
                   cashOrBankTransfer: doc["withdrawRequest"][i]
                       ["paymentMethod"],
-                  requestType: 'Landlord Withdraw Request',
                   requestID: doc.id,
+                  requestType: 'Landlord Withdraw Request',
                 ),
               );
             }
@@ -56,8 +57,8 @@ class _AdminRequestsPageState extends State<AdminRequestsPage> {
                       doc["paymentRequest"][i]["amount"].toString(),
                   uid: doc["paymentRequest"][i]["uid"],
                   cashOrBankTransfer: doc["paymentRequest"][i]["paymentMethod"],
-                  requestType: 'Tenant Payment Request',
                   requestID: doc.id,
+                  requestType: 'Tenant Payment Request',
                 ),
               );
             }
@@ -70,7 +71,7 @@ class _AdminRequestsPageState extends State<AdminRequestsPage> {
 
         try {
           if (doc['rentalRequest'] != null) {
-            print('rental request found');
+            // print('rental request found');
             for (var i = 0; i < doc["rentalRequest"].length; i++) {
               // add each request to the adminRequests list
 
@@ -78,13 +79,16 @@ class _AdminRequestsPageState extends State<AdminRequestsPage> {
                 AdminRequestData(
                     name: doc["rentalRequest"][i]["fullname"],
                     requestedAmount:
-                        doc["rentalRequest"][i]["amount"].toString(),
+                        doc["rentalRequest"][i]["property"]["price"].toString(),
                     uid: doc["rentalRequest"][i]["uid"],
-                    requestType: 'Rental  Request',
                     propertyTitle: doc["rentalRequest"][i]["property"]["title"],
                     propertyLocation: doc["rentalRequest"][i]["property"]
                         ["location"],
-                    requestID: doc.id),
+                    requestID: doc.id,
+                    requestType: 'Tenant Rental Request',
+                    propertyLandlordRef: doc["rentalRequest"][i]["property"]
+                        ["landlordRef"],
+                    propertyID: doc["rentalRequest"][i]["propertyID"]),
               );
             }
           }
@@ -93,6 +97,8 @@ class _AdminRequestsPageState extends State<AdminRequestsPage> {
             print('Error: $e');
           }
         }
+
+        //TODO add other states of requests if needed
       }
       setState(() {
         displayedRequests.addAll(adminRequests);
@@ -286,11 +292,14 @@ class AdminRequestData {
   final String name;
   String? requestedAmount;
   final String uid;
-  String? cashOrBankTransfer;
+  String?
+      cashOrBankTransfer; // TODO convert to other forms of payment in the future
   String? requestType;
   String? propertyTitle;
   String? propertyLocation;
   final String requestID;
+  DocumentReference<Map<String, dynamic>>? propertyLandlordRef;
+  String? propertyID;
 
   AdminRequestData({
     required this.name,
@@ -301,15 +310,19 @@ class AdminRequestData {
     this.propertyTitle,
     this.propertyLocation,
     required this.requestID,
+    this.propertyLandlordRef,
+    this.propertyID,
   });
 }
 
 class LandlordWithdrawalCard extends StatelessWidget {
   final AdminRequestData data;
 
-  const LandlordWithdrawalCard({
+  LandlordWithdrawalCard({
     required this.data,
   });
+
+  TextEditingController _newRentalAmountController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -341,7 +354,14 @@ class LandlordWithdrawalCard extends StatelessWidget {
           ),
           const SizedBox(height: 10),
           Text(
-            'Requested Amount: ${data.requestedAmount}',
+            // i have multiple cases of data.requestType, so i need to check for each one
+            data.requestType == 'Landlord Withdraw Request'
+                ? 'Requested Amount: ${data.requestedAmount}'
+                : data.requestType == 'Tenant Payment Request'
+                    ? 'Payable Amount: ${data.requestedAmount}'
+                    : data.requestType == 'Tenant Rental Request'
+                        ? 'Rental Amount: ${data.requestedAmount}'
+                        : 'Requested Amount: ${data.requestedAmount}',
             style: const TextStyle(
               fontSize: 16,
               fontFamily: 'Montserrat',
@@ -398,7 +418,7 @@ class LandlordWithdrawalCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
                   // Handle accept button press
                   //check if i can access the data here by printing all the data
                   // print all possible fields in the data object
@@ -522,24 +542,180 @@ class LandlordWithdrawalCard extends StatelessWidget {
                       });
                       //create a rentPayment firebase document that will be used to track the payment
                       // rentpayment will have fields amount date paymenttype propertyRef and tenantRef and landlordRef
-                      FirebaseFirestore.instance
+                      // with a random id and store this id in a local variable
+                      final rentPaymentRef = FirebaseFirestore.instance
                           .collection('rentPayments')
-                          .doc(data.requestID)
-                          .set({
-                        'amount': data.requestedAmount,
+                          .doc();
+
+                      //go to rentPayments firebase collection and create a document with the id stored in the local variable
+                      // and set the fields amount date paymenttype propertyRef and tenantRef and landlordRef
+                      // with the values from the data object
+                      rentPaymentRef.set({
+                        //convert requestedAmount to an integer
+                        //date should be a firebase timestamp
+                        // if payment type is cash set paymenttype to "cash" on "Bank Transfer" make it "banktransfer"
+                        'amount': int.parse(data.requestedAmount!),
                         'date': DateTime.now(),
-                        'paymentType': data.cashOrBankTransfer,
-                        'tenantRef': data.requestID,
+                        'paymentType': data.cashOrBankTransfer == 'Cash'
+                            ? 'cash'
+                            : 'banktransfer',
+                        'propertyRef': null,
+                        //tenant ref has to be a document reference to data.uid in Tenant doc
+                        'tenantRef': FirebaseFirestore.instance
+                            .collection('Tenants')
+                            .doc(data.uid),
+                        'landlordRef': null,
                       });
 
                       // set the tenant's rentPaymentRef to tenant's own id reference which is data.requestID
                       FirebaseFirestore.instance
                           .collection('Tenants')
-                          .doc(data.requestID)
-                          .set({
-                        'rentPaymentRef': data.requestID,
-                      }, SetOptions(merge: true));
+                          .doc(data.uid)
+                          .update({
+                        'rentpaymentRef': FieldValue.arrayUnion([
+                          rentPaymentRef,
+                        ])
+                      });
                     }
+                  } else if (data.requestType == 'Tenant Rental Request') {
+                    //rental request
+
+                    //before updating with data.requestedamount
+                    //prompt the admin to enter a new rental amount
+                    // print('mai idher hee hon');
+                    // pop up a dialog box to enter the new rental amount
+
+                    //newrenatal amount is coming as null there is some mistake
+                    //fix it use _newRentalAmountController
+
+                    final newRentalAmount = await showDialog<String?>(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: const Text('Enter New Rental Amount'),
+                        content: TextField(
+                          controller: _newRentalAmountController,
+                          keyboardType: TextInputType.number,
+                          decoration: const InputDecoration(
+                            labelText: 'New Rental Amount',
+                          ),
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            child: const Text('Cancel'),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pop(
+                                  context, _newRentalAmountController?.text);
+                            },
+                            child: const Text('Submit'),
+                          ),
+                        ],
+                      ),
+                    );
+
+                    //update the tenant's balance to show they owe this amount
+                    // this is done by adding the requested amount to the tenant's balance
+                    if (newRentalAmount != null) {
+                      FirebaseFirestore.instance
+                          .collection('Tenants')
+                          .doc(data.uid)
+                          .update({
+                        'rent':
+                            FieldValue.increment(int.parse(newRentalAmount)),
+                      });
+                    } else {
+                      FirebaseFirestore.instance
+                          .collection('Tenants')
+                          .doc(data.uid)
+                          .update({
+                        'rent': FieldValue.increment(
+                            int.parse(data.requestedAmount!)),
+                      });
+                    }
+
+                    //remove the rental request
+                    FirebaseFirestore.instance
+                        .collection('AdminRequests')
+                        .doc(data.requestID)
+                        .delete();
+                    //send a notification to the tenant by accessing the tenant's uid on Collection 'Notifications'
+                    // and appending to the array called 'notifications' which has fields amount and title
+                    FirebaseFirestore.instance
+                        .collection('Notifications')
+                        .doc(data.uid)
+                        .update({
+                      'notifications': FieldValue.arrayUnion([
+                        {
+                          'amount': data.requestedAmount,
+                          'title': 'Rental Request Accepted',
+                        }
+                      ])
+                    });
+                    // set isWithdraw in Tenant's document to false and set propertyRef to the property's document reference
+                    FirebaseFirestore.instance
+                        .collection('Tenants')
+                        .doc(data.uid)
+                        .set({
+                      'isWithdraw': false,
+                      'propertyRef': FirebaseFirestore.instance
+                          .collection('Properties')
+                          .doc(data.propertyID),
+                    }, SetOptions(merge: true));
+
+                    //set properties tenantref to the tenant's document reference
+                    FirebaseFirestore.instance
+                        .collection('Properties')
+                        .doc(data.propertyID)
+                        .update({
+                      'tenantRef': FirebaseFirestore.instance
+                          .collection('Tenants')
+                          .doc(data.uid),
+                    });
+
+                    //set tenants landlordref to the property's landlordref
+                    // first get landlordref from the property
+                    // then set the tenant's landlordref to the property's landlordref
+                    DocumentReference<Map<String, dynamic>>? landlordRef =
+                        data.propertyLandlordRef;
+
+                    //set the tenant's landlordref to the tenant's landlordref
+                    FirebaseFirestore.instance
+                        .collection('Tenants')
+                        .doc(data.uid)
+                        .update({
+                      'landlordRef': landlordRef,
+                    });
+
+                    // set the landlord's tenantRef to the document reference of tenant's uid
+                    // tenants uid is stored in data.uid
+                    // tenantRef is a list of document references append tenant ref to it
+                    FirebaseFirestore.instance
+                        .collection('Landlords')
+                        .doc(landlordRef!.id)
+                        .update({
+                      'tenantRef': FieldValue.arrayUnion([
+                        FirebaseFirestore.instance
+                            .collection('Tenants')
+                            .doc(data.uid),
+                      ])
+                    });
+
+                    //a new page should be called for setting the contract
+
+                    // make a navigation to that page
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => AdminPropertyContractsPage(
+                          landlordID: landlordRef.id,
+                          tenantID: data.uid,
+                        ),
+                      ),
+                    );
                   }
                 },
                 style: ElevatedButton.styleFrom(
