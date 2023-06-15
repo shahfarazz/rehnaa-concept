@@ -242,10 +242,9 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
   List<RentPayment> _filteredRentPayments() {
     // Filter rent payments based on search query
     return _rentPayments
-        .where((rentPayment) =>
-            '${firstName} ${lastName}'
-                .toLowerCase()
-                .contains(searchText.toLowerCase()))
+        .where((rentPayment) => '${firstName} ${lastName}'
+            .toLowerCase()
+            .contains(searchText.toLowerCase()))
         .toList();
   }
 
@@ -316,6 +315,41 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
     }
   }
 
+  Widget _buildRefreshButton() {
+    final Size size = MediaQuery.of(context).size;
+
+    return InkWell(
+      borderRadius: BorderRadius.circular(20),
+      onTap: () {
+        setState(() {
+          _rentPayments.clear();
+          _tenantRentPayments();
+          shouldDisplay = false;
+        });
+      },
+      child: Center(
+        child: ShaderMask(
+          shaderCallback: (Rect bounds) {
+            return const LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Color(0xff0FA697),
+                Color(0xff45BF7A),
+                Color(0xff0DF205),
+              ],
+            ).createShader(bounds);
+          },
+          child: Icon(
+            Icons.refresh,
+            color: Colors.white,
+            size: size.width * 0.08,
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     super.build(context); // Ensure the mixin's build method is called
@@ -326,14 +360,20 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
     return Scaffold(
       body: Column(
         children: [
-          SizedBox(height: size.height * 0.03),
-          Text(
-            'Payment History',
-            style: GoogleFonts.montserrat(
-              fontWeight: FontWeight.bold,
-              fontSize: size.width * 0.05,
-              color: const Color(0xff33907c),
-            ),
+          Row(
+            children: [
+              Padding(padding: EdgeInsets.fromLTRB(size.width * 0.2, 20, 0, 0)),
+              Text(
+                'Payment History',
+                style: GoogleFonts.montserrat(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 24.0,
+                  color: const Color(0xff33907c),
+                ),
+              ),
+              SizedBox(width: size.width * 0.04),
+              _buildRefreshButton(),
+            ],
           ),
           SizedBox(height: size.height * 0.03),
           Text(

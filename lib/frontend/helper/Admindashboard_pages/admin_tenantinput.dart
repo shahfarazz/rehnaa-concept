@@ -16,6 +16,8 @@ import 'package:path_provider/path_provider.dart';
 import '../../../backend/models/landlordmodel.dart';
 import '../../../backend/models/propertymodel.dart';
 import '../../../backend/models/tenantsmodel.dart';
+import 'admin_landlordinputhelper.dart';
+import 'admin_tenantinputhelper.dart';
 
 class AdminTenantsInputPage extends StatefulWidget {
   @override
@@ -28,6 +30,7 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
   TextEditingController searchController = TextEditingController();
   int currentPage = 1;
   int itemsPerPage = 10;
+  DocumentReference<Map<String, dynamic>>? landlordRef;
 
   @override
   void initState() {
@@ -43,6 +46,7 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
 
     for (var doc in querySnapshot.docs) {
       Tenant tenant = Tenant.fromJson(doc.data());
+      tenant.tempID = doc.id;
       tenantList.add(tenant);
     }
 
@@ -152,6 +156,258 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
     );
   }
 
+  void _showEditDialog(Tenant tenant) {
+    final TextEditingController firstNameController =
+        TextEditingController(text: tenant.firstName);
+    final TextEditingController lastNameController =
+        TextEditingController(text: tenant.lastName);
+    final TextEditingController descriptionController =
+        TextEditingController(text: tenant.description);
+    final TextEditingController rentController =
+        TextEditingController(text: tenant.rent.toString());
+    final TextEditingController creditPointsController =
+        TextEditingController(text: tenant.creditPoints.toString());
+    final TextEditingController cnicNumberController =
+        TextEditingController(text: tenant.cnicNumber);
+    final TextEditingController emailOrPhoneController =
+        TextEditingController(text: tenant.emailOrPhone);
+    final TextEditingController familyMembersController =
+        TextEditingController(text: tenant.familyMembers.toString());
+    final TextEditingController ratingController =
+        TextEditingController(text: tenant.rating.toString());
+
+    final hashedCnic = hashString(cnicNumberController.text);
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return Dialog(
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const ListTile(
+                  title: Text('Edit Tenant Details'),
+                ),
+                TextField(
+                  controller: firstNameController,
+                  decoration: const InputDecoration(labelText: 'First Name'),
+                ),
+                TextField(
+                  controller: lastNameController,
+                  decoration: const InputDecoration(labelText: 'Last Name'),
+                ),
+                TextField(
+                  controller: descriptionController,
+                  decoration: const InputDecoration(labelText: 'Description'),
+                ),
+                TextField(
+                  controller: rentController,
+                  decoration: const InputDecoration(labelText: 'Rent'),
+                  keyboardType: TextInputType.number,
+                ),
+                TextField(
+                  controller: creditPointsController,
+                  decoration: const InputDecoration(labelText: 'Credit Points'),
+                  keyboardType: TextInputType.number,
+                ),
+                TextField(
+                  controller: cnicNumberController,
+                  decoration: const InputDecoration(labelText: 'CNIC Number'),
+                ),
+                TextField(
+                  controller: emailOrPhoneController,
+                  decoration:
+                      const InputDecoration(labelText: 'Email or Phone'),
+                ),
+                TextField(
+                  controller: familyMembersController,
+                  decoration:
+                      const InputDecoration(labelText: 'Family Members'),
+                  keyboardType: TextInputType.number,
+                ),
+                TextField(
+                  controller: ratingController,
+                  decoration: const InputDecoration(labelText: 'Rating'),
+                  keyboardType: TextInputType.number,
+                ),
+                const SizedBox(height: 20),
+                StatefulBuilder(
+                  builder: (BuildContext context, StateSetter setState) {
+                    return ListTile(
+                      title: const Text('Select Landlord'),
+                      subtitle: Text(
+                        tenant.landlordRef != null
+                            ? 'Selected landlord: ${tenant.landlordRef?.id}'
+                            : 'Not selected',
+                        style: const TextStyle(
+                          color: Colors.grey,
+                        ),
+                      ),
+                      onTap: () {
+                        setState(() {
+                          _showLandlordSelectionDialog(() {
+                            setState(() {
+                              // Update the tenant's landlordRef directly
+                              tenant.landlordRef = landlordRef;
+                            });
+                          });
+                        });
+                      },
+                    );
+                  },
+                ),
+                ElevatedButton(
+                  onPressed: () async {
+                    // Update the tenant details in Firebase
+
+                    FirebaseFirestore.instance
+                        .collection('Tenants')
+                        .doc(tenant.tempID)
+                        .update({
+                      'firstName': firstNameController.text,
+                      'lastName': lastNameController.text,
+                      'description': descriptionController.text,
+                      'rent': double.tryParse(rentController.text) ?? 0.0,
+                      'creditPoints':
+                          int.tryParse(creditPointsController.text) ?? 0,
+                      'cnicNumber': cnicNumberController.text.isNotEmpty
+                          ? hashedCnic
+                          : '',
+                      'emailOrPhone': emailOrPhoneController.text,
+                      'familyMembers':
+                          int.tryParse(familyMembersController.text) ?? 0,
+                      'rating': double.tryParse(ratingController.text) ?? 0.0,
+                      'landlordRef': landlordRef
+                    });
+
+                    setState(() {
+                      // Update the tenant details in the local list
+                      tenant.firstName = firstNameController.text;
+                      tenant.lastName = lastNameController.text;
+                      tenant.description = descriptionController.text;
+                      tenant.rent = int.tryParse(rentController.text) ?? 0;
+                      tenant.creditPoints =
+                          int.tryParse(creditPointsController.text) ?? 0;
+                      tenant.cnicNumber = cnicNumberController.text.isNotEmpty
+                          ? hashedCnic
+                          : '';
+                      tenant.emailOrPhone = emailOrPhoneController.text;
+                      tenant.familyMembers =
+                          int.tryParse(familyMembersController.text) ?? 0;
+                      tenant.rating =
+                          double.tryParse(ratingController.text) ?? 0.0;
+                    });
+
+                    Navigator.of(context).pop(); // Close the dialog
+                  },
+                  child: const Text('Save'),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _showLandlordSelectionDialog(
+      VoidCallback onSelectionDone) async {
+    showDialog(
+      context: context,
+      builder: (context) {
+        int selectedLandlordIndex =
+            -1; // Declare the selectedLandlordIndex variable inside the builder function
+
+        List<QueryDocumentSnapshot<Map<String, dynamic>>> landlordDocs =
+            []; // Declare the landlordDocs list outside the builder function
+
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Text('Select a Landlord'),
+              content: Container(
+                constraints: BoxConstraints(maxHeight: 300),
+                child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                  stream: FirebaseFirestore.instance
+                      .collection('Landlords')
+                      .snapshots(),
+                  builder: (context, snapshot) {
+                    if (!snapshot.hasData) {
+                      return const CircularProgressIndicator();
+                    }
+
+                    landlordDocs =
+                        snapshot.data!.docs; // Assign value to landlordDocs
+
+                    return SingleChildScrollView(
+                      child: Column(
+                        children: landlordDocs.map((doc) {
+                          Map<String, dynamic>? landlordData = doc.data();
+                          Landlord landlord = Landlord.fromJson(landlordData);
+                          bool isSelected = selectedLandlordIndex ==
+                              landlordDocs.indexOf(doc);
+
+                          return RadioListTile<int>(
+                            title: Text(
+                                '${landlord.firstName} ${landlord.lastName}'),
+                            value: landlordDocs.indexOf(doc),
+                            groupValue: selectedLandlordIndex,
+                            onChanged: (value) {
+                              setState(() {
+                                selectedLandlordIndex = value!;
+                              });
+                            },
+                            selected: isSelected,
+                          );
+                        }).toList(),
+                      ),
+                    );
+                  },
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context); // Close the dialog
+                  },
+                  child: const Text('Cancel'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    if (selectedLandlordIndex != -1) {
+                      QueryDocumentSnapshot<Map<String, dynamic>>
+                          selectedLandlordDoc =
+                          landlordDocs[selectedLandlordIndex];
+                      Map<String, dynamic> landlordData =
+                          selectedLandlordDoc.data();
+                      Landlord selectedLandlord =
+                          Landlord.fromJson(landlordData);
+
+                      setState(() {
+                        landlordRef = FirebaseFirestore.instance
+                            .collection('Landlords')
+                            .doc(selectedLandlordDoc.id);
+                      });
+                      onSelectionDone();
+                      Navigator.pop(context); // Close the dialog
+                    } else {
+                      Fluttertoast.showToast(
+                        msg: 'Please select a landlord',
+                        toastLength: Toast.LENGTH_SHORT,
+                      );
+                    }
+                  },
+                  child: const Text('Done'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -199,7 +455,9 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
                     title: Text('${tenant.firstName} ${tenant.lastName}'),
                     subtitle: Text(tenant.rent.toString()),
                     leading: const Icon(Icons.person),
-                    onTap: () => openTenantDetailsDialog(tenant),
+                    onTap: () {
+                      _showEditDialog(tenant);
+                    },
                   );
                 },
               ),
@@ -254,252 +512,6 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
         },
         backgroundColor: const Color(0xff0FA697),
         child: const Icon(Icons.add),
-      ),
-    );
-  }
-}
-
-class TenantCardWidget extends StatefulWidget {
-  @override
-  _TenantCardWidgetState createState() => _TenantCardWidgetState();
-}
-
-class _TenantCardWidgetState extends State<TenantCardWidget> {
-  String firstName = '';
-  String lastName = '';
-  String description = '';
-  double rating = 0.0;
-  int rent = 0;
-  String? pathToImage;
-
-  bool uploading = false;
-
-  List<Tenant> tenantList = [];
-  List<html.File>? selectedImages = [];
-
-  final TextEditingController cnicController = TextEditingController();
-  final TextEditingController emailOrPhoneController = TextEditingController();
-  final TextEditingController propertyDetailsController =
-      TextEditingController();
-
-  @override
-  void initState() {
-    super.initState();
-    fetchTenants();
-  }
-
-  Future<void> fetchTenants() async {
-    QuerySnapshot<Map<String, dynamic>> querySnapshot =
-        await FirebaseFirestore.instance.collection('Tenants').get();
-
-    List<Tenant> tenants = [];
-
-    for (var doc in querySnapshot.docs) {
-      Tenant tenant = Tenant.fromJson(doc.data());
-      tenants.add(tenant);
-    }
-
-    setState(() {
-      tenantList = tenants;
-    });
-  }
-
-  void validateInputs() {
-    if (firstName.isEmpty || lastName.isEmpty || rent <= 0) {
-      Fluttertoast.showToast(
-        msg: 'Please enter valid first name, last name, and rent.',
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.CENTER,
-        backgroundColor: Colors.red,
-        textColor: Colors.white,
-      );
-      return;
-    }
-
-    if (selectedImages == null || selectedImages!.isEmpty) {
-      Fluttertoast.showToast(
-        msg: 'Please select at least one image.',
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.CENTER,
-        backgroundColor: Colors.red,
-        textColor: Colors.white,
-      );
-      return;
-    }
-
-    handleSubmit();
-  }
-
-  Future<void> handleSubmit() async {
-    setState(() {
-      uploading = true;
-    });
-
-    await uploadImages();
-
-    DocumentReference<Map<String, dynamic>> tenantDocRef =
-        await FirebaseFirestore.instance.collection('Tenants').add({
-      'firstName': firstName,
-      'lastName': lastName,
-      'description': description,
-      'rating': rating,
-      'rent': rent,
-      'pathToImage': pathToImage,
-      'creditPoints': 0,
-      'cnicNumber': cnicController.text,
-      'emailOrPhone': emailOrPhoneController.text,
-      'familyMembers': 0,
-      'landlordRef': null,
-    });
-
-    setState(() {
-      uploading = false;
-    });
-
-    Fluttertoast.showToast(
-      msg: 'Tenant added successfully!',
-      toastLength: Toast.LENGTH_SHORT,
-      gravity: ToastGravity.CENTER,
-      backgroundColor: Colors.green,
-      textColor: Colors.white,
-    );
-
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => AdminTenantsInputPage(),
-      ),
-    );
-  }
-
-  Future<void> selectImages() async {
-    final html.FileUploadInputElement input = html.FileUploadInputElement()
-      ..multiple = true;
-    input.click();
-
-    await input.onChange.first;
-
-    if (input.files != null) {
-      setState(() {
-        selectedImages = input.files;
-      });
-    }
-  }
-
-  Future<void> uploadImages() async {
-    if (selectedImages != null && selectedImages!.isNotEmpty) {
-      for (var file in selectedImages!) {
-        final reader = html.FileReader();
-        reader.readAsDataUrl(file);
-
-        final completer = Completer<String>();
-
-        reader.onLoad.first.then((_) {
-          completer.complete(reader.result.toString());
-        });
-
-        final encodedImage = await completer.future;
-
-        Reference storageReference = FirebaseStorage.instance
-            .ref()
-            .child('images/users/${DateTime.now().millisecondsSinceEpoch}');
-        UploadTask uploadTask = storageReference.putString(encodedImage,
-            format: PutStringFormat.dataUrl);
-        await uploadTask;
-        String imageUrl = await storageReference.getDownloadURL();
-
-        setState(() {
-          pathToImage = imageUrl;
-        });
-      }
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
-    return Card(
-      child: SingleChildScrollView(
-        child: Column(
-          children: [
-            Padding(
-              padding: EdgeInsets.fromLTRB(
-                size.width * 0.15,
-                0,
-                size.width * 0.15,
-                0,
-              ),
-              child: Column(
-                children: [
-                  const ListTile(
-                    title: Text('Tenant Details'),
-                  ),
-                  TextField(
-                    decoration: const InputDecoration(labelText: 'First Name'),
-                    onChanged: (value) {
-                      setState(() {
-                        firstName = value;
-                      });
-                    },
-                  ),
-                  TextField(
-                    decoration: const InputDecoration(labelText: 'Last Name'),
-                    onChanged: (value) {
-                      setState(() {
-                        lastName = value;
-                      });
-                    },
-                  ),
-                  TextField(
-                    decoration: const InputDecoration(labelText: 'Description'),
-                    onChanged: (value) {
-                      setState(() {
-                        description = value;
-                      });
-                    },
-                  ),
-                  TextField(
-                    decoration: const InputDecoration(labelText: 'Rating'),
-                    keyboardType: TextInputType.number,
-                    onChanged: (value) {
-                      setState(() {
-                        rating = double.tryParse(value) ?? 0.0;
-                      });
-                    },
-                  ),
-                  TextField(
-                    decoration: const InputDecoration(labelText: 'Rent'),
-                    keyboardType: TextInputType.number,
-                    onChanged: (value) {
-                      setState(() {
-                        rent = int.tryParse(value) ?? 0;
-                      });
-                    },
-                  ),
-                  const SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: selectImages,
-                    child: const Text('Select Images'),
-                  ),
-                  const SizedBox(height: 20),
-                  AbsorbPointer(
-                    absorbing: uploading,
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        ElevatedButton(
-                          onPressed: validateInputs,
-                          child: const Text('Submit'),
-                        ),
-                        if (uploading) const CircularProgressIndicator(),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }

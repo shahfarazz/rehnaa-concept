@@ -2,39 +2,40 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:rehnaa/backend/models/landlordmodel.dart';
 
 class Tenant {
-  final String firstName;
-  final String lastName;
-  final String description;
-  final double rating;
-  final int rent;
-  final int creditPoints;
-  // final String propertyDetails;
-  final String cnicNumber;
-  final String emailOrPhone;
-  final bool tasdeeqVerification;
-  final bool policeVerification;
-  final int familyMembers;
-  final DocumentReference<Map<String, dynamic>>? landlordRef;
+  String firstName;
+  String lastName;
+  String description;
+  double rating;
+  int rent;
+  int creditPoints;
+  //  String propertyDetails;
+  String cnicNumber;
+  String emailOrPhone;
+  bool tasdeeqVerification;
+  bool policeVerification;
+  int familyMembers;
+  DocumentReference<Map<String, dynamic>>? landlordRef;
   Landlord? landlord;
-  final String? pathToImage;
+  String? pathToImage;
+  String? tempID;
 
-  Tenant({
-    required this.firstName,
-    required this.lastName,
-    required this.description,
-    required this.rating,
-    required this.rent,
-    required this.creditPoints,
-    // required this.propertyDetails,
-    required this.cnicNumber,
-    required this.emailOrPhone,
-    required this.tasdeeqVerification,
-    required this.familyMembers,
-    required this.policeVerification,
-    this.landlordRef,
-    this.landlord,
-    this.pathToImage,
-  });
+  Tenant(
+      {required this.firstName,
+      required this.lastName,
+      required this.description,
+      required this.rating,
+      required this.rent,
+      required this.creditPoints,
+      // required this.propertyDetails,
+      required this.cnicNumber,
+      required this.emailOrPhone,
+      required this.tasdeeqVerification,
+      required this.familyMembers,
+      required this.policeVerification,
+      this.landlordRef,
+      this.landlord,
+      this.pathToImage,
+      this.tempID});
 
   factory Tenant.fromJson(Map<String, dynamic> json) {
     return Tenant(

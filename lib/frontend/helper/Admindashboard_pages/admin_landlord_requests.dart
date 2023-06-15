@@ -4,12 +4,14 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-class AdmninRequestsPage extends StatefulWidget {
+class AdminRequestsPage extends StatefulWidget {
+  const AdminRequestsPage({super.key});
+
   @override
-  _AdmninRequestsPageState createState() => _AdmninRequestsPageState();
+  _AdminRequestsPageState createState() => _AdminRequestsPageState();
 }
 
-class _AdmninRequestsPageState extends State<AdmninRequestsPage> {
+class _AdminRequestsPageState extends State<AdminRequestsPage> {
   Future<void> _getRequests() async {
     FirebaseFirestore.instance
         .collection('AdminRequests')
@@ -31,6 +33,7 @@ class _AdmninRequestsPageState extends State<AdmninRequestsPage> {
                   cashOrBankTransfer: doc["withdrawRequest"][i]
                       ["paymentMethod"],
                   requestType: 'Landlord Withdraw Request',
+                  requestID: doc.id,
                 ),
               );
             }
@@ -54,6 +57,7 @@ class _AdmninRequestsPageState extends State<AdmninRequestsPage> {
                   uid: doc["paymentRequest"][i]["uid"],
                   cashOrBankTransfer: doc["paymentRequest"][i]["paymentMethod"],
                   requestType: 'Tenant Payment Request',
+                  requestID: doc.id,
                 ),
               );
             }
@@ -72,14 +76,15 @@ class _AdmninRequestsPageState extends State<AdmninRequestsPage> {
 
               adminRequests.add(
                 AdminRequestData(
-                  name: doc["rentalRequest"][i]["fullname"],
-                  requestedAmount: doc["rentalRequest"][i]["amount"].toString(),
-                  uid: doc["rentalRequest"][i]["uid"],
-                  requestType: 'Rental  Request',
-                  propertyTitle: doc["rentalRequest"][i]["property"]["title"],
-                  propertyLocation: doc["rentalRequest"][i]["property"]
-                      ["location"],
-                ),
+                    name: doc["rentalRequest"][i]["fullname"],
+                    requestedAmount:
+                        doc["rentalRequest"][i]["amount"].toString(),
+                    uid: doc["rentalRequest"][i]["uid"],
+                    requestType: 'Rental  Request',
+                    propertyTitle: doc["rentalRequest"][i]["property"]["title"],
+                    propertyLocation: doc["rentalRequest"][i]["property"]
+                        ["location"],
+                    requestID: doc.id),
               );
             }
           }
@@ -135,7 +140,7 @@ class _AdmninRequestsPageState extends State<AdmninRequestsPage> {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Withdrawal Requests'),
+        title: const Text('Admin Requests'),
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             // borderRadius: BorderRadius.circular(24),
@@ -285,6 +290,7 @@ class AdminRequestData {
   String? requestType;
   String? propertyTitle;
   String? propertyLocation;
+  final String requestID;
 
   AdminRequestData({
     required this.name,
@@ -294,6 +300,7 @@ class AdminRequestData {
     this.requestType,
     this.propertyTitle,
     this.propertyLocation,
+    required this.requestID,
   });
 }
 
@@ -393,6 +400,59 @@ class LandlordWithdrawalCard extends StatelessWidget {
               ElevatedButton(
                 onPressed: () {
                   // Handle accept button press
+                  //check if i can access the data here by printing all the data
+                  // print all possible fields in the data object
+                  if (data.propertyLocation.isNull) {
+                    //withdrawal request or payment request
+                    if (data.requestType == 'Landlord Withdraw Request') {
+                      //withdrawal request
+                      //update the landlord's balance
+                      FirebaseFirestore.instance
+                          .collection('Landlords')
+                          .doc(data.uid)
+                          .update({
+                        'balance': FieldValue.increment(
+                            -int.parse(data.requestedAmount!)),
+                      });
+                      //remove the withdrawal request
+                      FirebaseFirestore.instance
+                          .collection('AdminRequests')
+                          .doc(data.requestID)
+                          .delete();
+                      //send a notification to the landlord by accessing the landlord's uid on Collection 'Notifications'
+                      // and appending to the array called 'notifications' which has fields amount and title
+                      FirebaseFirestore.instance
+                          .collection('Notifications')
+                          .doc(data.uid)
+                          .update({
+                        'notifications': FieldValue.arrayUnion([
+                          {
+                            'amount': data.requestedAmount,
+                            'title': 'Withdrawal Request Accepted',
+                          }
+                        ])
+                      });
+                      // set isWithdraw in Landlord's document to false
+                      FirebaseFirestore.instance
+                          .collection('Landlords')
+                          .doc(data.uid)
+                          .update({
+                        'isWithdraw': false,
+                      });
+                      //create a rentPayment firebase document that will be used to track the payment
+                      FirebaseFirestore.instance
+                          .collection('RentPayment')
+                          .doc(data.uid)
+                          .set({
+                        'amount': data.requestedAmount,
+                        'date': DateTime.now(),
+                        'isPaid': false,
+                        'isWithdraw': true,
+                        'landlordUID': data.uid,
+                        'tenantUID': '',
+                      });
+                    }
+                  }
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.green,

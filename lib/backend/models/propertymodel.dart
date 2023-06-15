@@ -44,7 +44,7 @@ class Property {
     this.propertyID,
   });
 
-  static Future<Property> fromJson(Map<String, dynamic> json) async {
+  static Property fromJson(Map<String, dynamic> json) {
     Property property = Property(
       imagePath: List<String>.from(json['imagePath']),
       type: json['type'],

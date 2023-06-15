@@ -299,7 +299,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => AdmninRequestsPage(),
+                          builder: (context) => AdminRequestsPage(),
                         ),
                       );
                     },
@@ -311,13 +311,13 @@ class _AdminDashboardState extends State<AdminDashboard> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(
-                          Icons.attach_money,
+                          Icons.admin_panel_settings_rounded,
                           size: 60,
                           color: Colors.white,
                         ),
                         SizedBox(height: 10),
                         Text(
-                          'Payments and Transactions',
+                          'Admin Requests',
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 14,

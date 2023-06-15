@@ -12,10 +12,12 @@ import '../../Screens/rentpayment_info.dart';
 class LandlordRentHistoryPage extends StatefulWidget {
   final String uid; // UID of the landlord
 
-  const LandlordRentHistoryPage({Key? key, required this.uid}) : super(key: key);
+  const LandlordRentHistoryPage({Key? key, required this.uid})
+      : super(key: key);
 
   @override
-  _LandlordRentHistoryPageState createState() => _LandlordRentHistoryPageState();
+  _LandlordRentHistoryPageState createState() =>
+      _LandlordRentHistoryPageState();
 }
 
 class _LandlordRentHistoryPageState extends State<LandlordRentHistoryPage>
@@ -50,8 +52,10 @@ class _LandlordRentHistoryPageState extends State<LandlordRentHistoryPage>
       lastName = data['lastName'];
 
       // Fetch each rent payment document using the document references
-      for (DocumentReference<Map<String, dynamic>> rentPaymentRef in rentPaymentRefs) {
-        DocumentSnapshot<Map<String, dynamic>> rentPaymentSnapshot = await rentPaymentRef.get();
+      for (DocumentReference<Map<String, dynamic>> rentPaymentRef
+          in rentPaymentRefs) {
+        DocumentSnapshot<Map<String, dynamic>> rentPaymentSnapshot =
+            await rentPaymentRef.get();
 
         Map<String, dynamic>? data = rentPaymentSnapshot.data();
         if (data != null) {
@@ -109,7 +113,8 @@ class _LandlordRentHistoryPageState extends State<LandlordRentHistoryPage>
     }
 
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: size.width * 0.02, vertical: size.height * 0.015),
+      padding: EdgeInsets.symmetric(
+          horizontal: size.width * 0.02, vertical: size.height * 0.015),
       child: GestureDetector(
         onTap: () {
           Navigator.push(
@@ -320,6 +325,41 @@ class _LandlordRentHistoryPageState extends State<LandlordRentHistoryPage>
     }
   }
 
+  Widget _buildRefreshButton() {
+    final Size size = MediaQuery.of(context).size;
+
+    return InkWell(
+      borderRadius: BorderRadius.circular(20),
+      onTap: () {
+        setState(() {
+          _rentPayments.clear();
+          _loadRentPayments();
+          shouldDisplay = false;
+        });
+      },
+      child: Center(
+        child: ShaderMask(
+          shaderCallback: (Rect bounds) {
+            return const LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Color(0xff0FA697),
+                Color(0xff45BF7A),
+                Color(0xff0DF205),
+              ],
+            ).createShader(bounds);
+          },
+          child: Icon(
+            Icons.refresh,
+            color: Colors.white,
+            size: size.width * 0.08,
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     super.build(context); // Ensure the mixin's build method is called
@@ -330,14 +370,20 @@ class _LandlordRentHistoryPageState extends State<LandlordRentHistoryPage>
     return Scaffold(
       body: Column(
         children: [
-          SizedBox(height: size.height * 0.03),
-          Text(
-            'Payment History',
-            style: GoogleFonts.montserrat(
-              fontWeight: FontWeight.bold,
-              fontSize: 24.0,
-              color: const Color(0xff33907c),
-            ),
+          Row(
+            children: [
+              Padding(padding: EdgeInsets.fromLTRB(size.width * 0.2, 20, 0, 0)),
+              Text(
+                'Payment History',
+                style: GoogleFonts.montserrat(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 24.0,
+                  color: const Color(0xff33907c),
+                ),
+              ),
+              SizedBox(width: size.width * 0.04),
+              _buildRefreshButton(),
+            ],
           ),
           SizedBox(height: size.height * 0.03),
           Text(
@@ -358,7 +404,8 @@ class _LandlordRentHistoryPageState extends State<LandlordRentHistoryPage>
                   height: 50,
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
-                    border: Border.all(width: 1, color: const Color(0xff33907c)),
+                    border:
+                        Border.all(width: 1, color: const Color(0xff33907c)),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: TextFormField(
@@ -388,7 +435,6 @@ class _LandlordRentHistoryPageState extends State<LandlordRentHistoryPage>
               ),
             ),
           ),
-
           SmoothPageIndicator(
             controller: _pageController,
             count: pageCount,
