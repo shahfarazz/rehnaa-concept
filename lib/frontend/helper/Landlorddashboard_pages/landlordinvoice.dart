@@ -212,7 +212,7 @@ class _LandlordInvoicePageState extends State<LandlordInvoicePage> {
 ),
             SizedBox(height: 8),
             Text(
-              'Withdraw Amount: ${widget.balance}',
+              'Withdraw Amount: ${widget.amount}',
               style: TextStyle(fontSize: 18),
             ),
             SizedBox(height: 8),

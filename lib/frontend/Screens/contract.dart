@@ -275,6 +275,18 @@ class MyScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 16),
                         const ContractCard(
+                          icon: Icons.security,
+                          label: 'Total Security:',
+                          data: 'asjdbshadba',
+                        ),
+                        const SizedBox(height: 16),
+                        const ContractCard(
+                          icon: Icons.security,
+                          label: 'Security in Rehna:',
+                          data: 'sakjaksjdas',
+                        ),
+                        const SizedBox(height: 16),
+                        const ContractCard(
                           icon: Icons.info,
                           label: 'Additional Information:',
                           data: 'Lorem ipsum dolor sit amet',
