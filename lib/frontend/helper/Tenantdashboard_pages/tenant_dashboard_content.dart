@@ -30,6 +30,7 @@ class TenantDashboardContent extends StatefulWidget {
 class _TenantDashboardContentState extends State<TenantDashboardContent>
     with AutomaticKeepAliveClientMixin<TenantDashboardContent> {
   late Future<Tenant> _tenantFuture;
+  late Stream<DocumentSnapshot<Map<String, dynamic>>> _tenantStream;
 
   @override
   bool get wantKeepAlive => true;
@@ -39,42 +40,10 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
   void initState() {
     super.initState();
     // Fetch tenant data from Firestore
-    _tenantFuture = getTenantFromFirestore(widget.uid);
-  }
-
-  Future<Tenant> getTenantFromFirestore(String uid) async {
-    try {
-      // Fetch the tenant document from Firestore
-      DocumentSnapshot snapshot =
-          await FirebaseFirestore.instance.collection('Tenants').doc(uid).get();
-      if (kDebugMode) {
-        print('Fetched snapshot: $snapshot');
-      }
-
-      // Convert the snapshot to JSON
-      Map<String, dynamic> json = snapshot.data() as Map<String, dynamic>;
-      if (kDebugMode) {
-        print('Tenant JSON: $json');
-      }
-
-      // Use the Tenant.fromJson method to create a Tenant instance
-      Tenant tenant = Tenant.fromJson(json);
-      if (json['isWithdraw'] != null && json['isWithdraw'] == true) {
-        setState(() {
-          isWithdraw = true;
-        });
-      }
-      if (kDebugMode) {
-        print('Created tenant: $tenant');
-      }
-
-      return tenant;
-    } catch (error) {
-      if (kDebugMode) {
-        print('Error fetching tenant: $error');
-      }
-      rethrow;
-    }
+    _tenantStream = FirebaseFirestore.instance
+        .collection('Tenants')
+        .doc(widget.uid)
+        .snapshots();
   }
 
   void showOptionDialog(Function callback, Tenant tenant) {
@@ -343,8 +312,8 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
       print('UID: ${widget.uid}');
     }
 
-    return FutureBuilder<Tenant>(
-      future: _tenantFuture,
+    return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+      stream: _tenantStream,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           // Show a loading indicator while waiting for the data
@@ -353,9 +322,10 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
           // Handle any error that occurred while fetching the data
           return Text('Error: ${snapshot.error}');
         } else if (snapshot.hasData) {
+          Map<String, dynamic> json =
+              snapshot.data!.data() as Map<String, dynamic>;
           // Fetch tenant
-          Tenant tenant = snapshot.data!;
-
+          Tenant tenant = Tenant.fromJson(json);
           // Format the rent for display
           String formattedRent = NumberFormat('#,##0').format(tenant.rent);
 
