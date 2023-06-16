@@ -234,6 +234,7 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                                                 rent: tenant.rent,
                                                 amount: amount,
                                                 selectedOption: selectedOption,
+                                                id: widget.uid,
                                               )),
                                     );
                                   } else {
@@ -437,7 +438,7 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                                       borderRadius: BorderRadius.circular(20),
                                       onTap: () {
                                         isWithdraw
-                                            ? null
+                                            ? someFunction(tenant)
                                             : someFunction(tenant);
                                         // Show the option dialog
                                       },
