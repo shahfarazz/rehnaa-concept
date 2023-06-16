@@ -43,12 +43,12 @@ class _TenantPropertiesPageState extends State<TenantPropertiesPage>
   Widget build(BuildContext context) {
     super.build(context); // Necessary for AutomaticKeepAliveClientMixin
 
-    return StreamBuilder(
+    return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
       stream: _propertyStream,
       builder: (context, snapshot) {
-        if (snapshot.hasData != true && !shouldDisplay) {
+        if (!snapshot.hasData && !shouldDisplay) {
           return const LandlordPropertiesSkeleton();
-        } else if (snapshot.hasData != true && shouldDisplay) {
+        } else if (!snapshot.hasData && shouldDisplay) {
           return Center(
             child: Card(
               elevation: 4.0,
@@ -84,22 +84,38 @@ class _TenantPropertiesPageState extends State<TenantPropertiesPage>
             ),
           );
         } else {
-          //stream is a Stream<QuerySnapshot<Map<String, dynamic>>>
-          //snapshot.data is a QuerySnapshot<Map<String, dynamic>>
-          // so we need to get the list of documents from the snapshot
-
-          List allData = snapshot.data!.docs;
+          List<DocumentSnapshot<Map<String, dynamic>>> allData =
+              snapshot.data!.docs;
+          List<Property> updatedProperties = [];
 
           for (int i = 0; i < allData.length; i++) {
-            // print('this print ${allData[i].data()['isRequestedByTenants']}');
-            // print('my uid is ${widget.uid}');
-            if (allData[i].data()['tenantRef'] == null) {
-              // allData[i].data()['propertyID'] = allData[i].id;
-              Property property = Property.fromJson(allData[i].data());
-              property.propertyID = allData[i].id;
-              properties.add(property);
+            Property property =
+                Property.fromJson(allData[i].data() as Map<String, dynamic>);
+            property.propertyID = allData[i].id;
+
+            // Check if the property already exists in the properties list
+            int existingIndex = properties.indexWhere(
+              (existingProperty) =>
+                  existingProperty.propertyID == property.propertyID,
+            );
+
+            if (existingIndex != -1) {
+              // Property already exists, update it
+              properties[existingIndex] = property;
+            } else {
+              // Property is new, add it to the properties list
+              if (allData[i].data()?['tenantRef'] == null)
+                properties.add(property);
             }
+
+            // Add the property to the updatedProperties list
+            updatedProperties.add(property);
           }
+
+          // Remove properties that are no longer in the snapshot
+          properties.removeWhere(
+            (existingProperty) => !updatedProperties.contains(existingProperty),
+          );
 
           return Scaffold(
             backgroundColor: const Color.fromARGB(255, 255, 255, 255),
