@@ -88,16 +88,6 @@ class TenantLandlordInfoPage extends StatelessWidget {
                         child: FractionallySizedBox(
                           widthFactor: 0.8,
                           child: WhiteBox(
-                            label: 'Property Details',
-                            value: tenant.propertyDetails,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 10.0),
-                      Center(
-                        child: FractionallySizedBox(
-                          widthFactor: 0.8,
-                          child: WhiteBox(
                             label: 'CNIC Number',
                             value: tenant.cnicNumber,
                           ),

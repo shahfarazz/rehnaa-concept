@@ -11,13 +11,17 @@ class PropertyPage extends StatefulWidget {
   final String firstName;
   final String lastName;
   final String pathToImage;
+  final String location;
+  final String address;
 
   const PropertyPage(
       {super.key,
       required this.property,
       required this.firstName,
       required this.lastName,
-      required this.pathToImage});
+      required this.pathToImage,
+      required this.location,
+      required this.address});
 
   @override
   // ignore: library_private_types_in_public_api
@@ -111,8 +115,8 @@ class PropertyCarousel extends StatelessWidget {
                           imagePath, // TODO define a new property.iconimagepath
 
                       placeholder: (context, url) =>
-                          CircularProgressIndicator(),
-                      errorWidget: (context, url, error) => Icon(Icons.error),
+                          const CircularProgressIndicator(),
+                      errorWidget: (context, url, error) => const Icon(Icons.error),
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -240,97 +244,125 @@ class PropertyDetails extends StatelessWidget {
                 property.description,
                 style: GoogleFonts.montserrat(),
               ),
-              SizedBox(height: screenHeight * 0.07),
-              Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-  children: [
-    
-    Text(
-      'Specifications',
-      style: GoogleFonts.montserrat(
-        fontSize: 18,
-        fontWeight: FontWeight.bold,
-      ),
-    ),
+              SizedBox(height: screenHeight * 0.03),
+              Text(
+                property.location,
+                style: GoogleFonts.montserrat(
+                  fontSize: 16,
+                  // fontWeight: FontWeight.bold,
+                  // color: const Color(0xFF33907C),
+                ),
+              ),
+              SizedBox(height: screenHeight * 0.01),
+              Text(
+                property.address,
+                style: GoogleFonts.montserrat(
+                  fontSize: 14,
+                  // fontWeight: FontWeight.bold,
+                  // color: const Color(0xFF33907C),
+                ),
+              ),
               SizedBox(height: screenHeight * 0.02),
-
-    Row(
-      children: [
-        Icon(
-          Icons.arrow_back_ios, // Replace with your desired arrow icon
-          size: 20,
-        ),
-        
-        Expanded(
-          
-          child: SingleChildScrollView(
-
-            
-            scrollDirection: Axis.horizontal,
-            physics: const AlwaysScrollableScrollPhysics(),
-            child: Row(
-              children: [
-              SizedBox(width: screenWidth * 0.025),
-
-                if (property.beds > 0)
-                  PropertySpecs(
-                    icon: Icons.king_bed_outlined,
-                    text: '${property.beds} Bed',
-                    
+                    Text.rich(
+                    TextSpan(
+                      text: "Type: ",
+                      style: GoogleFonts.montserrat(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                        // color: const Color(0xFF33907C),
+                      ),
+                      children: [
+                        TextSpan(
+                          text: "${property.type}",
+                          style: GoogleFonts.montserrat(
+                            fontWeight: FontWeight.normal,
+                            fontSize: 14,
+                            // color: const Color(0xFF33907C),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-              SizedBox(width: screenWidth * 0.02),
-
-                if (property.baths > 0)
-                  PropertySpecs(
-                    icon: Icons.bathtub_outlined,
-                    text: '${property.baths} Bath',
+              SizedBox(height: screenHeight * 0.04),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Specifications',
+                    style: GoogleFonts.montserrat(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-              SizedBox(width: screenWidth * 0.02),
-
-                if (property.garden)
-                  const PropertySpecs(
-                    icon: Icons.landscape_outlined,
-                    text: '1 Garden',
+                  SizedBox(height: screenHeight * 0.02),
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons
+                            .arrow_back_ios, // Replace with your desired arrow icon
+                        size: 20,
+                      ),
+                      Expanded(
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          child: Row(
+                            children: [
+                              SizedBox(width: screenWidth * 0.025),
+                              if (property.beds > 0)
+                                PropertySpecs(
+                                  icon: Icons.king_bed_outlined,
+                                  text: '${property.beds} Bed',
+                                ),
+                              SizedBox(width: screenWidth * 0.02),
+                              if (property.baths > 0)
+                                PropertySpecs(
+                                  icon: Icons.bathtub_outlined,
+                                  text: '${property.baths} Bath',
+                                ),
+                              SizedBox(width: screenWidth * 0.02),
+                              if (property.garden)
+                                const PropertySpecs(
+                                  icon: Icons.landscape_outlined,
+                                  text: '1 Garden',
+                                ),
+                              if (property.living > 0)
+                                PropertySpecs(
+                                  icon: Icons.weekend_outlined,
+                                  text: '${property.living} Living',
+                                ),
+                              if (property.floors > 0)
+                                PropertySpecs(
+                                  icon: Icons.house_outlined,
+                                  text: '${property.floors} Floor',
+                                ),
+                              if (property.carspace > 0)
+                                PropertySpecs(
+                                  icon: Icons.directions_car_outlined,
+                                  text: '${property.carspace} Carspace',
+                                ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const Icon(
+                        Icons
+                            .arrow_forward_ios, // Replace with your desired arrow icon
+                        size: 20,
+                      ),
+                    ],
                   ),
-                if (property.living > 0)
-                  PropertySpecs(
-                    icon: Icons.weekend_outlined,
-                    text: '${property.living} Living',
+                  const SizedBox(height: 25),
+                  Text(
+                    'Owner Details',
+                    style: GoogleFonts.montserrat(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                if (property.floors > 0)
-                  PropertySpecs(
-                    icon: Icons.house_outlined,
-                    text: '${property.floors} Floor',
-                  ),
-                if (property.carspace > 0)
-                  PropertySpecs(
-                    icon: Icons.directions_car_outlined,
-                    text: '${property.carspace} Carspace',
-                  ),
-              ],
-            ),
-          ),
-        ),
-        Icon(
-          Icons.arrow_forward_ios, // Replace with your desired arrow icon
-          size: 20,
-        ),
-      ],
-    ),
-    SizedBox(height: 25),
-
-    Text(
-      'Owner Details',
-      style: GoogleFonts.montserrat(
-        fontSize: 18,
-        fontWeight: FontWeight.bold,
-      ),
-    ),
-    SizedBox(height: 10),
-    
-  ],
-)
-,
+                  const SizedBox(height: 10),
+                ],
+              ),
               const SizedBox(height: 12),
               Row(
                 children: [
@@ -354,8 +386,7 @@ class PropertyDetails extends StatelessWidget {
                         // 'hello',
                         '$firstName $lastName', // Replace with the owner's name fetched from Firebase
                         style: GoogleFonts.montserrat(
-                  color: Color(0xFF33907C),
-
+                          color: const Color(0xFF33907C),
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
                         ),
@@ -606,8 +637,8 @@ class _ExpandedImagePageState extends State<ExpandedImagePage> {
                     imageUrl: widget
                         .imagePath, // TODO define a new property.iconimagepath
 
-                    placeholder: (context, url) => CircularProgressIndicator(),
-                    errorWidget: (context, url, error) => Icon(Icons.error),
+                    placeholder: (context, url) => const CircularProgressIndicator(),
+                    errorWidget: (context, url, error) => const Icon(Icons.error),
                     fit: BoxFit.cover,
                   ),
                 ),

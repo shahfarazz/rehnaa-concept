@@ -1,28 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-
-void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: LandlordsOnboardedInfoPage(),
-    );
-  }
-}
+import '../../../backend/models/landlordmodel.dart';
 
 class ContractCard extends StatelessWidget {
   final IconData icon;
   final String label;
   final String data;
 
-  const ContractCard({Key? key, required this.icon, required this.label, required this.data}) : super(key: key);
+  const ContractCard(
+      {Key? key, required this.icon, required this.label, required this.data})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +20,7 @@ class ContractCard extends StatelessWidget {
       ),
       elevation: 5, // shadow
       child: Padding(
-        padding: const EdgeInsets.all(10),
+        padding: const EdgeInsets.all(20.0),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
@@ -41,7 +29,7 @@ class ContractCard extends StatelessWidget {
               size: 24,
               color: const Color(0xff33907c),
             ),
-            SizedBox(width: 10),
+            const SizedBox(width: 10),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -54,7 +42,7 @@ class ContractCard extends StatelessWidget {
                       color: const Color(0xff33907c),
                     ),
                   ),
-                  SizedBox(height: 5),
+                  const SizedBox(height: 5),
                   Text(
                     data,
                     style: GoogleFonts.montserrat(
@@ -72,9 +60,9 @@ class ContractCard extends StatelessWidget {
   }
 }
 
-
 class LandlordsOnboardedInfoPage extends StatelessWidget {
-  const LandlordsOnboardedInfoPage({super.key});
+  final Landlord landlord;
+  const LandlordsOnboardedInfoPage({super.key, required this.landlord});
 
   @override
   Widget build(BuildContext context) {
@@ -132,7 +120,7 @@ class LandlordsOnboardedInfoPage extends StatelessWidget {
                 child: SingleChildScrollView(
                   child: Center(
                     child: Padding(
-                      padding: const EdgeInsets.all(1.0),
+                      padding: const EdgeInsets.all(20.0),
                       child: Card(
                         color: const Color.fromARGB(255, 235, 235, 235),
                         shape: RoundedRectangleBorder(
@@ -142,8 +130,8 @@ class LandlordsOnboardedInfoPage extends StatelessWidget {
                           padding: const EdgeInsets.all(8.0),
                           child: Column(
                             children: [
-                              const SizedBox(height: 10),
-                              const Text(
+                              SizedBox(height: 10),
+                              Text(
                                 "LandLord",
                                 style: TextStyle(
                                   fontSize: 28,
@@ -151,9 +139,8 @@ class LandlordsOnboardedInfoPage extends StatelessWidget {
                                   // fontWeight: FontWeight.bold,
                                 ),
                               ),
-                              const SizedBox(height: 16),
-
-                              const Text(
+                              SizedBox(height: 16),
+                              Text(
                                 "Arshad Ali",
                                 style: TextStyle(
                                   fontSize: 24,
@@ -161,51 +148,54 @@ class LandlordsOnboardedInfoPage extends StatelessWidget {
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
-  const SizedBox(height: 20),
-
-                               ContractCard(
-    icon: Icons.person,
-    label: 'LandLords Name:',
-    data: 'Arshad Ali',
-  ),
-  const SizedBox(height: 16),
-  ContractCard(
-    icon: Icons.person,
-    label: 'Tenant Name:',
-    data: 'Umer Sheikh',
-  ),
-  const SizedBox(height: 16),
-  ContractCard(
-    icon: Icons.calendar_today,
-    label: 'Contract Start Date:',
-    data: '2023-06-01',
-  ),
-  const SizedBox(height: 16),
-  ContractCard(
-    icon: Icons.calendar_today,
-    label: 'Contract End Date:',
-    data: '2024-05-31',
-  ),
-  const SizedBox(height: 16),
-  ContractCard(
-    icon: Icons.place,
-    label: 'Property Address:',
-    data: 'DHA Phase 5, 23 st',
-  ),
-  const SizedBox(height: 16),
-  ContractCard(
-    icon: Icons.request_page,
-    label: 'Upfront Bonus:',
-    data: '5000',
-  ),
-  const SizedBox(height: 16),
-  ContractCard(
-    icon: Icons.request_page,
-    label: 'Monthly Profit:',
-    data: '500',
-  ),
- 
-  const SizedBox(height: 24),
+                              SizedBox(height: 20),
+                              ContractCard(
+                                icon: Icons.person,
+                                label: 'LandLords Name:',
+                                data:
+                                    "${landlord.firstName} ${landlord.lastName}",
+                              ),
+                              SizedBox(height: 16),
+                              ContractCard(
+                                icon: Icons.person,
+                                label: 'Tenant Name:',
+                                data: landlord.tenant!.isEmpty
+                                    ? 'No tenant yet'
+                                    : landlord.tenant![0].firstName ?? '',
+                              ),
+                              SizedBox(height: 16),
+                              ContractCard(
+                                icon: Icons.calendar_today,
+                                label: 'Contract Start Date:',
+                                data: '2023-06-01',
+                              ),
+                              SizedBox(height: 16),
+                              ContractCard(
+                                icon: Icons.calendar_today,
+                                label: 'Contract End Date:',
+                                data: '2024-05-31',
+                              ),
+                              SizedBox(height: 16),
+                              ContractCard(
+                                icon: Icons.place,
+                                label: 'Property Address:',
+                                data: landlord.property.isEmpty
+                                    ? ''
+                                    : landlord.property[0].address ?? '',
+                              ),
+                              SizedBox(height: 16),
+                              ContractCard(
+                                icon: Icons.request_page,
+                                label: 'Upfront Bonus:',
+                                data: '5000',
+                              ),
+                              SizedBox(height: 16),
+                              ContractCard(
+                                icon: Icons.request_page,
+                                label: 'Monthly Profit:',
+                                data: '500',
+                              ),
+                              SizedBox(height: 24),
                             ],
                           ),
                         ),
@@ -220,8 +210,6 @@ class LandlordsOnboardedInfoPage extends StatelessWidget {
       ),
     );
   }
-
-  
 
   Widget buildRoundedImageCard(BuildContext context, String imagePath) {
     return GestureDetector(
@@ -249,10 +237,12 @@ class LandlordsOnboardedInfoPage extends StatelessWidget {
     );
   }
 }
+
 class ExpandedImageDialog extends StatelessWidget {
   final String imagePath;
 
-  const ExpandedImageDialog({Key? key, required this.imagePath}) : super(key: key);
+  const ExpandedImageDialog({Key? key, required this.imagePath})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {

@@ -1,11 +1,13 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
 void main() {
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -15,8 +17,34 @@ class MyApp extends StatelessWidget {
   }
 }
 
+class Voucher {
+  final String url;
+  final firebase_storage.Reference ref;
+
+  Voucher(this.url, this.ref);
+}
+
 class VouchersPage extends StatelessWidget {
-  const VouchersPage({super.key});
+  const VouchersPage({Key? key}) : super(key: key);
+
+  Future<List<Voucher>> fetchVouchers() async {
+    try {
+      firebase_storage.ListResult listResult = await firebase_storage
+          .FirebaseStorage.instance
+          .ref('images/vouchers/')
+          .listAll();
+      List<Voucher> vouchersList = [];
+      for (var ref in listResult.items) {
+        String url = await ref.getDownloadURL();
+        vouchersList.add(Voucher(url, ref));
+      }
+      return vouchersList;
+    } catch (error) {
+      print('Error fetching vouchers: $error');
+
+      return [];
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -94,14 +122,7 @@ class VouchersPage extends StatelessWidget {
                                 ),
                               ),
                               const SizedBox(height: 16),
-                              buildRoundedImageCard(context, 'assets/image1.jpg'),
-                              const SizedBox(height: 10),
-                              buildRoundedImageCard(context, 'assets/image1.jpg'),
-                              const SizedBox(height: 10),
-                              buildRoundedImageCard(context, 'assets/image1.jpg'),
-                              const SizedBox(height: 10),
-                              buildRoundedImageCard(context, 'assets/image1.jpg'),
-                              const SizedBox(height: 16.0),
+                              buildRoundedImageCards(context),
                             ],
                           ),
                         ),
@@ -117,36 +138,74 @@ class VouchersPage extends StatelessWidget {
     );
   }
 
-  Widget buildRoundedImageCard(BuildContext context, String imagePath) {
-    return GestureDetector(
-      onTap: () {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return ExpandedImageDialog(imagePath: imagePath);
-          },
+  Future<int> getImageCount() async {
+    firebase_storage.ListResult result = await firebase_storage
+        .FirebaseStorage.instance
+        .ref('images/vouchers/')
+        .listAll();
+    return result.items.length;
+  }
+
+  Widget buildRoundedImageCards(BuildContext context) {
+    return FutureBuilder<List<Voucher>>(
+      future: fetchVouchers(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const CircularProgressIndicator();
+        }
+        if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}');
+        }
+        List<Voucher> vouchersList = snapshot.data ?? [];
+
+        Size size = MediaQuery.of(context).size;
+
+        return SizedBox(
+          height: size.height * 0.8,
+          child: ListView.builder(
+            scrollDirection: Axis.vertical,
+            itemCount: vouchersList.length,
+            shrinkWrap: true, // Add this line
+            itemBuilder: (context, index) {
+              Voucher voucher = vouchersList[index];
+              return Padding(
+                padding: const EdgeInsets.only(right: 16.0),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(20.0),
+                  child: Card(
+                    child: SizedBox(
+                      width: 200,
+                      height: 200,
+                      child: CachedNetworkImage(
+                        //add a progress indicator here not circular
+                        progressIndicatorBuilder: (context, url, progress) =>
+                            Center(
+                          child: progress == null
+                              ? CircularProgressIndicator()
+                              : LinearProgressIndicator(
+                                  value: progress.progress,
+                                ),
+                        ),
+                        imageUrl: voucher.url,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
         );
       },
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(20.0),
-        child: Card(
-          child: SizedBox(
-            width: double.infinity,
-            height: 200,
-            child: Image.asset(
-              imagePath,
-              fit: BoxFit.cover,
-            ),
-          ),
-        ),
-      ),
     );
   }
 }
+
 class ExpandedImageDialog extends StatelessWidget {
   final String imagePath;
 
-  const ExpandedImageDialog({Key? key, required this.imagePath}) : super(key: key);
+  const ExpandedImageDialog({Key? key, required this.imagePath})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {

@@ -36,24 +36,24 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             // While data is being fetched, show a loading indicator
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           }
 
           if (snapshot.hasError) {
             // If there's an error fetching data, display an error message
-            return Center(child: Text('Error fetching data'));
+            return const Center(child: Text('Error fetching data'));
           }
 
           if (!snapshot.hasData) {
             // If no data is available, display a message
-            return Center(child: Text('No data available'));
+            return const Center(child: Text('No data available'));
           }
 
           final docData = snapshot.data!.data();
 
           if (docData == null) {
             // If document data is null, display a message
-            return Center(child: Text('Data is null'));
+            return const Center(child: Text('Data is null'));
           }
 
           final emailOrPhone = docData['emailOrPhone'] as String? ?? '';
@@ -74,11 +74,11 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
           }
 
           return SingleChildScrollView(
-            padding: EdgeInsets.all(16),
+            padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                SizedBox(height: 40),
+                const SizedBox(height: 40),
                 Stack(
                   alignment: Alignment.bottomRight,
                   children: [
@@ -87,7 +87,7 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
                       backgroundImage: AssetImage(pathToImage),
                     ),
                     IconButton(
-                      icon: Icon(
+                      icon: const Icon(
                         Icons.edit,
                         color: Colors.white,
                       ),
@@ -97,29 +97,29 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
                     ),
                   ],
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 Text(
                   '$firstName $lastName',
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 Text(
-                  '$description',
-                  style: TextStyle(
+                  description,
+                  style: const TextStyle(
                     fontSize: 18,
                     color: Colors.grey,
                   ),
                 ),
-                SizedBox(height: 20),
-                Divider(),
+                const SizedBox(height: 20),
+                const Divider(),
                 ProfileInfoItem(
                   icon: Icons.email,
                   title: isEmail ? 'Email' : 'Contact',
                   subtitle: contactInfo,
                 ),
-               ProfileInfoItem(
+               const ProfileInfoItem(
                   icon: Icons.location_on,
                   title: 'Location',
                   subtitle: 'Lahore, Punjab',
@@ -128,18 +128,18 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
                   onTap: toggleChangePassword,
                   child: Row(
                     children: [
-                      SizedBox(width: 17, height: 60),
+                      const SizedBox(width: 17, height: 60),
                       Icon(
                         Icons.settings,
                         color: Colors.grey[600],
                       ),
-                      SizedBox(width: 31),
+                      const SizedBox(width: 31),
                       Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          SizedBox(height: 18),
-                          Text(
+                          const SizedBox(height: 18),
+                          const Text(
                             'Additional Settings',
                             style: TextStyle(
                               fontSize: 16,
@@ -147,7 +147,7 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          SizedBox(height: 4),
+                          const SizedBox(height: 4),
                           Text(
                             'Click to access additional settings',
                             style: TextStyle(
@@ -162,7 +162,7 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
                       SizedBox(
                         height: 20,
                         child: AnimatedSwitcher(
-                          duration: Duration(milliseconds: 200),
+                          duration: const Duration(milliseconds: 200),
                           transitionBuilder: (child, animation) {
                             return ScaleTransition(
                               scale: animation,
@@ -188,7 +188,7 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
                 if (showChangePassword)
                   Column(
                     children: [
-                      SizedBox(height: 17,width: 8,),
+                      const SizedBox(height: 17,width: 8,),
                       ProfileInfoItem(
                         icon: Icons.lock,
                         title: 'Change Password',
@@ -200,12 +200,12 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
                               String newPassword = '';
 
                               return AlertDialog(
-                                title: Text('Change Password'),
+                                title: const Text('Change Password'),
                                 content: TextField(
                                   onChanged: (value) {
                                     newPassword = value;
                                   },
-                                  decoration: InputDecoration(hintText: 'Enter new password'),
+                                  decoration: const InputDecoration(hintText: 'Enter new password'),
                                 ),
                                 actions: [
                                   ElevatedButton(
@@ -214,13 +214,13 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
                                       print('New password: $newPassword');
                                       Navigator.of(context).pop();
                                     },
-                                    child: Text('Save'),
+                                    child: const Text('Save'),
                                   ),
                                   TextButton(
                                     onPressed: () {
                                       Navigator.of(context).pop();
                                     },
-                                    child: Text('Cancel'),
+                                    child: const Text('Cancel'),
                                   ),
                                 ],
                               );
@@ -239,20 +239,20 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
                               String password = '';
 
                               return AlertDialog(
-                                title: Text('Delete Account'),
+                                title: const Text('Delete Account'),
                                 content: Column(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    Text('Enter your password to confirm account deletion:'),
+                                    const Text('Enter your password to confirm account deletion:'),
                                     TextField(
                                       onChanged: (value) {
                                         password = value;
                                       },
-                                      decoration: InputDecoration(hintText: 'Password'),
+                                      decoration: const InputDecoration(hintText: 'Password'),
                                       obscureText: true,
                                     ),
                                     if (password.isNotEmpty && password != 'correct_password')
-                                      Text(
+                                      const Text(
                                         'Incorrect password',
                                         style: TextStyle(color: Colors.red),
                                       ),
@@ -267,13 +267,13 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
                                         Navigator.of(context).pop();
                                       }
                                     },
-                                    child: Text('Delete'),
+                                    child: const Text('Delete'),
                                   ),
                                   TextButton(
                                     onPressed: () {
                                       Navigator.of(context).pop();
                                     },
-                                    child: Text('Cancel'),
+                                    child: const Text('Cancel'),
                                   ),
                                 ],
                               );
@@ -313,7 +313,7 @@ class ProfileInfoItem extends StatelessWidget {
       leading: Icon(icon),
       title: Text(
         title,
-        style: TextStyle(
+        style: const TextStyle(
           fontWeight: FontWeight.bold,
         ),
       ),

@@ -86,7 +86,7 @@ class RentPaymentInfoPage extends StatelessWidget {
                     const SizedBox(height: 10.0),
                     Center(
                       child: Text(
-                        rentPayment.property!.location,
+                        rentPayment.property?.title ?? 'Withdrawal',
                         textAlign: TextAlign.center,
                         style: GoogleFonts.montserrat(
                           fontSize: 16.0,
@@ -110,7 +110,7 @@ class RentPaymentInfoPage extends StatelessWidget {
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
                     children: [
-                      SizedBox(height: 10.0),
+                      const SizedBox(height: 10.0),
                       Center(
                         child: WhiteBox(
                           icon: _getPaymentIcon(rentPayment.paymentType),
@@ -185,7 +185,7 @@ class WhiteBox extends StatelessWidget {
     return SizedBox(
       height: 90.0,
       width: 280,
-      child: Container(
+      child: SizedBox(
         width: MediaQuery.of(context).size.width,
         child: Card(
           elevation: 2.0,

@@ -3,14 +3,20 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenant_propertyinfo.dart';
 import '../../../backend/models/propertymodel.dart';
 import '../Landlorddashboard_pages/landlord_propertyinfo.dart';
 import '../Landlorddashboard_pages/landlordproperties.dart';
 
 class TenantPropertiesPage extends StatefulWidget {
   final String uid; // UID of the landlord
+  final bool isWithdraw;
 
-  const TenantPropertiesPage({Key? key, required this.uid}) : super(key: key);
+  const TenantPropertiesPage({
+    Key? key,
+    required this.uid,
+    required this.isWithdraw,
+  }) : super(key: key);
 
   @override
   // ignore: library_private_types_in_public_api
@@ -40,19 +46,21 @@ class _TenantPropertiesPageState extends State<TenantPropertiesPage>
         for (var docSnapshot in propertiesSnapshot.docs) {
           Map<String, dynamic> propertyData = docSnapshot.data();
 
-          Property property = await Property.fromJson(propertyData);
+          Property property = Property.fromJson(propertyData);
           property.landlord = await property.fetchLandlord();
-          setState(() {
-            shouldDisplay = true;
-          });
+          property.propertyID = docSnapshot.id;
+
+          if (property.tenantRef != null) continue;
+
           fetchedProperties.add(property);
-          print('Fetched property: ${property.landlord?.firstName}');
+          // print('Fetched property: ${property.landlord?.firstName}');
         }
 
         if (mounted) {
           setState(() {
             // Update the state with the fetched properties
             properties = fetchedProperties;
+            shouldDisplay = true;
           });
         }
       } else {
@@ -76,7 +84,7 @@ class _TenantPropertiesPageState extends State<TenantPropertiesPage>
     super.build(context); // Necessary for AutomaticKeepAliveClientMixin
 
     if (properties.isEmpty && !shouldDisplay) {
-      return LandlordPropertiesSkeleton();
+      return const LandlordPropertiesSkeleton();
     } else if (properties.isEmpty && shouldDisplay) {
       return Center(
         child: Card(
@@ -93,10 +101,10 @@ class _TenantPropertiesPageState extends State<TenantPropertiesPage>
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(
+                const Icon(
                   Icons.house,
                   size: 48.0,
-                  color: const Color(0xff33907c),
+                  color: Color(0xff33907c),
                 ),
                 const SizedBox(height: 16.0),
                 Text(
@@ -128,12 +136,17 @@ class _TenantPropertiesPageState extends State<TenantPropertiesPage>
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => PropertyPage(
+                    builder: (_) => TenantPropertyPage(
                       property: properties[index],
                       firstName: properties[index].landlord?.firstName ?? '',
                       lastName: properties[index].landlord?.lastName ?? '',
                       pathToImage: properties[index].landlord?.pathToImage ??
                           'assets/userimage.png',
+                      location: properties[index].location,
+                      address: properties[index].address,
+                      propertyID: properties[index].propertyID ?? '',
+                      uid: widget.uid,
+                      isWithdraw: widget.isWithdraw,
                     ),
                   ),
                 );
@@ -187,8 +200,9 @@ class PropertyCard extends StatelessWidget {
                   imageUrl: property
                       .imagePath[0], // TODO define a new property.iconimagepath
 
-                  placeholder: (context, url) => CircularProgressIndicator(),
-                  errorWidget: (context, url, error) => Icon(Icons.error),
+                  placeholder: (context, url) =>
+                      const CircularProgressIndicator(),
+                  errorWidget: (context, url, error) => const Icon(Icons.error),
                   fit: BoxFit.cover,
                 ),
               ),

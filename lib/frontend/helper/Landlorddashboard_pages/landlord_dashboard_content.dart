@@ -2,11 +2,14 @@ import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:rehnaa/backend/models/landlordmodel.dart';
+import 'package:rehnaa/frontend/Screens/faq.dart';
+import 'package:rehnaa/frontend/helper/Landlorddashboard_pages/landlordinvoice.dart';
 import 'skeleton.dart';
 
 class LandlordDashboardContent extends StatefulWidget {
@@ -30,6 +33,7 @@ class LandlordDashboardContent extends StatefulWidget {
 class _LandlordDashboardContentState extends State<LandlordDashboardContent>
     with AutomaticKeepAliveClientMixin<LandlordDashboardContent> {
   late Future<Landlord> _landlordFuture;
+  late Stream<DocumentSnapshot<Map<String, dynamic>>> _landlordStream;
 
   @override
   bool get wantKeepAlive => true;
@@ -39,7 +43,12 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
   void initState() {
     super.initState();
     // Fetch landlord data from Firestore
-    _landlordFuture = getLandlordFromFirestore(widget.uid);
+    // _landlordFuture = getLandlordFromFirestore(widget.uid);
+    // Establish the Firestore stream for the landlord document
+    _landlordStream = FirebaseFirestore.instance
+        .collection('Landlords')
+        .doc(widget.uid)
+        .snapshots();
   }
 
   Future<Landlord> getLandlordFromFirestore(String uid) async {
@@ -184,42 +193,109 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
                   ),
                   onPressed: () {
                     if (selectedOption.isNotEmpty) {
-                      if (kDebugMode) {
-                        print('Selected option: $selectedOption');
-                      }
-                      Fluttertoast.showToast(
-                        msg:
-                            'An admin will contact you soon regarding your payment via: $selectedOption',
-                        toastLength: Toast.LENGTH_SHORT,
-                        gravity: ToastGravity.BOTTOM,
-                        timeInSecForIosWeb: 3,
-                        backgroundColor: Color(0xff45BF7A),
-                      );
-                      FirebaseFirestore.instance
-                          .collection('Notifications')
-                          .doc(widget.uid)
-                          .update({
-                        // Union of previous notifications plus a new notification that i will create now
-                        'notifications': FieldValue.arrayUnion([
-                          {
-                            'title':
-                                'Withdraw Request by ${landlord.firstName + ' ' + landlord.lastName}',
-                            'amount': '\$${landlord.balance.toString()}',
-                          }
-                        ]),
-                      });
-                      FirebaseFirestore.instance
-                          .collection('Landlords')
-                          .doc(widget.uid)
-                          .update({
-                        // Union of previous notifications plus a new notification that i will create now
-                        'isWithdraw': true,
-                      });
-                      Navigator.pop(context);
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          double withdrawalAmount = 0.0;
 
-                      setState(() {
-                        isWithdraw = true;
-                      });
+                          return AlertDialog(
+                            title: Text('Enter Withdrawal Amount'),
+                            content: TextField(
+                              keyboardType: TextInputType.number,
+                              onChanged: (value) {
+                                withdrawalAmount =
+                                    double.tryParse(value) ?? 0.0;
+                              },
+                            ),
+                            actions: <Widget>[
+                              TextButton(
+                                child: Text('Cancel'),
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                              ),
+                              TextButton(
+                                child: Text('Submit'),
+                                onPressed: () {
+                                  if (withdrawalAmount > 0 &&
+                                      withdrawalAmount <= landlord.balance) {
+                                    Fluttertoast.showToast(
+                                      msg:
+                                          'An admin will contact you soon regarding your payment via: $selectedOption',
+                                      toastLength: Toast.LENGTH_SHORT,
+                                      gravity: ToastGravity.BOTTOM,
+                                      timeInSecForIosWeb: 3,
+                                      backgroundColor: const Color(0xff45BF7A),
+                                    );
+                                    FirebaseFirestore.instance
+                                        .collection('Notifications')
+                                        .doc(widget.uid)
+                                        .set({
+                                      'notifications': FieldValue.arrayUnion([
+                                        {
+                                          'title':
+                                              'Withdraw Request by ${'${landlord.firstName} ${landlord.lastName}'}',
+                                          'amount':
+                                              'Rs${landlord.balance.toString()}',
+                                        }
+                                      ]),
+                                    }, SetOptions(merge: true));
+                                    FirebaseFirestore.instance
+                                        .collection('Landlords')
+                                        .doc(widget.uid)
+                                        .set({
+                                      'isWithdraw': true,
+                                    }, SetOptions(merge: true));
+
+                                    FirebaseFirestore.instance
+                                        .collection('AdminRequests')
+                                        .doc(widget.uid)
+                                        .set({
+                                      'withdrawRequest': FieldValue.arrayUnion([
+                                        {
+                                          'fullname':
+                                              '${landlord.firstName} ${landlord.lastName}',
+                                          'amount': withdrawalAmount,
+                                          'paymentMethod': selectedOption,
+                                          'uid': widget.uid
+                                          // Convert to desired format
+                                        }
+                                      ]),
+                                      'timestamp': Timestamp.now(),
+                                    }, SetOptions(merge: true));
+
+                                    setState(() {
+                                      isWithdraw = true;
+                                    });
+
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              LandlordInvoicePage(
+                                                landlordName:
+                                                    '${landlord.firstName} ${landlord.lastName}',
+                                                // paymentDateTime: DateTime.now(),
+                                                balance: landlord.balance,
+                                                amount: withdrawalAmount,
+                                                transactionMode: selectedOption,
+                                              )),
+                                    );
+                                  } else {
+                                    Fluttertoast.showToast(
+                                      msg: 'Invalid withdrawal amount',
+                                      toastLength: Toast.LENGTH_SHORT,
+                                      gravity: ToastGravity.BOTTOM,
+                                      timeInSecForIosWeb: 3,
+                                      backgroundColor: Colors.red,
+                                    );
+                                  }
+                                },
+                              ),
+                            ],
+                          );
+                        },
+                      );
                     } else {
                       if (kDebugMode) {
                         print('Please select an option');
@@ -281,17 +357,33 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
       print('UID: ${widget.uid}');
     }
 
-    return FutureBuilder<Landlord>(
-      future: _landlordFuture,
+    return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+      stream: _landlordStream,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return LandlordDashboardContentSkeleton();
+          return const LandlordDashboardContentSkeleton();
         } else if (snapshot.hasError) {
           // Handle any error that occurred while fetching the data
           return Text('Error: ${snapshot.error}');
         } else if (snapshot.hasData) {
-          // Fetch landlord
-          Landlord landlord = snapshot.data!;
+          // Convert the snapshot to JSON
+          Map<String, dynamic> json =
+              snapshot.data!.data() as Map<String, dynamic>;
+          if (kDebugMode) {
+            print('Landlord JSON: $json');
+          }
+          // Use the Landlord.fromJson method to create a Landlord instance
+          Landlord landlord = Landlord.fromJson(json);
+
+          if (json['isWithdraw'] != null && json['isWithdraw'] == true) {
+            SchedulerBinding.instance!.addPostFrameCallback((_) {
+              if (mounted) {
+                setState(() {
+                  isWithdraw = true;
+                });
+              }
+            });
+          }
 
           // Format the balance for display
           String formattedBalance =
@@ -400,9 +492,9 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
                                             Colors.grey,
                                           ]
                                         : [
-                                            Color(0xff0FA697),
-                                            Color(0xff45BF7A),
-                                            Color(0xff0DF205),
+                                            const Color(0xff0FA697),
+                                            const Color(0xff45BF7A),
+                                            const Color(0xff0DF205),
                                           ],
                                   ),
                                 ),
@@ -412,7 +504,7 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
                                     borderRadius: BorderRadius.circular(20),
                                     onTap: () {
                                       isWithdraw
-                                          ? null
+                                          ? someFunction(landlord)
                                           : someFunction(
                                               landlord); // Show the option dialog
                                     },
@@ -468,8 +560,8 @@ class LandlordDashboardContentSkeleton extends StatelessWidget {
                 padding: const EdgeInsets.all(16.0),
                 child: Skeleton(width: size.width * 0.5, height: 30),
               ),
-              Padding(
-                padding: const EdgeInsets.only(bottom: 8.0),
+              const Padding(
+                padding: EdgeInsets.only(bottom: 8.0),
                 child: CircleSkeleton(
                   size: 150,
                 ),
@@ -504,7 +596,7 @@ class LandlordDashboardContentSkeleton extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
                         Skeleton(width: size.width * 0.5, height: 20),
-                        SizedBox(height: 16),
+                        const SizedBox(height: 16),
                         Skeleton(width: size.width * 0.5, height: 30),
                         SizedBox(height: size.height * 0.05),
                         Skeleton(width: size.width * 0.5, height: 50),

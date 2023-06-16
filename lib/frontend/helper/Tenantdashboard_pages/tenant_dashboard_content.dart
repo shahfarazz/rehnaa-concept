@@ -2,17 +2,26 @@ import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:rehnaa/backend/models/tenantsmodel.dart';
+import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenantinvoice.dart';
 
 import '../Landlorddashboard_pages/landlord_dashboard_content.dart';
 
 class TenantDashboardContent extends StatefulWidget {
   final String uid; // UID of the tenant
+  final bool isWithdraw;
+  final Function(bool) onUpdateWithdrawState;
 
-  const TenantDashboardContent({Key? key, required this.uid}) : super(key: key);
+  const TenantDashboardContent(
+      {Key? key,
+      required this.uid,
+      required this.isWithdraw,
+      required this.onUpdateWithdrawState})
+      : super(key: key);
 
   @override
   _TenantDashboardContentState createState() => _TenantDashboardContentState();
@@ -24,6 +33,7 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
 
   @override
   bool get wantKeepAlive => true;
+  bool isWithdraw = false;
 
   @override
   void initState() {
@@ -48,7 +58,12 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
       }
 
       // Use the Tenant.fromJson method to create a Tenant instance
-      Tenant tenant = await Tenant.fromJson(json);
+      Tenant tenant = Tenant.fromJson(json);
+      if (json['isWithdraw'] != null && json['isWithdraw'] == true) {
+        setState(() {
+          isWithdraw = true;
+        });
+      }
       if (kDebugMode) {
         print('Created tenant: $tenant');
       }
@@ -62,7 +77,7 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
     }
   }
 
-  void showOptionDialog() {
+  void showOptionDialog(Function callback, Tenant tenant) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -70,12 +85,13 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
 
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setState) {
+            // Your AlertDialog code goes here...
             return AlertDialog(
               title: const Padding(
                 padding:
                     EdgeInsets.only(top: 16.0), // Adjust the value as needed
                 child: Text(
-                  'Payment Options',
+                  'Withdraw Options',
                   style:
                       TextStyle(fontSize: 20.0, fontWeight: FontWeight.normal),
                 ),
@@ -167,10 +183,105 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                   ),
                   onPressed: () {
                     if (selectedOption.isNotEmpty) {
-                      if (kDebugMode) {
-                        print('Selected option: $selectedOption');
-                      }
-                      Navigator.pop(context);
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          double amount = 0.0;
+
+                          return AlertDialog(
+                            title: Text('Enter Payment Amount'),
+                            content: TextField(
+                              keyboardType: TextInputType.number,
+                              onChanged: (value) {
+                                amount = double.tryParse(value) ?? 0.0;
+                              },
+                            ),
+                            actions: <Widget>[
+                              TextButton(
+                                child: Text('Cancel'),
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                              ),
+                              TextButton(
+                                child: Text('Submit'),
+                                onPressed: () {
+                                  if (amount > 0 && amount <= tenant.rent) {
+                                    Fluttertoast.showToast(
+                                      msg:
+                                          'An admin will contact you soon regarding your payment via: $selectedOption',
+                                      toastLength: Toast.LENGTH_SHORT,
+                                      gravity: ToastGravity.BOTTOM,
+                                      timeInSecForIosWeb: 3,
+                                      backgroundColor: const Color(0xff45BF7A),
+                                    );
+                                    FirebaseFirestore.instance
+                                        .collection('Notifications')
+                                        .doc(widget.uid)
+                                        .set({
+                                      'notifications': FieldValue.arrayUnion([
+                                        {
+                                          'title':
+                                              'Payment Request by ${'${tenant.firstName} ${tenant.lastName}'}',
+                                          'amount':
+                                              'Rs${tenant.rent.toString()}',
+                                        }
+                                      ]),
+                                    }, SetOptions(merge: true));
+                                    FirebaseFirestore.instance
+                                        .collection('Tenants')
+                                        .doc(widget.uid)
+                                        .set({
+                                      'isWithdraw': true,
+                                    }, SetOptions(merge: true));
+                                    FirebaseFirestore.instance
+                                        .collection('AdminRequests')
+                                        .doc(widget.uid)
+                                        .set({
+                                      'paymentRequest': FieldValue.arrayUnion([
+                                        {
+                                          'fullname':
+                                              '${tenant.firstName} ${tenant.lastName}',
+                                          'amount': amount,
+                                          'paymentMethod': selectedOption,
+                                          'uid': widget.uid,
+                                        }
+                                      ]),
+                                      'timestamp': Timestamp.now()
+                                    }, SetOptions(merge: true));
+
+                                    setState(() {
+                                      isWithdraw = true;
+                                    });
+
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              TenantInvoicePage(
+                                                tenantName:
+                                                    '${tenant.firstName} ${tenant.lastName}',
+                                                // paymentDateTime: DateTime.now(),
+                                                rent: tenant.rent,
+                                                amount: amount,
+                                                selectedOption: selectedOption,
+                                              )),
+                                    );
+                                  } else {
+                                    Fluttertoast.showToast(
+                                      msg: 'Invalid withdrawal amount',
+                                      toastLength: Toast.LENGTH_SHORT,
+                                      gravity: ToastGravity.BOTTOM,
+                                      timeInSecForIosWeb: 3,
+                                      backgroundColor: Colors.red,
+                                    );
+                                  }
+                                },
+                              ),
+                            ],
+                          );
+                        },
+                      );
                     } else {
                       if (kDebugMode) {
                         print('Please select an option');
@@ -183,7 +294,16 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
           },
         );
       },
-    );
+    ).then((_) => callback());
+  }
+
+  void someFunction(Tenant tenant) {
+    showOptionDialog(() {
+      // setState(() {
+      //   isWithdraw = true;
+      // });
+      widget.onUpdateWithdrawState(false);
+    }, tenant);
   }
 
   Widget buildOptionTile({
@@ -228,7 +348,7 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           // Show a loading indicator while waiting for the data
-          return LandlordDashboardContentSkeleton();
+          return const LandlordDashboardContentSkeleton();
         } else if (snapshot.hasError) {
           // Handle any error that occurred while fetching the data
           return Text('Error: ${snapshot.error}');
@@ -325,14 +445,20 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                                   height: size.height * 0.06,
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(20),
-                                    gradient: const LinearGradient(
+                                    gradient: LinearGradient(
                                       begin: Alignment.topLeft,
                                       end: Alignment.bottomRight,
-                                      colors: [
-                                        Color(0xff0FA697),
-                                        Color(0xff45BF7A),
-                                        Color(0xff0DF205),
-                                      ],
+                                      colors: isWithdraw
+                                          ? [
+                                              Colors.grey,
+                                              Colors.grey,
+                                              Colors.grey,
+                                            ]
+                                          : [
+                                              const Color(0xff0FA697),
+                                              const Color(0xff45BF7A),
+                                              const Color(0xff0DF205),
+                                            ],
                                     ),
                                   ),
                                   child: Material(
@@ -340,11 +466,16 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                                     child: InkWell(
                                       borderRadius: BorderRadius.circular(20),
                                       onTap: () {
-                                        showOptionDialog(); // Show the option dialog
+                                        isWithdraw
+                                            ? null
+                                            : someFunction(tenant);
+                                        // Show the option dialog
                                       },
                                       child: Center(
                                         child: Text(
-                                          "Pay",
+                                          isWithdraw
+                                              ? "Payment Requested"
+                                              : "Pay",
                                           style: GoogleFonts.montserrat(
                                             color: Colors.white,
                                             fontSize: 18,

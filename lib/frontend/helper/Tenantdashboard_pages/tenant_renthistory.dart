@@ -6,6 +6,7 @@ import 'package:rehnaa/backend/models/rentpaymentmodel.dart';
 import 'package:rehnaa/backend/services/helperfunctions.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
+import '../../Screens/rentpayment_info.dart';
 import '../Landlorddashboard_pages/skeleton.dart';
 
 class TenantRentHistoryPage extends StatefulWidget {
@@ -24,6 +25,7 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
   String firstName = '';
   String lastName = '';
   bool shouldDisplay = false;
+  String searchText = ''; // Variable to store the search query
 
   @override
   bool get wantKeepAlive => true;
@@ -112,63 +114,58 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
     return Padding(
       padding: EdgeInsets.symmetric(
           horizontal: size.width * 0.02, vertical: size.height * 0.015),
-      child: Card(
-        elevation: 4.0,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(size.width * 0.04),
-        ),
-        child: Container(
-          height: whiteBoxHeight,
-          width: whiteBoxWidth,
-          decoration: BoxDecoration(
+      child: GestureDetector(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => RentPaymentInfoPage(
+                rentPayment: rentPayment,
+                firstName: firstName,
+                lastName: lastName,
+              ),
+            ),
+          );
+        },
+        child: Card(
+          elevation: 4.0,
+          shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(size.width * 0.04),
-            color: Colors.white,
           ),
-          padding: EdgeInsets.all(size.width * 0.04),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Image.asset(
-                    iconAsset,
-                    width: size.width * 0.2,
-                  ),
-                  SizedBox(width: size.width * 0.04),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          '$firstName $lastName',
-                          style: GoogleFonts.montserrat(
-                            fontSize: size.width * 0.04,
-                            fontWeight: FontWeight.bold,
-                            color: const Color(0xff33907c),
-                          ),
-                        ),
-                        SizedBox(height: size.height * 0.01),
-                        Text(
-                          rentPayment.property!.location,
-                          style: GoogleFonts.montserrat(
-                            fontSize: size.width * 0.03,
-                            color: const Color(0xff33907c),
-                          ),
-                        ),
-                      ],
+          child: Container(
+            height: whiteBoxHeight,
+            width: whiteBoxWidth,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(size.width * 0.04),
+              color: Colors.white,
+            ),
+            padding: EdgeInsets.all(size.width * 0.04),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Image.asset(
+                      iconAsset,
+                      width: size.width * 0.2,
                     ),
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
+                    SizedBox(width: size.width * 0.04),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            //display in format day/month/year
-                            '${rentPayment.date.day}/${rentPayment.date.month}/${rentPayment.date.year}',
+                            '$firstName $lastName',
+                            style: GoogleFonts.montserrat(
+                              fontSize: size.width * 0.04,
+                              fontWeight: FontWeight.bold,
+                              color: const Color(0xff33907c),
+                            ),
+                          ),
+                          SizedBox(height: size.height * 0.01),
+                          Text(
+                            rentPayment.property!.location,
                             style: GoogleFonts.montserrat(
                               fontSize: size.width * 0.03,
                               color: const Color(0xff33907c),
@@ -176,37 +173,56 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
                           ),
                         ],
                       ),
-                      SizedBox(height: size.height * 0.05),
-                      //add a padding so that the next row is pushed further down
-                      Padding(
-                        padding: EdgeInsets.only(bottom: size.height * 0.02),
-                      ),
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            '-',
-                            style: GoogleFonts.montserrat(
-                              fontSize: size.width * 0.04,
-                              fontWeight: FontWeight.bold,
-                              color: const Color(0xff33907c),
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              //display in format day/month/year
+                              '${rentPayment.date.day}/${rentPayment.date.month}/${rentPayment.date.year}',
+                              style: GoogleFonts.montserrat(
+                                fontSize: size.width * 0.03,
+                                color: const Color(0xff33907c),
+                              ),
                             ),
-                          ),
-                          Text(
-                            formatNumber(rentPayment.amount),
-                            style: GoogleFonts.montserrat(
-                              fontSize: size.width * 0.035,
-                              fontWeight: FontWeight.bold,
-                              color: const Color(0xff33907c),
+                          ],
+                        ),
+                        SizedBox(height: size.height * 0.05),
+                        //add a padding so that the next row is pushed further down
+                        Padding(
+                          padding: EdgeInsets.only(bottom: size.height * 0.02),
+                        ),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              firstName == 'Withdraw' ? '-' : '+',
+                              style: GoogleFonts.montserrat(
+                                fontSize: size.width * 0.04,
+                                fontWeight: FontWeight.bold,
+                                color: const Color(0xff33907c),
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ],
+                            Text(
+                              formatNumber(rentPayment.amount),
+                              style: GoogleFonts.montserrat(
+                                fontSize: size.width * 0.035,
+                                fontWeight: FontWeight.bold,
+                                color: const Color(0xff33907c),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -214,10 +230,21 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
   }
 
   List<Widget> _buildRentPaymentCards(int startIndex) {
-    return _rentPayments
+    final List<RentPayment> filteredRentPayments = _filteredRentPayments();
+
+    return filteredRentPayments
         .skip(startIndex)
         .take(_pageSize)
         .map((rentPayment) => _buildRentPaymentCard(rentPayment))
+        .toList();
+  }
+
+  List<RentPayment> _filteredRentPayments() {
+    // Filter rent payments based on search query
+    return _rentPayments
+        .where((rentPayment) => '${firstName} ${lastName}'
+            .toLowerCase()
+            .contains(searchText.toLowerCase()))
         .toList();
   }
 
@@ -244,12 +271,6 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
   Widget _rentPaymentSelectorWidget(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
 
-    // if rentPayments is empty and shouldDisplay is true , show center widget
-    // if rentpayments is empty and shouldDisplay is true, show Skeleton
-    // if rentpayments is not empty and shouldDisplay is true, show Sizedbox
-
-    // print('_rentPayments.isEmpty: ${_rentPayments.isEmpty}');
-
     if (_rentPayments.isEmpty && shouldDisplay) {
       return Center(
         child: Card(
@@ -266,10 +287,10 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(
+                const Icon(
                   Icons.error_outline,
                   size: 48.0,
-                  color: const Color(0xff33907c),
+                  color: Color(0xff33907c),
                 ),
                 const SizedBox(height: 16.0),
                 Text(
@@ -286,11 +307,47 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
         ),
       );
     } else if (_rentPayments.isEmpty && !shouldDisplay) {
-      return Expanded(
+      return const Expanded(
         child: TenantRentSkeleton(),
       );
-    } else
+    } else {
       return SizedBox(height: size.height * 0.02);
+    }
+  }
+
+  Widget _buildRefreshButton() {
+    final Size size = MediaQuery.of(context).size;
+
+    return InkWell(
+      borderRadius: BorderRadius.circular(20),
+      onTap: () {
+        setState(() {
+          _rentPayments.clear();
+          _tenantRentPayments();
+          shouldDisplay = false;
+        });
+      },
+      child: Center(
+        child: ShaderMask(
+          shaderCallback: (Rect bounds) {
+            return const LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Color(0xff0FA697),
+                Color(0xff45BF7A),
+                Color(0xff0DF205),
+              ],
+            ).createShader(bounds);
+          },
+          child: Icon(
+            Icons.refresh,
+            color: Colors.white,
+            size: size.width * 0.08,
+          ),
+        ),
+      ),
+    );
   }
 
   @override
@@ -298,19 +355,25 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
     super.build(context); // Ensure the mixin's build method is called
 
     final Size size = MediaQuery.of(context).size;
-    final int pageCount = (_rentPayments.length / _pageSize).ceil();
+    final int pageCount = (_filteredRentPayments().length / _pageSize).ceil();
 
     return Scaffold(
       body: Column(
         children: [
-          SizedBox(height: size.height * 0.03),
-          Text(
-            'Payment History',
-            style: GoogleFonts.montserrat(
-              fontWeight: FontWeight.bold,
-              fontSize: size.width * 0.05,
-              color: const Color(0xff33907c),
-            ),
+          Row(
+            children: [
+              Padding(padding: EdgeInsets.fromLTRB(size.width * 0.2, 20, 0, 0)),
+              Text(
+                'Payment History',
+                style: GoogleFonts.montserrat(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 24.0,
+                  color: const Color(0xff33907c),
+                ),
+              ),
+              SizedBox(width: size.width * 0.04),
+              _buildRefreshButton(),
+            ],
           ),
           SizedBox(height: size.height * 0.03),
           Text(
@@ -342,6 +405,11 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
                       border: InputBorder.none,
                       contentPadding: EdgeInsets.all(10),
                     ),
+                    onChanged: (value) {
+                      setState(() {
+                        searchText = value; // Update the search query
+                      });
+                    },
                   ),
                 ),
                 SizedBox(height: size.height * 0.02),
@@ -403,7 +471,7 @@ class TenantRentSkeleton extends StatelessWidget {
           SizedBox(height: size.height * 0.02),
           ListView.builder(
             shrinkWrap: true,
-            physics: NeverScrollableScrollPhysics(),
+            physics: const NeverScrollableScrollPhysics(),
             itemCount: 4,
             itemBuilder: (context, index) {
               return Padding(
@@ -426,12 +494,12 @@ class TenantRentSkeleton extends StatelessWidget {
                           width: size.width * 0.4,
                           height: 20.0,
                         ),
-                        SizedBox(height: 8.0),
+                        const SizedBox(height: 8.0),
                         Skeleton(
                           width: size.width * 0.7,
                           height: 16.0,
                         ),
-                        SizedBox(height: 16.0),
+                        const SizedBox(height: 16.0),
                         Row(
                           children: [
                             Skeleton(

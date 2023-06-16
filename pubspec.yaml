@@ -46,6 +46,10 @@ dependencies:
     confetti: ^0.7.0
     firebase_storage: ^11.2.2
     cached_network_image: ^3.0.0
+    image_picker: ^0.8.8
+    file_picker: ^4.1.4
+    pdf: ^3.6.0
+    fl_chart: ^0.63.0
 
 dev_dependencies:
     flutter_test:
@@ -59,6 +63,9 @@ dev_dependencies:
     faker: ^2.0.2
     carousel_slider: ^4.0.0
     photo_view: ^0.14.0
+    printing: ^5.6.0
+    modal_progress_hud_nsn: ^0.4.0
+    screenshot: ^2.1.0
 
     # photo_view: ^latest_version
 # For information on the generic Dart part of this file, see the

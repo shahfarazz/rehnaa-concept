@@ -99,7 +99,7 @@ class _LandlordPropertiesPageState extends State<LandlordPropertiesPage>
     // print('properties.isEmpty is ${properties.isEmpty}');
 
     if (properties.isEmpty && !shouldDisplay) {
-      return LandlordPropertiesSkeleton();
+      return const LandlordPropertiesSkeleton();
     } else if (properties.isEmpty && shouldDisplay) {
       return Column(
         children: [
@@ -118,10 +118,10 @@ class _LandlordPropertiesPageState extends State<LandlordPropertiesPage>
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.house,
                     size: 48.0,
-                    color: const Color(0xff33907c),
+                    color: Color(0xff33907c),
                   ),
                   const SizedBox(height: 16.0),
                   Text(
@@ -162,6 +162,8 @@ class _LandlordPropertiesPageState extends State<LandlordPropertiesPage>
                       lastName: properties[index].landlord?.lastName ?? '',
                       pathToImage: properties[index].landlord?.pathToImage ??
                           'assets/userimage.png',
+                        location: properties[index].location,
+                        address: properties[index].address,
                     ),
                   ),
                 );
@@ -181,7 +183,7 @@ class PropertyCard extends StatelessWidget {
   final String? pathToImage;
   final VoidCallback onTap;
 
-  PropertyCard({
+  const PropertyCard({
     super.key,
     required this.property,
     required this.firstName,
@@ -217,8 +219,8 @@ class PropertyCard extends StatelessWidget {
                   imageUrl: property
                       .imagePath[0], // TODO define a new property.iconimagepath
 
-                  placeholder: (context, url) => CircularProgressIndicator(),
-                  errorWidget: (context, url, error) => Icon(Icons.error),
+                  placeholder: (context, url) => const CircularProgressIndicator(),
+                  errorWidget: (context, url, error) => const Icon(Icons.error),
                   fit: BoxFit.cover,
                 ),
               ),
@@ -303,7 +305,7 @@ class LandlordPropertiesSkeleton extends StatelessWidget {
           SizedBox(height: size.height * 0.02),
           ListView.builder(
             shrinkWrap: true,
-            physics: NeverScrollableScrollPhysics(),
+            physics: const NeverScrollableScrollPhysics(),
             itemCount: 4,
             itemBuilder: (context, index) {
               return Padding(

@@ -4,16 +4,18 @@ import 'package:provider/provider.dart';
 import 'package:rehnaa/frontend/Screens/login_page.dart';
 import 'package:rehnaa/frontend/Screens/signup_page.dart';
 import 'backend/services/authentication_service.dart';
+import 'frontend/Screens/Dealer/dealer_dashboard.dart';
 import 'frontend/Screens/Tenant/tenant_dashboard.dart';
 import 'frontend/Screens/Tenant/tenantsignupdetails.dart';
 import 'frontend/Screens/splash.dart';
+import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
-  runApp(
-    const MyApp(),
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
   );
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -24,16 +26,19 @@ class MyApp extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (context) => AuthenticationService(),
       child: MaterialApp(
-          debugShowCheckedModeBanner: false,
-          title: 'Rehnaa',
-          theme: ThemeData(
-            primarySwatch: Colors.blue,
-          ),
-          home: const SplashScreen()
-          // home: TenantDashboardPage(
-          //     uid: 'K55YzmkUXt09OgFwnDuT'), //TODO remove this Jugaar
-          // home: TeanantsSignUpDetailsPage(),
-          ),
+        debugShowCheckedModeBanner: false,
+        title: 'Rehnaa',
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+        ),
+        // home: LoginPage(),
+        // home: const SplashScreen(),
+        home: TenantDashboardPage(
+            uid: 'K55YzmkUXt09OgFwnDuT'), //TODO remove this Jugaar
+        // home: DealerDashboardPage(
+        //   uid: 'fUuFmW7bNaweyP5xkc4c',
+        // ),
+      ),
     );
   }
 }

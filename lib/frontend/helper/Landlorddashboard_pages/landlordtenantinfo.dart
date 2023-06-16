@@ -108,7 +108,7 @@ class LandlordTenantInfoPage extends StatelessWidget {
               widthFactor: 0.9,
               heightFactor: 1.2,
               child: Transform.translate(
-                offset: Offset(0, -40),
+                offset: const Offset(0, -40),
                 child: Card(
                   color: Colors.grey[200],
                   elevation: 4.0,
@@ -132,15 +132,7 @@ class LandlordTenantInfoPage extends StatelessWidget {
                               points: '${tenant.creditPoints}',
                             ),
                           ),
-                          const SizedBox(height: 10.0),
-                          Center(
-                            child: WhiteBox(
-                              icon: Icons.home,
-                              iconColor: const Color(0xff33907c),
-                              label: 'Property Details',
-                              value: tenant.propertyDetails,
-                            ),
-                          ),
+
                           const SizedBox(height: 10.0),
                           Center(
                             child: WhiteBox(
@@ -226,7 +218,7 @@ class WhiteBox extends StatelessWidget {
     return SizedBox(
       height: 90.0,
       width: 280,
-      child: Container(
+      child: SizedBox(
         width: MediaQuery.of(context).size.width,
         child: Card(
           elevation: 2.0,

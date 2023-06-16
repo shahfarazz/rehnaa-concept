@@ -12,9 +12,16 @@ class Landlord {
   final List<DocumentReference<Map<String, dynamic>>>? tenantRef;
   final List<DocumentReference<Map<String, dynamic>>> propertyRef;
   final List<DocumentReference<Map<String, dynamic>>>? rentpaymentRef;
-  List<Tenant>? tenant;
-  List<Property> property;
-  List<RentPayment>? rentpayment;
+  List<Tenant>? tenant = [];
+  List<Property> property = [];
+  List<RentPayment>? rentpayment = [];
+  String tempID;
+  List<DocumentReference<Map<String, dynamic>>>? dealerRef;
+  String? cnic;
+  String? bankName;
+  String? raastId;
+  String? accountNumber;
+  String? iban;
 
   Landlord({
     required this.firstName,
@@ -27,9 +34,16 @@ class Landlord {
     this.tenantRef,
     required this.propertyRef,
     this.rentpaymentRef,
+    this.tempID = '',
+    this.dealerRef,
+    this.cnic,
+    this.bankName,
+    this.raastId,
+    this.accountNumber,
+    this.iban,
   });
 
-  static Future<Landlord> fromJson(Map<String, dynamic>? json) async {
+  static Landlord fromJson(Map<String, dynamic>? json) {
     Landlord landlord = Landlord(
       firstName: json!['firstName'],
       lastName: json['lastName'],
@@ -50,12 +64,10 @@ class Landlord {
           ? List<DocumentReference<Map<String, dynamic>>>.from(
               json['rentpaymentRef'].map((ref) => ref as DocumentReference))
           : null,
-      pathToImage: json['pathToImage'] != null
-          ? json['pathToImage']
-          : 'assets/defaulticon.png',
+      pathToImage: json['pathToImage'] ?? 'assets/defaulticon.png',
     );
 
-    await landlord.fetchData();
+    // await landlord.fetchData();
 
     return landlord;
   }
