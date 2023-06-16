@@ -65,6 +65,7 @@ class Property {
       tenantRating: json['tenantRating'].toDouble(),
       tenantReview: json['tenantReview'],
       address: json['address'] ?? 'No address provided',
+      tenantRef: json['tenantRef'],
     );
 
     return property;

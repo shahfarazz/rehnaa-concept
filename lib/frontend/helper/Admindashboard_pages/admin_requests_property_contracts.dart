@@ -105,7 +105,6 @@ class _AdminPropertyContractsPageState
       'secondWitnessCnic': secondWitnessCnic,
       'secondWitnessContact': secondWitnessContact,
       'propertyAddress': propertyAddress,
-      // 'securityAmount': securityAmount,
       'monthlyRent': monthlyRent,
       'contractStartDate': contractStartDate,
       'contractEndDate': contractEndDate,
