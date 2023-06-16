@@ -59,20 +59,49 @@ class _TenantInvoicePageState extends State<TenantInvoicePage> {
               final pdf = pdfWidgets.Document();
 
               pdf.addPage(
-                pdfWidgets.Page(
-                  build: (pdfWidgets.Context context) => pdfWidgets.Center(
-                    child: pdfWidgets.Text(
-                      "Payment to Rehnaa\n"
-                      "Tenant Name: ${widget.tenantName}\n"
-                      "Payment Date: ${DateFormat('MM/dd/yyyy hh:mm a').format(paymentDateTime)}\n"
-                      "Payment Amount: ${widget.amount}\n"
-                      "Amount Due: ${widget.rent - widget.amount}\n"
-                      "Request Mode: ${widget.selectedOption}\n"
-                      "Payment Made To: Rehnaa",
-                      style: pdfWidgets.TextStyle(fontSize: 20),
-                    ),
-                  ),
-                ),
+                 pdfWidgets.Page(
+  build: (pdfWidgets.Context context) => pdfWidgets.Column(
+    crossAxisAlignment: pdfWidgets.CrossAxisAlignment.start,
+    children: [
+      pdfWidgets.Center(
+        child: pdfWidgets.Text(
+          "Payment to Rehnaa",
+          style: pdfWidgets.TextStyle(fontSize: 30, fontWeight: pdfWidgets.FontWeight.bold),
+        ),
+      ),
+      pdfWidgets.SizedBox(height: 30),
+      pdfWidgets.Text(
+        "Tenant Name: ${widget.tenantName}",
+        style: pdfWidgets.TextStyle(fontSize: 20),
+      ),
+      pdfWidgets.SizedBox(height: 20),
+      pdfWidgets.Text(
+        "Payment Date: ${DateFormat('MM/dd/yyyy hh:mm a').format(paymentDateTime)}",
+        style: pdfWidgets.TextStyle(fontSize: 20),
+      ),
+      pdfWidgets.SizedBox(height: 20),
+      pdfWidgets.Text(
+        "Payment Amount: ${widget.amount}",
+        style: pdfWidgets.TextStyle(fontSize: 20),
+      ),
+      pdfWidgets.SizedBox(height: 20),
+      pdfWidgets.Text(
+        "Amount Due: ${widget.rent - widget.amount}",
+        style: pdfWidgets.TextStyle(fontSize: 20, color: PdfColors.red),
+      ),
+      pdfWidgets.SizedBox(height: 20),
+      pdfWidgets.Text(
+        "Request Mode: ${widget.selectedOption}",
+        style: pdfWidgets.TextStyle(fontSize: 20),
+      ),
+      pdfWidgets.SizedBox(height: 20),
+      pdfWidgets.Text(
+        "Payment Made To: Rehnaa",
+        style: pdfWidgets.TextStyle(fontSize: 20),
+      ),
+    ],
+  ),
+),
               );
 
               await Printing.sharePdf(bytes: await pdf.save(), filename: 'invoice.pdf');
