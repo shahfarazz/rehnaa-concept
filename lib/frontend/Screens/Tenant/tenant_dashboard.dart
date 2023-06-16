@@ -137,7 +137,9 @@ class _DashboardPageState extends State<TenantDashboardPage>
                               isWithdraw: _isWithdraw,
                               onUpdateWithdrawState: updateWithdrawState,
                             ),
-                            TenantRentAccrualPage(),
+                            TenantRentAccrualPage(
+                              uid: widget.uid,
+                            ),
                             TenantPropertiesPage(
                               uid: widget.uid,
                               isWithdraw: _isWithdraw,

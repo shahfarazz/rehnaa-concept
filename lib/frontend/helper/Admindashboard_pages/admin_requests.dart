@@ -98,6 +98,26 @@ class _AdminRequestsPageState extends State<AdminRequestsPage> {
           }
         }
 
+        try {
+          if (doc['rentAccrualRequest'] != null) {
+            // print('rental request found');
+            for (var i = 0; i < doc["rentAccrualRequest"].length; i++) {
+              // add each request to the adminRequests list
+
+              adminRequests.add(AdminRequestData(
+                name: doc["rentAccrualRequest"][i]["fullname"],
+                uid: doc["rentAccrualRequest"][i]["uid"],
+                requestType: 'Rent Accrual Request',
+                requestID: doc.id,
+              ));
+            }
+          }
+        } catch (e) {
+          if (kDebugMode) {
+            print('Error: $e');
+          }
+        }
+
         //TODO add other states of requests if needed
       }
       setState(() {
