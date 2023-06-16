@@ -32,6 +32,8 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
   bool _isSidebarOpen = false;
   late AnimationController _sidebarController;
   bool _isWithdraw = false;
+  late Stream<DocumentSnapshot<Map<String, dynamic>>> _notificationStream;
+  late Stream<DocumentSnapshot<Map<String, dynamic>>> _notificationStream2;
 
   @override
   void initState() {
@@ -40,13 +42,22 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
       vsync: this,
       duration: const Duration(milliseconds: 300),
     );
-    _getNotifs();
+    _notificationStream = FirebaseFirestore.instance
+        .collection('Notifications')
+        .doc(widget.uid)
+        .snapshots();
+    _notificationStream2 = FirebaseFirestore.instance
+        .collection('Notifications')
+        .doc(widget.uid)
+        .snapshots();
   }
 
   @override
   void dispose() {
     _pageController.dispose();
     _sidebarController.dispose();
+    _notificationStream.drain();
+    _notificationStream2.drain();
     super.dispose();
   }
 
@@ -59,60 +70,6 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeInOut,
     );
-  }
-
-  // List<Map<String, String>> notifications =
-
-  // = [
-  //   // {
-  //   //   'title': 'Rent paid by Tenant: Michelle',
-  //   //   'amount': '\$30000',
-  //   // },
-  //   // {
-  //   //   'title': 'Maintenance request by Tenant: John',
-  //   //   'amount': '',
-  //   // },
-  //   // {
-  //   //   'title': 'Contract renewal notice for Property: ABC Apartment',
-  //   //   'amount': '',
-  //   // },
-  //   // {
-  //   //   'title': 'Notification 4',
-  //   //   'amount': '',
-  //   // },
-  //   // Add more notifications here
-  // ];
-
-  List<Map<String, String>> notifications = [];
-
-  Future<void> _getNotifs() async {
-    DocumentSnapshot snapshot = await FirebaseFirestore.instance
-        .collection('Notifications')
-        .doc(widget.uid)
-        .get();
-
-    if (snapshot.data() != null) {
-      Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
-
-      if (data.containsKey('notifications')) {
-        List<dynamic> notificationstemp = data['notifications'];
-
-        for (var i = 0; i < notificationstemp.length; i++) {
-          Map<String, dynamic> notification = notificationstemp[i];
-
-          String title = notification['title'] ?? '';
-          String amount = notification['amount'] ?? 0.0;
-
-          print('Title: $title');
-          print('Amount: $amount');
-
-          // Add the notification to a list or perform other operations
-          setState(() {
-            notifications.add({'title': title, 'amount': amount});
-          });
-        }
-      }
-    }
   }
 
   void _toggleSidebar() {
@@ -136,7 +93,6 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
   void updateWithdrawState(bool isWithdraw) {
     setState(() {
       _isWithdraw = isWithdraw;
-      _getNotifs();
     });
   }
 
@@ -240,6 +196,7 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
                     'assets/mainlogo.png',
                     width: 60,
                     height: 60,
+                    fit: BoxFit.cover,
                   ),
                 ),
               ],
@@ -259,27 +216,46 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
               ),
               Positioned(
                 right: 13,
-                child: Container(
-                  padding: const EdgeInsets.all(2),
-                  decoration: BoxDecoration(
-                    color:
-                        notifications.isEmpty ? Colors.transparent : Colors.red,
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  constraints: const BoxConstraints(
-                    minWidth: 10,
-                    minHeight: 10,
-                  ),
-                  child: Text(
-                    notifications.isEmpty
-                        ? ''
-                        : notifications.length.toString(),
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 10,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
+                child: StreamBuilder<DocumentSnapshot>(
+                  stream: _notificationStream,
+                  builder: (BuildContext context,
+                      AsyncSnapshot<DocumentSnapshot> snapshot) {
+                    int notificationsCount = 0;
+
+                    if (snapshot.hasData && snapshot.data != null) {
+                      Map<String, dynamic>? data =
+                          snapshot.data!.data() as Map<String, dynamic>?;
+
+                      if (data != null && data.containsKey('notifications')) {
+                        List<dynamic> notificationstemp = data['notifications'];
+                        notificationsCount = notificationstemp.length;
+                      }
+                    }
+
+                    return Container(
+                      padding: const EdgeInsets.all(2),
+                      decoration: BoxDecoration(
+                        color: notificationsCount == 0
+                            ? Colors.transparent
+                            : Colors.red,
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      constraints: const BoxConstraints(
+                        minWidth: 10,
+                        minHeight: 10,
+                      ),
+                      child: Text(
+                        notificationsCount == 0
+                            ? ''
+                            : notificationsCount.toString(),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    );
+                  },
                 ),
               ),
             ],
@@ -529,169 +505,206 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
             borderRadius: BorderRadius.circular(25.0),
           ),
           child: Container(
-            height: MediaQuery.of(context).size.height * 0.3,
+            height: MediaQuery.of(context).size.height * 0.37,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(25.0),
             ),
-            child: Stack(
-              children: <Widget>[
-                Positioned.fill(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          Color(0xFF0FA697),
-                          Color(0xFF45BF7A),
-                          Color(0xFF0DF205),
-                        ],
-                      ),
-                      borderRadius: BorderRadius.circular(25.0),
-                    ),
-                  ),
-                ),
-                Column(
-                  children: <Widget>[
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: <Widget>[
-                          const Hero(
-                            tag: 'notificationTitle',
-                            child: Text(
-                              'Notifications',
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                                fontFamily: 'Montserrat',
+            child: StreamBuilder<DocumentSnapshot>(
+              stream: _notificationStream2,
+              builder: (BuildContext context,
+                  AsyncSnapshot<DocumentSnapshot> snapshot) {
+                print('snapshot: $snapshot');
+                if (snapshot.hasData && snapshot.data != null) {
+                  Map<String, dynamic>? data =
+                      snapshot.data!.data() as Map<String, dynamic>?;
+
+                  if (data != null && data.containsKey('notifications')) {
+                    List<dynamic> notificationstemp = data['notifications'];
+                    Size size = MediaQuery.of(context).size;
+
+                    return Stack(
+                      children: <Widget>[
+                        Positioned.fill(
+                          child: Container(
+                            decoration: BoxDecoration(
+                              gradient: const LinearGradient(
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                colors: [
+                                  Color(0xFF0FA697),
+                                  Color(0xFF45BF7A),
+                                  Color(0xFF0DF205),
+                                ],
                               ),
+                              borderRadius: BorderRadius.circular(25.0),
                             ),
                           ),
-                          IconButton(
-                            icon: const Icon(Icons.close),
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                            color: Colors.white,
-                          ),
-                        ],
-                      ),
-                    ),
-                    const Divider(
-                      height: 0,
-                      color: Colors.grey,
-                    ),
-                    Expanded(
-                      child: ClipRRect(
-                        borderRadius: const BorderRadius.only(
-                          bottomLeft: Radius.circular(20.0),
-                          bottomRight: Radius.circular(20.0),
                         ),
-                        child: Container(
-                          padding: const EdgeInsets.only(bottom: 4.0),
-                          color: Colors.white,
-                          child: Scrollbar(
-                            thumbVisibility: true,
-                            child: SingleChildScrollView(
-                              child: Column(
-                                children: notifications.reversed
-                                    .map(
-                                      (notification) => Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            vertical: 8.0),
-                                        child: Row(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: <Widget>[
-                                            const SizedBox(
-                                              width: 24.0,
-                                              child: Padding(
-                                                padding:
-                                                    EdgeInsets.only(left: 8.0),
-                                                child: Text(
-                                                  '\u2022',
-                                                  style: TextStyle(
-                                                    fontSize: 24.0,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Color(0xFF45BF7A),
-                                                  ),
-                                                ),
-                                              ),
+                        Column(
+                          children: <Widget>[
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                top: 0.0,
+                                left: 20.0,
+                                right: 20.0,
+                                bottom: 0.0,
+                              ),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: <Widget>[
+                                  const Hero(
+                                    tag: 'notificationTitle',
+                                    child: Text(
+                                      'Notifications',
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                        fontFamily: 'Montserrat',
+                                      ),
+                                    ),
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(Icons.close),
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
+                                    color: Colors.white,
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const Divider(
+                              height: 0,
+                              color: Colors.grey,
+                            ),
+                            Expanded(
+                              child: ClipRRect(
+                                borderRadius: const BorderRadius.only(
+                                  bottomLeft: Radius.circular(20.0),
+                                  bottomRight: Radius.circular(20.0),
+                                ),
+                                child: Container(
+                                  padding: const EdgeInsets.only(bottom: 4.0),
+                                  color: Colors.white,
+                                  child: Scrollbar(
+                                    thumbVisibility: true,
+                                    child: SingleChildScrollView(
+                                      child: Column(
+                                        children: notificationstemp.reversed
+                                            .map((notification) {
+                                          String title =
+                                              notification['title'] ?? '';
+                                          var amount =
+                                              notification['amount'] ?? '';
+
+                                          return Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                              vertical: 8.0,
                                             ),
-                                            const SizedBox(width: 12.0),
-                                            Expanded(
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Text(
-                                                    notification['title']!,
-                                                    style: const TextStyle(
-                                                      fontSize: 18.0,
-                                                      fontFamily: 'Montserrat',
-                                                    ),
-                                                  ),
-                                                  if (notification['amount']!
-                                                      .isNotEmpty)
-                                                    Padding(
-                                                      padding:
-                                                          const EdgeInsets.only(
-                                                              left: 24.0),
-                                                      child: RichText(
-                                                        text: TextSpan(
-                                                          style:
-                                                              const TextStyle(
-                                                            fontSize: 16.0,
-                                                            fontFamily:
-                                                                'Montserrat',
-                                                            color: Colors.black,
-                                                          ),
-                                                          children: [
-                                                            const TextSpan(
-                                                              text: 'Amount: ',
-                                                              style: TextStyle(
-                                                                fontFamily:
-                                                                    'Montserrat',
-                                                              ),
-                                                            ),
-                                                            TextSpan(
-                                                              text: notification[
-                                                                  'amount']!,
-                                                              style:
-                                                                  const TextStyle(
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                                color: Color(
-                                                                    0xFF45BF7A),
-                                                                fontFamily:
-                                                                    'Montserrat',
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
+                                            child: Row(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: <Widget>[
+                                                const SizedBox(
+                                                  width: 24.0,
+                                                  child: Padding(
+                                                    padding: EdgeInsets.only(
+                                                        left: 8.0),
+                                                    child: Text(
+                                                      '\u2022',
+                                                      style: TextStyle(
+                                                        fontSize: 24.0,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color:
+                                                            Color(0xFF45BF7A),
                                                       ),
                                                     ),
-                                                ],
-                                              ),
+                                                  ),
+                                                ),
+                                                const SizedBox(width: 12.0),
+                                                Expanded(
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Text(
+                                                        title,
+                                                        style: const TextStyle(
+                                                          fontSize: 18.0,
+                                                          fontFamily:
+                                                              'Montserrat',
+                                                        ),
+                                                      ),
+                                                      if (amount.isNotEmpty)
+                                                        Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .only(
+                                                            left: 24.0,
+                                                          ),
+                                                          child: RichText(
+                                                            text: TextSpan(
+                                                              style:
+                                                                  const TextStyle(
+                                                                fontSize: 16.0,
+                                                                fontFamily:
+                                                                    'Montserrat',
+                                                                color: Colors
+                                                                    .black,
+                                                              ),
+                                                              children: [
+                                                                const TextSpan(
+                                                                  text:
+                                                                      'Amount: ',
+                                                                  style:
+                                                                      TextStyle(
+                                                                    fontFamily:
+                                                                        'Montserrat',
+                                                                  ),
+                                                                ),
+                                                                TextSpan(
+                                                                  text: amount,
+                                                                  style:
+                                                                      const TextStyle(
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold,
+                                                                    color: Color(
+                                                                        0xFF45BF7A),
+                                                                    fontFamily:
+                                                                        'Montserrat',
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                        ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ],
                                             ),
-                                          ],
-                                        ),
+                                          );
+                                        }).toList(),
                                       ),
-                                    )
-                                    .toList(),
+                                    ),
+                                  ),
+                                ),
                               ),
                             ),
-                          ),
+                          ],
                         ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
+                      ],
+                    );
+                  }
+                }
+
+                return Container(); // Placeholder for loading state or empty state
+              },
             ),
           ),
         );
