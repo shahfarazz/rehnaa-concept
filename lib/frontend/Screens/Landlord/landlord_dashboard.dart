@@ -392,7 +392,9 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const ContractPage(),
+                            builder: (context) => const ContractPage(
+                              identifier: 'Landlord',
+                            ),
                           ),
                         );
                         // _closeSidebar();

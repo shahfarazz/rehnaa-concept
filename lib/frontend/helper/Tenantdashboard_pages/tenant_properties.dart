@@ -35,43 +35,45 @@ class _TenantPropertiesPageState extends State<TenantPropertiesPage>
   }
 
   Future<void> _loadProperties() async {
-    // try {
-    // Fetch the document snapshot for the properties
-    QuerySnapshot<Map<String, dynamic>> propertiesSnapshot =
-        await FirebaseFirestore.instance.collection('Properties').get();
+    try {
+      // Fetch the document snapshot for the properties
+      QuerySnapshot<Map<String, dynamic>> propertiesSnapshot =
+          await FirebaseFirestore.instance.collection('Properties').get();
 
-    if (propertiesSnapshot.size > 0) {
-      List<Property> fetchedProperties = [];
+      if (propertiesSnapshot.size > 0) {
+        List<Property> fetchedProperties = [];
 
-      for (var docSnapshot in propertiesSnapshot.docs) {
-        Map<String, dynamic> propertyData = docSnapshot.data();
+        for (var docSnapshot in propertiesSnapshot.docs) {
+          Map<String, dynamic> propertyData = docSnapshot.data();
 
-        Property property = await Property.fromJson(propertyData);
-        property.landlord = await property.fetchLandlord();
-        property.propertyID = docSnapshot.id;
+          Property property = Property.fromJson(propertyData);
+          property.landlord = await property.fetchLandlord();
+          property.propertyID = docSnapshot.id;
 
-        fetchedProperties.add(property);
-        // print('Fetched property: ${property.landlord?.firstName}');
+          if (property.tenantRef != null) continue;
+
+          fetchedProperties.add(property);
+          // print('Fetched property: ${property.landlord?.firstName}');
+        }
+
+        if (mounted) {
+          setState(() {
+            // Update the state with the fetched properties
+            properties = fetchedProperties;
+            shouldDisplay = true;
+          });
+        }
+      } else {
+        // Handle the case where no properties are found
+        properties = [];
       }
-
-      if (mounted) {
-        setState(() {
-          // Update the state with the fetched properties
-          properties = fetchedProperties;
-          shouldDisplay = true;
-        });
+    } catch (e) {
+      // Handle any error that occurred while fetching the properties
+      if (kDebugMode) {
+        print('Error fetching properties: $e');
       }
-    } else {
-      // Handle the case where no properties are found
       properties = [];
     }
-    // } catch (e) {
-    //   // Handle any error that occurred while fetching the properties
-    //   if (kDebugMode) {
-    //     print('Error fetching properties: $e');
-    //   }
-    //   properties = [];
-    // }
   }
 
   @override

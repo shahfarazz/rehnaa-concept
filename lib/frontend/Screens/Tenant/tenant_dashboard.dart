@@ -381,7 +381,9 @@ class _DashboardPageState extends State<TenantDashboardPage>
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const ContractPage(),
+                            builder: (context) => const ContractPage(
+                              identifier: 'Tenant',
+                            ),
                           ),
                         );
                         // _closeSidebar();
