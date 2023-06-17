@@ -259,6 +259,9 @@ class AuthenticationService extends ChangeNotifier {
             }
           },
         );
+      } else {
+        // toast
+        showToast('Incorrect password. Please try again.', Colors.red);
       }
     }
   }
