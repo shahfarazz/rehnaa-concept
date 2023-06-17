@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:pdf/widgets.dart' as pdfWidgets;
+import 'package:rehnaa/frontend/Screens/Landlord/landlord_dashboard.dart';
+import 'package:printing/printing.dart';
+import 'package:pdf/pdf.dart';
 
 
 
@@ -8,8 +12,9 @@ class LandlordInvoicePage extends StatefulWidget {
   final double balance;
   final double amount;
   final String transactionMode;
+  final String id;
 
-  LandlordInvoicePage({required this.landlordName, required this.balance , required this.amount , required this.transactionMode});
+  LandlordInvoicePage({required this.landlordName, required this.balance , required this.amount , required this.transactionMode, required this.id});
 
   @override
   _LandlordInvoicePageState createState() => _LandlordInvoicePageState();
@@ -21,22 +26,6 @@ class _LandlordInvoicePageState extends State<LandlordInvoicePage> {
   double paymentAmount = 0;
   double amountDue = 0;
   bool showLoading = false;
-
-  // void submitPayment(double amount) {
-  //   setState(() {
-  //     showLoading = true;
-  //   });
-
-  //   // Simulating a delay of 2 seconds for payment processing
-  //   Future.delayed(Duration(seconds: 1), () {
-  //     setState(() {
-  //       showInvoice = true;
-  //       paymentAmount = amount;
-  //       amountDue = widget.balance - paymentAmount;
-  //       showLoading = false;
-  //     });
-  //   });
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -56,6 +45,71 @@ class _LandlordInvoicePageState extends State<LandlordInvoicePage> {
             ),
           ),
         ),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            // Handle the navigation to the desired page here
+            Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) => LandlordDashboardPage(uid: widget.id,),
+            ));
+          },
+        ),
+        actions: [
+          IconButton(
+            onPressed: () async {
+              final pdf = pdfWidgets.Document();
+
+              pdf.addPage(
+               pdfWidgets.Page(
+                build: (pdfWidgets.Context context) => pdfWidgets.Column(
+                  crossAxisAlignment: pdfWidgets.CrossAxisAlignment.start,
+                  children: [
+                    pdfWidgets.Center(
+                      child: pdfWidgets.Text(
+                        "Withdraw Request to Rehnaa",
+                        style: pdfWidgets.TextStyle(fontSize: 30, fontWeight: pdfWidgets.FontWeight.bold),
+                      ),
+                    ),
+                    pdfWidgets.SizedBox(height: 30),
+                    pdfWidgets.Text(
+                      "Landlord Name: ${widget.landlordName}",
+                      style: pdfWidgets.TextStyle(fontSize: 20),
+                    ),
+                    pdfWidgets.SizedBox(height: 20),
+                    pdfWidgets.Text(
+                      "Request Date: ${DateFormat('MM/dd/yyyy hh:mm a').format(paymentDateTime)}",
+                      style: pdfWidgets.TextStyle(fontSize: 20),
+                    ),
+                    pdfWidgets.SizedBox(height: 20),
+                    pdfWidgets.Text(
+                      "Withdrawal Amount: ${widget.amount}",
+                      style: pdfWidgets.TextStyle(fontSize: 20),
+                    ),
+                    pdfWidgets.SizedBox(height: 20),
+                    pdfWidgets.Text(
+                      "Balance: ${widget.balance - widget.amount}",
+                      style: pdfWidgets.TextStyle(fontSize: 20, color: PdfColors.red),
+                    ),
+                    pdfWidgets.SizedBox(height: 20),
+                    pdfWidgets.Text(
+                      "Request Mode: ${widget.transactionMode}",
+                      style: pdfWidgets.TextStyle(fontSize: 20),
+                    ),
+                    pdfWidgets.SizedBox(height: 20),
+                    pdfWidgets.Text(
+                      "Withdrawal request sent to: Rehnaa",
+                      style: pdfWidgets.TextStyle(fontSize: 20),
+                    ),
+                  ],
+                ),
+              ),
+              );
+
+              await Printing.sharePdf(bytes: await pdf.save(), filename: 'invoice.pdf');
+            },
+            icon: const Icon(Icons.print),
+          ),
+        ],
       ),
       body: Stack(
         children: [

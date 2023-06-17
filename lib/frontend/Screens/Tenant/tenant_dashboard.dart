@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:rehnaa/frontend/Screens/contract.dart';
 import 'package:rehnaa/frontend/Screens/faq.dart';
@@ -34,6 +35,9 @@ class _DashboardPageState extends State<TenantDashboardPage>
   bool _isSidebarOpen = false;
   // Declare the AnimationController
   late AnimationController _sidebarController;
+  late Stream<DocumentSnapshot<Map<String, dynamic>>> _notificationStream;
+  late Stream<DocumentSnapshot<Map<String, dynamic>>> _notificationStream2;
+
   bool _isWithdraw = false;
 
   @override
@@ -44,7 +48,14 @@ class _DashboardPageState extends State<TenantDashboardPage>
       vsync: this,
       duration: const Duration(milliseconds: 300),
     );
-    _getNotifs();
+    _notificationStream = FirebaseFirestore.instance
+        .collection('Notifications')
+        .doc(widget.uid)
+        .snapshots();
+    _notificationStream2 = FirebaseFirestore.instance
+        .collection('Notifications')
+        .doc(widget.uid)
+        .snapshots();
   }
 
   @override
@@ -53,6 +64,8 @@ class _DashboardPageState extends State<TenantDashboardPage>
     _sidebarController.dispose(); // Dispose the AnimationController
     super.dispose();
     // _getNotifs();
+    _notificationStream.drain();
+    _notificationStream2.drain();
   }
 
   @override
@@ -64,40 +77,6 @@ class _DashboardPageState extends State<TenantDashboardPage>
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeInOut,
     );
-  }
-
-  List<Map<String, String>> notifications = [
-    // Add more notifications here
-  ];
-
-  Future<void> _getNotifs() async {
-    DocumentSnapshot snapshot = await FirebaseFirestore.instance
-        .collection('Notifications')
-        .doc(widget.uid)
-        .get();
-
-    if (snapshot.data() != null) {
-      Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
-
-      if (data.containsKey('notifications')) {
-        List<dynamic> notificationstemp = data['notifications'];
-
-        for (var i = 0; i < notificationstemp.length; i++) {
-          Map<String, dynamic> notification = notificationstemp[i];
-
-          String title = notification['title'] ?? '';
-          var amount = notification['amount'] ?? '';
-
-          print('Title: $title');
-          print('Amount: $amount');
-
-          // Add the notification to a list or perform other operations
-          setState(() {
-            notifications.add({'title': title, 'amount': amount});
-          });
-        }
-      }
-    }
   }
 
   void _toggleSidebar() {
@@ -121,7 +100,6 @@ class _DashboardPageState extends State<TenantDashboardPage>
   void updateWithdrawState(bool isWithdraw) {
     setState(() {
       _isWithdraw = isWithdraw;
-      _getNotifs();
     });
   }
 
@@ -159,7 +137,9 @@ class _DashboardPageState extends State<TenantDashboardPage>
                               isWithdraw: _isWithdraw,
                               onUpdateWithdrawState: updateWithdrawState,
                             ),
-                            TenantRentAccrualPage(),
+                            TenantRentAccrualPage(
+                              uid: widget.uid,
+                            ),
                             TenantPropertiesPage(
                               uid: widget.uid,
                               isWithdraw: _isWithdraw,
@@ -248,27 +228,46 @@ class _DashboardPageState extends State<TenantDashboardPage>
               ),
               Positioned(
                 right: 13,
-                child: Container(
-                  padding: const EdgeInsets.all(2),
-                  decoration: BoxDecoration(
-                    color:
-                        notifications.isEmpty ? Colors.transparent : Colors.red,
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  constraints: const BoxConstraints(
-                    minWidth: 10,
-                    minHeight: 10,
-                  ),
-                  child: Text(
-                    notifications.isEmpty
-                        ? ''
-                        : notifications.length.toString(),
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 10,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
+                child: StreamBuilder<DocumentSnapshot>(
+                  stream: _notificationStream,
+                  builder: (BuildContext context,
+                      AsyncSnapshot<DocumentSnapshot> snapshot) {
+                    int notificationsCount = 0;
+
+                    if (snapshot.hasData && snapshot.data != null) {
+                      Map<String, dynamic>? data =
+                          snapshot.data!.data() as Map<String, dynamic>?;
+
+                      if (data != null && data.containsKey('notifications')) {
+                        List<dynamic> notificationstemp = data['notifications'];
+                        notificationsCount = notificationstemp.length;
+                      }
+                    }
+
+                    return Container(
+                      padding: const EdgeInsets.all(2),
+                      decoration: BoxDecoration(
+                        color: notificationsCount == 0
+                            ? Colors.transparent
+                            : Colors.red,
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      constraints: const BoxConstraints(
+                        minWidth: 10,
+                        minHeight: 10,
+                      ),
+                      child: Text(
+                        notificationsCount == 0
+                            ? ''
+                            : notificationsCount.toString(),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    );
+                  },
                 ),
               ),
             ],
@@ -531,165 +530,304 @@ class _DashboardPageState extends State<TenantDashboardPage>
             borderRadius: BorderRadius.circular(25.0),
           ),
           child: Container(
-            height: MediaQuery.of(context).size.height * 0.3,
+            height: MediaQuery.of(context).size.height * 0.37,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(25.0),
             ),
-            child: Stack(
-              children: <Widget>[
-                Positioned.fill(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          Color(0xFF0FA697),
-                          Color(0xFF45BF7A),
-                          Color(0xFF0DF205),
-                        ],
-                      ),
-                      borderRadius: BorderRadius.circular(25.0),
-                    ),
-                  ),
-                ),
-                Column(
-                  children: <Widget>[
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: <Widget>[
-                          const Hero(
-                            tag: 'notificationTitle',
-                            child: Text(
-                              'Notifications',
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                                fontFamily: 'Montserrat',
+            child: StreamBuilder<DocumentSnapshot>(
+              stream: _notificationStream2,
+              builder: (BuildContext context,
+                  AsyncSnapshot<DocumentSnapshot> snapshot) {
+                print('snapshot: $snapshot');
+                if (snapshot.hasData && snapshot.data != null) {
+                  Map<String, dynamic>? data =
+                      snapshot.data!.data() as Map<String, dynamic>?;
+
+                  if (data != null && data.containsKey('notifications')) {
+                    List<dynamic> notificationstemp = data['notifications'];
+                    Size size = MediaQuery.of(context).size;
+
+                    return Stack(
+                      children: <Widget>[
+                        Positioned.fill(
+                          child: Container(
+                            decoration: BoxDecoration(
+                              gradient: const LinearGradient(
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                colors: [
+                                  Color(0xFF0FA697),
+                                  Color(0xFF45BF7A),
+                                  Color(0xFF0DF205),
+                                ],
                               ),
+                              borderRadius: BorderRadius.circular(25.0),
                             ),
                           ),
-                          IconButton(
-                            icon: const Icon(Icons.close),
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                            color: Colors.white,
-                          ),
-                        ],
-                      ),
-                    ),
-                    const Divider(
-                      height: 0,
-                      color: Colors.grey,
-                    ),
-                    Expanded(
-                      child: ClipRRect(
-                        borderRadius: const BorderRadius.only(
-                          bottomLeft: Radius.circular(20.0),
-                          bottomRight: Radius.circular(20.0),
                         ),
-                        child: Container(
-                          padding: const EdgeInsets.only(bottom: 4.0),
-                          color: Colors.white,
-                          child: Scrollbar(
-                            thumbVisibility: true,
-                            child: SingleChildScrollView(
-                              child: Column(
-                                children:
-                                    notifications.reversed.map((notification) {
-                                  return Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 8.0),
-                                    child: Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: <Widget>[
-                                        const SizedBox(
-                                          width: 24.0,
-                                          child: Padding(
-                                            padding: EdgeInsets.only(left: 8.0),
-                                            child: Text(
-                                              '\u2022',
-                                              style: TextStyle(
-                                                fontSize: 24.0,
-                                                fontWeight: FontWeight.bold,
-                                                color: Color(0xFF45BF7A),
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        const SizedBox(width: 12.0),
-                                        Expanded(
+                        Column(
+                          children: <Widget>[
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                top: 0.0,
+                                left: 20.0,
+                                right: 20.0,
+                                bottom: 0.0,
+                              ),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: <Widget>[
+                                  const Hero(
+                                    tag: 'notificationTitle',
+                                    child: Text(
+                                      'Notifications',
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                        fontFamily: 'Montserrat',
+                                      ),
+                                    ),
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(Icons.close),
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
+                                    color: Colors.white,
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const Divider(
+                              height: 0,
+                              color: Colors.grey,
+                            ),
+                            Expanded(
+                              child: ClipRRect(
+                                borderRadius: const BorderRadius.only(
+                                  bottomLeft: Radius.circular(20.0),
+                                  bottomRight: Radius.circular(20.0),
+                                ),
+                                child: Container(
+                                    padding: const EdgeInsets.only(bottom: 4.0),
+                                    color: Colors.white,
+                                    child: Scrollbar(
+                                        thumbVisibility: true,
+                                        child: SingleChildScrollView(
                                           child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                notification['title']!,
-                                                style: const TextStyle(
-                                                  fontSize: 18.0,
-                                                  fontFamily: 'Montserrat',
-                                                ),
-                                              ),
-                                              if (notification['amount']!
-                                                  .isNotEmpty)
-                                                Padding(
+                                            children: notificationstemp.reversed
+                                                .map((notification) {
+                                              String title =
+                                                  notification['title'] ?? '';
+                                              var amount =
+                                                  notification['amount'] ?? '';
+
+                                              // Generate a unique key for each notification using its index
+                                              Key dismissibleKey = UniqueKey();
+
+                                              return Dismissible(
+                                                key: dismissibleKey,
+                                                direction:
+                                                    DismissDirection.horizontal,
+                                                confirmDismiss: (_) async {
+                                                  return await showDialog(
+                                                    context: context,
+                                                    builder:
+                                                        (BuildContext context) {
+                                                      return AlertDialog(
+                                                        title: const Text(
+                                                            "Delete Notification"),
+                                                        content: const Text(
+                                                            "Are you sure you want to delete this notification?"),
+                                                        actions: <Widget>[
+                                                          TextButton(
+                                                            onPressed: () =>
+                                                                Navigator.of(
+                                                                        context)
+                                                                    .pop(false),
+                                                            child: const Text(
+                                                                "Cancel"),
+                                                          ),
+                                                          TextButton(
+                                                            onPressed: () =>
+                                                                Navigator.of(
+                                                                        context)
+                                                                    .pop(true),
+                                                            child: const Text(
+                                                                "Delete"),
+                                                          ),
+                                                        ],
+                                                      );
+                                                    },
+                                                  );
+                                                },
+                                                onDismissed: (_) {
+                                                  // Remove the notification from the list
+                                                  setState(() {
+                                                    notificationstemp
+                                                        .remove(notification);
+                                                  });
+
+                                                  FirebaseFirestore.instance
+                                                      .collection(
+                                                          'Notifications')
+                                                      .doc(widget.uid)
+                                                      .update({
+                                                    'notifications':
+                                                        FieldValue.arrayRemove(
+                                                            [notification])
+                                                  });
+
+                                                  // Show a snackbar! This snackbar could also contain "Undo" actions
+                                                  ScaffoldMessenger.of(context)
+                                                      .showSnackBar(
+                                                    SnackBar(
+                                                      backgroundColor:
+                                                          Colors.green[400],
+                                                      content: Text(
+                                                          'Notification dismissed'),
+                                                      duration: const Duration(
+                                                          seconds: 2),
+                                                    ),
+                                                  );
+                                                },
+                                                background: Container(
+                                                  color: Colors.red,
+                                                  child: const Icon(
+                                                      Icons.delete,
+                                                      color: Colors.white),
+                                                  alignment:
+                                                      Alignment.centerLeft,
                                                   padding:
                                                       const EdgeInsets.only(
-                                                          left: 24.0),
-                                                  child: RichText(
-                                                    text: TextSpan(
-                                                      style: const TextStyle(
-                                                        fontSize: 16.0,
-                                                        fontFamily:
-                                                            'Montserrat',
-                                                        color: Colors.black,
-                                                      ),
-                                                      children: [
-                                                        const TextSpan(
-                                                          text: 'Amount: ',
-                                                          style: TextStyle(
-                                                            fontFamily:
-                                                                'Montserrat',
-                                                          ),
-                                                        ),
-                                                        TextSpan(
-                                                          text: notification[
-                                                              'amount']!,
-                                                          style:
-                                                              const TextStyle(
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                            color: Color(
-                                                                0xFF45BF7A),
-                                                            fontFamily:
-                                                                'Montserrat',
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
+                                                          left: 16),
                                                 ),
-                                            ],
+                                                child: Column(
+                                                  children: <Widget>[
+                                                    Padding(
+                                                      padding: const EdgeInsets
+                                                              .symmetric(
+                                                          vertical: 8.0),
+                                                      child: Row(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: <Widget>[
+                                                          const SizedBox(
+                                                            width: 24.0,
+                                                            child: Padding(
+                                                              padding: EdgeInsets
+                                                                  .only(
+                                                                      left:
+                                                                          8.0),
+                                                              child: Text(
+                                                                '\u2022',
+                                                                style:
+                                                                    TextStyle(
+                                                                  fontSize:
+                                                                      24.0,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                  color: Color(
+                                                                      0xFF45BF7A),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          const SizedBox(
+                                                              width: 12.0),
+                                                          Expanded(
+                                                            child: Column(
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .start,
+                                                              children: [
+                                                                Text(
+                                                                  title,
+                                                                  style:
+                                                                      const TextStyle(
+                                                                    fontSize:
+                                                                        18.0,
+                                                                    fontFamily:
+                                                                        'Montserrat',
+                                                                  ),
+                                                                ),
+                                                                if (amount
+                                                                    .isNotEmpty)
+                                                                  Padding(
+                                                                    padding:
+                                                                        const EdgeInsets
+                                                                            .only(
+                                                                      left:
+                                                                          24.0,
+                                                                      top: 4.0,
+                                                                    ),
+                                                                    child:
+                                                                        RichText(
+                                                                      text:
+                                                                          TextSpan(
+                                                                        style:
+                                                                            const TextStyle(
+                                                                          fontSize:
+                                                                              16.0,
+                                                                          fontFamily:
+                                                                              'Montserrat',
+                                                                          color:
+                                                                              Colors.black,
+                                                                        ),
+                                                                        children: [
+                                                                          const TextSpan(
+                                                                            text:
+                                                                                'Amount: ',
+                                                                            style:
+                                                                                TextStyle(
+                                                                              fontFamily: 'Montserrat',
+                                                                            ),
+                                                                          ),
+                                                                          TextSpan(
+                                                                            text:
+                                                                                amount,
+                                                                            style:
+                                                                                const TextStyle(
+                                                                              fontWeight: FontWeight.bold,
+                                                                              color: Color(0xFF45BF7A),
+                                                                              fontFamily: 'Montserrat',
+                                                                            ),
+                                                                          ),
+                                                                        ],
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    const Divider(
+                                                      height: 0,
+                                                      color: Colors.grey,
+                                                    ),
+                                                  ],
+                                                ),
+                                              );
+                                            }).toList(),
                                           ),
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                }).toList(),
+                                        ))),
                               ),
                             ),
-                          ),
+                          ],
                         ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
+                      ],
+                    );
+                  }
+                }
+
+                return Container(); // Placeholder for loading state or empty state
+              },
             ),
           ),
         );

@@ -279,6 +279,7 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
                                                 balance: landlord.balance,
                                                 amount: withdrawalAmount,
                                                 transactionMode: selectedOption,
+                                                id: widget.uid,
                                               )),
                                     );
                                   } else {

@@ -27,53 +27,13 @@ class _TenantPropertiesPageState extends State<TenantPropertiesPage>
     with AutomaticKeepAliveClientMixin<TenantPropertiesPage> {
   List<Property> properties = [];
   bool shouldDisplay = false;
+  late Stream<QuerySnapshot<Map<String, dynamic>>> _propertyStream;
 
   @override
   void initState() {
     super.initState();
-    _loadProperties();
-  }
-
-  Future<void> _loadProperties() async {
-    try {
-      // Fetch the document snapshot for the properties
-      QuerySnapshot<Map<String, dynamic>> propertiesSnapshot =
-          await FirebaseFirestore.instance.collection('Properties').get();
-
-      if (propertiesSnapshot.size > 0) {
-        List<Property> fetchedProperties = [];
-
-        for (var docSnapshot in propertiesSnapshot.docs) {
-          Map<String, dynamic> propertyData = docSnapshot.data();
-
-          Property property = Property.fromJson(propertyData);
-          property.landlord = await property.fetchLandlord();
-          property.propertyID = docSnapshot.id;
-
-          if (property.tenantRef != null) continue;
-
-          fetchedProperties.add(property);
-          // print('Fetched property: ${property.landlord?.firstName}');
-        }
-
-        if (mounted) {
-          setState(() {
-            // Update the state with the fetched properties
-            properties = fetchedProperties;
-            shouldDisplay = true;
-          });
-        }
-      } else {
-        // Handle the case where no properties are found
-        properties = [];
-      }
-    } catch (e) {
-      // Handle any error that occurred while fetching the properties
-      if (kDebugMode) {
-        print('Error fetching properties: $e');
-      }
-      properties = [];
-    }
+    _propertyStream =
+        FirebaseFirestore.instance.collection('Properties').snapshots();
   }
 
   @override
@@ -83,79 +43,119 @@ class _TenantPropertiesPageState extends State<TenantPropertiesPage>
   Widget build(BuildContext context) {
     super.build(context); // Necessary for AutomaticKeepAliveClientMixin
 
-    if (properties.isEmpty && !shouldDisplay) {
-      return const LandlordPropertiesSkeleton();
-    } else if (properties.isEmpty && shouldDisplay) {
-      return Center(
-        child: Card(
-          elevation: 4.0,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20.0),
-          ),
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20.0),
-              color: Colors.white,
-            ),
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(
-                  Icons.house,
-                  size: 48.0,
-                  color: Color(0xff33907c),
+    return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+      stream: _propertyStream,
+      builder: (context, snapshot) {
+        if (!snapshot.hasData && !shouldDisplay) {
+          return const LandlordPropertiesSkeleton();
+        } else if (!snapshot.hasData && shouldDisplay) {
+          return Center(
+            child: Card(
+              elevation: 4.0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20.0),
+              ),
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20.0),
+                  color: Colors.white,
                 ),
-                const SizedBox(height: 16.0),
-                Text(
-                  'Oops! No Properties yet...',
-                  style: GoogleFonts.montserrat(
-                    fontSize: 20.0,
-                    fontWeight: FontWeight.bold,
-                    color: const Color(0xff33907c),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      );
-    } else {
-      return Scaffold(
-        backgroundColor: const Color.fromARGB(255, 255, 255, 255),
-        body: ListView.builder(
-          itemCount: properties.length,
-          itemBuilder: (context, index) {
-            return PropertyCard(
-              property: properties[index],
-              firstName: properties[index].landlord?.firstName ?? '',
-              lastName: properties[index].landlord?.lastName ?? '',
-              pathToImage: properties[index].landlord?.pathToImage ??
-                  'assets/userimage.png',
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => TenantPropertyPage(
-                      property: properties[index],
-                      firstName: properties[index].landlord?.firstName ?? '',
-                      lastName: properties[index].landlord?.lastName ?? '',
-                      pathToImage: properties[index].landlord?.pathToImage ??
-                          'assets/userimage.png',
-                      location: properties[index].location,
-                      address: properties[index].address,
-                      propertyID: properties[index].propertyID ?? '',
-                      uid: widget.uid,
-                      isWithdraw: widget.isWithdraw,
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(
+                      Icons.house,
+                      size: 48.0,
+                      color: Color(0xff33907c),
                     ),
-                  ),
+                    const SizedBox(height: 16.0),
+                    Text(
+                      'Oops! No Properties yet...',
+                      style: GoogleFonts.montserrat(
+                        fontSize: 20.0,
+                        fontWeight: FontWeight.bold,
+                        color: const Color(0xff33907c),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        } else {
+          List<DocumentSnapshot<Map<String, dynamic>>> allData =
+              snapshot.data!.docs;
+          List<Property> updatedProperties = [];
+
+          for (int i = 0; i < allData.length; i++) {
+            Property property =
+                Property.fromJson(allData[i].data() as Map<String, dynamic>);
+            property.propertyID = allData[i].id;
+
+            // Check if the property already exists in the properties list
+            int existingIndex = properties.indexWhere(
+              (existingProperty) =>
+                  existingProperty.propertyID == property.propertyID,
+            );
+
+            if (existingIndex != -1) {
+              // Property already exists, update it
+              properties[existingIndex] = property;
+            } else {
+              // Property is new, add it to the properties list
+              if (allData[i].data()?['tenantRef'] == null)
+                properties.add(property);
+            }
+
+            // Add the property to the updatedProperties list
+            updatedProperties.add(property);
+          }
+
+          // Remove properties that are no longer in the snapshot
+          properties.removeWhere(
+            (existingProperty) => !updatedProperties.contains(existingProperty),
+          );
+
+          return Scaffold(
+            backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+            body: ListView.builder(
+              itemCount: properties.length,
+              itemBuilder: (context, index) {
+                return PropertyCard(
+                  property: properties[index],
+                  firstName: properties[index].landlord?.firstName ?? '',
+                  lastName: properties[index].landlord?.lastName ?? '',
+                  pathToImage: properties[index].landlord?.pathToImage ??
+                      'assets/userimage.png',
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => TenantPropertyPage(
+                          property: properties[index],
+                          firstName:
+                              properties[index].landlord?.firstName ?? '',
+                          lastName: properties[index].landlord?.lastName ?? '',
+                          pathToImage:
+                              properties[index].landlord?.pathToImage ??
+                                  'assets/userimage.png',
+                          location: properties[index].location,
+                          address: properties[index].address,
+                          propertyID: properties[index].propertyID ?? '',
+                          uid: widget.uid,
+                          isWithdraw: widget.isWithdraw,
+                        ),
+                      ),
+                    );
+                  },
                 );
               },
-            );
-          },
-        ),
-      );
-    }
+            ),
+          );
+        }
+      },
+    );
   }
 }
 

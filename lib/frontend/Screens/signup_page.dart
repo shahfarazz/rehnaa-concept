@@ -85,6 +85,7 @@ class _SignUpPageState extends State<SignUpPage> {
               'type': selectedOption,
               'balance': 0,
               'pathToImage': 'assets/defaulticon.png',
+              'dateJoined': Timestamp.now(),
             });
             Navigator.push(
               context,
@@ -103,6 +104,7 @@ class _SignUpPageState extends State<SignUpPage> {
               'type': selectedOption,
               'balance': 0,
               'pathToImage': 'assets/defaulticon.png',
+              'dateJoined': Timestamp.now(),
             });
             Navigator.push(
               context,
