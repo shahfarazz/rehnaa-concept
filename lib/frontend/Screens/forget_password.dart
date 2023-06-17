@@ -26,7 +26,7 @@ class _ForgetPasswordPageState extends State<ForgetPasswordPage> {
     }
 
     // Call your existing signInWithPhoneNumber function with the adjusted phone number.
-    authService.signInWithPhoneNumber(phoneNumber, context);
+    authService.signInForgetWithPhoneNumber(phoneNumber, context);
   }
 
   // Handle password reset

@@ -36,12 +36,12 @@ class MyScreen extends StatelessWidget {
     DocumentSnapshot<Map<String, dynamic>> tenantSnapshot =
         await FirebaseFirestore.instance.collection('Tenants').doc(id).get();
 
-    DocumentReference<Map<String, dynamic>> landlordRef =
+    DocumentReference<Map<String, dynamic>>? landlordRef =
         tenantSnapshot.data()?['landlordRef'];
 
-    String contractID = landlordRef.id;
+    String? contractID = landlordRef?.id;
 
-    DocumentReference<Map<String, dynamic>> contractRef =
+    DocumentReference<Map<String, dynamic>>? contractRef =
         await FirebaseFirestore.instance
             .collection('Contracts')
             .doc(contractID);

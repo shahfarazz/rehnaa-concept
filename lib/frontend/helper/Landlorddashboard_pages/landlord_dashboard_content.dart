@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -45,6 +46,7 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
     // Fetch landlord data from Firestore
     // _landlordFuture = getLandlordFromFirestore(widget.uid);
     // Establish the Firestore stream for the landlord document
+    print('widget.uid is ${widget.uid}');
     _landlordStream = FirebaseFirestore.instance
         .collection('Landlords')
         .doc(widget.uid)
@@ -91,6 +93,7 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
     showDialog(
       context: context,
       builder: (BuildContext context) {
+        print('Firebase auth id is: ${FirebaseAuth.instance.currentUser!.uid}');
         String selectedOption = '';
 
         return StatefulBuilder(
@@ -368,6 +371,7 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
           return Text('Error: ${snapshot.error}');
         } else if (snapshot.hasData) {
           // Convert the snapshot to JSON
+          print('Snapshot: ${snapshot.data!.data()}');
           Map<String, dynamic> json =
               snapshot.data!.data() as Map<String, dynamic>;
           if (kDebugMode) {
