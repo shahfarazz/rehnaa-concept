@@ -33,11 +33,11 @@ class MyApp extends StatelessWidget {
         ),
         // home: LoginPage(),
         // home: const SplashScreen(),
-        home: TenantDashboardPage(
-            uid: 'K55YzmkUXt09OgFwnDuT'), //TODO remove this Jugaar
-        // home: DealerDashboardPage(
-        //   uid: 'fUuFmW7bNaweyP5xkc4c',
-        // ),
+        // home: TenantDashboardPage(
+        //     uid: 'K55YzmkUXt09OgFwnDuT'), //TODO remove this Jugaar
+        home: DealerDashboardPage(
+          uid: 'fUuFmW7bNaweyP5xkc4c',
+        ),
       ),
     );
   }
