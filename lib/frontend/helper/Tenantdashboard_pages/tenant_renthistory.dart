@@ -50,6 +50,10 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
       firstName = data['firstName'];
       lastName = data['lastName'];
 
+      setState(() {
+        shouldDisplay = true;
+      });
+
       // Fetch each rent payment document using the document references
       for (DocumentReference<Map<String, dynamic>> rentPaymentRef
           in rentPaymentRefs) {
@@ -60,9 +64,6 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
         if (data != null) {
           RentPayment rentPayment = await RentPayment.fromJson(data);
           _rentPayments.add(rentPayment);
-          setState(() {
-            shouldDisplay = true;
-          });
         }
       }
 

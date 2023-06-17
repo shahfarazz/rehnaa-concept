@@ -1,6 +1,42 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-class TenantRentAccrualPage extends StatelessWidget {
+import '../../../backend/models/tenantsmodel.dart';
+
+class TenantRentAccrualPage extends StatefulWidget {
+  String uid;
+  TenantRentAccrualPage({Key? key, required this.uid}) : super(key: key);
+  @override
+  _TenantRentAccrualPageState createState() => _TenantRentAccrualPageState();
+}
+
+class _TenantRentAccrualPageState extends State<TenantRentAccrualPage> {
+  bool isApplied = false;
+  Tenant? tenant;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    checkIsApplied();
+  }
+
+  Future<void> checkIsApplied() async {
+    var myTenant = await FirebaseFirestore.instance
+        .collection('Tenants')
+        .doc(widget.uid)
+        .get();
+
+    tenant = Tenant.fromJson(myTenant.data()!);
+
+    if (myTenant.data()?['isApplied'] == true) {
+      setState(() {
+        isApplied = true;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -8,7 +44,9 @@ class TenantRentAccrualPage extends StatelessWidget {
         child: Container(
           color: Colors.grey[200], // Set the background color
           padding: const EdgeInsets.symmetric(
-              vertical: 100.0, horizontal: 16.0), // Updated padding
+            vertical: 100.0,
+            horizontal: 16.0,
+          ), // Updated padding
           child: Card(
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20.0),
@@ -54,14 +92,16 @@ class TenantRentAccrualPage extends StatelessWidget {
                           width: MediaQuery.of(context).size.width * 0.6,
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(30.0),
-                            gradient: const LinearGradient(
+                            gradient: LinearGradient(
                               begin: Alignment.topLeft,
                               end: Alignment.bottomRight,
-                              colors: [
-                                Color(0xff0FA697),
-                                Color(0xff45BF7A),
-                                Color(0xff0DF205),
-                              ],
+                              colors: isApplied
+                                  ? [Colors.grey, Colors.grey, Colors.grey]
+                                  : [
+                                      Color(0xff0FA697),
+                                      Color(0xff45BF7A),
+                                      Color(0xff0DF205),
+                                    ],
                             ),
                           ),
                           child: Material(
@@ -69,16 +109,70 @@ class TenantRentAccrualPage extends StatelessWidget {
                             child: InkWell(
                               borderRadius: BorderRadius.circular(30.0),
                               onTap: () {
+                                if (isApplied) {
+                                  return;
+                                }
                                 // Handle button press
+                                setState(() {
+                                  isApplied = true;
+                                });
+                                FirebaseFirestore.instance
+                                    .collection('Tenants')
+                                    .doc(widget.uid)
+                                    .set({
+                                  'isApplied': true,
+                                }, SetOptions(merge: true));
+
+                                //send an AdminRequest for the tenant
+                                FirebaseFirestore.instance
+                                    .collection('AdminRequests')
+                                    .doc(widget.uid)
+                                    .set({
+                                  'rentAccrualRequest': FieldValue.arrayUnion([
+                                    {
+                                      'fullname':
+                                          '${tenant?.firstName} ${tenant?.lastName}',
+                                      'uid': widget.uid,
+                                    }
+                                  ]),
+                                  'timestamp': Timestamp.now()
+                                }, SetOptions(merge: true));
+
+                                //send a notification to the tenant that the request has been sent
+                                FirebaseFirestore.instance
+                                    .collection('Notifications')
+                                    .doc(widget.uid)
+                                    .set({
+                                  'notifications': FieldValue.arrayUnion([
+                                    {
+                                      'title':
+                                          'Your request for rent accrual has been sent to the admin.',
+                                    }
+                                  ])
+                                }, SetOptions(merge: true));
+
+                                // show in green snackbar that the request has been sent
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    backgroundColor: Colors.green,
+                                    content: Text(
+                                      'Your request for rent accrual has been sent to the admin.',
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontFamily: 'Montserrat',
+                                      ),
+                                    ),
+                                  ),
+                                );
                               },
                               child: Ink(
                                 padding: const EdgeInsets.symmetric(
                                   vertical: 16.0,
                                   horizontal: 32.0,
                                 ),
-                                child: const Center(
+                                child: Center(
                                   child: Text(
-                                    'Apply',
+                                    isApplied ? 'Applied' : 'Apply',
                                     style: TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.bold,

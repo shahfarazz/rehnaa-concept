@@ -1,10 +1,13 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:crypto/crypto.dart';
+// import 'package:rehnaa/frontend/helper/Admindashboard_pages/admin_landlordinputhelper.dart';
 
 import 'Landlord/landlord_dashboard.dart';
 import 'Tenant/tenant_dashboard.dart';
@@ -16,6 +19,12 @@ class SignUpPage extends StatefulWidget {
   @override
   // ignore: library_private_types_in_public_api
   _SignUpPageState createState() => _SignUpPageState();
+}
+
+String hashString(String input) {
+  final bytes = utf8.encode(input);
+  final digest = sha256.convert(bytes);
+  return digest.toString();
 }
 
 class _SignUpPageState extends State<SignUpPage> {
@@ -85,6 +94,7 @@ class _SignUpPageState extends State<SignUpPage> {
               'type': selectedOption,
               'balance': 0,
               'pathToImage': 'assets/defaulticon.png',
+              'dateJoined': Timestamp.now(),
             });
             Navigator.push(
               context,
@@ -103,6 +113,7 @@ class _SignUpPageState extends State<SignUpPage> {
               'type': selectedOption,
               'balance': 0,
               'pathToImage': 'assets/defaulticon.png',
+              'dateJoined': Timestamp.now(),
             });
             Navigator.push(
               context,
@@ -133,6 +144,16 @@ class _SignUpPageState extends State<SignUpPage> {
       return;
     }
     String phoneNumber = emailOrPhone.replaceFirst(RegExp('^0'), '+92');
+
+    // check if phoneNumber is already registered in users collection
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .where('emailOrPhone', isEqualTo: emailOrPhone)
+        .get();
+    if (querySnapshot.docs.isNotEmpty) {
+      _showToast('Phone number already registered.', Colors.red);
+      return;
+    }
 
     codeSent(String verificationId, int? forceResendingToken) async {
       this.verificationId = verificationId;
@@ -170,6 +191,7 @@ class _SignUpPageState extends State<SignUpPage> {
 
     verificationFailed(FirebaseAuthException authException) {
       _showToast('Phone number verification failed.', Colors.red);
+      print('exception occured: ${authException.message}');
     }
 
     try {
@@ -183,6 +205,7 @@ class _SignUpPageState extends State<SignUpPage> {
       );
     } catch (e) {
       _showToast('Failed to Verify Phone Number.', Colors.red);
+      print('error that occured: $e');
     }
   }
 
@@ -206,6 +229,7 @@ class _SignUpPageState extends State<SignUpPage> {
         'lastName': lastName,
         'emailOrPhone': emailOrPhone,
         'type': selectedOption,
+        'password': hashString(password),
       });
 
       if (selectedOption == 'Landlord') {
