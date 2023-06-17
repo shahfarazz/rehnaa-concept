@@ -96,56 +96,79 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
     });
   }
 
+// Method to check if the keyboard is visible
+  bool isKeyboardVisible(BuildContext context) {
+    return MediaQuery.of(context).viewInsets.bottom > 0;
+  }
+
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
     super.build(context);
     return Scaffold(
       appBar: _buildAppBar(size),
-      body: Stack(
-        children: [
-          GestureDetector(
-            onTap: () {
-              if (_isSidebarOpen) {
-                _closeSidebar();
-              }
-            },
-            child: Stack(
-              children: [
-                Transform.translate(
-                  offset: Offset(_isSidebarOpen ? size.width * 0.7 : 0, 0),
-                  child: Column(
-                    children: [
-                      Expanded(
-                        child: PageView(
-                          controller: _pageController,
-                          onPageChanged: (index) {
-                            setState(() {
-                              _currentIndex = index;
-                            });
-                          },
-                          children: <Widget>[
-                            LandlordDashboardContent(
+      resizeToAvoidBottomInset:
+          false, // Prevent resizing when the keyboard is shown
+      body: GestureDetector(
+        onTap: () {
+          if (_isSidebarOpen) {
+            _closeSidebar();
+          }
+          // Close the keyboard
+          FocusScope.of(context).unfocus();
+        },
+        child: Stack(
+          children: [
+            Transform.translate(
+              offset: Offset(_isSidebarOpen ? size.width * 0.7 : 0, 0),
+              child: Column(
+                children: [
+                  Expanded(
+                    child: PageView.builder(
+                      controller: _pageController,
+                      onPageChanged: (index) {
+                        setState(() {
+                          _currentIndex = index;
+                        });
+                      },
+                      physics: isKeyboardVisible(context)
+                          ? NeverScrollableScrollPhysics()
+                          : const AlwaysScrollableScrollPhysics(),
+                      itemCount: 5, // Number of pages
+                      itemBuilder: (context, index) {
+                        switch (index) {
+                          case 0:
+                            return LandlordDashboardContent(
                               uid: widget.uid,
                               isWithdraw: _isWithdraw,
                               onUpdateWithdrawState: updateWithdrawState,
-                            ),
-                            LandlordTenantsPage(uid: widget.uid),
-                            LandlordPropertiesPage(uid: widget.uid),
-                            LandlordRentHistoryPage(uid: widget.uid),
-                            LandlordProfilePage(uid: widget.uid),
-                          ],
-                        ),
-                      ),
-                      _buildBottomNavigationBar(),
-                    ],
+                            );
+                          case 1:
+                            return LandlordTenantsPage(
+                              uid: widget.uid,
+                            );
+                          case 2:
+                            return LandlordPropertiesPage(
+                              uid: widget.uid,
+                              // isWithdraw: _isWithdraw,
+                            );
+                          case 3:
+                            return LandlordRentHistoryPage(uid: widget.uid);
+                          case 4:
+                            return LandlordProfilePage(uid: widget.uid);
+                          default:
+                            return Container();
+                        }
+                      },
+                    ),
                   ),
-                ),
-                if (_isSidebarOpen) _buildSidebar(size),
-              ],
+                  _buildBottomNavigationBar(),
+                ],
+              ),
             ),
-          ),
-        ],
+            if (_isSidebarOpen) _buildSidebar(size),
+          ],
+        ),
       ),
     );
   }
