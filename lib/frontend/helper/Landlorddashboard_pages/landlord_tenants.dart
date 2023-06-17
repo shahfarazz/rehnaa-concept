@@ -240,7 +240,7 @@ class _LandlordTenantsPageState extends State<LandlordTenantsPage>
                     ),
                     const SizedBox(height: 16.0),
                     Text(
-                      'Oops! No Tenants yet...',
+                      'No tenants to show.',
                       style: GoogleFonts.montserrat(
                         fontSize: 20.0,
                         // fontWeight: FontWeight.bold,

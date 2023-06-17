@@ -306,10 +306,10 @@ class _LandlordRentHistoryPageState extends State<LandlordRentHistoryPage>
                 ),
                 const SizedBox(height: 16.0),
                 Text(
-                  'Oops! Nothing to show here...',
+                  'No transactions to show',
                   style: GoogleFonts.montserrat(
                     fontSize: 20.0,
-                    fontWeight: FontWeight.bold,
+                    // fontWeight: FontWeight.bold,
                     color: const Color(0xff33907c),
                   ),
                 ),
