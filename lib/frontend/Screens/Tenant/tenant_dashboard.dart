@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:rehnaa/frontend/Screens/contract.dart';
 import 'package:rehnaa/frontend/Screens/faq.dart';
 import 'package:rehnaa/frontend/Screens/vouchers.dart';
@@ -103,61 +104,79 @@ class _DashboardPageState extends State<TenantDashboardPage>
     });
   }
 
+// Method to check if the keyboard is visible
+  bool isKeyboardVisible(BuildContext context) {
+    return MediaQuery.of(context).viewInsets.bottom > 0;
+  }
+
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
     super.build(context);
     return Scaffold(
       appBar: _buildAppBar(size),
-      body: Stack(
-        children: [
-          GestureDetector(
-            onTap: () {
-              if (_isSidebarOpen) {
-                _closeSidebar();
-              }
-            },
-            child: Stack(
-              children: [
-                Transform.translate(
-                  offset: Offset(_isSidebarOpen ? size.width * 0.7 : 0, 0),
-                  child: Column(
-                    children: [
-                      Expanded(
-                        child: PageView(
-                          controller: _pageController,
-                          onPageChanged: (index) {
-                            setState(() {
-                              _currentIndex = index;
-                            });
-                          },
-                          children: <Widget>[
-                            TenantDashboardContent(
+      resizeToAvoidBottomInset:
+          false, // Prevent resizing when the keyboard is shown
+      body: GestureDetector(
+        onTap: () {
+          if (_isSidebarOpen) {
+            _closeSidebar();
+          }
+          // Close the keyboard
+          FocusScope.of(context).unfocus();
+        },
+        child: Stack(
+          children: [
+            Transform.translate(
+              offset: Offset(_isSidebarOpen ? size.width * 0.7 : 0, 0),
+              child: Column(
+                children: [
+                  Expanded(
+                    child: PageView.builder(
+                      controller: _pageController,
+                      onPageChanged: (index) {
+                        setState(() {
+                          _currentIndex = index;
+                        });
+                      },
+                      physics: isKeyboardVisible(context)
+                          ? NeverScrollableScrollPhysics()
+                          : const AlwaysScrollableScrollPhysics(),
+                      itemCount: 5, // Number of pages
+                      itemBuilder: (context, index) {
+                        switch (index) {
+                          case 0:
+                            return TenantDashboardContent(
                               uid: widget.uid,
                               isWithdraw: _isWithdraw,
                               onUpdateWithdrawState: updateWithdrawState,
-                            ),
-                            TenantRentAccrualPage(
+                            );
+                          case 1:
+                            return TenantRentAccrualPage(
                               uid: widget.uid,
-                            ),
-                            TenantPropertiesPage(
+                            );
+                          case 2:
+                            return TenantPropertiesPage(
                               uid: widget.uid,
                               isWithdraw: _isWithdraw,
-                            ),
-                            TenantRentHistoryPage(uid: widget.uid),
-                            TenantProfilePage(uid: widget.uid),
-                          ],
-                        ),
-                      ),
-                      _buildBottomNavigationBar(),
-                    ],
+                            );
+                          case 3:
+                            return TenantRentHistoryPage(uid: widget.uid);
+                          case 4:
+                            return TenantProfilePage(uid: widget.uid);
+                          default:
+                            return Container();
+                        }
+                      },
+                    ),
                   ),
-                ),
-                if (_isSidebarOpen) _buildSidebar(size),
-              ],
+                  _buildBottomNavigationBar(),
+                ],
+              ),
             ),
-          ),
-        ],
+            if (_isSidebarOpen) _buildSidebar(size),
+          ],
+        ),
       ),
     );
   }
@@ -353,13 +372,13 @@ class _DashboardPageState extends State<TenantDashboardPage>
                                       Color(0xFF0DF205),
                                     ],
                                   ).createShader(bounds),
-                                  child: const Text(
-                                    'Rehnaa',
-                                    style: TextStyle(
+                                  child: Text(
+                                    'REHNAA.PK',
+                                    style: GoogleFonts.belleza(
                                       fontSize: 24,
-                                      fontFamily: 'Montserrat',
                                       fontWeight: FontWeight.bold,
                                       color: Colors.white,
+                                      letterSpacing: 1.75,
                                     ),
                                   ),
                                 ),
