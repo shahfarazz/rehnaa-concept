@@ -289,16 +289,16 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
               mainAxisSize: MainAxisSize.min,
               children: [
                 const Icon(
-                  Icons.error_outline,
+                  Icons.error_outline_outlined,
                   size: 48.0,
                   color: Color(0xff33907c),
                 ),
                 const SizedBox(height: 16.0),
                 Text(
-                  'Oops! Nothing to show here...',
+                  'No transactions to show',
                   style: GoogleFonts.montserrat(
                     fontSize: 20.0,
-                    fontWeight: FontWeight.bold,
+                    // fontWeight: FontWeight.bold,
                     color: const Color(0xff33907c),
                   ),
                 ),

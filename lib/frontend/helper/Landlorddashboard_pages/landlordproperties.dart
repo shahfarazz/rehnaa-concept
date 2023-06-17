@@ -125,7 +125,7 @@ class _LandlordPropertiesPageState extends State<LandlordPropertiesPage>
                   ),
                   const SizedBox(height: 16.0),
                   Text(
-                    'Oops! No Properties yet...',
+                    'No properties to show',
                     style: GoogleFonts.montserrat(
                       fontSize: 20.0,
                       // fontWeight: FontWeight.bold,
