@@ -38,6 +38,9 @@ class _LandlordPropertiesPageState extends State<LandlordPropertiesPage>
               .get();
 
       if (landlordSnapshot.exists) {
+        setState(() {
+          shouldDisplay = true;
+        });
         Map<String, dynamic> data = landlordSnapshot.data()!;
 
         List<DocumentReference<Map<String, dynamic>>> propertyDataList =
@@ -46,9 +49,6 @@ class _LandlordPropertiesPageState extends State<LandlordPropertiesPage>
 
         // Fetch properties using the fetchProperties method
         properties = await fetchProperties(propertyDataList, context);
-        setState(() {
-          shouldDisplay = true;
-        });
 
         if (mounted) {
           setState(() {
@@ -162,8 +162,8 @@ class _LandlordPropertiesPageState extends State<LandlordPropertiesPage>
                       lastName: properties[index].landlord?.lastName ?? '',
                       pathToImage: properties[index].landlord?.pathToImage ??
                           'assets/userimage.png',
-                        location: properties[index].location,
-                        address: properties[index].address,
+                      location: properties[index].location,
+                      address: properties[index].address,
                     ),
                   ),
                 );
@@ -219,7 +219,8 @@ class PropertyCard extends StatelessWidget {
                   imageUrl: property
                       .imagePath[0], // TODO define a new property.iconimagepath
 
-                  placeholder: (context, url) => const CircularProgressIndicator(),
+                  placeholder: (context, url) =>
+                      const CircularProgressIndicator(),
                   errorWidget: (context, url, error) => const Icon(Icons.error),
                   fit: BoxFit.cover,
                 ),
