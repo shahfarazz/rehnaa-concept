@@ -6,7 +6,7 @@ class Tenant {
   String lastName;
   String description;
   double rating;
-  int rent;
+  var rent;
   int creditPoints;
   //  String propertyDetails;
   String cnicNumber;

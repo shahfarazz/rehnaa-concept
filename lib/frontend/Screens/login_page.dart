@@ -121,7 +121,8 @@ class LoginPage extends StatelessWidget {
 
                           if (authService.isPhoneNumber(emailOrPhone)) {
                             // Modify the phone number format
-                            emailOrPhone = '+92${emailOrPhone.substring(1)}';
+                            String password = _passwordController.text.trim();
+
                             if (kDebugMode) {
                               print('email or phone is:');
                             }
@@ -129,9 +130,8 @@ class LoginPage extends StatelessWidget {
                               print(emailOrPhone);
                             }
 
-                            // Call the sign-in function using the modified phone number
                             authService.signInWithPhoneNumber(
-                                emailOrPhone, context);
+                                emailOrPhone, password, context);
                           } else if (authService.isEmail(emailOrPhone)) {
                             // Call the sign-in function using the email and password
                             String password = _passwordController.text.trim();
