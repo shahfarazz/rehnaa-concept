@@ -429,8 +429,12 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
                                                             Navigator.pop(
                                                                 context);
                                                           },
-                                                          child:
-                                                              Text('Cancel')),
+                                                          child: Text(
+                                                            'Cancel',
+                                                            style: TextStyle(
+                                                                color: Colors
+                                                                    .green),
+                                                          )),
                                                       TextButton(
                                                           onPressed: () {
                                                             changePassword(
@@ -440,7 +444,12 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
                                                                     .text);
                                                             // Navigator.pop(context);
                                                           },
-                                                          child: Text('Change'))
+                                                          child: Text(
+                                                            'Change',
+                                                            style: TextStyle(
+                                                                color: Colors
+                                                                    .green),
+                                                          ))
                                                     ],
                                                   );
                                                 },
