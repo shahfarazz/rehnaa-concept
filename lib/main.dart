@@ -9,6 +9,7 @@ import 'frontend/Screens/Tenant/tenant_dashboard.dart';
 import 'frontend/Screens/Tenant/tenantsignupdetails.dart';
 import 'frontend/Screens/splash.dart';
 import 'firebase_options.dart';
+import 'frontend/helper/Tenantdashboard_pages/tenant_profile.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -31,13 +32,14 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        home: LoginPage(),
-        // home: const SplashScreen(),
+        // home: LoginPage(),
+        home: const SplashScreen(),
         // home: TenantDashboardPage(
         //     uid: 'K55YzmkUXt09OgFwnDuT'), //TODO remove this Jugaar
         // home: DealerDashboardPage(
         //   uid: 'fUuFmW7bNaweyP5xkc4c',
         // ),
+        // home: TenantProfilePage(uid: 'K55YzmkUXt09OgFwnDuT'),
       ),
     );
   }

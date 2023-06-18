@@ -201,7 +201,9 @@ class PropertyCard extends StatelessWidget {
                       .imagePath[0], // TODO define a new property.iconimagepath
 
                   placeholder: (context, url) =>
-                      const CircularProgressIndicator(),
+                      const CircularProgressIndicator(
+                    color: Color(0xFF33907C),
+                  ),
                   errorWidget: (context, url, error) => const Icon(Icons.error),
                   fit: BoxFit.cover,
                 ),

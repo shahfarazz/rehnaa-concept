@@ -270,7 +270,7 @@ class AuthenticationService extends ChangeNotifier {
     String phoneNumber,
     BuildContext context,
   ) async {
-    // bool isSignInCompleted = false; // Flag to track sign-in completion
+    bool isSignInCompleted = false; // Flag to track sign-in completion
 
     await _auth.verifyPhoneNumber(
       phoneNumber: phoneNumber,
@@ -285,7 +285,7 @@ class AuthenticationService extends ChangeNotifier {
             .doc(_auth.currentUser!.uid)
             .get();
 
-        if (userDoc.data()!['type'] == 'tenant') {
+        if (userDoc.data()!['type'] == 'Tenant') {
           //push to tenant dashboard
           Navigator.push(
             context,
@@ -293,7 +293,7 @@ class AuthenticationService extends ChangeNotifier {
                 builder: (context) =>
                     TenantDashboardPage(uid: _auth.currentUser!.uid)),
           );
-        } else {
+        } else if (userDoc.data()!['type'] == 'Landlord') {
           //push to landlord dashboard
           Navigator.push(
             context,
@@ -302,7 +302,7 @@ class AuthenticationService extends ChangeNotifier {
                     LandlordDashboardPage(uid: _auth.currentUser!.uid)),
           );
         }
-        // isSignInCompleted = true; // Mark sign-in as completed
+        isSignInCompleted = true; // Mark sign-in as completed
       },
       verificationFailed: (FirebaseAuthException e) {
         if (kDebugMode) {
@@ -342,13 +342,13 @@ class AuthenticationService extends ChangeNotifier {
                         print(
                             "Phone number verified and user signed in: ${_auth.currentUser?.uid}");
                       }
-                      Navigator.of(context).pop();
+                      // Navigator.of(context).pop();
                       final userDoc = await FirebaseFirestore.instance
                           .collection('users')
                           .doc(_auth.currentUser!.uid)
                           .get();
 
-                      if (userDoc.data()!['type'] == 'tenant') {
+                      if (userDoc.data()!['type'] == 'Tenant') {
                         //push to tenant dashboard
                         Navigator.push(
                           context,
@@ -356,7 +356,7 @@ class AuthenticationService extends ChangeNotifier {
                               builder: (context) => TenantDashboardPage(
                                   uid: _auth.currentUser!.uid)),
                         );
-                      } else {
+                      } else if (userDoc.data()!['type'] == 'Landlord') {
                         //push to landlord dashboard
                         Navigator.push(
                           context,
@@ -365,11 +365,11 @@ class AuthenticationService extends ChangeNotifier {
                                   uid: _auth.currentUser!.uid)),
                         );
                       }
-                      // isSignInCompleted = true; // Mark sign-in as completed
+                      isSignInCompleted = true; // Mark sign-in as completed
                     } catch (e) {
                       showToast(
                           'Invalid SMS code. Please try again.', Colors.red);
-                      Navigator.of(context).pop();
+                      // Navigator.of(context).pop();
                     }
                   },
                 ),
@@ -381,9 +381,9 @@ class AuthenticationService extends ChangeNotifier {
       codeAutoRetrievalTimeout: (String verificationId) {
         // if (!isSignInCompleted) {
         //   // Check if sign-in is not completed
-        showToast('Phone number verification timed out. Please try again.',
-            Colors.red);
-        Navigator.of(context).pop();
+        // showToast('Phone number verification timed out. Please try again.',
+        //     Colors.red);
+        // Navigator.of(context).pop();
       },
     );
   }
@@ -410,6 +410,7 @@ class AuthenticationService extends ChangeNotifier {
           .get();
 
       if (userDoc.data()!['type'] == 'Tenant') {
+        showToast('Signed in with Email and Password.', Colors.green);
         //push to tenant dashboard
         Navigator.push(
           context,
@@ -418,6 +419,8 @@ class AuthenticationService extends ChangeNotifier {
                   TenantDashboardPage(uid: _auth.currentUser!.uid)),
         );
       } else if (userDoc.data()!['type'] == 'Landlord') {
+        showToast('Signed in with Email and Password.', Colors.green);
+
         //push to landlord dashboard
         Navigator.push(
           context,
@@ -427,6 +430,7 @@ class AuthenticationService extends ChangeNotifier {
         );
       }
     } catch (e) {
+      print('Error signing in with Email and Password: $e');
       showToast('Failed to sign in with email and password.', Colors.red);
     }
   }

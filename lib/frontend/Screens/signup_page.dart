@@ -230,6 +230,7 @@ class _SignUpPageState extends State<SignUpPage> {
         'emailOrPhone': emailOrPhone,
         'type': selectedOption,
         'password': hashString(password),
+        'dateJoined': Timestamp.now(),
       });
 
       if (selectedOption == 'Landlord') {
@@ -243,6 +244,7 @@ class _SignUpPageState extends State<SignUpPage> {
           'type': selectedOption,
           'balance': 0,
           'pathToImage': 'assets/defaulticon.png',
+          'dateJoined': Timestamp.now(),
         });
         Navigator.push(
           context,
@@ -261,6 +263,7 @@ class _SignUpPageState extends State<SignUpPage> {
           'type': selectedOption,
           'balance': 0,
           'pathToImage': 'assets/defaulticon.png',
+          'dateJoined': Timestamp.now(),
         });
         Navigator.push(
           context,
@@ -319,7 +322,10 @@ class _SignUpPageState extends State<SignUpPage> {
               buildCreateButton(),
               SizedBox(height: MediaQuery.of(context).size.height * 0.02),
               buildSignInText(),
-              if (isLoading) const CircularProgressIndicator(),
+              if (isLoading)
+                const CircularProgressIndicator(
+                  color: Colors.green,
+                ),
               const SizedBox(height: 50.0),
             ],
           ),
