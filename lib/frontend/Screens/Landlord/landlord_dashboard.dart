@@ -536,7 +536,7 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
               stream: _notificationStream2,
               builder: (BuildContext context,
                   AsyncSnapshot<DocumentSnapshot> snapshot) {
-                print('snapshot: $snapshot');
+                // print('snapshot: $snapshot');
                 if (snapshot.hasData && snapshot.data != null) {
                   Map<String, dynamic>? data =
                       snapshot.data!.data() as Map<String, dynamic>?;
@@ -865,6 +865,7 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
     );
   }
 }
+
 class HexagonClipper extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {

@@ -1,8 +1,11 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/rendering.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 import '../../../backend/services/authentication_service.dart';
+import '../../Screens/signup_page.dart';
 import '../Landlorddashboard_pages/landlord_profile.dart';
 
 class TenantProfilePage extends StatefulWidget {
@@ -17,6 +20,125 @@ class TenantProfilePage extends StatefulWidget {
 class _TenantProfilePageState extends State<TenantProfilePage> {
   bool showChangePassword = false;
   bool showDeleteAccount = false;
+  bool _obscurePassword = true; // Track whether the password is obscured or not
+  bool _obscurePassword2 =
+      true; // Track whether the password is obscured or not
+  //define two new controllers for the password fields
+  final TextEditingController _oldPasswordController = TextEditingController();
+  final TextEditingController _newPasswordController = TextEditingController();
+
+  Future<void> changePassword(String oldPassword, String newPassword) async {
+    try {
+      //show green loading indicator
+      showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              content: Row(
+                children: [
+                  const CircularProgressIndicator(
+                    color: Colors.green,
+                  ),
+                  const SizedBox(
+                    width: 20,
+                  ),
+                  const Text('Changing password...'),
+                ],
+              ),
+            );
+          });
+      User? user = FirebaseAuth.instance.currentUser;
+
+      //check if user is signed up using mobile number or email
+      FirebaseFirestore.instance
+          .collection('users')
+          .doc(user?.uid)
+          .get()
+          .then((value) async {
+        String emailOrPhone = value['emailOrPhone'];
+        if (emailOrPhone == null) {
+          //show toast that there is no email or phone number associated with this account
+          Fluttertoast.showToast(
+              msg:
+                  'There is no email or phone number associated with this account',
+              toastLength: Toast.LENGTH_LONG,
+              gravity: ToastGravity.BOTTOM,
+              timeInSecForIosWeb: 1,
+              backgroundColor: Colors.red,
+              textColor: Colors.white,
+              fontSize: 16.0);
+        }
+        if (emailOrPhone.contains('@')) {
+          //user signed up using email
+          print(
+              'user signed up using email is $emailOrPhone ,password is $oldPassword, new pass is $newPassword');
+
+          if (user != null) {
+            // Reauthenticate the user with their old password
+            AuthCredential credential = EmailAuthProvider.credential(
+              email: user.email!,
+              password: oldPassword,
+            );
+            await user.reauthenticateWithCredential(credential);
+
+            // Change the user's password
+            await user.updatePassword(newPassword);
+            //show toast
+            Fluttertoast.showToast(
+                msg: 'Password changed successfully',
+                toastLength: Toast.LENGTH_LONG,
+                gravity: ToastGravity.BOTTOM,
+                timeInSecForIosWeb: 1,
+                backgroundColor: Colors.green,
+                textColor: Colors.white,
+                fontSize: 16.0);
+          } else {
+            print('No user signed in');
+          }
+        } else {
+          //user signed up using mobile number
+          print('user signed up using mobile number');
+          String hashPassword = hashString(oldPassword);
+          //check firebase firestore users collecion to get hashed password
+          // stored in password field
+          FirebaseFirestore.instance
+              .collection('users')
+              .doc(user?.uid)
+              .get()
+              .then((value) async {
+            String password = value['password'];
+            if (password == hashPassword) {
+              //user entered correct old password
+              //update password in firebase firestore
+              String newHashPassword = hashString(newPassword);
+              await FirebaseFirestore.instance
+                  .collection('users')
+                  .doc(user?.uid)
+                  .update({'password': newHashPassword});
+              print('Password changed successfully');
+            } else {
+              //user entered wrong old password
+              print('user entered wrong old password');
+              Fluttertoast.showToast(
+                  msg: 'Wrong old password entered',
+                  toastLength: Toast.LENGTH_LONG,
+                  gravity: ToastGravity.BOTTOM,
+                  timeInSecForIosWeb: 1,
+                  backgroundColor: Colors.red,
+                  textColor: Colors.white,
+                  fontSize: 16.0);
+            }
+          });
+        }
+        Navigator.of(context).pop();
+        Navigator.of(context).pop();
+      });
+    } catch (e) {
+      print('Error changing password: $e');
+      Navigator.of(context).pop();
+      Navigator.of(context).pop();
+    }
+  }
 
   void toggleChangePassword() {
     setState(() {
@@ -230,7 +352,103 @@ class _TenantProfilePageState extends State<TenantProfilePage> {
                                             subtitle:
                                                 'Click to change your password',
                                             onTap: () {
-                                              // Change password logic
+                                              showDialog(
+                                                  context: context,
+                                                  builder: (context) {
+                                                    return StatefulBuilder(
+                                                      builder:
+                                                          (BuildContext context,
+                                                              setState) {
+                                                        return AlertDialog(
+                                                          title: Text(
+                                                              'Change Password'),
+                                                          content: Column(
+                                                            mainAxisSize:
+                                                                MainAxisSize
+                                                                    .min,
+                                                            children: [
+                                                              TextField(
+                                                                controller:
+                                                                    _oldPasswordController,
+                                                                obscureText:
+                                                                    _obscurePassword,
+                                                                decoration:
+                                                                    InputDecoration(
+                                                                  labelText:
+                                                                      'Old Password',
+                                                                  suffixIcon:
+                                                                      GestureDetector(
+                                                                    onTap: () {
+                                                                      setState(
+                                                                          () {
+                                                                        _obscurePassword =
+                                                                            !_obscurePassword;
+                                                                      });
+                                                                    },
+                                                                    child: Icon(
+                                                                      _obscurePassword
+                                                                          ? Icons
+                                                                              .visibility
+                                                                          : Icons
+                                                                              .visibility_off,
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                              TextField(
+                                                                controller:
+                                                                    _newPasswordController,
+                                                                obscureText:
+                                                                    _obscurePassword2,
+                                                                decoration:
+                                                                    InputDecoration(
+                                                                  labelText:
+                                                                      'New Password',
+                                                                  suffixIcon:
+                                                                      GestureDetector(
+                                                                    onTap: () {
+                                                                      setState(
+                                                                          () {
+                                                                        _obscurePassword2 =
+                                                                            !_obscurePassword2;
+                                                                      });
+                                                                    },
+                                                                    child: Icon(
+                                                                      _obscurePassword2
+                                                                          ? Icons
+                                                                              .visibility
+                                                                          : Icons
+                                                                              .visibility_off,
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                          actions: [
+                                                            TextButton(
+                                                                onPressed: () {
+                                                                  Navigator.pop(
+                                                                      context);
+                                                                },
+                                                                child: Text(
+                                                                    'Cancel')),
+                                                            TextButton(
+                                                                onPressed: () {
+                                                                  changePassword(
+                                                                      _oldPasswordController
+                                                                          .text,
+                                                                      _newPasswordController
+                                                                          .text);
+                                                                  // Navigator.pop(context);
+                                                                },
+                                                                child: Text(
+                                                                    'Change'))
+                                                          ],
+                                                        );
+                                                      },
+                                                    );
+                                                  });
                                             },
                                           ),
                                           ProfileInfoItem(

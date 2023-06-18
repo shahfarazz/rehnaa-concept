@@ -117,66 +117,70 @@ class _DashboardPageState extends State<TenantDashboardPage>
       appBar: _buildAppBar(size),
       resizeToAvoidBottomInset:
           false, // Prevent resizing when the keyboard is shown
-      body: GestureDetector(
-        onTap: () {
-          if (_isSidebarOpen) {
-            _closeSidebar();
-          }
-          // Close the keyboard
-          FocusScope.of(context).unfocus();
-        },
-        child: Stack(
-          children: [
-            Transform.translate(
-              offset: Offset(_isSidebarOpen ? size.width * 0.7 : 0, 0),
-              child: Column(
-                children: [
-                  Expanded(
-                    child: PageView.builder(
-                      controller: _pageController,
-                      onPageChanged: (index) {
-                        setState(() {
-                          _currentIndex = index;
-                        });
-                      },
-                      physics: isKeyboardVisible(context)
-                          ? NeverScrollableScrollPhysics()
-                          : const AlwaysScrollableScrollPhysics(),
-                      itemCount: 5, // Number of pages
-                      itemBuilder: (context, index) {
-                        switch (index) {
-                          case 0:
-                            return TenantDashboardContent(
-                              uid: widget.uid,
-                              isWithdraw: _isWithdraw,
-                              onUpdateWithdrawState: updateWithdrawState,
-                            );
-                          case 1:
-                            return TenantRentAccrualPage(
-                              uid: widget.uid,
-                            );
-                          case 2:
-                            return TenantPropertiesPage(
-                              uid: widget.uid,
-                              isWithdraw: _isWithdraw,
-                            );
-                          case 3:
-                            return TenantRentHistoryPage(uid: widget.uid);
-                          case 4:
-                            return TenantProfilePage(uid: widget.uid);
-                          default:
-                            return Container();
-                        }
-                      },
-                    ),
+      body: StatefulBuilder(
+        builder: (BuildContext context, setState) {
+          return GestureDetector(
+            onTap: () {
+              if (_isSidebarOpen) {
+                _closeSidebar();
+              }
+              // Close the keyboard
+              FocusScope.of(context).unfocus();
+            },
+            child: Stack(
+              children: [
+                Transform.translate(
+                  offset: Offset(_isSidebarOpen ? size.width * 0.7 : 0, 0),
+                  child: Column(
+                    children: [
+                      Expanded(
+                        child: PageView.builder(
+                          controller: _pageController,
+                          onPageChanged: (index) {
+                            setState(() {
+                              _currentIndex = index;
+                            });
+                          },
+                          physics: isKeyboardVisible(context)
+                              ? NeverScrollableScrollPhysics()
+                              : const AlwaysScrollableScrollPhysics(),
+                          itemCount: 5, // Number of pages
+                          itemBuilder: (context, index) {
+                            switch (index) {
+                              case 0:
+                                return TenantDashboardContent(
+                                  uid: widget.uid,
+                                  isWithdraw: _isWithdraw,
+                                  onUpdateWithdrawState: updateWithdrawState,
+                                );
+                              case 1:
+                                return TenantRentAccrualPage(
+                                  uid: widget.uid,
+                                );
+                              case 2:
+                                return TenantPropertiesPage(
+                                  uid: widget.uid,
+                                  isWithdraw: _isWithdraw,
+                                );
+                              case 3:
+                                return TenantRentHistoryPage(uid: widget.uid);
+                              case 4:
+                                return TenantProfilePage(uid: widget.uid);
+                              default:
+                                return Container();
+                            }
+                          },
+                        ),
+                      ),
+                      _buildBottomNavigationBar(),
+                    ],
                   ),
-                  _buildBottomNavigationBar(),
-                ],
-              ),
+                ),
+                if (_isSidebarOpen) _buildSidebar(size),
+              ],
             ),
-            if (_isSidebarOpen) _buildSidebar(size),
-          ],
-        ),
+          );
+        },
       ),
     );
   }

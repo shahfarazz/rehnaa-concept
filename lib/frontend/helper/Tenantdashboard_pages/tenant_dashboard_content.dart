@@ -438,7 +438,7 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                                       borderRadius: BorderRadius.circular(20),
                                       onTap: () {
                                         isWithdraw
-                                            ? someFunction(tenant)
+                                            ? null
                                             : someFunction(tenant);
                                         // Show the option dialog
                                       },
