@@ -112,7 +112,7 @@ class EventsPage extends StatelessWidget {
 
   Widget buildTextCard() {
     const String privacyPolicyText =
-        "rehnaa holds annual events to further strenghten ";
+        "Rehnaa holds annual events to further strengthen our dealer network and to appraise the high performance of affiliated dealers. Stayed tuned for upcoming events";
 
     return Card(
       shape: RoundedRectangleBorder(

@@ -159,9 +159,10 @@ class LandlordsOnboardedInfoPage extends StatelessWidget {
                               ContractCard(
                                 icon: Icons.person,
                                 label: 'Tenant Name:',
-                                data: landlord.tenant!.isEmpty
-                                    ? 'No tenant yet'
-                                    : landlord.tenant![0].firstName ?? '',
+                                data: landlord.tenant == null || landlord.tenant!.isEmpty
+                                ? 'No tenant yet'
+                                : landlord.tenant![0].firstName ?? '',
+
                               ),
                               SizedBox(height: 16),
                               ContractCard(
