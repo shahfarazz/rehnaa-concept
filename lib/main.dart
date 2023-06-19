@@ -25,24 +25,30 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => AuthenticationService(),
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'Rehnaa',
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
+    return GestureDetector(
+      onHorizontalDragUpdate: (details) {
+        // Check if the user is swiping from the left edge
+        if (details.delta.dx < 0) {
+          // Disable the pop gesture by consuming the event
+          return;
+        }
+      },
+      child: ChangeNotifierProvider(
+        create: (context) => AuthenticationService(),
+        child: MaterialApp(
+          debugShowCheckedModeBanner: false,
+          title: 'Rehnaa',
+          theme: ThemeData(
+            primarySwatch: Colors.blue,
+          ),
+          home: LandlordDashboardPage(
+            uid: 'R88XI7AqrOZBtGZzQwgyX2Wr7Yz1',
+          ),
+          // home: const SplashScreen(),
+          // home: TenantDashboardPage(
+          //   uid: 'K55YzmkUXt09OgFwnDuT',
+          // ), //TODO remove this Jugaar
         ),
-        // home: LandlordDashboardPage(
-        //   uid: 'R88XI7AqrOZBtGZzQwgyX2Wr7Yz1',
-        // ),
-        // home: const SplashScreen(),
-        home: TenantDashboardPage(
-            uid: 'K55YzmkUXt09OgFwnDuT'), //TODO remove this Jugaar
-        // home: DealerDashboardPage(
-        //   uid: 'fUuFmW7bNaweyP5xkc4c',
-        // ),
-        // home: TenantProfilePage(uid: 'K55YzmkUXt09OgFwnDuT'),
       ),
     );
   }
