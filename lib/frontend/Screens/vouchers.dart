@@ -180,7 +180,7 @@ class VouchersPage extends StatelessWidget {
   itemBuilder: (context, index) {
     Voucher voucher = vouchersList[index];
     return Padding(
-      padding: const EdgeInsets.only(right: 16.0),
+      padding: const EdgeInsets.only(right: 0),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(20.0),
         child: Card(
@@ -224,6 +224,7 @@ class VouchersPage extends StatelessWidget {
   }
 
 }
+
 class ExpandedImageDialog extends StatelessWidget {
   final ImageProvider imageProvider;
 
