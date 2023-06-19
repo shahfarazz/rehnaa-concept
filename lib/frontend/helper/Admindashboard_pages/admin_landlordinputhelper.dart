@@ -124,32 +124,32 @@ class _LandlordCardWidgetState extends State<LandlordCardWidget> {
       return;
     }
 
-    if (accountNumberController.text.length != 16) {
-      // Display error message or perform necessary actions for invalid bank account number
-      // For example, show a snackbar or toast with an error message
-      Fluttertoast.showToast(
-        msg:
-            'Please enter a valid bank account number (20 alphanumeric characters).',
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.CENTER,
-        backgroundColor: Colors.red,
-        textColor: Colors.white,
-      );
-      return;
-    }
+    // if (accountNumberController.text.length != 16) {
+    //   // Display error message or perform necessary actions for invalid bank account number
+    //   // For example, show a snackbar or toast with an error message
+    //   Fluttertoast.showToast(
+    //     msg:
+    //         'Please enter a valid bank account number (16 numbers).',
+    //     toastLength: Toast.LENGTH_SHORT,
+    //     gravity: ToastGravity.CENTER,
+    //     backgroundColor: Colors.red,
+    //     textColor: Colors.white,
+    //   );
+    //   return;
+    // }
 
-    if (ibanController.text.length != 24) {
-      // Display error message or perform necessary actions for invalid IBAN
-      // For example, show a snackbar or toast with an error message
-      Fluttertoast.showToast(
-        msg: 'Please enter a valid IBAN (24 alphanumeric characters).',
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.CENTER,
-        backgroundColor: Colors.red,
-        textColor: Colors.white,
-      );
-      return;
-    }
+    // if (ibanController.text.length != 24) {
+    //   // Display error message or perform necessary actions for invalid IBAN
+    //   // For example, show a snackbar or toast with an error message
+    //   Fluttertoast.showToast(
+    //     msg: 'Please enter a valid IBAN (24 alphanumeric characters).',
+    //     toastLength: Toast.LENGTH_SHORT,
+    //     gravity: ToastGravity.CENTER,
+    //     backgroundColor: Colors.red,
+    //     textColor: Colors.white,
+    //   );
+    //   return;
+    // }
 
     // All inputs are valid, proceed with submission
     handleSubmit();

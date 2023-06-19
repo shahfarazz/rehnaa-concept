@@ -799,10 +799,14 @@ class _PropertyCardWidgetState extends State<PropertyCardWidget> {
                           await uploadImages();
 
                           //upload property details to firebase// random doc id
-                          await FirebaseFirestore.instance
-                              .collection('Properties')
-                              .doc()
-                              .set({
+                          // get that random doc id below
+                          DocumentReference<Map<String, dynamic>> propertyRef =
+                              FirebaseFirestore.instance
+                                  .collection('Properties')
+                                  .doc();
+
+                          //set the values of propertyref
+                          await propertyRef.set({
                             'imagePath': imagePath,
                             'type': type,
                             'beds': beds,
@@ -821,6 +825,12 @@ class _PropertyCardWidgetState extends State<PropertyCardWidget> {
                             'tenantRating': tenantRating,
                             'tenantReview': tenantReview,
                           }, SetOptions(merge: true));
+
+                          // set landlord's property ref to the new property ref above
+                          await landlordRef!.update({
+                            'propertyRef': FieldValue.arrayUnion(
+                                [propertyRef as DocumentReference])
+                          });
 
                           setState(() {
                             uploading =
