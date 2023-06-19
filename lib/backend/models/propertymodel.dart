@@ -47,6 +47,7 @@ class Property {
   });
 
   static Property fromJson(Map<String, dynamic> json) {
+    // print("json is $json");
     Property property = Property(
       imagePath: List<String>.from(json['imagePath']),
       type: json['type'],
@@ -66,6 +67,7 @@ class Property {
       tenantReview: json['tenantReview'],
       address: json['address'] ?? 'No address provided',
       tenantRef: json['tenantRef'],
+      landlord: json['landlord'],
     );
 
     return property;

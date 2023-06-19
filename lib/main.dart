@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
+import 'package:rehnaa/frontend/Screens/Landlord/landlord_dashboard.dart';
 import 'package:rehnaa/frontend/Screens/login_page.dart';
 import 'package:rehnaa/frontend/Screens/signup_page.dart';
 import 'backend/services/authentication_service.dart';
@@ -32,8 +33,10 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        // home: LoginPage(),
-        home: const SplashScreen(),
+        home: LandlordDashboardPage(
+          uid: 'R88XI7AqrOZBtGZzQwgyX2Wr7Yz1',
+        ),
+        // home: const SplashScreen(),
         // home: TenantDashboardPage(
         // uid: 'K55YzmkUXt09OgFwnDuT'), //TODO remove this Jugaar
         // home: DealerDashboardPage(
