@@ -33,10 +33,10 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        home: LandlordDashboardPage(
-          uid: 'R88XI7AqrOZBtGZzQwgyX2Wr7Yz1',
-        ),
-        // home: const SplashScreen(),
+        // home: LandlordDashboardPage(
+        //   uid: 'R88XI7AqrOZBtGZzQwgyX2Wr7Yz1',
+        // ),
+        home: const SplashScreen(),
         // home: TenantDashboardPage(
         // uid: 'K55YzmkUXt09OgFwnDuT'), //TODO remove this Jugaar
         // home: DealerDashboardPage(

@@ -24,7 +24,7 @@ class PrivacyPolicyPage extends StatelessWidget {
       body: Stack(
         children: [
           Positioned(
-            top: 40.0,
+            top: 65.0,
             left: 10.0,
             child: GestureDetector(
               onTap: () {
@@ -120,13 +120,13 @@ Widget buildTextCard() {
       child: SelectableText.rich(
         TextSpan(
           children: <TextSpan>[
-            TextSpan(
-              text: 'Privacy Policy Rehnaa.pk\n\n',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-              ),
-            ),
+            // TextSpan(
+            //   text: 'Privacy Policy Rehnaa.pk\n\n',
+            //   style: TextStyle(
+            //     fontWeight: FontWeight.bold,
+            //     fontSize: 16,
+            //   ),
+            // ),
             TextSpan(
               text:
                   'At Rehnaa, we are committed to protecting the privacy and personal information of our users. This Privacy Policy outlines how we collect, use, disclose, and safeguard the information you provide when using our rental platform ("Platform"). By accessing or using the Platform, you agree to the terms of this Privacy Policy.\n\n',

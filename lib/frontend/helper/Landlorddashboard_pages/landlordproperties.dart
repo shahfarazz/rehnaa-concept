@@ -142,11 +142,8 @@ class _LandlordPropertiesPageState extends State<LandlordPropertiesPage>
         } else {
           return Scaffold(
             backgroundColor: const Color.fromARGB(255, 255, 255, 255),
-            body: ListView.builder(
-              itemCount: snapshot.data!.length,
-              itemBuilder: (context, index) {
-                DocumentSnapshot<Map<String, dynamic>> propertySnapshot =
-                    snapshot.data![index];
+            body: ListView(
+              children: snapshot.data!.map((propertySnapshot) {
                 Property property = Property.fromJson(
                     propertySnapshot.data() as Map<String, dynamic>);
 
@@ -156,6 +153,9 @@ class _LandlordPropertiesPageState extends State<LandlordPropertiesPage>
                   lastName: lastName ?? '',
                   pathToImage:
                       property.landlord?.pathToImage ?? 'assets/userimage.png',
+                  location: property.location,
+                  address: property.address,
+                  type: property.type,
                   onTap: () {
                     Navigator.push(
                       context,
@@ -173,7 +173,7 @@ class _LandlordPropertiesPageState extends State<LandlordPropertiesPage>
                     );
                   },
                 );
-              },
+              }).toList(),
             ),
           );
         }
@@ -188,6 +188,9 @@ class PropertyCard extends StatelessWidget {
   final String lastName;
   final String? pathToImage;
   final VoidCallback onTap;
+  final String location;
+  final String address;
+  final String type;
 
   const PropertyCard({
     super.key,
@@ -196,6 +199,9 @@ class PropertyCard extends StatelessWidget {
     required this.lastName,
     required this.pathToImage,
     required this.onTap,
+    required this.location,
+    required this.address,
+    required this.type,
   });
 
   @override
@@ -213,7 +219,7 @@ class PropertyCard extends StatelessWidget {
           width: screenWidth *
               0.4, // Adjust the width as a fraction of the screen width
           height: screenHeight *
-              0.35, // Adjust the height as a fraction of the screen height
+              0.37, // Adjust the height as a fraction of the screen height
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -243,6 +249,12 @@ class PropertyCard extends StatelessWidget {
                         fontWeight: FontWeight.bold,
                         color: const Color(0xFF33907C),
                       ),
+                    ),
+                    SizedBox(height: screenHeight * 0.005),
+
+                    Text(
+                      '$location\n$address',
+                      style: TextStyle(fontSize: screenWidth * 0.035),
                     ),
                     SizedBox(height: screenHeight * 0.01),
                     Row(
@@ -277,8 +289,14 @@ class PropertyCard extends StatelessWidget {
                           '$firstName $lastName',
                           style: TextStyle(fontSize: screenWidth * 0.035),
                         ),
+                        SizedBox(width: screenWidth * 0.01),
+                        Text(
+                          '($type)',
+                          style: TextStyle(fontSize: screenWidth * 0.035),
+                        ),
                       ],
                     ),
+                    // SizedBox(height: 10),
                   ],
                 ),
               ),
