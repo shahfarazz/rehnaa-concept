@@ -432,7 +432,10 @@ class _TenantProfilePageState extends State<TenantProfilePage> {
                                                                       context);
                                                                 },
                                                                 child: Text(
-                                                                    'Cancel')),
+                                                                    'Cancel',
+                                                                    style: TextStyle(
+                                                                        color: Colors
+                                                                            .green))),
                                                             TextButton(
                                                                 onPressed: () {
                                                                   changePassword(
@@ -443,7 +446,13 @@ class _TenantProfilePageState extends State<TenantProfilePage> {
                                                                   // Navigator.pop(context);
                                                                 },
                                                                 child: Text(
-                                                                    'Change'))
+                                                                  'Change',
+                                                                  style:
+                                                                      TextStyle(
+                                                                    color: Colors
+                                                                        .green,
+                                                                  ),
+                                                                ))
                                                           ],
                                                         );
                                                       },

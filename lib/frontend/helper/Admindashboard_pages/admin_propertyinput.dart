@@ -498,12 +498,12 @@ class _PropertyCardWidgetState extends State<PropertyCardWidget> {
         TaskSnapshot storageSnapshot = await uploadTask;
         String imageUrl = await storageSnapshot.ref.getDownloadURL();
 
-        setState(() {
-          imagePath.add(imageUrl);
-        });
-
-        return;
+        imagePath.add(imageUrl);
       }
+
+      setState(() {
+        imagePath = imagePath;
+      });
     }
   }
 
