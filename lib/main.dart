@@ -36,9 +36,9 @@ class MyApp extends StatelessWidget {
         // home: LandlordDashboardPage(
         //   uid: 'R88XI7AqrOZBtGZzQwgyX2Wr7Yz1',
         // ),
-        home: const SplashScreen(),
-        // home: TenantDashboardPage(
-        // uid: 'K55YzmkUXt09OgFwnDuT'), //TODO remove this Jugaar
+        // home: const SplashScreen(),
+        home: TenantDashboardPage(
+            uid: 'K55YzmkUXt09OgFwnDuT'), //TODO remove this Jugaar
         // home: DealerDashboardPage(
         //   uid: 'fUuFmW7bNaweyP5xkc4c',
         // ),

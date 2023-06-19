@@ -14,6 +14,7 @@ import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenant_renthistory.
 import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenant_dashboard_content.dart';
 import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenantmonthlyrentoff.dart';
 
+import '../../helper/Tenantdashboard_pages/tenant_rented_property.dart';
 import '../privacypolicy.dart';
 import '../login_page.dart';
 
@@ -405,6 +406,21 @@ class _DashboardPageState extends State<TenantDashboardPage>
                           MaterialPageRoute(
                             builder: (context) => const ContractPage(
                               identifier: 'Tenant',
+                            ),
+                          ),
+                        );
+                        // _closeSidebar();
+                      },
+                    ),
+                    _buildSidebarItem(
+                      icon: Icons.home_work_sharp,
+                      label: 'Rented Properties',
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => TenantRentedPropertyPage(
+                              uid: widget.uid,
                             ),
                           ),
                         );
