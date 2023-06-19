@@ -24,7 +24,7 @@ class PrivacyPolicyPage extends StatelessWidget {
       body: Stack(
         children: [
           Positioned(
-            top: 40.0,
+            top: 65.0,
             left: 10.0,
             child: GestureDetector(
               onTap: () {

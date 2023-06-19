@@ -169,7 +169,7 @@ class PropertyCarousel extends StatelessWidget {
           ),
         ),
         Positioned(
-          top: 30,
+          top: 65,
           left: 10,
           child: Container(
             height: 40,
@@ -789,7 +789,7 @@ class _ExpandedImagePageState extends State<ExpandedImagePage> {
             ),
           ),
           Positioned(
-            top: 30.0,
+            top: 65.0,
             left: 10.0,
             child: GestureDetector(
               onTap: () {
