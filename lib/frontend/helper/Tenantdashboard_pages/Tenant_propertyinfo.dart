@@ -6,6 +6,8 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:rehnaa/frontend/Screens/Tenant/tenant_dashboard.dart';
 import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenant_dashboard_content.dart';
+import 'package:photo_view/photo_view.dart';
+
 
 import '../../../backend/models/propertymodel.dart';
 import '../../../backend/models/tenantsmodel.dart';
@@ -120,7 +122,7 @@ class PropertyCarousel extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => ExpandedImagePage(imagePath: imagePath),
+                        builder: (_) => ExpandedImageDialog(imageProvider: imagePath),
                       ),
                     );
                   },
@@ -169,7 +171,7 @@ class PropertyCarousel extends StatelessWidget {
           ),
         ),
         Positioned(
-          top: 30,
+          top: 65,
           left: 10,
           child: Container(
             height: 40,
@@ -731,65 +733,36 @@ class GradientButton extends StatelessWidget {
   }
 }
 
-class ExpandedImagePage extends StatefulWidget {
-  final String imagePath;
 
-  const ExpandedImagePage({super.key, required this.imagePath});
+class ExpandedImageDialog extends StatelessWidget {
+  final String imageProvider;
 
-  @override
-  // ignore: library_private_types_in_public_api
-  _ExpandedImagePageState createState() => _ExpandedImagePageState();
-}
-
-class _ExpandedImagePageState extends State<ExpandedImagePage> {
-  double _scale = 1.0;
-  double _previousScale = 1.0;
-  Offset _previousOffset = Offset.zero;
-  Offset _offset = Offset.zero;
+  const ExpandedImageDialog({Key? key, required this.imageProvider})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white, // Set the background color to white
-      body: Stack(
+    return Dialog(
+      insetPadding: EdgeInsets.zero,
+      child: Stack(
         children: [
-          GestureDetector(
-            onTap: () {
-              // Do nothing when tapped on the image
-            },
-            onScaleStart: (ScaleStartDetails details) {
-              _previousScale = _scale;
-              _previousOffset = details.focalPoint - _offset;
-            },
-            onScaleUpdate: (ScaleUpdateDetails details) {
-              setState(() {
-                _scale = (_previousScale * details.scale).clamp(1.0, 4.0);
-                _offset = details.focalPoint - _previousOffset;
-              });
-            },
-            child: Container(
-              color: Colors.white,
-              alignment: Alignment.center,
-              child: Transform.scale(
-                scale: _scale,
-                child: Transform.translate(
-                  offset: _offset,
-                  child: CachedNetworkImage(
-                    imageUrl: widget
-                        .imagePath, // TODO define a new property.iconimagepath
-
-                    placeholder: (context, url) =>
-                        const CircularProgressIndicator(),
-                    errorWidget: (context, url, error) =>
-                        const Icon(Icons.error),
-                    fit: BoxFit.cover,
-                  ),
-                ),
+          Container(
+            constraints: const BoxConstraints.expand(),
+            child: PhotoView(
+              imageProvider: CachedNetworkImageProvider(imageProvider),
+              backgroundDecoration: BoxDecoration(
+                color: Colors.transparent,
               ),
+              minScale: PhotoViewComputedScale.contained * 1.0,
+              maxScale: PhotoViewComputedScale.covered * 2.0,
+              initialScale: PhotoViewComputedScale.contained,
+              basePosition: Alignment.center,
+              heroAttributes: const PhotoViewHeroAttributes(tag: "someTag"),
+              customSize: MediaQuery.of(context).size,
             ),
           ),
           Positioned(
-            top: 30.0,
+            top: 40.0,
             left: 10.0,
             child: GestureDetector(
               onTap: () {

@@ -126,6 +126,9 @@ class _TenantPropertiesPageState extends State<TenantPropertiesPage>
                   property: properties[index],
                   firstName: properties[index].landlord?.firstName ?? '',
                   lastName: properties[index].landlord?.lastName ?? '',
+                  location: properties[index].location,
+                  address: properties[index].address,
+                  type: properties[index].type,
                   pathToImage: properties[index].landlord?.pathToImage ??
                       'assets/userimage.png',
                   onTap: () {
@@ -165,6 +168,9 @@ class PropertyCard extends StatelessWidget {
   final String lastName;
   final String? pathToImage;
   final VoidCallback onTap;
+  final String location;
+  final String address;
+  final String type;
 
   const PropertyCard({
     super.key,
@@ -173,6 +179,9 @@ class PropertyCard extends StatelessWidget {
     required this.lastName,
     required this.pathToImage,
     required this.onTap,
+    required this.location,
+    required this.address,
+    required this.type,
   });
 
   @override
@@ -188,7 +197,7 @@ class PropertyCard extends StatelessWidget {
           width: screenWidth *
               0.4, // Adjust the width as a fraction of the screen width
           height: screenHeight *
-              0.35, // Adjust the height as a fraction of the screen height
+              0.37, // Adjust the height as a fraction of the screen height
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -201,7 +210,9 @@ class PropertyCard extends StatelessWidget {
                       .imagePath[0], // TODO define a new property.iconimagepath
 
                   placeholder: (context, url) =>
-                      const CircularProgressIndicator(),
+                      const CircularProgressIndicator(
+                    color: Color(0xFF33907C),
+                  ),
                   errorWidget: (context, url, error) => const Icon(Icons.error),
                   fit: BoxFit.cover,
                 ),
@@ -219,6 +230,12 @@ class PropertyCard extends StatelessWidget {
                         color: const Color(0xFF33907C),
                       ),
                     ),
+                     SizedBox(height: screenHeight * 0.005),
+                    
+                    Text(
+                          '$location\n$address',
+                          style: TextStyle(fontSize: screenWidth * 0.035),
+                        ),
                     SizedBox(height: screenHeight * 0.01),
                     Row(
                       children: [
@@ -250,6 +267,11 @@ class PropertyCard extends StatelessWidget {
                         SizedBox(width: screenWidth * 0.01),
                         Text(
                           '$firstName $lastName',
+                          style: TextStyle(fontSize: screenWidth * 0.035),
+                        ),
+                        SizedBox(width: screenWidth * 0.01),
+                        Text(
+                          '($type)',
                           style: TextStyle(fontSize: screenWidth * 0.035),
                         ),
                       ],

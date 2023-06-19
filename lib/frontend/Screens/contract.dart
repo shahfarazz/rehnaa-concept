@@ -103,12 +103,12 @@ class MyScreen extends StatelessWidget {
                       SafeArea(
                         child: Container(
                           alignment: Alignment.topLeft,
-                          padding: const EdgeInsets.all(16.0),
+                          padding: const EdgeInsets.all(20.0),
                           // child: Text('Your Content'),
                         ),
                       ),
                       Positioned(
-                        top: 10.0,
+                        top: 30.0,
                         left: 10.0,
                         child: GestureDetector(
                           onTap: () {
@@ -401,7 +401,7 @@ class _ZoomedScreenState extends State<ZoomedScreen> {
                 ),
               ),
               Positioned(
-                top: 40.0,
+                top: 65.0,
                 left: 10.0,
                 child: GestureDetector(
                   onTap: () {

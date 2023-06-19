@@ -536,7 +536,7 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
               stream: _notificationStream2,
               builder: (BuildContext context,
                   AsyncSnapshot<DocumentSnapshot> snapshot) {
-                print('snapshot: $snapshot');
+                // print('snapshot: $snapshot');
                 if (snapshot.hasData && snapshot.data != null) {
                   Map<String, dynamic>? data =
                       snapshot.data!.data() as Map<String, dynamic>?;
@@ -870,12 +870,14 @@ class HexagonClipper extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {
     final path = Path();
+    final double controlPointOffset = size.height / 6;
+
     path.moveTo(size.width / 2, 0);
-    path.lineTo(size.width, size.height / 4);
-    path.lineTo(size.width, size.height * 3 / 4);
+    path.lineTo(size.width, size.height / 2 - controlPointOffset);
+    path.lineTo(size.width, size.height / 2 + controlPointOffset);
     path.lineTo(size.width / 2, size.height);
-    path.lineTo(0, size.height * 3 / 4);
-    path.lineTo(0, size.height / 4);
+    path.lineTo(0, size.height / 2 + controlPointOffset);
+    path.lineTo(0, size.height / 2 - controlPointOffset);
     path.close();
     return path;
   }

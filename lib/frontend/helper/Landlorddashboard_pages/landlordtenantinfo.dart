@@ -38,7 +38,7 @@ class LandlordTenantInfoPage extends StatelessWidget {
                 ),
               ),
               Positioned(
-                top: 40.0,
+                top: 65.0,
                 left: 10.0,
                 child: GestureDetector(
                   onTap: () {

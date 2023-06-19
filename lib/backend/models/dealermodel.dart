@@ -4,18 +4,26 @@ import 'package:rehnaa/backend/models/landlordmodel.dart';
 class Dealer {
   final String firstName;
   final String lastName;
+  final double balance;
+  String? pathToImage;
+
   final List<DocumentReference<Map<String, dynamic>>>? landlordRef;
 
   Dealer({
     required this.firstName,
     required this.lastName,
+    required this.balance,
     this.landlordRef,
+    this.pathToImage,
   });
 
   factory Dealer.fromJson(Map<String, dynamic> json) {
     return Dealer(
       firstName: json['firstName'],
       lastName: json['lastName'],
+      balance: json['balance'] != null ? json['balance'].toDouble() : 0.0,
+
+      pathToImage: json['pathToImage'] ?? 'assets/defaulticon.png',
       landlordRef: json['landlordRef'] != null
           ? List<DocumentReference<Map<String, dynamic>>>.from(
               json['landlordRef'].map((ref) => ref as DocumentReference))

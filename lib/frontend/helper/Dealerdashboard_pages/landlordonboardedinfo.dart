@@ -70,7 +70,7 @@ class LandlordsOnboardedInfoPage extends StatelessWidget {
       body: Stack(
         children: [
           Positioned(
-            top: 40.0,
+            top: 65.0,
             left: 10.0,
             child: GestureDetector(
               onTap: () {
@@ -159,9 +159,10 @@ class LandlordsOnboardedInfoPage extends StatelessWidget {
                               ContractCard(
                                 icon: Icons.person,
                                 label: 'Tenant Name:',
-                                data: landlord.tenant!.isEmpty
-                                    ? 'No tenant yet'
-                                    : landlord.tenant![0].firstName ?? '',
+                                data: landlord.tenant == null || landlord.tenant!.isEmpty
+                                ? 'No tenant yet'
+                                : landlord.tenant![0].firstName ?? '',
+
                               ),
                               SizedBox(height: 16),
                               ContractCard(
@@ -263,7 +264,7 @@ class ExpandedImageDialog extends StatelessWidget {
             ),
           ),
           Positioned(
-            top: 10.0,
+            top: 65.0,
             left: 10.0,
             child: GestureDetector(
               onTap: () {

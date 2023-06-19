@@ -1,6 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:http/http.dart' as http;
+import 'dart:typed_data';
+import 'package:photo_view/photo_view.dart';
+
 
 void main() {
   runApp(const MyApp());
@@ -19,32 +23,37 @@ class MyApp extends StatelessWidget {
 
 class Voucher {
   final String url;
+  final ImageProvider imageProvider;
   final firebase_storage.Reference ref;
 
-  Voucher(this.url, this.ref);
+  Voucher(this.url, this.ref, this.imageProvider);
 }
+
+
 
 class VouchersPage extends StatelessWidget {
   const VouchersPage({Key? key}) : super(key: key);
 
   Future<List<Voucher>> fetchVouchers() async {
-    try {
-      firebase_storage.ListResult listResult = await firebase_storage
-          .FirebaseStorage.instance
-          .ref('images/vouchers/')
-          .listAll();
-      List<Voucher> vouchersList = [];
-      for (var ref in listResult.items) {
-        String url = await ref.getDownloadURL();
-        vouchersList.add(Voucher(url, ref));
-      }
-      return vouchersList;
-    } catch (error) {
-      print('Error fetching vouchers: $error');
-
-      return [];
+  try {
+    firebase_storage.ListResult listResult = await firebase_storage
+        .FirebaseStorage.instance
+        .ref('images/vouchers/')
+        .listAll();
+    List<Voucher> vouchersList = [];
+    for (var ref in listResult.items) {
+      String url = await ref.getDownloadURL();
+      final response = await http.get(Uri.parse(url));
+      Uint8List imageData = response.bodyBytes;
+      vouchersList.add(Voucher(url, ref, MemoryImage(imageData)));
     }
+    return vouchersList;
+  } catch (error) {
+    print('Error fetching vouchers: $error');
+    return [];
   }
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -52,7 +61,7 @@ class VouchersPage extends StatelessWidget {
       body: Stack(
         children: [
           Positioned(
-            top: 40.0,
+            top: 65.0,
             left: 10.0,
             child: GestureDetector(
               onTap: () {
@@ -146,6 +155,8 @@ class VouchersPage extends StatelessWidget {
     return result.items.length;
   }
 
+  
+
   Widget buildRoundedImageCards(BuildContext context) {
     return FutureBuilder<List<Voucher>>(
       future: fetchVouchers(),
@@ -163,48 +174,61 @@ class VouchersPage extends StatelessWidget {
         return SizedBox(
           height: size.height * 0.8,
           child: ListView.builder(
-            scrollDirection: Axis.vertical,
-            itemCount: vouchersList.length,
-            shrinkWrap: true, // Add this line
-            itemBuilder: (context, index) {
-              Voucher voucher = vouchersList[index];
-              return Padding(
-                padding: const EdgeInsets.only(right: 16.0),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(20.0),
-                  child: Card(
-                    child: SizedBox(
-                      width: 200,
-                      height: 200,
-                      child: CachedNetworkImage(
-                        //add a progress indicator here not circular
-                        progressIndicatorBuilder: (context, url, progress) =>
-                            Center(
-                          child: progress == null
-                              ? CircularProgressIndicator()
-                              : LinearProgressIndicator(
-                                  value: progress.progress,
-                                ),
-                        ),
-                        imageUrl: voucher.url,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  ),
+  scrollDirection: Axis.vertical,
+  itemCount: vouchersList.length,
+  shrinkWrap: true, 
+  itemBuilder: (context, index) {
+    Voucher voucher = vouchersList[index];
+    return Padding(
+      padding: const EdgeInsets.only(right: 0),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20.0),
+        child: Card(
+          child: GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>ExpandedImageDialog(imageProvider: voucher.imageProvider),
+
                 ),
               );
             },
+            child: SizedBox(
+              width: 200,
+              height: 200,
+              child: CachedNetworkImage(
+                //add a progress indicator here not circular
+                progressIndicatorBuilder: (context, url, progress) =>
+                    Center(
+                  child: progress == null
+                      ? CircularProgressIndicator()
+                      : LinearProgressIndicator(
+                          value: progress.progress,
+                        ),
+                ),
+                imageUrl: voucher.url,
+                fit: BoxFit.cover,
+              ),
+            ),
           ),
+        ),
+      ),
+    );
+  },
+),
+
         );
       },
     );
   }
+
 }
 
 class ExpandedImageDialog extends StatelessWidget {
-  final String imagePath;
+  final ImageProvider imageProvider;
 
-  const ExpandedImageDialog({Key? key, required this.imagePath})
+  const ExpandedImageDialog({Key? key, required this.imageProvider})
       : super(key: key);
 
   @override
@@ -215,18 +239,21 @@ class ExpandedImageDialog extends StatelessWidget {
         children: [
           Container(
             constraints: const BoxConstraints.expand(),
-            child: InteractiveViewer(
-              boundaryMargin: const EdgeInsets.all(20),
-              minScale: 0.5,
-              maxScale: 5.0,
-              child: Image.asset(
-                imagePath,
-                fit: BoxFit.contain,
+            child: PhotoView(
+              imageProvider: imageProvider,
+              backgroundDecoration: BoxDecoration(
+                color: Colors.transparent,
               ),
+              minScale: PhotoViewComputedScale.contained * 1.0,
+              maxScale: PhotoViewComputedScale.covered * 2.0,
+              initialScale: PhotoViewComputedScale.contained,
+              basePosition: Alignment.center,
+              heroAttributes: const PhotoViewHeroAttributes(tag: "someTag"),
+              customSize: MediaQuery.of(context).size,
             ),
           ),
           Positioned(
-            top: 10.0,
+            top: 40.0,
             left: 10.0,
             child: GestureDetector(
               onTap: () {

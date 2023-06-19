@@ -1,6 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:rehnaa/backend/services/authentication_service.dart';
+
+import '../../Screens/signup_page.dart';
 
 class LandlordProfilePage extends StatefulWidget {
   final String uid;
@@ -14,6 +18,125 @@ class LandlordProfilePage extends StatefulWidget {
 class _LandlordProfilePageState extends State<LandlordProfilePage> {
   bool showAdditionalSettings = false;
   bool showChangePassword = false;
+  bool _obscurePassword = true; // Track whether the password is obscured or not
+  bool _obscurePassword2 =
+      true; // Track whether the password is obscured or not
+  //define two new controllers for the password fields
+  final TextEditingController _oldPasswordController = TextEditingController();
+  final TextEditingController _newPasswordController = TextEditingController();
+
+  Future<void> changePassword(String oldPassword, String newPassword) async {
+    try {
+      //show green loading indicator
+      showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              content: Row(
+                children: [
+                  const CircularProgressIndicator(
+                    color: Colors.green,
+                  ),
+                  const SizedBox(
+                    width: 20,
+                  ),
+                  const Text('Changing password...'),
+                ],
+              ),
+            );
+          });
+      User? user = FirebaseAuth.instance.currentUser;
+
+      //check if user is signed up using mobile number or email
+      FirebaseFirestore.instance
+          .collection('users')
+          .doc(user?.uid)
+          .get()
+          .then((value) async {
+        String emailOrPhone = value['emailOrPhone'];
+        if (emailOrPhone == null) {
+          //show toast that there is no email or phone number associated with this account
+          Fluttertoast.showToast(
+              msg:
+                  'There is no email or phone number associated with this account',
+              toastLength: Toast.LENGTH_LONG,
+              gravity: ToastGravity.BOTTOM,
+              timeInSecForIosWeb: 1,
+              backgroundColor: Colors.red,
+              textColor: Colors.white,
+              fontSize: 16.0);
+        }
+        if (emailOrPhone.contains('@')) {
+          //user signed up using email
+          print(
+              'user signed up using email is $emailOrPhone ,password is $oldPassword, new pass is $newPassword');
+
+          if (user != null) {
+            // Reauthenticate the user with their old password
+            AuthCredential credential = EmailAuthProvider.credential(
+              email: user.email!,
+              password: oldPassword,
+            );
+            await user.reauthenticateWithCredential(credential);
+
+            // Change the user's password
+            await user.updatePassword(newPassword);
+            //show toast
+            Fluttertoast.showToast(
+                msg: 'Password changed successfully',
+                toastLength: Toast.LENGTH_LONG,
+                gravity: ToastGravity.BOTTOM,
+                timeInSecForIosWeb: 1,
+                backgroundColor: Colors.green,
+                textColor: Colors.white,
+                fontSize: 16.0);
+          } else {
+            print('No user signed in');
+          }
+        } else {
+          //user signed up using mobile number
+          print('user signed up using mobile number');
+          String hashPassword = hashString(oldPassword);
+          //check firebase firestore users collecion to get hashed password
+          // stored in password field
+          FirebaseFirestore.instance
+              .collection('users')
+              .doc(user?.uid)
+              .get()
+              .then((value) async {
+            String password = value['password'];
+            if (password == hashPassword) {
+              //user entered correct old password
+              //update password in firebase firestore
+              String newHashPassword = hashString(newPassword);
+              await FirebaseFirestore.instance
+                  .collection('users')
+                  .doc(user?.uid)
+                  .update({'password': newHashPassword});
+              print('Password changed successfully');
+            } else {
+              //user entered wrong old password
+              print('user entered wrong old password');
+              Fluttertoast.showToast(
+                  msg: 'Wrong old password entered',
+                  toastLength: Toast.LENGTH_LONG,
+                  gravity: ToastGravity.BOTTOM,
+                  timeInSecForIosWeb: 1,
+                  backgroundColor: Colors.red,
+                  textColor: Colors.white,
+                  fontSize: 16.0);
+            }
+          });
+        }
+        Navigator.of(context).pop();
+        Navigator.of(context).pop();
+      });
+    } catch (e) {
+      print('Error changing password: $e');
+      Navigator.of(context).pop();
+      Navigator.of(context).pop();
+    }
+  }
 
   void toggleAdditionalSettings() {
     setState(() {
@@ -32,7 +155,10 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
     final authService = AuthenticationService();
     return Scaffold(
       body: FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-        future: FirebaseFirestore.instance.collection('Landlords').doc(widget.uid).get(),
+        future: FirebaseFirestore.instance
+            .collection('Landlords')
+            .doc(widget.uid)
+            .get(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             // While data is being fetched, show a loading indicator
@@ -119,170 +245,237 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
                   title: isEmail ? 'Email' : 'Contact',
                   subtitle: contactInfo,
                 ),
-               const ProfileInfoItem(
+                const ProfileInfoItem(
                   icon: Icons.location_on,
                   title: 'Location',
                   subtitle: 'Lahore, Punjab',
                 ),
-                GestureDetector(
-                  onTap: toggleChangePassword,
-                  child: Row(
-                    children: [
-                      const SizedBox(width: 17, height: 60),
-                      Icon(
-                        Icons.settings,
-                        color: Colors.grey[600],
-                      ),
-                      const SizedBox(width: 31),
-                      Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const SizedBox(height: 18),
-                          const Text(
-                            'Additional Settings',
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
-                            ),
+                StatefulBuilder(
+                  builder: (BuildContext context, StateSetter setState) {
+                    return Column(
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              showChangePassword = !showChangePassword;
+                            });
+                          },
+                          child: Row(
+                            children: [
+                              const SizedBox(width: 17, height: 60),
+                              Icon(
+                                Icons.settings,
+                                color: Colors.grey[600],
+                              ),
+                              const SizedBox(width: 31),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const SizedBox(height: 18),
+                                    const Text(
+                                      'Additional Settings',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      'Click to access additional settings',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.grey[700],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              SizedBox(
+                                height: 20,
+                                child: LayoutBuilder(
+                                  builder: (context, constraints) {
+                                    return AnimatedSwitcher(
+                                      duration:
+                                          const Duration(milliseconds: 200),
+                                      transitionBuilder: (child, animation) {
+                                        final height = constraints.maxHeight;
+                                        return ScaleTransition(
+                                          scale: CurvedAnimation(
+                                            parent: animation,
+                                            curve: Curves.easeInOut,
+                                          ),
+                                          child: child,
+                                        );
+                                      },
+                                      child: showChangePassword
+                                          ? const Icon(
+                                              Icons.arrow_drop_up,
+                                              color: Colors.grey,
+                                              key: Key('arrow_up'),
+                                            )
+                                          : const Icon(
+                                              Icons.arrow_drop_down,
+                                              color: Colors.grey,
+                                              key: Key('arrow_down'),
+                                            ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            ],
                           ),
-                          const SizedBox(height: 4),
-                          Text(
-                            'Click to access additional settings',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.grey[700],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-
-                      SizedBox(
-                        height: 20,
-                        child: AnimatedSwitcher(
+                        ),
+                        AnimatedSwitcher(
                           duration: const Duration(milliseconds: 200),
                           transitionBuilder: (child, animation) {
-                            return ScaleTransition(
-                              scale: animation,
-                              child: child,
+                            return SlideTransition(
+                              position: Tween<Offset>(
+                                begin: const Offset(0, -0.5),
+                                end: Offset.zero,
+                              ).animate(animation),
+                              child: FadeTransition(
+                                opacity: animation,
+                                child: child,
+                              ),
                             );
                           },
                           child: showChangePassword
-                              ? Icon(
-                                  Icons.arrow_drop_up,
-                                  color: Colors.grey,
-                                  key: UniqueKey(),
-                                )
-                              : Icon(
-                                  Icons.arrow_drop_down,
-                                  color: Colors.grey,
-                                  key: UniqueKey(),
-                                ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                if (showChangePassword)
-                  Column(
-                    children: [
-                      const SizedBox(height: 17,width: 8,),
-                      ProfileInfoItem(
-                        icon: Icons.lock,
-                        title: 'Change Password',
-                        subtitle: 'Click to change your password',
-                        onTap: () {
-                          showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              String newPassword = '';
-
-                              return AlertDialog(
-                                title: const Text('Change Password'),
-                                content: TextField(
-                                  onChanged: (value) {
-                                    newPassword = value;
-                                  },
-                                  decoration: const InputDecoration(hintText: 'Enter new password'),
-                                ),
-                                actions: [
-                                  ElevatedButton(
-                                    onPressed: () {
-                                      // Handle password change logic here
-                                      print('New password: $newPassword');
-                                      Navigator.of(context).pop();
-                                    },
-                                    child: const Text('Save'),
-                                  ),
-                                  TextButton(
-                                    onPressed: () {
-                                      Navigator.of(context).pop();
-                                    },
-                                    child: const Text('Cancel'),
-                                  ),
-                                ],
-                              );
-                            },
-                          );
-                        },
-                      ),
-                      ProfileInfoItem(
-                        icon: Icons.delete,
-                        title: 'Delete Account',
-                        subtitle: 'Click to delete your account',
-                        onTap: () {
-                          showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              String password = '';
-
-                              return AlertDialog(
-                                title: const Text('Delete Account'),
-                                content: Column(
-                                  mainAxisSize: MainAxisSize.min,
+                              ? Column(
+                                  key: const Key('additional_settings'),
                                   children: [
-                                    const Text('Enter your password to confirm account deletion:'),
-                                    TextField(
-                                      onChanged: (value) {
-                                        password = value;
-                                      },
-                                      decoration: const InputDecoration(hintText: 'Password'),
-                                      obscureText: true,
+                                    const SizedBox(
+                                      height: 17,
+                                      width: 8,
                                     ),
-                                    if (password.isNotEmpty && password != 'correct_password')
-                                      const Text(
-                                        'Incorrect password',
-                                        style: TextStyle(color: Colors.red),
-                                      ),
+                                    ProfileInfoItem(
+                                      icon: Icons.lock,
+                                      title: 'Change Password',
+                                      subtitle: 'Click to change your password',
+                                      onTap: () {
+                                        showDialog(
+                                            context: context,
+                                            builder: (context) {
+                                              return StatefulBuilder(
+                                                builder: (BuildContext context,
+                                                    setState) {
+                                                  return AlertDialog(
+                                                    title:
+                                                        Text('Change Password'),
+                                                    content: Column(
+                                                      mainAxisSize:
+                                                          MainAxisSize.min,
+                                                      children: [
+                                                        TextField(
+                                                          controller:
+                                                              _oldPasswordController,
+                                                          obscureText:
+                                                              _obscurePassword,
+                                                          decoration:
+                                                              InputDecoration(
+                                                            labelText:
+                                                                'Old Password',
+                                                            suffixIcon:
+                                                                GestureDetector(
+                                                              onTap: () {
+                                                                setState(() {
+                                                                  _obscurePassword =
+                                                                      !_obscurePassword;
+                                                                });
+                                                              },
+                                                              child: Icon(
+                                                                _obscurePassword
+                                                                    ? Icons
+                                                                        .visibility
+                                                                    : Icons
+                                                                        .visibility_off,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        TextField(
+                                                          controller:
+                                                              _newPasswordController,
+                                                          obscureText:
+                                                              _obscurePassword2,
+                                                          decoration:
+                                                              InputDecoration(
+                                                            labelText:
+                                                                'New Password',
+                                                            suffixIcon:
+                                                                GestureDetector(
+                                                              onTap: () {
+                                                                setState(() {
+                                                                  _obscurePassword2 =
+                                                                      !_obscurePassword2;
+                                                                });
+                                                              },
+                                                              child: Icon(
+                                                                _obscurePassword2
+                                                                    ? Icons
+                                                                        .visibility
+                                                                    : Icons
+                                                                        .visibility_off,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    actions: [
+                                                      TextButton(
+                                                          onPressed: () {
+                                                            Navigator.pop(
+                                                                context);
+                                                          },
+                                                          child: Text(
+                                                            'Cancel',
+                                                            style: TextStyle(
+                                                                color: Colors
+                                                                    .green),
+                                                          )),
+                                                      TextButton(
+                                                          onPressed: () {
+                                                            changePassword(
+                                                                _oldPasswordController
+                                                                    .text,
+                                                                _newPasswordController
+                                                                    .text);
+                                                            // Navigator.pop(context);
+                                                          },
+                                                          child: Text(
+                                                            'Change',
+                                                            style: TextStyle(
+                                                                color: Colors
+                                                                    .green),
+                                                          ))
+                                                    ],
+                                                  );
+                                                },
+                                              );
+                                            });
+                                      },
+                                    ),
+                                    ProfileInfoItem(
+                                      icon: Icons.delete,
+                                      title: 'Delete Account',
+                                      subtitle: 'Click to delete your account',
+                                      onTap: () {
+                                        // Delete account logic
+                                      },
+                                    ),
                                   ],
-                                ),
-                                actions: [
-                                  ElevatedButton(
-                                    onPressed: () {
-                                      if (password == 'correct_password') {
-                                        // Handle account deletion logic here
-                                        print('Deleting account...');
-                                        Navigator.of(context).pop();
-                                      }
-                                    },
-                                    child: const Text('Delete'),
-                                  ),
-                                  TextButton(
-                                    onPressed: () {
-                                      Navigator.of(context).pop();
-                                    },
-                                    child: const Text('Cancel'),
-                                  ),
-                                ],
-                              );
-                            },
-                          );
-                        },
-                      ),
-                    ],
-                  ),
+                                )
+                              : const SizedBox(
+                                  width: 0,
+                                  height: 0,
+                                ), // Empty SizedBox
+                        ),
+                      ],
+                    );
+                  },
+                ),
               ],
             ),
           );
@@ -291,7 +484,6 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
     );
   }
 }
-
 
 class ProfileInfoItem extends StatelessWidget {
   final IconData icon;

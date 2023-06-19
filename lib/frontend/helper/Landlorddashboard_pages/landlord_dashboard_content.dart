@@ -358,7 +358,7 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
     final Size size = MediaQuery.of(context).size;
 
     if (kDebugMode) {
-      print('UID: ${widget.uid}');
+      // print('UID: ${widget.uid}');
     }
 
     return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
@@ -371,11 +371,11 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
           return Text('Error: ${snapshot.error}');
         } else if (snapshot.hasData) {
           // Convert the snapshot to JSON
-          print('Snapshot: ${snapshot.data!.data()}');
+          // print('Snapshot: ${snapshot.data!.data()}');
           Map<String, dynamic> json =
               snapshot.data!.data() as Map<String, dynamic>;
           if (kDebugMode) {
-            print('Landlord JSON: $json');
+            // print('Landlord JSON: $json');
           }
           // Use the Landlord.fromJson method to create a Landlord instance
           Landlord landlord = Landlord.fromJson(json);

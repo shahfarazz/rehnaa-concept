@@ -6,12 +6,11 @@ import 'package:rehnaa/frontend/Screens/privacypolicy.dart';
 import 'package:rehnaa/frontend/Screens/faq.dart';
 import 'package:rehnaa/frontend/Screens/login_page.dart';
 import 'package:rehnaa/frontend/Screens/vouchers.dart';
-import 'package:rehnaa/frontend/helper/Dealerdashboard_pages/dealer_profile.dart';
+import 'package:rehnaa/frontend/helper/Dealerdashboard_pages/dealer_dashboard_content.dart';
+import 'package:rehnaa/frontend/helper/Dealerdashboard_pages/dealer_renthistory.dart';
 import 'package:rehnaa/frontend/helper/Landlorddashboard_pages/landlord_dashboard_content.dart';
 import 'package:rehnaa/frontend/helper/Landlorddashboard_pages/landlord_profile.dart';
-import '../../helper/Dealerdashboard_pages/dealer_dashboard_content.dart';
-import '../../helper/Dealerdashboard_pages/dealer_renthistory.dart';
-import '../../helper/Dealerdashboard_pages/events.dart';
+import '../../helper/Dealerdashboard_pages/dealer_profile.dart';
 import '../../helper/Dealerdashboard_pages/dealerlandlordonboarded.dart';
 import '../../helper/Landlorddashboard_pages/landlord_renthistory.dart';
 import '../../helper/Landlorddashboard_pages/landlord_tenants.dart';
@@ -36,6 +35,9 @@ class _DealerDashboardPageState extends State<DealerDashboardPage>
   final _pageController = PageController();
   bool _isSidebarOpen = false;
   late AnimationController _sidebarController;
+  bool _isWithdraw = false;
+  late Stream<DocumentSnapshot<Map<String, dynamic>>> _notificationStream;
+  late Stream<DocumentSnapshot<Map<String, dynamic>>> _notificationStream2;
 
   @override
   void initState() {
@@ -44,13 +46,22 @@ class _DealerDashboardPageState extends State<DealerDashboardPage>
       vsync: this,
       duration: const Duration(milliseconds: 300),
     );
-    _getNotifs();
+    _notificationStream = FirebaseFirestore.instance
+        .collection('Notifications')
+        .doc(widget.uid)
+        .snapshots();
+    _notificationStream2 = FirebaseFirestore.instance
+        .collection('Notifications')
+        .doc(widget.uid)
+        .snapshots();
   }
 
   @override
   void dispose() {
     _pageController.dispose();
     _sidebarController.dispose();
+    _notificationStream.drain();
+    _notificationStream2.drain();
     super.dispose();
   }
 
@@ -63,38 +74,6 @@ class _DealerDashboardPageState extends State<DealerDashboardPage>
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeInOut,
     );
-  }
-
-  List<Map<String, String>> notifications = [];
-
-  Future<void> _getNotifs() async {
-    DocumentSnapshot snapshot = await FirebaseFirestore.instance
-        .collection('Notifications')
-        .doc(widget.uid)
-        .get();
-
-    if (snapshot.data() != null) {
-      Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
-
-      if (data.containsKey('notifications')) {
-        List<dynamic> notificationstemp = data['notifications'];
-
-        for (var i = 0; i < notificationstemp.length; i++) {
-          Map<String, dynamic> notification = notificationstemp[i];
-
-          String title = notification['title'] ?? '';
-          String amount = notification['amount'] ?? 0.0;
-
-          print('Title: $title');
-          print('Amount: $amount');
-
-          // Add the notification to a list or perform other operations
-          setState(() {
-            notifications.add({'title': title, 'amount': amount});
-          });
-        }
-      }
-    }
   }
 
   void _toggleSidebar() {
@@ -115,57 +94,82 @@ class _DealerDashboardPageState extends State<DealerDashboardPage>
     });
   }
 
+  void updateWithdrawState(bool isWithdraw) {
+    setState(() {
+      _isWithdraw = isWithdraw;
+    });
+  }
+
+// Method to check if the keyboard is visible
+  bool isKeyboardVisible(BuildContext context) {
+    return MediaQuery.of(context).viewInsets.bottom > 0;
+  }
+
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
     super.build(context);
     return Scaffold(
       appBar: _buildAppBar(size),
-      body: Stack(
-        children: [
-          GestureDetector(
-            onTap: () {
-              if (_isSidebarOpen) {
-                _closeSidebar();
-              }
-            },
-            child: Stack(
-              children: [
-                Transform.translate(
-                  offset: Offset(_isSidebarOpen ? size.width * 0.7 : 0, 0),
-                  child: Column(
-                    children: [
-                      Expanded(
-                        child: PageView(
-                          controller: _pageController,
-                          onPageChanged: (index) {
-                            setState(() {
-                              _currentIndex = index;
-                            });
-                          },
-                          children: <Widget>[
-                            DealerDashboardContent(
+      resizeToAvoidBottomInset:
+          false, // Prevent resizing when the keyboard is shown
+      body: GestureDetector(
+        onTap: () {
+          if (_isSidebarOpen) {
+            _closeSidebar();
+          }
+          // Close the keyboard
+          FocusScope.of(context).unfocus();
+        },
+        child: Stack(
+          children: [
+            Transform.translate(
+              offset: Offset(_isSidebarOpen ? size.width * 0.7 : 0, 0),
+              child: Column(
+                children: [
+                  Expanded(
+                    child: PageView.builder(
+                      controller: _pageController,
+                      onPageChanged: (index) {
+                        setState(() {
+                          _currentIndex = index;
+                        });
+                      },
+                      physics: isKeyboardVisible(context)
+                          ? NeverScrollableScrollPhysics()
+                          : const AlwaysScrollableScrollPhysics(),
+                      itemCount: 5, // Number of pages
+                      itemBuilder: (context, index) {
+                        switch (index) {
+                          case 0:
+                            return DealerDashboardContent(
                               uid: widget.uid,
-                            ),
-                            DealerLandlordOnboardedPage(
+                              isWithdraw: _isWithdraw,
+                              onUpdateWithdrawState: updateWithdrawState,
+                            );
+                          case 1:
+                            return DealerLandlordOnboardedPage(
                               uid: widget.uid,
-                            ),
-                            DealerRentHistoryPage(
+                            );
+                          case 2:
+                            return DealerRentHistoryPage(
                               uid: widget.uid,
-                            ),
-                            DealerProfilePage(uid: widget.uid),
-                          ],
-                        ),
-                      ),
-                      _buildBottomNavigationBar(),
-                    ],
+                            );
+                          case 3:
+                            return DealerProfilePage(uid: widget.uid);
+                          default:
+                            return Container();
+                        }
+                      },
+                    ),
                   ),
-                ),
-                if (_isSidebarOpen) _buildSidebar(size),
-              ],
+                  _buildBottomNavigationBar(),
+                ],
+              ),
             ),
-          ),
-        ],
+            if (_isSidebarOpen) _buildSidebar(size),
+          ],
+        ),
       ),
     );
   }
@@ -216,6 +220,7 @@ class _DealerDashboardPageState extends State<DealerDashboardPage>
                     'assets/mainlogo.png',
                     width: 60,
                     height: 60,
+                    fit: BoxFit.cover,
                   ),
                 ),
               ],
@@ -235,27 +240,46 @@ class _DealerDashboardPageState extends State<DealerDashboardPage>
               ),
               Positioned(
                 right: 13,
-                child: Container(
-                  padding: const EdgeInsets.all(2),
-                  decoration: BoxDecoration(
-                    color:
-                        notifications.isEmpty ? Colors.transparent : Colors.red,
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  constraints: const BoxConstraints(
-                    minWidth: 10,
-                    minHeight: 10,
-                  ),
-                  child: Text(
-                    notifications.isEmpty
-                        ? ''
-                        : notifications.length.toString(),
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 10,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
+                child: StreamBuilder<DocumentSnapshot>(
+                  stream: _notificationStream,
+                  builder: (BuildContext context,
+                      AsyncSnapshot<DocumentSnapshot> snapshot) {
+                    int notificationsCount = 0;
+
+                    if (snapshot.hasData && snapshot.data != null) {
+                      Map<String, dynamic>? data =
+                          snapshot.data!.data() as Map<String, dynamic>?;
+
+                      if (data != null && data.containsKey('notifications')) {
+                        List<dynamic> notificationstemp = data['notifications'];
+                        notificationsCount = notificationstemp.length;
+                      }
+                    }
+
+                    return Container(
+                      padding: const EdgeInsets.all(2),
+                      decoration: BoxDecoration(
+                        color: notificationsCount == 0
+                            ? Colors.transparent
+                            : Colors.red,
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      constraints: const BoxConstraints(
+                        minWidth: 10,
+                        minHeight: 10,
+                      ),
+                      child: Text(
+                        notificationsCount == 0
+                            ? ''
+                            : notificationsCount.toString(),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    );
+                  },
                 ),
               ),
             ],
@@ -391,19 +415,6 @@ class _DealerDashboardPageState extends State<DealerDashboardPage>
                       showBadge: true,
                     ),
                     _buildSidebarItem(
-                      icon: Icons.local_play,
-                      label: 'Events',
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const EventsPage(),
-                          ),
-                        );
-                        // _closeSidebar();
-                      },
-                    ),
-                    _buildSidebarItem(
                       icon: Icons.lock,
                       label: 'Privacy Policy',
                       onTap: () {
@@ -518,169 +529,304 @@ class _DealerDashboardPageState extends State<DealerDashboardPage>
             borderRadius: BorderRadius.circular(25.0),
           ),
           child: Container(
-            height: MediaQuery.of(context).size.height * 0.3,
+            height: MediaQuery.of(context).size.height * 0.37,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(25.0),
             ),
-            child: Stack(
-              children: <Widget>[
-                Positioned.fill(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          Color(0xFF0FA697),
-                          Color(0xFF45BF7A),
-                          Color(0xFF0DF205),
-                        ],
-                      ),
-                      borderRadius: BorderRadius.circular(25.0),
-                    ),
-                  ),
-                ),
-                Column(
-                  children: <Widget>[
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: <Widget>[
-                          const Hero(
-                            tag: 'notificationTitle',
-                            child: Text(
-                              'Notifications',
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                                fontFamily: 'Montserrat',
+            child: StreamBuilder<DocumentSnapshot>(
+              stream: _notificationStream2,
+              builder: (BuildContext context,
+                  AsyncSnapshot<DocumentSnapshot> snapshot) {
+                print('snapshot: $snapshot');
+                if (snapshot.hasData && snapshot.data != null) {
+                  Map<String, dynamic>? data =
+                      snapshot.data!.data() as Map<String, dynamic>?;
+
+                  if (data != null && data.containsKey('notifications')) {
+                    List<dynamic> notificationstemp = data['notifications'];
+                    Size size = MediaQuery.of(context).size;
+
+                    return Stack(
+                      children: <Widget>[
+                        Positioned.fill(
+                          child: Container(
+                            decoration: BoxDecoration(
+                              gradient: const LinearGradient(
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                colors: [
+                                  Color(0xFF0FA697),
+                                  Color(0xFF45BF7A),
+                                  Color(0xFF0DF205),
+                                ],
                               ),
+                              borderRadius: BorderRadius.circular(25.0),
                             ),
                           ),
-                          IconButton(
-                            icon: const Icon(Icons.close),
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                            color: Colors.white,
-                          ),
-                        ],
-                      ),
-                    ),
-                    const Divider(
-                      height: 0,
-                      color: Colors.grey,
-                    ),
-                    Expanded(
-                      child: ClipRRect(
-                        borderRadius: const BorderRadius.only(
-                          bottomLeft: Radius.circular(20.0),
-                          bottomRight: Radius.circular(20.0),
                         ),
-                        child: Container(
-                          padding: const EdgeInsets.only(bottom: 4.0),
-                          color: Colors.white,
-                          child: Scrollbar(
-                            thumbVisibility: true,
-                            child: SingleChildScrollView(
-                              child: Column(
-                                children: notifications
-                                    .map(
-                                      (notification) => Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            vertical: 8.0),
-                                        child: Row(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: <Widget>[
-                                            const SizedBox(
-                                              width: 24.0,
-                                              child: Padding(
-                                                padding:
-                                                    EdgeInsets.only(left: 8.0),
-                                                child: Text(
-                                                  '\u2022',
-                                                  style: TextStyle(
-                                                    fontSize: 24.0,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Color(0xFF45BF7A),
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                            const SizedBox(width: 12.0),
-                                            Expanded(
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Text(
-                                                    notification['title']!,
-                                                    style: const TextStyle(
-                                                      fontSize: 18.0,
-                                                      fontFamily: 'Montserrat',
-                                                    ),
-                                                  ),
-                                                  if (notification['amount']!
-                                                      .isNotEmpty)
-                                                    Padding(
-                                                      padding:
-                                                          const EdgeInsets.only(
-                                                              left: 24.0),
-                                                      child: RichText(
-                                                        text: TextSpan(
-                                                          style:
-                                                              const TextStyle(
-                                                            fontSize: 16.0,
-                                                            fontFamily:
-                                                                'Montserrat',
-                                                            color: Colors.black,
+                        Column(
+                          children: <Widget>[
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                top: 0.0,
+                                left: 20.0,
+                                right: 20.0,
+                                bottom: 0.0,
+                              ),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: <Widget>[
+                                  const Hero(
+                                    tag: 'notificationTitle',
+                                    child: Text(
+                                      'Notifications',
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                        fontFamily: 'Montserrat',
+                                      ),
+                                    ),
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(Icons.close),
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
+                                    color: Colors.white,
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const Divider(
+                              height: 0,
+                              color: Colors.grey,
+                            ),
+                            Expanded(
+                              child: ClipRRect(
+                                borderRadius: const BorderRadius.only(
+                                  bottomLeft: Radius.circular(20.0),
+                                  bottomRight: Radius.circular(20.0),
+                                ),
+                                child: Container(
+                                    padding: const EdgeInsets.only(bottom: 4.0),
+                                    color: Colors.white,
+                                    child: Scrollbar(
+                                        thumbVisibility: true,
+                                        child: SingleChildScrollView(
+                                          child: Column(
+                                            children: notificationstemp.reversed
+                                                .map((notification) {
+                                              String title =
+                                                  notification['title'] ?? '';
+                                              var amount =
+                                                  notification['amount'] ?? '';
+
+                                              // Generate a unique key for each notification using its index
+                                              Key dismissibleKey = UniqueKey();
+
+                                              return Dismissible(
+                                                key: dismissibleKey,
+                                                direction:
+                                                    DismissDirection.horizontal,
+                                                confirmDismiss: (_) async {
+                                                  return await showDialog(
+                                                    context: context,
+                                                    builder:
+                                                        (BuildContext context) {
+                                                      return AlertDialog(
+                                                        title: const Text(
+                                                            "Delete Notification"),
+                                                        content: const Text(
+                                                            "Are you sure you want to delete this notification?"),
+                                                        actions: <Widget>[
+                                                          TextButton(
+                                                            onPressed: () =>
+                                                                Navigator.of(
+                                                                        context)
+                                                                    .pop(false),
+                                                            child: const Text(
+                                                                "Cancel"),
                                                           ),
-                                                          children: [
-                                                            const TextSpan(
-                                                              text: 'Amount: ',
-                                                              style: TextStyle(
-                                                                fontFamily:
-                                                                    'Montserrat',
+                                                          TextButton(
+                                                            onPressed: () =>
+                                                                Navigator.of(
+                                                                        context)
+                                                                    .pop(true),
+                                                            child: const Text(
+                                                                "Delete"),
+                                                          ),
+                                                        ],
+                                                      );
+                                                    },
+                                                  );
+                                                },
+                                                onDismissed: (_) {
+                                                  // Remove the notification from the list
+                                                  setState(() {
+                                                    notificationstemp
+                                                        .remove(notification);
+                                                  });
+
+                                                  FirebaseFirestore.instance
+                                                      .collection(
+                                                          'Notifications')
+                                                      .doc(widget.uid)
+                                                      .update({
+                                                    'notifications':
+                                                        FieldValue.arrayRemove(
+                                                            [notification])
+                                                  });
+
+                                                  // Show a snackbar! This snackbar could also contain "Undo" actions
+                                                  ScaffoldMessenger.of(context)
+                                                      .showSnackBar(
+                                                    SnackBar(
+                                                      backgroundColor:
+                                                          Colors.green[400],
+                                                      content: Text(
+                                                          'Notification dismissed'),
+                                                      duration: const Duration(
+                                                          seconds: 2),
+                                                    ),
+                                                  );
+                                                },
+                                                background: Container(
+                                                  color: Colors.red,
+                                                  child: const Icon(
+                                                      Icons.delete,
+                                                      color: Colors.white),
+                                                  alignment:
+                                                      Alignment.centerLeft,
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          left: 16),
+                                                ),
+                                                child: Column(
+                                                  children: <Widget>[
+                                                    Padding(
+                                                      padding: const EdgeInsets
+                                                              .symmetric(
+                                                          vertical: 8.0),
+                                                      child: Row(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: <Widget>[
+                                                          const SizedBox(
+                                                            width: 24.0,
+                                                            child: Padding(
+                                                              padding: EdgeInsets
+                                                                  .only(
+                                                                      left:
+                                                                          8.0),
+                                                              child: Text(
+                                                                '\u2022',
+                                                                style:
+                                                                    TextStyle(
+                                                                  fontSize:
+                                                                      24.0,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                  color: Color(
+                                                                      0xFF45BF7A),
+                                                                ),
                                                               ),
                                                             ),
-                                                            TextSpan(
-                                                              text: notification[
-                                                                  'amount']!,
-                                                              style:
-                                                                  const TextStyle(
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                                color: Color(
-                                                                    0xFF45BF7A),
-                                                                fontFamily:
-                                                                    'Montserrat',
-                                                              ),
+                                                          ),
+                                                          const SizedBox(
+                                                              width: 12.0),
+                                                          Expanded(
+                                                            child: Column(
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .start,
+                                                              children: [
+                                                                Text(
+                                                                  title,
+                                                                  style:
+                                                                      const TextStyle(
+                                                                    fontSize:
+                                                                        18.0,
+                                                                    fontFamily:
+                                                                        'Montserrat',
+                                                                  ),
+                                                                ),
+                                                                if (amount
+                                                                    .isNotEmpty)
+                                                                  Padding(
+                                                                    padding:
+                                                                        const EdgeInsets
+                                                                            .only(
+                                                                      left:
+                                                                          24.0,
+                                                                      top: 4.0,
+                                                                    ),
+                                                                    child:
+                                                                        RichText(
+                                                                      text:
+                                                                          TextSpan(
+                                                                        style:
+                                                                            const TextStyle(
+                                                                          fontSize:
+                                                                              16.0,
+                                                                          fontFamily:
+                                                                              'Montserrat',
+                                                                          color:
+                                                                              Colors.black,
+                                                                        ),
+                                                                        children: [
+                                                                          const TextSpan(
+                                                                            text:
+                                                                                'Amount: ',
+                                                                            style:
+                                                                                TextStyle(
+                                                                              fontFamily: 'Montserrat',
+                                                                            ),
+                                                                          ),
+                                                                          TextSpan(
+                                                                            text:
+                                                                                amount,
+                                                                            style:
+                                                                                const TextStyle(
+                                                                              fontWeight: FontWeight.bold,
+                                                                              color: Color(0xFF45BF7A),
+                                                                              fontFamily: 'Montserrat',
+                                                                            ),
+                                                                          ),
+                                                                        ],
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                              ],
                                                             ),
-                                                          ],
-                                                        ),
+                                                          ),
+                                                        ],
                                                       ),
                                                     ),
-                                                ],
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    )
-                                    .toList(),
+                                                    const Divider(
+                                                      height: 0,
+                                                      color: Colors.grey,
+                                                    ),
+                                                  ],
+                                                ),
+                                              );
+                                            }).toList(),
+                                          ),
+                                        ))),
                               ),
                             ),
-                          ),
+                          ],
                         ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
+                      ],
+                    );
+                  }
+                }
+
+                return Container(); // Placeholder for loading state or empty state
+              },
             ),
           ),
         );
@@ -721,17 +867,18 @@ class _DealerDashboardPageState extends State<DealerDashboardPage>
     );
   }
 }
-
 class HexagonClipper extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {
     final path = Path();
+    final double controlPointOffset = size.height / 6;
+
     path.moveTo(size.width / 2, 0);
-    path.lineTo(size.width, size.height / 4);
-    path.lineTo(size.width, size.height * 3 / 4);
+    path.lineTo(size.width, size.height / 2 - controlPointOffset);
+    path.lineTo(size.width, size.height / 2 + controlPointOffset);
     path.lineTo(size.width / 2, size.height);
-    path.lineTo(0, size.height * 3 / 4);
-    path.lineTo(0, size.height / 4);
+    path.lineTo(0, size.height / 2 + controlPointOffset);
+    path.lineTo(0, size.height / 2 - controlPointOffset);
     path.close();
     return path;
   }

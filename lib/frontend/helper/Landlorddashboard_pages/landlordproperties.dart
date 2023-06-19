@@ -4,8 +4,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:rehnaa/frontend/helper/Landlorddashboard_pages/skeleton.dart';
+import '../../../backend/models/landlordmodel.dart';
 import '../../../backend/models/propertymodel.dart';
 import 'landlord_propertyinfo.dart';
+import 'package:rxdart/rxdart.dart';
 
 class LandlordPropertiesPage extends StatefulWidget {
   final String uid; // UID of the landlord
@@ -20,17 +22,30 @@ class LandlordPropertiesPage extends StatefulWidget {
 class _LandlordPropertiesPageState extends State<LandlordPropertiesPage>
     with AutomaticKeepAliveClientMixin<LandlordPropertiesPage> {
   List<Property> properties = [];
+  late Stream<List<DocumentSnapshot<Map<String, dynamic>>>> _propertyStream;
+  String firstName = '';
+  String lastName = '';
 
   bool shouldDisplay = false;
   @override
   void initState() {
     super.initState();
-    _loadProperties();
+    // _loadProperties();
+    _propertyStream = const Stream.empty();
+    _loadProperties(); // Initialize the stream for the properties
   }
 
-  Future<void> _loadProperties() async {
+  void _loadProperties() {
+    _getPropertyStream().then((stream) {
+      setState(() {
+        _propertyStream = stream;
+      });
+    });
+  }
+
+  Future<Stream<List<DocumentSnapshot<Map<String, dynamic>>>>>
+      _getPropertyStream() async {
     try {
-      // Fetch the document snapshot for the landlord
       DocumentSnapshot<Map<String, dynamic>> landlordSnapshot =
           await FirebaseFirestore.instance
               .collection('Landlords')
@@ -41,53 +56,37 @@ class _LandlordPropertiesPageState extends State<LandlordPropertiesPage>
         setState(() {
           shouldDisplay = true;
         });
+
         Map<String, dynamic> data = landlordSnapshot.data()!;
+        Landlord landlord = Landlord.fromJson(data as Map<String, dynamic>);
+        firstName = landlord.firstName;
+        lastName = landlord.lastName;
 
         List<DocumentReference<Map<String, dynamic>>> propertyDataList =
             (data['propertyRef'] as List<dynamic>)
                 .cast<DocumentReference<Map<String, dynamic>>>();
 
-        // Fetch properties using the fetchProperties method
-        properties = await fetchProperties(propertyDataList, context);
+        Iterable<Stream<DocumentSnapshot<Map<String, dynamic>>>>
+            propertySnapshotsStreams =
+            propertyDataList.map((ref) => ref.snapshots());
 
-        if (mounted) {
-          setState(() {
-            // Update the state with the fetched properties
-            properties = properties;
-          });
-        }
+        properties = []; // Clear the properties list
+        // Combine the property snapshots streams into a single stream
+        Stream<List<DocumentSnapshot<Map<String, dynamic>>>> combinedStream =
+            CombineLatestStream.list(propertySnapshotsStreams);
+
+        return combinedStream;
       } else {
-        // Handle the case where the landlord document doesn't exist
-        properties = [];
+        properties =
+            []; // Handle the case where the landlord document doesn't exist
+        return Stream.empty();
       }
     } catch (e) {
-      // Handle any error that occurred while fetching the properties
       if (kDebugMode) {
         print('Error fetching properties: $e');
       }
-      properties = [];
+      return Stream.empty();
     }
-  }
-
-  Future<List<Property>> fetchProperties(
-      List<dynamic> propertyDataList, BuildContext context) async {
-    List<Property> fetchedProperties = [];
-
-    for (var propertyDataRef in propertyDataList) {
-      DocumentSnapshot<Map<String, dynamic>> propertySnapshot =
-          await propertyDataRef.get();
-
-      Map<String, dynamic>? propertyData = propertySnapshot.data();
-      if (propertyData != null) {
-        Property property = await Property.fromJson(propertyData);
-        property.landlord = await property.fetchLandlord();
-        precacheImage(NetworkImage(property.imagePath[0]), context);
-
-        fetchedProperties.add(property);
-      }
-    }
-
-    return fetchedProperties;
   }
 
   @override
@@ -98,81 +97,88 @@ class _LandlordPropertiesPageState extends State<LandlordPropertiesPage>
     super.build(context); // Necessary for AutomaticKeepAliveClientMixin
     // print('properties.isEmpty is ${properties.isEmpty}');
 
-    if (properties.isEmpty && !shouldDisplay) {
-      return const LandlordPropertiesSkeleton();
-    } else if (properties.isEmpty && shouldDisplay) {
-      return Column(
-        children: [
-          const SizedBox(height: 50),
-          Card(
-            elevation: 4.0,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20.0),
-            ),
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20.0),
-                color: Colors.white,
-              ),
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(
-                    Icons.house,
-                    size: 48.0,
-                    color: Color(0xff33907c),
+    return StreamBuilder<List<DocumentSnapshot<Map<String, dynamic>>>>(
+      stream: _propertyStream,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const LandlordPropertiesSkeleton();
+        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return Column(
+            children: [
+              const SizedBox(height: 50),
+              Card(
+                elevation: 4.0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20.0),
+                ),
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20.0),
+                    color: Colors.white,
                   ),
-                  const SizedBox(height: 16.0),
-                  Text(
-                    'No properties to show',
-                    style: GoogleFonts.montserrat(
-                      fontSize: 20.0,
-                      // fontWeight: FontWeight.bold,
-                      color: const Color(0xff33907c),
-                    ),
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(
+                        Icons.house,
+                        size: 48.0,
+                        color: Color(0xff33907c),
+                      ),
+                      const SizedBox(height: 16.0),
+                      Text(
+                        'No properties to show',
+                        style: GoogleFonts.montserrat(
+                          fontSize: 20.0,
+                          color: const Color(0xff33907c),
+                        ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-            ),
-          )
-        ],
-      );
-    } else {
-      return Scaffold(
-        backgroundColor: const Color.fromARGB(255, 255, 255, 255),
-        body: ListView.builder(
-          itemCount: properties.length,
-          itemBuilder: (context, index) {
-            // if properties is empty return empty container
+                ),
+              )
+            ],
+          );
+        } else {
+          return Scaffold(
+            backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+            body: ListView(
+              children: snapshot.data!.map((propertySnapshot) {
+                Property property = Property.fromJson(
+                    propertySnapshot.data() as Map<String, dynamic>);
 
-            return PropertyCard(
-              property: properties[index],
-              firstName: properties[index].landlord?.firstName ?? '',
-              lastName: properties[index].landlord?.lastName ?? '',
-              pathToImage: properties[index].landlord?.pathToImage ??
-                  'assets/userimage.png',
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => PropertyPage(
-                      property: properties[index],
-                      firstName: properties[index].landlord?.firstName ?? '',
-                      lastName: properties[index].landlord?.lastName ?? '',
-                      pathToImage: properties[index].landlord?.pathToImage ??
-                          'assets/userimage.png',
-                      location: properties[index].location,
-                      address: properties[index].address,
-                    ),
-                  ),
+                return PropertyCard(
+                  property: property,
+                  firstName: firstName ?? '',
+                  lastName: lastName ?? '',
+                  pathToImage:
+                      property.landlord?.pathToImage ?? 'assets/userimage.png',
+                  location: property.location,
+                  address: property.address,
+                  type: property.type,
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => PropertyPage(
+                          property: property,
+                          firstName: firstName ?? '',
+                          lastName: lastName ?? '',
+                          pathToImage: property.landlord?.pathToImage ??
+                              'assets/userimage.png',
+                          location: property.location,
+                          address: property.address,
+                        ),
+                      ),
+                    );
+                  },
                 );
-              },
-            );
-          },
-        ),
-      );
-    }
+              }).toList(),
+            ),
+          );
+        }
+      },
+    );
   }
 }
 
@@ -182,6 +188,9 @@ class PropertyCard extends StatelessWidget {
   final String lastName;
   final String? pathToImage;
   final VoidCallback onTap;
+  final String location;
+  final String address;
+  final String type;
 
   const PropertyCard({
     super.key,
@@ -190,6 +199,9 @@ class PropertyCard extends StatelessWidget {
     required this.lastName,
     required this.pathToImage,
     required this.onTap,
+    required this.location,
+    required this.address,
+    required this.type,
   });
 
   @override
@@ -207,7 +219,7 @@ class PropertyCard extends StatelessWidget {
           width: screenWidth *
               0.4, // Adjust the width as a fraction of the screen width
           height: screenHeight *
-              0.35, // Adjust the height as a fraction of the screen height
+              0.37, // Adjust the height as a fraction of the screen height
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -216,11 +228,11 @@ class PropertyCard extends StatelessWidget {
                     0.2, // Adjust the height as a fraction of the card height
                 width: double.infinity,
                 child: CachedNetworkImage(
-                  imageUrl: property
-                      .imagePath[0], // TODO define a new property.iconimagepath
-
+                  imageUrl: property.imagePath[0],
                   placeholder: (context, url) =>
-                      const CircularProgressIndicator(),
+                      const CircularProgressIndicator(
+                    color: Colors.green,
+                  ),
                   errorWidget: (context, url, error) => const Icon(Icons.error),
                   fit: BoxFit.cover,
                 ),
@@ -237,6 +249,12 @@ class PropertyCard extends StatelessWidget {
                         fontWeight: FontWeight.bold,
                         color: const Color(0xFF33907C),
                       ),
+                    ),
+                    SizedBox(height: screenHeight * 0.005),
+
+                    Text(
+                      '$location\n$address',
+                      style: TextStyle(fontSize: screenWidth * 0.035),
                     ),
                     SizedBox(height: screenHeight * 0.01),
                     Row(
@@ -271,8 +289,14 @@ class PropertyCard extends StatelessWidget {
                           '$firstName $lastName',
                           style: TextStyle(fontSize: screenWidth * 0.035),
                         ),
+                        SizedBox(width: screenWidth * 0.01),
+                        Text(
+                          '($type)',
+                          style: TextStyle(fontSize: screenWidth * 0.035),
+                        ),
                       ],
                     ),
+                    // SizedBox(height: 10),
                   ],
                 ),
               ),

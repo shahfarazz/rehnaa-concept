@@ -1,6 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'Tenant/tenant_dashboard.dart';
 import 'login_page.dart'; // Import your login page
 import 'Landlord/landlord_dashboard.dart'; // Import your main dashboard page
 
@@ -29,9 +31,30 @@ class _SplashScreenState extends State<SplashScreen> {
     if (user != null) {
       // If the user is logged in, navigate to the main page.
       // ignore: use_build_context_synchronously
-      Navigator.of(context).pushReplacement(MaterialPageRoute(
-        builder: (context) => LandlordDashboardPage(uid: user.uid),
-      ));
+
+      // checking if user is Tenant or Landlord
+
+      FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .get()
+          .then((DocumentSnapshot documentSnapshot) {
+        if (documentSnapshot.exists) {
+          Map<String, dynamic> data =
+              documentSnapshot.data() as Map<String, dynamic>;
+          if (data['type'] == 'Tenant') {
+            Navigator.of(context).pushReplacement(MaterialPageRoute(
+              builder: (context) => TenantDashboardPage(uid: user.uid),
+            ));
+          } else if (data['type'] == 'Landlord') {
+            Navigator.of(context).pushReplacement(MaterialPageRoute(
+              builder: (context) => LandlordDashboardPage(uid: user.uid),
+            ));
+          } else {
+            //do nothing
+          }
+        }
+      });
     } else {
       // If the user is not logged in, navigate to the login page.
       if (kDebugMode) {
