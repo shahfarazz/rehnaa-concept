@@ -381,6 +381,7 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
             'All Tenant Rentals',
             style: GoogleFonts.montserrat(
               fontWeight: FontWeight.bold,
+              fontStyle: FontStyle.italic,
               fontSize: size.width * 0.045,
               color: const Color(0xff33907c),
             ),
