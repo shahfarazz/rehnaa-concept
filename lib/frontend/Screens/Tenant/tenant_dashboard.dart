@@ -81,6 +81,37 @@ class _DashboardPageState extends State<TenantDashboardPage>
     );
   }
 
+  Future<void> _markNotificationsAsRead() async {
+    // Get the current user's UID
+    String uid = widget.uid;
+
+    // Get the reference to the user's notifications document in Firestore
+    DocumentReference<Map<String, dynamic>> notificationRef =
+        FirebaseFirestore.instance.collection('Notifications').doc(uid);
+
+// Get the snapshot of the notifications document
+    DocumentSnapshot<Map<String, dynamic>> snapshot =
+        await notificationRef.get();
+
+    // Check if the document exists and has a 'notifications' field
+    if (snapshot.exists && snapshot.data() != null) {
+      List<dynamic> notifications = snapshot.data()!['notifications'];
+
+      // Mark all notifications as read
+      List<dynamic> updatedNotifications = notifications
+          .map((notification) => {
+                ...notification,
+                'read': true, // Mark the notification as read
+              })
+          .toList();
+
+      // Update the 'notifications' field in Firestore
+      await notificationRef.update({
+        'notifications': updatedNotifications,
+      });
+    }
+  }
+
   void _toggleSidebar() {
     setState(() {
       _isSidebarOpen = !_isSidebarOpen;
@@ -248,7 +279,10 @@ class _DashboardPageState extends State<TenantDashboardPage>
             children: [
               IconButton(
                 icon: const Icon(Icons.notifications_active),
-                onPressed: _showNotificationsDialog,
+                onPressed: () async {
+                  await _markNotificationsAsRead();
+                  _showNotificationsDialog();
+                },
               ),
               Positioned(
                 right: 13,
@@ -264,7 +298,16 @@ class _DashboardPageState extends State<TenantDashboardPage>
 
                       if (data != null && data.containsKey('notifications')) {
                         List<dynamic> notificationstemp = data['notifications'];
-                        notificationsCount = notificationstemp.length;
+
+                        // Filter notifications based on read status
+                        List<dynamic> unreadNotifications =
+                            notificationstemp.where((notification) {
+                          // Check if 'read' field is null or false
+                          return notification['read'] == null ||
+                              notification['read'] == false;
+                        }).toList();
+
+                        notificationsCount = unreadNotifications.length;
                       }
                     }
 

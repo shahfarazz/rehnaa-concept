@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -215,7 +216,9 @@ class _TenantProfilePageState extends State<TenantProfilePage> {
                       const SizedBox(height: 40),
                       CircleAvatar(
                         radius: 80,
-                        backgroundImage: AssetImage(pathToImage),
+                        backgroundImage: pathToImage.startsWith('https')
+                            ? NetworkImage(pathToImage)
+                            : AssetImage(pathToImage) as ImageProvider,
                       ),
                       const SizedBox(height: 20),
                       Text(

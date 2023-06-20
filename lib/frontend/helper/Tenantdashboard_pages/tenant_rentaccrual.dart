@@ -31,9 +31,9 @@ class _TenantRentAccrualPageState extends State<TenantRentAccrualPage> {
     tenant = Tenant.fromJson(myTenant.data()!);
 
     if (myTenant.data()?['isApplied'] == true) {
-      setState(() {
-        isApplied = true;
-      });
+      // setState(() {
+      isApplied = true;
+      // });
     }
   }
 

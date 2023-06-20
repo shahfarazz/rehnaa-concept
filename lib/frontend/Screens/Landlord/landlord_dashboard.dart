@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import 'package:rehnaa/frontend/Screens/contract.dart';
 import 'package:rehnaa/frontend/Screens/privacypolicy.dart';
@@ -235,7 +236,10 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
             children: [
               IconButton(
                 icon: const Icon(Icons.notifications_active),
-                onPressed: _showNotificationsDialog,
+                onPressed: () async {
+                  await _markNotificationsAsRead();
+                  _showNotificationsDialog();
+                },
               ),
               Positioned(
                 right: 13,
@@ -251,7 +255,16 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
 
                       if (data != null && data.containsKey('notifications')) {
                         List<dynamic> notificationstemp = data['notifications'];
-                        notificationsCount = notificationstemp.length;
+
+                        // Filter notifications based on read status
+                        List<dynamic> unreadNotifications =
+                            notificationstemp.where((notification) {
+                          // Check if 'read' field is null or false
+                          return notification['read'] == null ||
+                              notification['read'] == false;
+                        }).toList();
+
+                        notificationsCount = unreadNotifications.length;
                       }
                     }
 
@@ -364,13 +377,13 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
                                       Color(0xFF0DF205),
                                     ],
                                   ).createShader(bounds),
-                                  child: const Text(
-                                    'Rehnaa',
-                                    style: TextStyle(
+                                  child: Text(
+                                    'REHNAA.PK',
+                                    style: GoogleFonts.belleza(
                                       fontSize: 24,
-                                      fontFamily: 'Montserrat',
                                       fontWeight: FontWeight.bold,
                                       color: Colors.white,
+                                      letterSpacing: 1.75,
                                     ),
                                   ),
                                 ),
@@ -476,6 +489,37 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
         builder: (context) => LoginPage(),
       ),
     );
+  }
+
+  Future<void> _markNotificationsAsRead() async {
+    // Get the current user's UID
+    String uid = widget.uid;
+
+    // Get the reference to the user's notifications document in Firestore
+    DocumentReference<Map<String, dynamic>> notificationRef =
+        FirebaseFirestore.instance.collection('Notifications').doc(uid);
+
+// Get the snapshot of the notifications document
+    DocumentSnapshot<Map<String, dynamic>> snapshot =
+        await notificationRef.get();
+
+    // Check if the document exists and has a 'notifications' field
+    if (snapshot.exists && snapshot.data() != null) {
+      List<dynamic> notifications = snapshot.data()!['notifications'];
+
+      // Mark all notifications as read
+      List<dynamic> updatedNotifications = notifications
+          .map((notification) => {
+                ...notification,
+                'read': true, // Mark the notification as read
+              })
+          .toList();
+
+      // Update the 'notifications' field in Firestore
+      await notificationRef.update({
+        'notifications': updatedNotifications,
+      });
+    }
   }
 
   Widget _buildSidebarItem({
