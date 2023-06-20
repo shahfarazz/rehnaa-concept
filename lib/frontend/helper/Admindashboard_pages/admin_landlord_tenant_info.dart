@@ -89,39 +89,45 @@ class _AdminLandlordTenantInfoPageState
           lastName: doc['lastName'],
           balance: doc['balance'].toDouble(),
           pathToImage: doc['pathToImage'],
-          // propertyRef: doc['propertyRef'],
-          // rentpaymentRef: doc['rentpaymentRef'],
         );
       }).toList();
       filteredLandlords = List.from(landlords);
     });
   }
 
-  Future<void> fetchTenants() async {
-    QuerySnapshot<Map<String, dynamic>> querySnapshot =
-        await FirebaseFirestore.instance.collection('Tenants').get();
+  QuerySnapshot<Map<String, dynamic>>? _querySnapshot;
 
-    setState(() {
-      tenants = querySnapshot.docs.map((doc) {
-        return Tenant(
-          firstName: doc['firstName'] ?? '',
-          lastName: doc['lastName'] ?? '',
-          description: doc['description'] ?? '',
-          rating: doc['rating'] ?? 0.0,
-          rent: doc['rent'] ?? 0,
-          creditPoints: doc['creditPoints'] ?? 0,
-          // propertyDetails: doc['propertyDetails'] ?? '',
-          cnicNumber: doc['cnicNumber'] ?? '',
-          emailOrPhone: doc['emailOrPhone'] ?? '',
-          tasdeeqVerification: doc['tasdeeqVerification'] ?? false,
-          policeVerification: false, //TODO remove fake false when db is clean
-          familyMembers: doc['familyMembers'] ?? 0,
-          landlordRef: doc['landlordRef'],
-          pathToImage: doc['pathToImage'] ?? '',
-        );
-      }).toList();
-      filteredTenants = List.from(tenants);
-    });
+  Future<void> fetchTenants() async {
+    try {
+      _querySnapshot =
+          await FirebaseFirestore.instance.collection('Tenants').get();
+
+      setState(() {
+        tenants = _querySnapshot!.docs.map((doc1) {
+          var doc = doc1.data();
+          // print('reached here doc is ${doc.data()}');
+
+          return Tenant(
+            firstName: doc['firstName'] ?? '',
+            lastName: doc['lastName'] ?? '',
+            description: doc['description'] ?? '',
+            rating: doc['rating'] ?? 0.0,
+            rent: doc['rent'] ?? 0,
+            creditPoints: doc['creditPoints'] ?? 0,
+            cnicNumber: doc['cnicNumber'] ?? '',
+            emailOrPhone: doc['emailOrPhone'] ?? '',
+            tasdeeqVerification: doc['tasdeeqVerification'] ?? false,
+            policeVerification: false,
+            familyMembers: doc['familyMembers'] ?? 0,
+            landlordRef: doc['landlordRef'] ?? null,
+            pathToImage: doc['pathToImage'] ?? '',
+          );
+        }).toList();
+        filteredTenants = List.from(tenants);
+      });
+    } catch (e) {
+      print('Error is $e');
+    }
   }
 
   void filterLandlords(String query) {
@@ -157,7 +163,9 @@ class _AdminLandlordTenantInfoPageState
   List<Landlord> getPaginatedLandlords() {
     final startIndex = (currentPage - 1) * itemsPerPage;
     final endIndex = startIndex + itemsPerPage;
-    if (endIndex >= filteredLandlords.length) {
+    if (startIndex >= filteredLandlords.length) {
+      return [];
+    } else if (endIndex >= filteredLandlords.length) {
       return filteredLandlords.sublist(startIndex);
     } else {
       return filteredLandlords.sublist(startIndex, endIndex);
@@ -167,7 +175,9 @@ class _AdminLandlordTenantInfoPageState
   List<Tenant> getPaginatedTenants() {
     final startIndex = (currentPage - 1) * itemsPerPage;
     final endIndex = startIndex + itemsPerPage;
-    if (endIndex >= filteredTenants.length) {
+    if (startIndex >= filteredTenants.length) {
+      return [];
+    } else if (endIndex >= filteredTenants.length) {
       return filteredTenants.sublist(startIndex);
     } else {
       return filteredTenants.sublist(startIndex, endIndex);
@@ -181,7 +191,6 @@ class _AdminLandlordTenantInfoPageState
         title: const Text('Landlord & Tenant Info'),
         flexibleSpace: Container(
           decoration: const BoxDecoration(
-            // borderRadius: BorderRadius.circular(24),
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
@@ -219,7 +228,6 @@ class _AdminLandlordTenantInfoPageState
                 length: 2,
                 child: Column(
                   children: [
-                    // ignore: prefer_const_constructors
                     TabBar(
                       indicatorColor: const Color(0xff0FA697),
                       unselectedLabelColor: Colors.grey,
@@ -247,11 +255,8 @@ class _AdminLandlordTenantInfoPageState
                                 elevation: 2.0,
                                 child: ListTile(
                                   leading: CircleAvatar(
-                                    backgroundImage: AssetImage(
-                                      landlord.pathToImage ??
-                                          'assets/placeholder.png',
-                                    ),
-                                  ),
+                                      backgroundImage:
+                                          NetworkImage(landlord.pathToImage!)),
                                   title: Text(
                                     '${landlord.firstName} ${landlord.lastName}',
                                     style: const TextStyle(
@@ -281,11 +286,8 @@ class _AdminLandlordTenantInfoPageState
                                 elevation: 2.0,
                                 child: ListTile(
                                   leading: CircleAvatar(
-                                    backgroundImage: AssetImage(
-                                      tenant.pathToImage ??
-                                          'assets/placeholder.png',
-                                    ),
-                                  ),
+                                      backgroundImage:
+                                          NetworkImage(tenant.pathToImage!)),
                                   title: Text(
                                     '${tenant.firstName} ${tenant.lastName}',
                                     style: const TextStyle(
@@ -338,10 +340,7 @@ class _AdminLandlordTenantInfoPageState
                   onPressed: () {
                     setState(() {
                       final maxPage =
-                          (filteredLandlords.length / itemsPerPage).ceil() >
-                                  (filteredTenants.length / itemsPerPage).ceil()
-                              ? (filteredLandlords.length / itemsPerPage).ceil()
-                              : (filteredTenants.length / itemsPerPage).ceil();
+                          (filteredLandlords.length / itemsPerPage).ceil();
                       if (currentPage < maxPage) {
                         currentPage++;
                       }
