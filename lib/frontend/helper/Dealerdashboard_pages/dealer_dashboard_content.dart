@@ -97,7 +97,7 @@ class _DealerDashboardContentState extends State<DealerDashboardContent>
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        print('Firebase auth id is: ${FirebaseAuth.instance.currentUser!.uid}');
+        // print('Firebase auth id is: ${FirebaseAuth.instance.currentUser!.uid}');
         String selectedOption = '';
 
         return StatefulBuilder(

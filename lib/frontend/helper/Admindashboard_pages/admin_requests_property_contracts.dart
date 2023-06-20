@@ -160,6 +160,19 @@ class _AdminPropertyContractsPageState
     return Scaffold(
       appBar: AppBar(
         title: const Text('Property Contracts'),
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Color(0xff0FA697),
+                Color(0xff45BF7A),
+                Color(0xff0DF205),
+              ],
+            ),
+          ),
+        ),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),

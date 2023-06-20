@@ -90,7 +90,20 @@ class _AdminAnalyticsPageState extends State<AdminAnalyticsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Admin Analytics'),
+        title: const Text('Admin Analytics'),
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Color(0xff0FA697),
+                Color(0xff45BF7A),
+                Color(0xff0DF205),
+              ],
+            ),
+          ),
+        ),
       ),
       body: Center(
         child: Column(

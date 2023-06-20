@@ -6,7 +6,6 @@ import 'package:printing/printing.dart';
 import 'package:pdf/pdf.dart';
 
 
-
 class LandlordInvoicePage extends StatefulWidget {
   final String landlordName;
   final double balance;
