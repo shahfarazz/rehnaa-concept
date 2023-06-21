@@ -158,7 +158,20 @@ class _AdminVouchersPageState extends State<AdminVouchersPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Admin Vouchers'),
+        title: const Text('Landlord & Tenant Info'),
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Color(0xff0FA697),
+                Color(0xff45BF7A),
+                Color(0xff0DF205),
+              ],
+            ),
+          ),
+        ),
       ),
       body: Center(
         child: Column(

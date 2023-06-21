@@ -67,7 +67,7 @@ class Property {
       tenantReview: json['tenantReview'],
       address: json['address'] ?? 'No address provided',
       tenantRef: json['tenantRef'],
-      landlord: json['landlord'],
+      // landlord: Landlord.fromJson(json['landlord']),
     );
 
     return property;

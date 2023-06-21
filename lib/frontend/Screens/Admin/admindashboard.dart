@@ -88,100 +88,109 @@ class _AdminDashboardState extends State<AdminDashboard> {
         context: context,
         builder: (BuildContext context) {
           return Dialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8.0),
-            ),
-            child: Container(
-              width: 400.0,
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  const Text(
-                    'Notifications',
-                    style: TextStyle(
-                      fontSize: 20.0,
-                      fontWeight: FontWeight.bold,
-                    ),
+            // Dialog content
+            child: Column(
+              children: <Widget>[
+                const Text(
+                  'Notifications',
+                  style: TextStyle(
+                    fontSize: 20.0,
+                    fontWeight: FontWeight.bold,
                   ),
-                  const SizedBox(height: 16.0),
-                  Expanded(
-                    child: ListView(
-                      children: notifications.reversed.map(
-                        (notification) {
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 8.0),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: <Widget>[
-                                const SizedBox(
-                                  width: 24.0,
-                                  child: Padding(
-                                    padding: EdgeInsets.only(left: 8.0),
-                                    child: Text(
-                                      '\u2022',
-                                      style: TextStyle(
-                                        fontSize: 24.0,
-                                        fontWeight: FontWeight.bold,
-                                        color: Color(0xFF45BF7A),
-                                      ),
+                ),
+                const SizedBox(height: 16.0),
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: notifications.length,
+                    itemBuilder: (context, index) {
+                      final notification = notifications[index];
+
+                      return Dismissible(
+                        key: Key(notification.toString()),
+                        onDismissed: (direction) {
+                          setState(() {
+                            notifications.removeAt(index);
+                          });
+                        },
+                        background: Container(
+                          color: Colors.red,
+                          alignment: Alignment.centerRight,
+                          padding: const EdgeInsets.only(right: 16.0),
+                          child: const Icon(
+                            Icons.delete,
+                            color: Colors.white,
+                          ),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8.0),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              const SizedBox(
+                                width: 24.0,
+                                child: Padding(
+                                  padding: EdgeInsets.only(left: 8.0),
+                                  child: Text(
+                                    '\u2022',
+                                    style: TextStyle(
+                                      fontSize: 24.0,
+                                      fontWeight: FontWeight.bold,
+                                      color: Color(0xFF45BF7A),
                                     ),
                                   ),
                                 ),
-                                const SizedBox(width: 12.0),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: notification.entries.map(
-                                      (entry) {
-                                        return Padding(
-                                          padding:
-                                              const EdgeInsets.only(left: 24.0),
-                                          child: RichText(
-                                            text: TextSpan(
-                                              style: const TextStyle(
-                                                fontSize: 14.0,
-                                                color: Colors.black,
-                                              ),
-                                              children: [
-                                                TextSpan(
-                                                  text: '${entry.key}: ',
-                                                  style: const TextStyle(
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                                TextSpan(
-                                                  text: entry.value,
-                                                ),
-                                              ],
+                              ),
+                              const SizedBox(width: 12.0),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: notification.entries.map(
+                                    (entry) {
+                                      return Padding(
+                                        padding:
+                                            const EdgeInsets.only(left: 24.0),
+                                        child: RichText(
+                                          text: TextSpan(
+                                            style: const TextStyle(
+                                              fontSize: 14.0,
+                                              color: Colors.black,
                                             ),
+                                            children: [
+                                              TextSpan(
+                                                text: '${entry.key}: ',
+                                                style: const TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                              TextSpan(
+                                                text: entry.value,
+                                              ),
+                                            ],
                                           ),
-                                        );
-                                      },
-                                    ).toList(),
-                                  ),
+                                        ),
+                                      );
+                                    },
+                                  ).toList(),
                                 ),
-                              ],
-                            ),
-                          );
-                        },
-                      ).toList(),
-                    ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
                   ),
-                  const SizedBox(height: 16.0),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      child: const Text('Close'),
-                    ),
+                ),
+                const SizedBox(height: 16.0),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: const Text('Close'),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           );
         },
@@ -212,7 +221,34 @@ class _AdminDashboardState extends State<AdminDashboard> {
                   Row(
                     children: [
                       IconButton(
-                        icon: Icon(Icons.notifications_active),
+                        icon: Stack(
+                          children: [
+                            Icon(Icons.notifications_active),
+                            if (notifications.length > 0)
+                              Positioned(
+                                right: 0,
+                                child: Container(
+                                  padding: EdgeInsets.all(0),
+                                  decoration: BoxDecoration(
+                                    color: Colors.red,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  constraints: BoxConstraints(
+                                    minWidth: 16,
+                                    minHeight: 16,
+                                  ),
+                                  child: Text(
+                                    notifications.length.toString(),
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 12,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
                         onPressed: _showNotificationsDialog,
                       ),
                       IconButton(

@@ -74,6 +74,75 @@ class MyScreen extends StatelessWidget {
           Map<String, dynamic>? contractFields = data.data();
           print('contractFields: $contractFields');
 
+          if (contractFields == null) {
+            //return a nice looking small card with montserrat
+            // green font that says No contract yet with an icon
+
+            return Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: EdgeInsets.only(top: 75, left: 25),
+                  child: Positioned(
+                    top: 30.0,
+                    left: 10.0,
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.pop(context);
+                      },
+                      child: Container(
+                        width: 40,
+                        height: 40,
+                        decoration: const BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Color(0xFF33907C),
+                          gradient: LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [
+                              Color(0xff0FA697),
+                              Color(0xff45BF7A),
+                              Color(0xff0DF205),
+                            ],
+                          ),
+                        ),
+                        child: const Icon(
+                          Icons.arrow_back,
+                          size: 20,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(left: 25),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      //add a back button top left corner
+
+                      Icon(
+                        Icons.description,
+                        color: Colors.green,
+                        size: 50,
+                      ),
+                      SizedBox(height: 20),
+                      Text(
+                        'No contract yet',
+                        style: GoogleFonts.montserrat(
+                          fontSize: 24,
+                          color: Colors.green,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            );
+          }
+
           return Column(
             children: [
               SizedBox(height: 30),

@@ -47,25 +47,30 @@ class _AdminRentOffWinnerPageState extends State<AdminRentOffWinnerPage> {
   }
 
   Future<void> fetchTenants() async {
-    QuerySnapshot<Map<String, dynamic>> querySnapshot =
-        await FirebaseFirestore.instance.collection('Tenants').get();
+    try {
+      QuerySnapshot<Map<String, dynamic>> querySnapshot =
+          await FirebaseFirestore.instance.collection('Tenants').get();
 
-    setState(() {
-      tenants = querySnapshot.docs.map((doc) {
-        return Tenant(
-          firstName: doc['firstName'] ?? '',
-          lastName: doc['lastName'] ?? '',
-          rating: doc['rating'] ?? 0.0,
-          rent: doc['rent'] ?? 0,
-          propertyDetails: doc['propertyDetails'] ?? '',
-          emailOrPhone: doc['emailOrPhone'] ?? '',
-          familyMembers: doc['familyMembers'] ?? 0,
-          pathToImage: doc['pathToImage'] ?? '',
-          docid: doc.id,
-        );
-      }).toList();
-      filteredTenants = List.from(tenants);
-    });
+      setState(() {
+        tenants = querySnapshot.docs.map((doc1) {
+          var doc = doc1.data();
+          return Tenant(
+            firstName: doc['firstName'] ?? '',
+            lastName: doc['lastName'] ?? '',
+            rating: doc['rating'] ?? 0.0,
+            rent: doc['rent'] ?? 0,
+            propertyDetails: doc['propertyDetails'] ?? '',
+            emailOrPhone: doc['emailOrPhone'] ?? '',
+            familyMembers: doc['familyMembers'] ?? 0,
+            pathToImage: doc['pathToImage'] ?? '',
+            docid: doc1.id,
+          );
+        }).toList();
+        filteredTenants = List.from(tenants);
+      });
+    } catch (e) {
+      print('Error in fetching tenants: $e');
+    }
   }
 
   void filterTenants(String query) {
@@ -177,8 +182,9 @@ class _AdminRentOffWinnerPageState extends State<AdminRentOffWinnerPage> {
                               title: const Text('Enter Discount'),
                               content: TextField(
                                 controller: controller,
-                                keyboardType: const TextInputType.numberWithOptions(
-                                    decimal: true),
+                                keyboardType:
+                                    const TextInputType.numberWithOptions(
+                                        decimal: true),
                                 inputFormatters: <TextInputFormatter>[
                                   FilteringTextInputFormatter.allow(
                                       RegExp(r'^\d+\.?\d{0,2}')),

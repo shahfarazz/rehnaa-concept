@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenant_propertyinfo.dart';
+import '../../../backend/models/landlordmodel.dart';
 import '../../../backend/models/propertymodel.dart';
 import '../Landlorddashboard_pages/landlord_propertyinfo.dart';
 import '../Landlorddashboard_pages/landlordproperties.dart';
@@ -25,15 +26,44 @@ class TenantPropertiesPage extends StatefulWidget {
 
 class _TenantPropertiesPageState extends State<TenantPropertiesPage>
     with AutomaticKeepAliveClientMixin<TenantPropertiesPage> {
-  List<Property> properties = [];
+  late Future<List<Property>> _propertiesFuture;
   bool shouldDisplay = false;
-  late Stream<QuerySnapshot<Map<String, dynamic>>> _propertyStream;
 
   @override
   void initState() {
     super.initState();
-    _propertyStream =
-        FirebaseFirestore.instance.collection('Properties').snapshots();
+    _propertiesFuture = _fetchProperties();
+  }
+
+  Future<List<Property>> _fetchProperties() async {
+    QuerySnapshot<Map<String, dynamic>> snapshot =
+        await FirebaseFirestore.instance.collection('Properties').get();
+
+    List<Property> properties = [];
+    for (DocumentSnapshot<Map<String, dynamic>> documentSnapshot
+        in snapshot.docs) {
+      Property property =
+          Property.fromJson(documentSnapshot.data() as Map<String, dynamic>);
+      property.propertyID = documentSnapshot.id;
+
+      DocumentSnapshot<Map<String, dynamic>> landlordSnapshot =
+          await property.landlordRef!.get();
+      if (landlordSnapshot.exists) {
+        Landlord landlord =
+            Landlord.fromJson(landlordSnapshot.data() as Map<String, dynamic>);
+        property.landlord = landlord;
+      }
+
+      properties.add(property);
+    }
+
+    return properties;
+  }
+
+  Future<void> _refreshProperties() async {
+    setState(() {
+      _propertiesFuture = _fetchProperties();
+    });
   }
 
   @override
@@ -43,12 +73,17 @@ class _TenantPropertiesPageState extends State<TenantPropertiesPage>
   Widget build(BuildContext context) {
     super.build(context); // Necessary for AutomaticKeepAliveClientMixin
 
-    return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-      stream: _propertyStream,
+    return FutureBuilder<List<Property>>(
+      future: _propertiesFuture,
       builder: (context, snapshot) {
-        if (!snapshot.hasData && !shouldDisplay) {
-          return const LandlordPropertiesSkeleton();
-        } else if (!snapshot.hasData && shouldDisplay) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(
+              child: CircularProgressIndicator(
+            color: Colors.green,
+          ));
+        } else if (snapshot.hasError) {
+          return const Center(child: Text('Error retrieving data'));
+        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
           return Center(
             child: Card(
               elevation: 4.0,
@@ -74,7 +109,6 @@ class _TenantPropertiesPageState extends State<TenantPropertiesPage>
                       'No Properties to show',
                       style: GoogleFonts.montserrat(
                         fontSize: 20.0,
-                        // fontWeight: FontWeight.bold,
                         color: const Color(0xff33907c),
                       ),
                     ),
@@ -84,68 +118,36 @@ class _TenantPropertiesPageState extends State<TenantPropertiesPage>
             ),
           );
         } else {
-          List<DocumentSnapshot<Map<String, dynamic>>> allData =
-              snapshot.data!.docs;
-          List<Property> updatedProperties = [];
+          List<Property> properties = snapshot.data!;
 
-          for (int i = 0; i < allData.length; i++) {
-            Property property =
-                Property.fromJson(allData[i].data() as Map<String, dynamic>);
-            property.propertyID = allData[i].id;
-
-            // Check if the property already exists in the properties list
-            int existingIndex = properties.indexWhere(
-              (existingProperty) =>
-                  existingProperty.propertyID == property.propertyID,
-            );
-
-            if (existingIndex != -1) {
-              // Property already exists, update it
-              properties[existingIndex] = property;
-            } else {
-              // Property is new, add it to the properties list
-              if (allData[i].data()?['tenantRef'] == null)
-                properties.add(property);
-            }
-
-            // Add the property to the updatedProperties list
-            updatedProperties.add(property);
-          }
-
-          // Remove properties that are no longer in the snapshot
-          properties.removeWhere(
-            (existingProperty) => !updatedProperties.contains(existingProperty),
-          );
-
-          return Scaffold(
-            backgroundColor: const Color.fromARGB(255, 255, 255, 255),
-            body: ListView.builder(
+          return RefreshIndicator(
+            onRefresh: _refreshProperties,
+            child: ListView.builder(
               itemCount: properties.length,
               itemBuilder: (context, index) {
+                Property property = properties[index];
                 return PropertyCard(
-                  property: properties[index],
-                  firstName: properties[index].landlord?.firstName ?? '',
-                  lastName: properties[index].landlord?.lastName ?? '',
-                  location: properties[index].location,
-                  address: properties[index].address,
-                  type: properties[index].type,
-                  pathToImage: properties[index].landlord?.pathToImage ??
-                      'assets/userimage.png',
+                  property: property,
+                  firstName: property.landlord?.firstName ?? '',
+                  lastName: property.landlord?.lastName ?? '',
+                  location: property.location,
+                  address: property.address,
+                  type: property.type,
+                  pathToImage:
+                      property.landlord?.pathToImage ?? 'assets/userimage.png',
                   onTap: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (_) => TenantPropertyPage(
-                          property: properties[index],
-                          firstName:
-                              properties[index].landlord?.firstName ?? '',
-                          lastName: properties[index].landlord?.lastName ?? '',
-                          pathToImage:
-                              properties[index].landlord?.pathToImage ??
-                                  'assets/userimage.png',
-                          location: properties[index].location,
-                          address: properties[index].address,
-                          propertyID: properties[index].propertyID ?? '',
+                          property: property,
+                          firstName: property.landlord?.firstName ?? '',
+                          lastName: property.landlord?.lastName ?? '',
+                          pathToImage: property.landlord?.pathToImage ??
+                              'assets/userimage.png',
+                          location: property.location,
+                          address: property.address,
+                          propertyID: property.propertyID ?? '',
                           uid: widget.uid,
                           isWithdraw: widget.isWithdraw,
                         ),
@@ -230,12 +232,11 @@ class PropertyCard extends StatelessWidget {
                         color: const Color(0xFF33907C),
                       ),
                     ),
-                     SizedBox(height: screenHeight * 0.005),
-                    
+                    SizedBox(height: screenHeight * 0.005),
                     Text(
-                          '$location\n$address',
-                          style: TextStyle(fontSize: screenWidth * 0.035),
-                        ),
+                      '$location\n$address',
+                      style: TextStyle(fontSize: screenWidth * 0.035),
+                    ),
                     SizedBox(height: screenHeight * 0.01),
                     Row(
                       children: [
@@ -259,9 +260,9 @@ class PropertyCard extends StatelessWidget {
                     Row(
                       children: [
                         CircleAvatar(
-                          backgroundImage: AssetImage(
+                          backgroundImage: Image.network(
                             pathToImage ?? 'assets/userimage.png',
-                          ),
+                          ).image,
                           radius: screenWidth * 0.025,
                         ),
                         SizedBox(width: screenWidth * 0.01),

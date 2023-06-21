@@ -341,6 +341,7 @@ class PropertyDetails extends StatelessWidget {
                         Text(
                           'Specifications',
                           style: GoogleFonts.montserrat(
+                            fontStyle: FontStyle.italic,
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                           ),
@@ -407,6 +408,7 @@ class PropertyDetails extends StatelessWidget {
                         Text(
                           'Owner Details',
                           style: GoogleFonts.montserrat(
+                            fontStyle: FontStyle.italic,
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                           ),
@@ -536,6 +538,7 @@ class PropertyDetails extends StatelessWidget {
                     Text(
                       'Ratings',
                       style: GoogleFonts.montserrat(
+                        fontStyle: FontStyle.italic,
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
@@ -566,6 +569,7 @@ class PropertyDetails extends StatelessWidget {
                                 Text(
                                   'Past Tenant Rating: ${property.tenantRating}',
                                   style: GoogleFonts.montserrat(
+                                    fontStyle: FontStyle.italic,
                                     fontSize: 14,
                                   ),
                                 ),
@@ -579,6 +583,7 @@ class PropertyDetails extends StatelessWidget {
                     Text(
                       'Past Tenant Review',
                       style: GoogleFonts.montserrat(
+                        fontStyle: FontStyle.italic,
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
@@ -597,6 +602,7 @@ class PropertyDetails extends StatelessWidget {
                     Text(
                       'Monthly Rent',
                       style: GoogleFonts.montserrat(
+                        fontStyle: FontStyle.italic,
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
@@ -762,7 +768,7 @@ class ExpandedImageDialog extends StatelessWidget {
             ),
           ),
           Positioned(
-            top: 40.0,
+            top: 65.0,
             left: 10.0,
             child: GestureDetector(
               onTap: () {
