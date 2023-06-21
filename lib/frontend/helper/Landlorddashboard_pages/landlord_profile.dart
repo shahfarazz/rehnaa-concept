@@ -5,6 +5,9 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:rehnaa/backend/services/authentication_service.dart';
 
 import '../../Screens/signup_page.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 
 class LandlordProfilePage extends StatefulWidget {
   final String uid;
@@ -148,6 +151,86 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
     setState(() {
       showChangePassword = !showChangePassword;
     });
+  }
+
+  Future<void> _uploadImageToFirebase() async {
+    final picker = ImagePicker();
+    final pickedImage = await picker.getImage(source: ImageSource.gallery);
+    if (pickedImage == null) return;
+
+    final File imageFile = File(pickedImage.path);
+    final String fileName = 'users/${widget.uid}/profile_image.jpg';
+
+    try {
+      // Upload the image to Firebase Storage
+      final Reference storageReference =
+          FirebaseStorage.instance.ref().child(fileName);
+      final UploadTask uploadTask = storageReference.putFile(imageFile);
+      final TaskSnapshot taskSnapshot = await uploadTask.whenComplete(() {});
+
+      // Get the download URL of the uploaded image
+      final String downloadURL = await taskSnapshot.ref.getDownloadURL();
+
+      // Update the 'pathToImage' property in the 'Tenants' collection
+      await FirebaseFirestore.instance
+          .collection('Tenants')
+          .doc(widget.uid)
+          .update({'pathToImage': downloadURL});
+
+      // Show a success toast
+      Fluttertoast.showToast(
+        msg: 'Image uploaded successfully',
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.green,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
+    } catch (e) {
+      // Show an error toast
+      Fluttertoast.showToast(
+        msg: 'Failed to upload image',
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
+      print('Error uploading image: $e');
+    }
+  }
+
+  Future<void> _openImagePicker() async {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Upload Image'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                GestureDetector(
+                  child: const Text('Gallery'),
+                  onTap: () {
+                    _uploadImageToFirebase();
+                    Navigator.of(context).pop();
+                  },
+                ),
+                const SizedBox(height: 10),
+                GestureDetector(
+                  child: const Text('Cancel'),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
   @override
