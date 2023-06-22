@@ -14,6 +14,7 @@ import 'package:flutter/services.dart';
 import 'dart:html' as html;
 
 import '../../../backend/models/propertymodel.dart';
+import 'admin_propertyedit.dart';
 
 class AdminPropertyInputPage extends StatefulWidget {
   @override
@@ -40,7 +41,8 @@ class _AdminPropertyInputPageState extends State<AdminPropertyInputPage> {
     List<Property> propertyList = [];
 
     for (var doc in querySnapshot.docs) {
-      Property property = await Property.fromJson(doc.data());
+      Property property = Property.fromJson(doc.data());
+      property.propertyID = doc.id;
       propertyList.add(property);
     }
 
@@ -90,192 +92,14 @@ class _AdminPropertyInputPageState extends State<AdminPropertyInputPage> {
     }
   }
 
-  Future<void> openPropertyDetailsDialog(Property property) async {
+  Future<void> openPropertyDetailsPage(Property property) async {
     String landlordName = await getLandlordName(property.landlordRef);
 
-    // ignore: use_build_context_synchronously
-    showDialog(
-      context: context,
-      builder: (context) {
-        print('reached here');
-
-        return Dialog(
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ListTile(
-                  title: Text(
-                    property.title,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  subtitle: Text(
-                    'Landlord: $landlordName',
-                    style: const TextStyle(
-                      fontSize: 16,
-                    ),
-                  ),
-                ),
-                ListTile(
-                  leading: const Icon(Icons.location_on),
-                  title: Text(
-                    property.location,
-                    style: const TextStyle(
-                      fontSize: 16,
-                    ),
-                  ),
-                ),
-                ListTile(
-                  leading: const Icon(Icons.home),
-                  title: Text(
-                    'Type: ${property.type}',
-                    style: const TextStyle(
-                      fontSize: 16,
-                    ),
-                  ),
-                ),
-                ListTile(
-                  leading: const Icon(Icons.hotel),
-                  title: Text(
-                    'Beds: ${property.beds}',
-                    style: const TextStyle(
-                      fontSize: 16,
-                    ),
-                  ),
-                ),
-                ListTile(
-                  leading: const Icon(Icons.bathtub),
-                  title: Text(
-                    'Baths: ${property.baths}',
-                    style: const TextStyle(
-                      fontSize: 16,
-                    ),
-                  ),
-                ),
-                ListTile(
-                  leading: const Icon(Icons.spa),
-                  title: Text(
-                    'Garden: ${property.garden ? "Yes" : "No"}',
-                    style: const TextStyle(
-                      fontSize: 16,
-                    ),
-                  ),
-                ),
-                ListTile(
-                  leading: const Icon(Icons.living),
-                  title: Text(
-                    'Living: ${property.living}',
-                    style: const TextStyle(
-                      fontSize: 16,
-                    ),
-                  ),
-                ),
-                ListTile(
-                  leading: const Icon(Icons.layers),
-                  title: Text(
-                    'Floors: ${property.floors}',
-                    style: const TextStyle(
-                      fontSize: 16,
-                    ),
-                  ),
-                ),
-                ListTile(
-                  leading: const Icon(Icons.car_rental),
-                  title: Text(
-                    'Carspace: ${property.carspace}',
-                    style: const TextStyle(
-                      fontSize: 16,
-                    ),
-                  ),
-                ),
-                ListTile(
-                  leading: const Icon(Icons.description),
-                  title: Text(
-                    'Description: ${property.description}',
-                    style: const TextStyle(
-                      fontSize: 16,
-                    ),
-                  ),
-                ),
-                ListTile(
-                  leading: const Icon(Icons.attach_money),
-                  title: Text(
-                    'Price: \$${property.price.toStringAsFixed(2)}',
-                    style: const TextStyle(
-                      fontSize: 16,
-                    ),
-                  ),
-                ),
-                ListTile(
-                  leading: const Icon(Icons.star),
-                  title: Text(
-                    'Rehnaa Rating: ${property.rehnaaRating.toStringAsFixed(1)}',
-                    style: const TextStyle(
-                      fontSize: 16,
-                    ),
-                  ),
-                ),
-                ListTile(
-                  leading: const Icon(Icons.star),
-                  title: Text(
-                    'Tenant Rating: ${property.tenantRating.toStringAsFixed(1)}',
-                    style: const TextStyle(
-                      fontSize: 16,
-                    ),
-                  ),
-                ),
-                ListTile(
-                  leading: const Icon(Icons.rate_review),
-                  title: Text(
-                    'Tenant Review: ${property.tenantReview}',
-                    style: const TextStyle(
-                      fontSize: 16,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 10),
-                const Text(
-                  'Images',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 10),
-                // Display the images with loading indicator
-                SizedBox(
-                  height: 200.0, // Adjust this value according to your needs.
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: property.imagePath.length,
-                    itemBuilder: (context, index) {
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                        child: CachedNetworkImage(
-                          imageUrl: property.imagePath[index],
-                          errorWidget: (context, error, stackTrace) {
-                            return const Icon(Icons.error);
-                          },
-                          progressIndicatorBuilder:
-                              (context, url, downloadProgress) {
-                            return CircularProgressIndicator(
-                              value: downloadProgress.progress,
-                            );
-                          },
-                        ),
-                      );
-                    },
-                  ),
-                ),
-                const SizedBox(height: 10),
-              ],
-            ),
-          ),
-        );
-      },
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => PropertyEditPage(property: property),
+      ),
     );
   }
 
@@ -326,7 +150,7 @@ class _AdminPropertyInputPageState extends State<AdminPropertyInputPage> {
                     title: Text(property.title),
                     subtitle: Text(property.location),
                     leading: const Icon(Icons.home),
-                    onTap: () => openPropertyDetailsDialog(property),
+                    onTap: () => openPropertyDetailsPage(property),
                   );
                 },
               ),

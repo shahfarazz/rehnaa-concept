@@ -22,6 +22,7 @@ class Landlord {
   String? raastId;
   String? accountNumber;
   String? iban;
+  String? emailOrPhone;
 
   Landlord({
     required this.firstName,
@@ -41,6 +42,7 @@ class Landlord {
     this.raastId,
     this.accountNumber,
     this.iban,
+    this.emailOrPhone,
   });
 
   static Landlord fromJson(Map<String, dynamic>? json) {
@@ -65,6 +67,7 @@ class Landlord {
               json['rentpaymentRef'].map((ref) => ref as DocumentReference))
           : null,
       pathToImage: json['pathToImage'] ?? 'assets/defaulticon.png',
+      emailOrPhone: json['emailOrPhone'] ?? '',
     );
 
     // await landlord.fetchData();

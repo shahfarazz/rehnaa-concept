@@ -24,6 +24,7 @@ class _TenantRentedPropertyPageState extends State<TenantRentedPropertyPage> {
   String firstName = '';
   String lastName = '';
   String pathToImage = 'assets/defaulticon.png';
+  String emailOrPhone = '';
 
   void _initStream() async {
     //use uid to generate reference to tenant document
@@ -51,6 +52,8 @@ class _TenantRentedPropertyPageState extends State<TenantRentedPropertyPage> {
         firstName = landlordData!['firstName'];
         lastName = landlordData['lastName'];
         pathToImage = landlordData['pathToImage'];
+        emailOrPhone = landlordData['emailOrPhone'];
+
         setState(() {});
       });
     });
@@ -126,12 +129,14 @@ class _TenantRentedPropertyPageState extends State<TenantRentedPropertyPage> {
               // var isWithdraw = false;
 
               return PropertyPage(
-                  property: property,
-                  firstName: firstName,
-                  lastName: lastName,
-                  pathToImage: pathToImage,
-                  location: location,
-                  address: address);
+                property: property,
+                firstName: firstName,
+                lastName: lastName,
+                pathToImage: pathToImage,
+                location: location,
+                address: address,
+                emailOrPhone: emailOrPhone,
+              );
             } catch (e) {
               print('error is $e');
             }

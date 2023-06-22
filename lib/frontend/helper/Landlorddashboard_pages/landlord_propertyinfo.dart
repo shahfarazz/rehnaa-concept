@@ -7,7 +7,6 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../backend/models/propertymodel.dart';
 import 'package:photo_view/photo_view.dart';
 
-
 class PropertyPage extends StatefulWidget {
   final Property property;
   final String firstName;
@@ -15,6 +14,7 @@ class PropertyPage extends StatefulWidget {
   final String pathToImage;
   final String location;
   final String address;
+  final String emailOrPhone;
 
   const PropertyPage(
       {super.key,
@@ -23,7 +23,8 @@ class PropertyPage extends StatefulWidget {
       required this.lastName,
       required this.pathToImage,
       required this.location,
-      required this.address});
+      required this.address,
+      required this.emailOrPhone});
 
   @override
   // ignore: library_private_types_in_public_api
@@ -60,6 +61,7 @@ class _PropertyPageState extends State<PropertyPage> {
                     firstName: widget.firstName,
                     lastName: widget.lastName,
                     pathToImage: widget.pathToImage,
+                    emailOrPhone: widget.emailOrPhone,
                   ),
                 ),
               ],
@@ -106,7 +108,8 @@ class PropertyCarousel extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => ExpandedImageDialog(imageProvider: imagePath),
+                        builder: (_) =>
+                            ExpandedImageDialog(imageProvider: imagePath),
                       ),
                     );
                   },
@@ -118,7 +121,8 @@ class PropertyCarousel extends StatelessWidget {
 
                       placeholder: (context, url) =>
                           const CircularProgressIndicator(),
-                      errorWidget: (context, url, error) => const Icon(Icons.error),
+                      errorWidget: (context, url, error) =>
+                          const Icon(Icons.error),
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -199,13 +203,15 @@ class PropertyDetails extends StatelessWidget {
   final String firstName;
   final String lastName;
   final String pathToImage;
+  final String emailOrPhone;
 
   const PropertyDetails(
       {super.key,
       required this.property,
       required this.firstName,
       required this.lastName,
-      required this.pathToImage});
+      required this.pathToImage,
+      required this.emailOrPhone});
 
   @override
   Widget build(BuildContext context) {
@@ -265,26 +271,26 @@ class PropertyDetails extends StatelessWidget {
                 ),
               ),
               SizedBox(height: screenHeight * 0.02),
-                    Text.rich(
+              Text.rich(
+                TextSpan(
+                  text: "Type: ",
+                  style: GoogleFonts.montserrat(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                    // color: const Color(0xFF33907C),
+                  ),
+                  children: [
                     TextSpan(
-                      text: "Type: ",
+                      text: "${property.type}",
                       style: GoogleFonts.montserrat(
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.normal,
                         fontSize: 14,
                         // color: const Color(0xFF33907C),
                       ),
-                      children: [
-                        TextSpan(
-                          text: "${property.type}",
-                          style: GoogleFonts.montserrat(
-                            fontWeight: FontWeight.normal,
-                            fontSize: 14,
-                            // color: const Color(0xFF33907C),
-                          ),
-                        ),
-                      ],
                     ),
-                  ),
+                  ],
+                ),
+              ),
               SizedBox(height: screenHeight * 0.04),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -395,12 +401,15 @@ class PropertyDetails extends StatelessWidget {
                           fontSize: 16,
                         ),
                       ),
-                      Text(
-                        '03333295546', // Replace with the owner's phone number fetched from Firebase
-                        style: GoogleFonts.montserrat(
-                          fontSize: 13,
+                      Container(
+                        width: 150,
+                        child: Text(
+                          emailOrPhone, // Replace with the owner's phone number fetched from Firebase
+                          style: GoogleFonts.montserrat(
+                            fontSize: 13,
+                          ),
                         ),
-                      ),
+                      )
                     ],
                   ),
                   const Spacer(),

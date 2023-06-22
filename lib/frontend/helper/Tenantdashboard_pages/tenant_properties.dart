@@ -28,6 +28,7 @@ class _TenantPropertiesPageState extends State<TenantPropertiesPage>
     with AutomaticKeepAliveClientMixin<TenantPropertiesPage> {
   late Future<List<Property>> _propertiesFuture;
   bool shouldDisplay = false;
+  String? emailOrPhone;
 
   @override
   void initState() {
@@ -150,6 +151,7 @@ class _TenantPropertiesPageState extends State<TenantPropertiesPage>
                           propertyID: property.propertyID ?? '',
                           uid: widget.uid,
                           isWithdraw: widget.isWithdraw,
+                          emailOrPhone: property.landlord?.emailOrPhone ?? '',
                         ),
                       ),
                     );

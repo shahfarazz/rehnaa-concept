@@ -121,7 +121,17 @@ class AuthenticationService extends ChangeNotifier {
 
     if (userDoc.size == 1) {
       final user = userDoc.docs.first;
-      phoneNumber = '+92${phoneNumber.substring(1)}';
+      // String phoneNumber;
+
+      if (phoneNumber.startsWith('0')) {
+        phoneNumber = phoneNumber.replaceFirst(RegExp('^0'), '+92');
+        phoneNumber = '+92${phoneNumber.substring(1)}';
+      } else if (phoneNumber.startsWith('+92')) {
+        phoneNumber = phoneNumber;
+      } else {
+        // Handle invalid cases or default behavior
+        phoneNumber = '';
+      }
 
       // Get the password stored in Firestore for the user
       final storedPassword = user.data()['password'];

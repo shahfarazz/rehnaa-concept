@@ -168,6 +168,7 @@ class _LandlordPropertiesPageState extends State<LandlordPropertiesPage>
                               'assets/userimage.png',
                           location: property.location,
                           address: property.address,
+                          emailOrPhone: property.landlord?.emailOrPhone ?? '',
                         ),
                       ),
                     );

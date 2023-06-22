@@ -33,7 +33,7 @@ class _TenantProfilePageState extends State<TenantProfilePage> {
 
   Future<void> _uploadImageToFirebase() async {
     final picker = ImagePicker();
-    final pickedImage = await picker.getImage(source: ImageSource.gallery);
+    final pickedImage = await picker.pickImage(source: ImageSource.gallery);
     if (pickedImage == null) return;
 
     final File imageFile = File(pickedImage.path);

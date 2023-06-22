@@ -143,7 +143,16 @@ class _SignUpPageState extends State<SignUpPage> {
       _showToast(formError, Colors.red);
       return;
     }
-    String phoneNumber = emailOrPhone.replaceFirst(RegExp('^0'), '+92');
+    String phoneNumber;
+
+    if (emailOrPhone.startsWith('0')) {
+      phoneNumber = emailOrPhone.replaceFirst(RegExp('^0'), '+92');
+    } else if (emailOrPhone.startsWith('+92')) {
+      phoneNumber = emailOrPhone;
+    } else {
+      // Handle invalid cases or default behavior
+      phoneNumber = '';
+    }
 
     // check if phoneNumber is already registered in users collection
     QuerySnapshot querySnapshot = await FirebaseFirestore.instance
@@ -347,7 +356,7 @@ class _SignUpPageState extends State<SignUpPage> {
 
     if (emailOrPhone.isEmpty) return 'Email/Phone cannot be empty';
     if (!isEmail(emailOrPhone)) {
-      final regex = RegExp(r'^03\d{9}$');
+      final regex = RegExp(r'^(03\d{9}|\+92\d{10})$');
       if (!regex.hasMatch(emailOrPhone)) {
         return 'Enter a valid Pakistani phone number';
       }

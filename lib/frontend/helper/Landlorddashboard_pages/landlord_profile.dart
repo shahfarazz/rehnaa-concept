@@ -155,7 +155,7 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
 
   Future<void> _uploadImageToFirebase() async {
     final picker = ImagePicker();
-    final pickedImage = await picker.getImage(source: ImageSource.gallery);
+    final pickedImage = await picker.pickImage(source: ImageSource.gallery);
     if (pickedImage == null) return;
 
     final File imageFile = File(pickedImage.path);
@@ -173,7 +173,7 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
 
       // Update the 'pathToImage' property in the 'Tenants' collection
       await FirebaseFirestore.instance
-          .collection('Tenants')
+          .collection('Landlords')
           .doc(widget.uid)
           .update({'pathToImage': downloadURL});
 
@@ -291,9 +291,13 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
                 Stack(
                   alignment: Alignment.bottomRight,
                   children: [
-                    CircleAvatar(
-                      radius: 80,
-                      backgroundImage: AssetImage(pathToImage),
+                    GestureDetector(
+                      onTap: () {
+                        _openImagePicker();
+                      },
+                      child: CircleAvatar(
+                          radius: 80,
+                          backgroundImage: NetworkImage(pathToImage)),
                     ),
                     IconButton(
                       icon: const Icon(
