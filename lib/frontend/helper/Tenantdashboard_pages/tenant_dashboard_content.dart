@@ -9,6 +9,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:rehnaa/backend/models/tenantsmodel.dart';
 import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenantinvoice.dart';
 
+import '../../../backend/models/landlordmodel.dart';
 import '../Landlorddashboard_pages/landlord_dashboard_content.dart';
 
 class TenantDashboardContent extends StatefulWidget {
@@ -222,20 +223,36 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                                       isWithdraw = true;
                                     });
 
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              TenantInvoicePage(
-                                                tenantName:
-                                                    '${tenant.firstName} ${tenant.lastName}',
-                                                // paymentDateTime: DateTime.now(),
-                                                rent: tenant.rent,
-                                                amount: amount,
-                                                selectedOption: selectedOption,
-                                                id: widget.uid,
-                                              )),
-                                    );
+                                    tenant.landlordRef
+                                        ?.get()
+                                        .then((landlordDoc) {
+                                      // print(
+                                      //     'landlordDoc.exists: ${landlordDoc.data()}');
+                                      if (landlordDoc.exists) {
+                                        var landlordJson = landlordDoc.data()
+                                            as Map<String, dynamic>;
+                                        Landlord landlord =
+                                            Landlord.fromJson(landlordJson);
+                                        print(
+                                            'reached here landlord is ${landlord.firstName} ${landlord.lastName}}');
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  TenantInvoicePage(
+                                                    tenantName:
+                                                        '${tenant.firstName} ${tenant.lastName}',
+                                                    // paymentDateTime: DateTime.now(),
+                                                    rent: tenant.rent,
+                                                    amount: amount,
+                                                    selectedOption:
+                                                        selectedOption,
+                                                    id: widget.uid,
+                                                    landlord: landlord,
+                                                  )),
+                                        );
+                                      }
+                                    });
                                   } else {
                                     Fluttertoast.showToast(
                                       msg: 'Invalid withdrawal amount',

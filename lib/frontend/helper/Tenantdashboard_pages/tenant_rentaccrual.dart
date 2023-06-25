@@ -204,12 +204,16 @@ class _TenantRentAccrualPageState extends State<TenantRentAccrualPage> {
                       ),
                     ],
                   ),
-                  child: const Column(
+                  child: Column(
                     children: [
                       Row(
                         children: [
                           Text(
-                            '22 March 2023',
+                            tenant?.dateJoined
+                                    ?.toDate()
+                                    .toString()
+                                    .substring(0, 10) ??
+                                'Date Joined',
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,

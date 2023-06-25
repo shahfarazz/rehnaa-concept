@@ -147,8 +147,7 @@ class _DashboardPageState extends State<TenantDashboardPage>
     super.build(context);
     return Scaffold(
       appBar: _buildAppBar(size),
-      resizeToAvoidBottomInset:
-          false, // Prevent resizing when the keyboard is shown
+      resizeToAvoidBottomInset: false,
       body: StatefulBuilder(
         builder: (BuildContext context, setState) {
           return GestureDetector(
@@ -156,7 +155,6 @@ class _DashboardPageState extends State<TenantDashboardPage>
               if (_isSidebarOpen) {
                 _closeSidebar();
               }
-              // Close the keyboard
               FocusScope.of(context).unfocus();
             },
             child: Stack(
@@ -176,7 +174,7 @@ class _DashboardPageState extends State<TenantDashboardPage>
                           physics: isKeyboardVisible(context)
                               ? NeverScrollableScrollPhysics()
                               : const AlwaysScrollableScrollPhysics(),
-                          itemCount: 5, // Number of pages
+                          itemCount: 5,
                           itemBuilder: (context, index) {
                             switch (index) {
                               case 0:

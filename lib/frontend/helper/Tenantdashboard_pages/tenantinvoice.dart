@@ -4,6 +4,7 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pdfWidgets;
 import 'package:printing/printing.dart';
 import 'package:rehnaa/frontend/Screens/faq.dart';
+import '../../../backend/models/landlordmodel.dart';
 import '../../Screens/Tenant/tenant_dashboard.dart';
 import 'package:flutter/services.dart';
 
@@ -13,6 +14,7 @@ class TenantInvoicePage extends StatefulWidget {
   final double amount;
   final String selectedOption;
   final String id;
+  final Landlord landlord;
 
   TenantInvoicePage({
     required this.tenantName,
@@ -20,6 +22,7 @@ class TenantInvoicePage extends StatefulWidget {
     required this.amount,
     required this.selectedOption,
     required this.id,
+    required this.landlord,
   });
 
   @override
@@ -69,33 +72,28 @@ class _TenantInvoicePageState extends State<TenantInvoicePage> {
             onPressed: () async {
               final pdf = pdfWidgets.Document();
 
-              final imageBytes =
-                  (await rootBundle.load('assets/mainlogo.png')).buffer
-                      .asUint8List();
+              final imageBytes = (await rootBundle.load('assets/mainlogo.png'))
+                  .buffer
+                  .asUint8List();
               final image = pdfWidgets.MemoryImage(imageBytes);
-              
 
               pdf.addPage(
                 pdfWidgets.Page(
                   build: (pdfWidgets.Context context) => pdfWidgets.Column(
-
-                    
-
                     crossAxisAlignment: pdfWidgets.CrossAxisAlignment.start,
                     children: [
-
-                      
-                        
                       pdfWidgets.Row(
                         mainAxisAlignment:
                             pdfWidgets.MainAxisAlignment.spaceBetween,
                         children: [
                           pdfWidgets.Row(
                             children: [
-                              pdfWidgets.Image(image,
-                              width: 80,
-                              height: 80,
-                              fit: pdfWidgets.BoxFit.contain,),
+                              pdfWidgets.Image(
+                                image,
+                                width: 80,
+                                height: 80,
+                                fit: pdfWidgets.BoxFit.contain,
+                              ),
                               pdfWidgets.Padding(
                                 padding: pdfWidgets.EdgeInsets.only(left: 6.0),
                                 child: pdfWidgets.Text(
@@ -110,42 +108,42 @@ class _TenantInvoicePageState extends State<TenantInvoicePage> {
                             ],
                           ),
 
-                           pdfWidgets.Column(
+                          pdfWidgets.Column(
                             children: [
-                              
                               pdfWidgets.Padding(
-                                padding: pdfWidgets.EdgeInsets.only(top: 100.0, left: 50),
+                                padding: pdfWidgets.EdgeInsets.only(
+                                    top: 100.0, left: 50),
                                 child: pdfWidgets.Text(
                                   'INVOICE',
                                   style: pdfWidgets.TextStyle(
                                     fontSize: 60,
-                                    color: PdfColors.green500,  // 50% opaque green color
+                                    color: PdfColors
+                                        .green500, // 50% opaque green color
                                     fontWeight: pdfWidgets.FontWeight.bold,
                                   ),
                                 ),
                               ),
                             ],
                           ),
-                          
-                        //   pdfWidgets.Text(
-                        //   'INVOICE',
-                        //   style: pdfWidgets.TextStyle(
-                        //     fontSize: 60,
-                        //     color: PdfColors.green500,  // 50% opaque green color
-                        //     fontWeight: pdfWidgets.FontWeight.bold,
-                        //   ),
-                        // ),
-                        
 
-
+                          //   pdfWidgets.Text(
+                          //   'INVOICE',
+                          //   style: pdfWidgets.TextStyle(
+                          //     fontSize: 60,
+                          //     color: PdfColors.green500,  // 50% opaque green color
+                          //     fontWeight: pdfWidgets.FontWeight.bold,
+                          //   ),
+                          // ),
                         ],
                       ),
                       pdfWidgets.Padding(
-                        padding: pdfWidgets.EdgeInsets.only(left: 300.0, top: 40),
+                        padding:
+                            pdfWidgets.EdgeInsets.only(left: 300.0, top: 40),
                         child: pdfWidgets.Text(
                           'Invoice Date: ${DateFormat('MM/dd/yyyy').format(paymentDateTime)}\nInvoice Time: ${DateFormat('hh:mm   a').format(paymentDateTime)}\n\nEmail: \nPhone:',
-
-                          style: pdfWidgets.TextStyle(fontSize: 16,),
+                          style: pdfWidgets.TextStyle(
+                            fontSize: 16,
+                          ),
                         ),
                       ),
                       pdfWidgets.Padding(
@@ -162,7 +160,9 @@ class _TenantInvoicePageState extends State<TenantInvoicePage> {
                         padding: pdfWidgets.EdgeInsets.only(top: -50),
                         child: pdfWidgets.Text(
                           '${widget.tenantName}',
-                          style: pdfWidgets.TextStyle(fontSize: 25, fontWeight: pdfWidgets.FontWeight.bold),
+                          style: pdfWidgets.TextStyle(
+                              fontSize: 25,
+                              fontWeight: pdfWidgets.FontWeight.bold),
                         ),
                       ),
                       pdfWidgets.Padding(
@@ -173,11 +173,13 @@ class _TenantInvoicePageState extends State<TenantInvoicePage> {
                         ),
                       ),
 
-                       pdfWidgets.Padding(
+                      pdfWidgets.Padding(
                         padding: pdfWidgets.EdgeInsets.only(bottom: 20.0),
                         child: pdfWidgets.Text(
                           'Property Rented Address:',
-                          style: pdfWidgets.TextStyle(fontSize: 15, fontWeight: pdfWidgets.FontWeight.bold),
+                          style: pdfWidgets.TextStyle(
+                              fontSize: 15,
+                              fontWeight: pdfWidgets.FontWeight.bold),
                         ),
                       ),
 
@@ -185,7 +187,9 @@ class _TenantInvoicePageState extends State<TenantInvoicePage> {
                         padding: pdfWidgets.EdgeInsets.only(bottom: 20.0),
                         child: pdfWidgets.Text(
                           'Mode of Payment : ${widget.selectedOption}',
-                          style: pdfWidgets.TextStyle(fontSize: 15, fontWeight: pdfWidgets.FontWeight.bold),
+                          style: pdfWidgets.TextStyle(
+                              fontSize: 15,
+                              fontWeight: pdfWidgets.FontWeight.bold),
                         ),
                       ),
                       // pdfWidgets.Padding(
@@ -224,90 +228,119 @@ class _TenantInvoicePageState extends State<TenantInvoicePage> {
                       //     style: pdfWidgets.TextStyle(fontSize: 20),
                       //   ),
                       // ),
-                     pdfWidgets.Center(
-        child: pdfWidgets.Container(
-          width: 500,
-          height: 55,
-          decoration: pdfWidgets.BoxDecoration(
-            // borderRadius: 10,
-            color: PdfColors.green400,
-          ),
-          child: pdfWidgets.Padding(
-            padding: const pdfWidgets.EdgeInsets.all(10),
-            child: pdfWidgets.Column(
-              crossAxisAlignment: pdfWidgets.CrossAxisAlignment.start,
-              children: [
-                // pdfWidgets.Text('Card Title', style: pdfWidgets.TextStyle(fontSize: 20, fontWeight: pdfWidgets.FontWeight.bold, )),
-                pdfWidgets.SizedBox(height: 10),
-                pdfWidgets.Row(
-                  mainAxisAlignment: pdfWidgets.MainAxisAlignment.spaceBetween,
-                  children: [
-                    pdfWidgets.Text('Landlord Name', style: pdfWidgets.TextStyle(fontSize: 20, fontWeight: pdfWidgets.FontWeight.bold, color: PdfColors.white, )),
-                    pdfWidgets.Text('Month',  style: pdfWidgets.TextStyle(fontSize: 20, fontWeight: pdfWidgets.FontWeight.bold, color: PdfColors.white,  )),
-                    pdfWidgets.Text('Amount', style: pdfWidgets.TextStyle(fontSize: 20, fontWeight: pdfWidgets.FontWeight.bold, color: PdfColors.white,  )),
-                  ],
-                ),
-                
-              ],
-            ),
-          ),
-        ),
-      ),
-                    
-                pdfWidgets.SizedBox(height: 20),
+                      pdfWidgets.Center(
+                        child: pdfWidgets.Container(
+                          width: 500,
+                          height: 55,
+                          decoration: pdfWidgets.BoxDecoration(
+                            // borderRadius: 10,
+                            color: PdfColors.green400,
+                          ),
+                          child: pdfWidgets.Padding(
+                            padding: const pdfWidgets.EdgeInsets.all(10),
+                            child: pdfWidgets.Column(
+                              crossAxisAlignment:
+                                  pdfWidgets.CrossAxisAlignment.start,
+                              children: [
+                                // pdfWidgets.Text('Card Title', style: pdfWidgets.TextStyle(fontSize: 20, fontWeight: pdfWidgets.FontWeight.bold, )),
+                                pdfWidgets.SizedBox(height: 10),
+                                pdfWidgets.Row(
+                                  mainAxisAlignment:
+                                      pdfWidgets.MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    pdfWidgets.Text('Landlord Name',
+                                        style: pdfWidgets.TextStyle(
+                                          fontSize: 20,
+                                          fontWeight:
+                                              pdfWidgets.FontWeight.bold,
+                                          color: PdfColors.white,
+                                        )),
+                                    pdfWidgets.Text('Month',
+                                        style: pdfWidgets.TextStyle(
+                                          fontSize: 20,
+                                          fontWeight:
+                                              pdfWidgets.FontWeight.bold,
+                                          color: PdfColors.white,
+                                        )),
+                                    pdfWidgets.Text('Amount',
+                                        style: pdfWidgets.TextStyle(
+                                          fontSize: 20,
+                                          fontWeight:
+                                              pdfWidgets.FontWeight.bold,
+                                          color: PdfColors.white,
+                                        )),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
 
-                    pdfWidgets.Center(
-        child: pdfWidgets.Container(
-          width: 500,
-          height: 70,
-          decoration: pdfWidgets.BoxDecoration(
-            // borderRadius: 10,
-            color: PdfColors.grey200,
-          ),
-          child: pdfWidgets.Padding(
-            padding: const pdfWidgets.EdgeInsets.all(10),
-            child: pdfWidgets.Column(
-              crossAxisAlignment: pdfWidgets.CrossAxisAlignment.start,
-              children: [
-                // pdfWidgets.Text('Card Title', style: pdfWidgets.TextStyle(fontSize: 20, fontWeight: pdfWidgets.FontWeight.bold, )),
-                pdfWidgets.SizedBox(height: 15),
-                pdfWidgets.Row(
-                  mainAxisAlignment: pdfWidgets.MainAxisAlignment.spaceBetween,
-                  children: [
-                    pdfWidgets.Text('John Doe', style: pdfWidgets.TextStyle(fontSize: 20,color: PdfColors.black, )),
-                    pdfWidgets.Text('${DateFormat('MMMM').format(paymentDateTime)}',  style: pdfWidgets.TextStyle(fontSize: 20, color: PdfColors.black, )),
-                    pdfWidgets.Text('${widget.rent}', style: pdfWidgets.TextStyle(fontSize: 20, color: PdfColors.black, )),
-                  ],
-                ),
-                
-              ],
-            ),
-          ),
-          
-        ),
-      ),
-     
-      
-                pdfWidgets.SizedBox(height: 110),
+                      pdfWidgets.SizedBox(height: 20),
 
-                    pdfWidgets.Align(
-                      
-            alignment: pdfWidgets.Alignment.bottomRight,
-            child: pdfWidgets.Column(
-              crossAxisAlignment: pdfWidgets.CrossAxisAlignment.end,
-              children: <pdfWidgets.Widget>[
-                pdfWidgets.Text('Signature'),
-                pdfWidgets.SizedBox(height: 20),
-                pdfWidgets.Container(
-                  height: 1.0,
-                  width: 100.0,
-                  color: PdfColors.black,
-                ),
-              ],
-            ),
-          ),
+                      pdfWidgets.Center(
+                        child: pdfWidgets.Container(
+                          width: 500,
+                          height: 70,
+                          decoration: pdfWidgets.BoxDecoration(
+                            // borderRadius: 10,
+                            color: PdfColors.grey200,
+                          ),
+                          child: pdfWidgets.Padding(
+                            padding: const pdfWidgets.EdgeInsets.all(10),
+                            child: pdfWidgets.Column(
+                              crossAxisAlignment:
+                                  pdfWidgets.CrossAxisAlignment.start,
+                              children: [
+                                // pdfWidgets.Text('Card Title', style: pdfWidgets.TextStyle(fontSize: 20, fontWeight: pdfWidgets.FontWeight.bold, )),
+                                pdfWidgets.SizedBox(height: 15),
+                                pdfWidgets.Row(
+                                  mainAxisAlignment:
+                                      pdfWidgets.MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    pdfWidgets.Text(
+                                        '${widget.landlord.firstName} ${widget.landlord.lastName}',
+                                        style: pdfWidgets.TextStyle(
+                                          fontSize: 20,
+                                          color: PdfColors.black,
+                                        )),
+                                    pdfWidgets.Text(
+                                        '${DateFormat('MMMM').format(paymentDateTime)}',
+                                        style: pdfWidgets.TextStyle(
+                                          fontSize: 20,
+                                          color: PdfColors.black,
+                                        )),
+                                    pdfWidgets.Text('${widget.amount}',
+                                        style: pdfWidgets.TextStyle(
+                                          fontSize: 20,
+                                          color: PdfColors.black,
+                                        )),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
 
-          
+                      pdfWidgets.SizedBox(height: 110),
+
+                      pdfWidgets.Align(
+                        alignment: pdfWidgets.Alignment.bottomRight,
+                        child: pdfWidgets.Column(
+                          crossAxisAlignment: pdfWidgets.CrossAxisAlignment.end,
+                          children: <pdfWidgets.Widget>[
+                            pdfWidgets.Text('Signature'),
+                            pdfWidgets.SizedBox(height: 20),
+                            pdfWidgets.Container(
+                              height: 1.0,
+                              width: 100.0,
+                              color: PdfColors.black,
+                            ),
+                          ],
+                        ),
+                      ),
                     ],
                   ),
                 ),

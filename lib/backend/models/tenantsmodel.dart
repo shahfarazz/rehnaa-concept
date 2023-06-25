@@ -19,6 +19,7 @@ class Tenant {
   Landlord? landlord;
   String? pathToImage;
   String? tempID;
+  Timestamp? dateJoined;
 
   Tenant(
       {required this.firstName,
@@ -37,7 +38,8 @@ class Tenant {
       this.landlord,
       this.pathToImage,
       this.tempID,
-      this.propertyRef});
+      this.propertyRef,
+      this.dateJoined});
 
   factory Tenant.fromJson(Map<String, dynamic> json) {
     return Tenant(
@@ -55,6 +57,7 @@ class Tenant {
       landlordRef: json['landlordRef'],
       pathToImage: json['pathToImage'] ?? 'assets/defaultimage.png',
       policeVerification: json['policeVerification'] ?? false,
+      dateJoined: json['dateJoined'],
     );
   }
 
