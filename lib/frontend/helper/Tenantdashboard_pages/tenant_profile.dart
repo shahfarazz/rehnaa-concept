@@ -262,6 +262,7 @@ class _TenantProfilePageState extends State<TenantProfilePage> {
           }
 
           final docData = snapshot.data!.data();
+          print('docData is ${docData}');
 
           if (docData == null) {
             // If document data is null, display a message
@@ -276,12 +277,12 @@ class _TenantProfilePageState extends State<TenantProfilePage> {
           final description = docData['description'] as String? ?? '';
 
           final isEmail = authService.isEmail(emailOrPhone);
-          final isPhoneNumber = authService.isPhoneNumber(emailOrPhone);
+          // final isPhoneNumber = authService.isPhoneNumber(emailOrPhone);
           String contactInfo = '';
 
           if (isEmail) {
             contactInfo = 'Email: $emailOrPhone';
-          } else if (isPhoneNumber) {
+          } else {
             contactInfo = 'Phone: $emailOrPhone';
           }
 

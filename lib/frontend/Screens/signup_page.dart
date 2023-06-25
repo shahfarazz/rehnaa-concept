@@ -390,6 +390,7 @@ class _SignUpPageState extends State<SignUpPage> {
       gravity: ToastGravity.BOTTOM,
       backgroundColor: backgroundColor,
       textColor: Colors.white,
+      fontSize: 16.0,
     );
   }
 

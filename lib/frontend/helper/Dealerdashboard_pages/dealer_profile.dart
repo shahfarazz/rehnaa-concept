@@ -71,12 +71,12 @@ class _DealerProfilePageState extends State<DealerProfilePage> {
           final description = docData['description'] as String? ?? '';
 
           final isEmail = authService.isEmail(emailOrPhone);
-          final isPhoneNumber = authService.isPhoneNumber(emailOrPhone);
+          // final isPhoneNumber = authService.isPhoneNumber(emailOrPhone);
           String contactInfo = '';
 
           if (isEmail) {
             contactInfo = 'Email: $emailOrPhone';
-          } else if (isPhoneNumber) {
+          } else {
             contactInfo = 'Phone: $emailOrPhone';
           }
 
