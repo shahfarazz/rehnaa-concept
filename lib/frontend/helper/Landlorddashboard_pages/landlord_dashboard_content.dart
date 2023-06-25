@@ -238,8 +238,7 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
                                         {
                                           'title':
                                               'Withdraw Request by ${'${landlord.firstName} ${landlord.lastName}'}',
-                                          'amount':
-                                              'Rs${landlord.balance.toString()}',
+                                          'amount': 'Rs${withdrawalAmount}',
                                         }
                                       ]),
                                     }, SetOptions(merge: true));

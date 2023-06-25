@@ -192,8 +192,7 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                                         {
                                           'title':
                                               'Payment Request by ${'${tenant.firstName} ${tenant.lastName}'}',
-                                          'amount':
-                                              'Rs${tenant.rent.toString()}',
+                                          'amount': 'Rs${amount}',
                                         }
                                       ]),
                                     }, SetOptions(merge: true));

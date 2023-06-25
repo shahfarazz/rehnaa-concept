@@ -262,7 +262,7 @@ class _TenantProfilePageState extends State<TenantProfilePage> {
           }
 
           final docData = snapshot.data!.data();
-          print('docData is ${docData}');
+          // print('docData is ${docData}');
 
           if (docData == null) {
             // If document data is null, display a message
