@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
@@ -84,6 +85,27 @@ class _AdminVouchersPageState extends State<AdminVouchersPage> {
             ),
           );
         });
+
+        WriteBatch batch = FirebaseFirestore.instance.batch();
+
+        // Update documents in the Tenants collection
+        QuerySnapshot tenantsQuerySnapshot =
+            await FirebaseFirestore.instance.collection('Tenants').get();
+        tenantsQuerySnapshot.docs.forEach((tenantDoc) {
+          batch.set(tenantDoc.reference, {'isNewVouchers': true},
+              SetOptions(merge: true));
+        });
+
+        // Update documents in the Landlords collection
+        QuerySnapshot landlordsQuerySnapshot =
+            await FirebaseFirestore.instance.collection('Landlords').get();
+        landlordsQuerySnapshot.docs.forEach((landlordDoc) {
+          batch.set(landlordDoc.reference, {'isNewVouchers': true},
+              SetOptions(merge: true));
+        });
+
+        // Commit the batched write operation
+        await batch.commit();
       }
     } else {
       setState(() {

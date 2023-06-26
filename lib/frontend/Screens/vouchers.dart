@@ -4,7 +4,7 @@ import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:http/http.dart' as http;
 import 'dart:typed_data';
 import 'package:photo_view/photo_view.dart';
-
+import 'package:rehnaa/frontend/Screens/splash.dart';
 
 void main() {
   runApp(const MyApp());
@@ -29,31 +29,28 @@ class Voucher {
   Voucher(this.url, this.ref, this.imageProvider);
 }
 
-
-
 class VouchersPage extends StatelessWidget {
   const VouchersPage({Key? key}) : super(key: key);
 
   Future<List<Voucher>> fetchVouchers() async {
-  try {
-    firebase_storage.ListResult listResult = await firebase_storage
-        .FirebaseStorage.instance
-        .ref('images/vouchers/')
-        .listAll();
-    List<Voucher> vouchersList = [];
-    for (var ref in listResult.items) {
-      String url = await ref.getDownloadURL();
-      final response = await http.get(Uri.parse(url));
-      Uint8List imageData = response.bodyBytes;
-      vouchersList.add(Voucher(url, ref, MemoryImage(imageData)));
+    try {
+      firebase_storage.ListResult listResult = await firebase_storage
+          .FirebaseStorage.instance
+          .ref('images/vouchers/')
+          .listAll();
+      List<Voucher> vouchersList = [];
+      for (var ref in listResult.items) {
+        String url = await ref.getDownloadURL();
+        final response = await http.get(Uri.parse(url));
+        Uint8List imageData = response.bodyBytes;
+        vouchersList.add(Voucher(url, ref, MemoryImage(imageData)));
+      }
+      return vouchersList;
+    } catch (error) {
+      print('Error fetching vouchers: $error');
+      return [];
     }
-    return vouchersList;
-  } catch (error) {
-    print('Error fetching vouchers: $error');
-    return [];
   }
-}
-
 
   @override
   Widget build(BuildContext context) {
@@ -65,7 +62,13 @@ class VouchersPage extends StatelessWidget {
             left: 10.0,
             child: GestureDetector(
               onTap: () {
-                Navigator.pop(context);
+                // push with a set state
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const SplashScreen(),
+                  ),
+                );
               },
               child: Container(
                 width: 40,
@@ -85,7 +88,12 @@ class VouchersPage extends StatelessWidget {
                 ),
                 child: IconButton(
                   onPressed: () {
-                    Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const SplashScreen(),
+                      ),
+                    );
                   },
                   icon: const Icon(
                     Icons.arrow_back,
@@ -155,8 +163,6 @@ class VouchersPage extends StatelessWidget {
     return result.items.length;
   }
 
-  
-
   Widget buildRoundedImageCards(BuildContext context) {
     return FutureBuilder<List<Voucher>>(
       future: fetchVouchers(),
@@ -174,55 +180,53 @@ class VouchersPage extends StatelessWidget {
         return SizedBox(
           height: size.height * 0.8,
           child: ListView.builder(
-  scrollDirection: Axis.vertical,
-  itemCount: vouchersList.length,
-  shrinkWrap: true, 
-  itemBuilder: (context, index) {
-    Voucher voucher = vouchersList[index];
-    return Padding(
-      padding: const EdgeInsets.only(right: 0),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(20.0),
-        child: Card(
-          child: GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) =>ExpandedImageDialog(imageProvider: voucher.imageProvider),
-
+            scrollDirection: Axis.vertical,
+            itemCount: vouchersList.length,
+            shrinkWrap: true,
+            itemBuilder: (context, index) {
+              Voucher voucher = vouchersList[index];
+              return Padding(
+                padding: const EdgeInsets.only(right: 0),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(20.0),
+                  child: Card(
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ExpandedImageDialog(
+                                imageProvider: voucher.imageProvider),
+                          ),
+                        );
+                      },
+                      child: SizedBox(
+                        width: 200,
+                        height: 200,
+                        child: CachedNetworkImage(
+                          //add a progress indicator here not circular
+                          progressIndicatorBuilder: (context, url, progress) =>
+                              Center(
+                            child: progress == null
+                                ? CircularProgressIndicator()
+                                : LinearProgressIndicator(
+                                    value: progress.progress,
+                                  ),
+                          ),
+                          imageUrl: voucher.url,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
               );
             },
-            child: SizedBox(
-              width: 200,
-              height: 200,
-              child: CachedNetworkImage(
-                //add a progress indicator here not circular
-                progressIndicatorBuilder: (context, url, progress) =>
-                    Center(
-                  child: progress == null
-                      ? CircularProgressIndicator()
-                      : LinearProgressIndicator(
-                          value: progress.progress,
-                        ),
-                ),
-                imageUrl: voucher.url,
-                fit: BoxFit.cover,
-              ),
-            ),
           ),
-        ),
-      ),
-    );
-  },
-),
-
         );
       },
     );
   }
-
 }
 
 class ExpandedImageDialog extends StatelessWidget {
