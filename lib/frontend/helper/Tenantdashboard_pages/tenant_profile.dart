@@ -524,6 +524,15 @@ class _TenantProfilePageState extends State<TenantProfilePage> {
                                                                     _obscurePassword,
                                                                 decoration:
                                                                     InputDecoration(
+                                                                  iconColor:
+                                                                      Colors
+                                                                          .green,
+                                                                  focusColor:
+                                                                      Colors
+                                                                          .green,
+                                                                  hoverColor:
+                                                                      Colors
+                                                                          .green,
                                                                   labelText:
                                                                       'Old Password',
                                                                   suffixIcon:

@@ -178,7 +178,7 @@ class _LandlordAdvanceRentPageState extends State<LandlordAdvanceRentPage> {
                                   SnackBar(
                                     backgroundColor: Colors.green,
                                     content: Text(
-                                      'Your request for rent advance has been sent to the admin.\nRehaa Team will contact you shortly. Thanks',
+                                      'Your request for rent advance has been sent to the admin.\nRehnaa team will contact you shortly. Thanks',
                                       style: TextStyle(
                                         fontSize: 18,
                                         fontFamily: 'Montserrat',
@@ -212,52 +212,56 @@ class _LandlordAdvanceRentPageState extends State<LandlordAdvanceRentPage> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                Container(
-                  padding: const EdgeInsets.all(16.0),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20.0),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.3),
-                        spreadRadius: 2,
-                        blurRadius: 5,
-                        offset: const Offset(0, 3),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    children: [
-                      Row(
-                        children: [
-                          Text(
-                            landlord?.dateJoined
-                                    ?.toDate()
-                                    .toString()
-                                    .substring(0, 10) ??
-                                'Date Joined',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              fontFamily: 'Montserrat',
-                              color: Color(0xff45BF7A),
+                Center(
+                  child: Container(
+                    padding: const EdgeInsets.all(16.0),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(20.0),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.3),
+                          spreadRadius: 2,
+                          blurRadius: 5,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment
+                          .center, // Align contents vertically in the center
+                      children: [
+                        Row(
+                          children: [
+                            Text(
+                              landlord?.dateJoined
+                                      ?.toDate()
+                                      .toString()
+                                      .substring(0, 10) ??
+                                  'Date Joined',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                fontFamily: 'Montserrat',
+                                color: Color(0xff45BF7A),
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 10),
-                      Row(
-                        children: [
-                          Text(
-                            'Date Joined',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontFamily: 'Montserrat',
+                          ],
+                        ),
+                        SizedBox(height: 10),
+                        Row(
+                          children: [
+                            Text(
+                              'Date Joined',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontFamily: 'Montserrat',
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                    ],
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ],

@@ -424,124 +424,93 @@ class PropertyDetails extends StatelessWidget {
                     const SizedBox(height: 12),
                     Row(
                       children: [
-                        Container(
-                          width: 40,
-                          height: 40,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(color: Colors.black, width: 2),
-                          ),
-                          child: const CircleAvatar(
-                            // Replace with the owner's image
-                            backgroundImage: AssetImage('assets/userimage.jpg'),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Text(
-                            //   '$firstName $lastName', // Replace with the owner's name fetched from Firebase
-                            //   style: GoogleFonts.montserrat(
-                            //     color: const Color(0xFF33907C),
-                            //     fontWeight: FontWeight.bold,
-                            //     fontSize: 16,
-                            //   ),
-                            // ),
-                            // wrap below text in a container and set its width to 200
-                            // Container(
-                            //   width: 150,
-                            //   child: Text(
-                            //     emailOrPhone, // Replace with the owner's phone number fetched from Firebase
-                            //     style: GoogleFonts.montserrat(
-                            //       fontSize: 13,
-                            //     ),
-                            //   ),
-                            // )
-                          ],
-                        ),
-                        const Spacer(),
-                        isRequested
-                            ? GradientButton(
-                                onPressed: () {},
-                                text: 'Requested',
-                                isRequested: isRequested,
-                              )
-                            : GradientButton(
-                                isRequested: isRequested,
-                                onPressed: () async {
-                                  // Fetch tenant data from Firebase
-                                  Tenant tenant = await getTenant();
+                        // const SizedBox(width: 8),
+                        // const Spacer(),
+                        Padding(
+                            padding: EdgeInsets.only(left: screenWidth * 0.3)),
+                        Center(
+                          child: isRequested
+                              ? GradientButton(
+                                  onPressed: () {},
+                                  text: 'Requested',
+                                  isRequested: isRequested,
+                                )
+                              : GradientButton(
+                                  isRequested: isRequested,
+                                  onPressed: () async {
+                                    // Fetch tenant data from Firebase
+                                    Tenant tenant = await getTenant();
 
-                                  // Convert property to a map
-                                  Map<String, dynamic> propertyMap =
-                                      property.toMap();
+                                    // Convert property to a map
+                                    Map<String, dynamic> propertyMap =
+                                        property.toMap();
 
-                                  // Send request to admin
-                                  FirebaseFirestore.instance
-                                      .collection('AdminRequests')
-                                      .doc(uid)
-                                      .set({
-                                    'rentalRequest': FieldValue.arrayUnion([
-                                      {
-                                        'fullname':
-                                            '${tenant.firstName} ${tenant.lastName}',
-                                        'uid': uid,
-                                        'property': propertyMap,
-                                        'propertyID': propertyID,
-                                      }
-                                    ]),
-                                    'timestamp': Timestamp.now(),
-                                  }, SetOptions(merge: true));
+                                    // Send request to admin
+                                    FirebaseFirestore.instance
+                                        .collection('AdminRequests')
+                                        .doc(uid)
+                                        .set({
+                                      'rentalRequest': FieldValue.arrayUnion([
+                                        {
+                                          'fullname':
+                                              '${tenant.firstName} ${tenant.lastName}',
+                                          'uid': uid,
+                                          'property': propertyMap,
+                                          'propertyID': propertyID,
+                                        }
+                                      ]),
+                                      'timestamp': Timestamp.now(),
+                                    }, SetOptions(merge: true));
 
-                                  // Create a notification for the tenant
-                                  FirebaseFirestore.instance
-                                      .collection('Notifications')
-                                      .doc(uid)
-                                      .set({
-                                    'notifications': FieldValue.arrayUnion([
-                                      {
-                                        'title':
-                                            'Rental Request of property ${property.title} has been sent to the admin',
-                                      }
-                                    ]),
-                                  }, SetOptions(merge: true));
+                                    // Create a notification for the tenant
+                                    FirebaseFirestore.instance
+                                        .collection('Notifications')
+                                        .doc(uid)
+                                        .set({
+                                      'notifications': FieldValue.arrayUnion([
+                                        {
+                                          'title':
+                                              'Rental Request of property ${property.title} has been sent to the admin',
+                                        }
+                                      ]),
+                                    }, SetOptions(merge: true));
 
-                                  // Update Properties's isRequestedbyTenants field
-                                  FirebaseFirestore.instance
-                                      .collection('Properties')
-                                      .doc(propertyID)
-                                      .set({
-                                    'isRequestedByTenants':
-                                        FieldValue.arrayUnion([uid])
-                                  }, SetOptions(merge: true));
+                                    // Update Properties's isRequestedbyTenants field
+                                    FirebaseFirestore.instance
+                                        .collection('Properties')
+                                        .doc(propertyID)
+                                        .set({
+                                      'isRequestedByTenants':
+                                          FieldValue.arrayUnion([uid])
+                                    }, SetOptions(merge: true));
 
-                                  // Navigate to the TenantDashboardPage
-                                  Navigator.pushReplacement(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            TenantPropertyPage(
-                                              property: property,
-                                              firstName: firstName,
-                                              lastName: lastName,
-                                              pathToImage: pathToImage,
-                                              location: location,
-                                              address: address,
-                                              uid: uid,
-                                              isWithdraw: isWithdraw,
-                                              propertyID: propertyID,
-                                              emailOrPhone: emailOrPhone,
-                                            )),
-                                  );
-                                },
-                                text: 'Request',
-                                gradientColors: const [
-                                  Color(0xff0FA697),
-                                  Color(0xff45BF7A),
-                                  Color(0xff0DF205),
-                                ],
-                              ),
+                                    // Navigate to the TenantDashboardPage
+                                    Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              TenantPropertyPage(
+                                                property: property,
+                                                firstName: firstName,
+                                                lastName: lastName,
+                                                pathToImage: pathToImage,
+                                                location: location,
+                                                address: address,
+                                                uid: uid,
+                                                isWithdraw: isWithdraw,
+                                                propertyID: propertyID,
+                                                emailOrPhone: emailOrPhone,
+                                              )),
+                                    );
+                                  },
+                                  text: 'Request',
+                                  gradientColors: const [
+                                    Color(0xff0FA697),
+                                    Color(0xff45BF7A),
+                                    Color(0xff0DF205),
+                                  ],
+                                ),
+                        )
                       ],
                     ),
                     SizedBox(height: screenHeight * 0.03),

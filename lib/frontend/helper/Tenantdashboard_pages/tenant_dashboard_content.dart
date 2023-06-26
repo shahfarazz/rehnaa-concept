@@ -368,6 +368,8 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                       padding: const EdgeInsets.only(bottom: 8.0),
                       child: CircleAvatar(
                         radius: 75,
+                        backgroundColor: Colors
+                            .transparent, // Set the background color to transparent
                         child: ClipOval(
                           child: tenant.pathToImage != null &&
                                   tenant.pathToImage!.isNotEmpty
