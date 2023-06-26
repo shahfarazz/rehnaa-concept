@@ -724,7 +724,10 @@ class GradientButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(8),
           onTap: onPressed,
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 5,
+              vertical: 12,
+            ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [

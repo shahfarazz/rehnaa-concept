@@ -67,7 +67,7 @@ class _SignUpPageState extends State<SignUpPage> {
         'Verification email has been sent. Please check your inbox.',
         Colors.green,
       );
-      Timer.periodic(const Duration(seconds: 2), (timer) async {
+      Timer.periodic(const Duration(seconds: 5), (timer) async {
         await FirebaseAuth.instance.currentUser!.reload();
         if (FirebaseAuth.instance.currentUser!.emailVerified) {
           timer.cancel();

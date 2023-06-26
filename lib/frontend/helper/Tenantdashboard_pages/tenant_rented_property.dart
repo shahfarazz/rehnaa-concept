@@ -42,20 +42,24 @@ class _TenantRentedPropertyPageState extends State<TenantRentedPropertyPage> {
     // get landlord's first name, last name and path to image
 
     stream.listen((event) {
-      var propertyData = event.docs[0].data();
-      var landlordRef = propertyData['landlordRef'];
-      DocumentReference<Map<String, dynamic>> landlordRefDoc =
-          landlordRef as DocumentReference<Map<String, dynamic>>;
+      if (event.docs.isNotEmpty) {
+        var propertyData = event.docs[0].data();
+        var landlordRef = propertyData['landlordRef'];
+        DocumentReference<Map<String, dynamic>> landlordRefDoc =
+            landlordRef as DocumentReference<Map<String, dynamic>>;
 
-      landlordRefDoc.get().then((value) {
-        var landlordData = value.data();
-        firstName = landlordData!['firstName'];
-        lastName = landlordData['lastName'];
-        pathToImage = landlordData['pathToImage'];
-        emailOrPhone = landlordData['emailOrPhone'];
+        landlordRefDoc.get().then((value) {
+          var landlordData = value.data();
+          if (landlordData != null) {
+            firstName = landlordData['firstName'];
+            lastName = landlordData['lastName'];
+            pathToImage = landlordData['pathToImage'];
+            emailOrPhone = landlordData['emailOrPhone'];
+          }
 
-        setState(() {});
-      });
+          setState(() {});
+        });
+      }
     });
 
     setState(() {
@@ -71,53 +75,148 @@ class _TenantRentedPropertyPageState extends State<TenantRentedPropertyPage> {
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder(
-        stream: stream,
-        builder: ((context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting &&
-              !isStreamLoaded) {
-            //return skeleton ui
-            return const LandlordPropertiesSkeleton();
-          } else if (!snapshot.hasData && isStreamLoaded) {
-            //return no properties rented
-            return Center(
-              child: Card(
-                elevation: 4.0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20.0),
-                ),
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20.0),
-                    color: Colors.white,
-                  ),
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(
-                        Icons.house,
-                        size: 48.0,
-                        color: Color(0xff33907c),
-                      ),
-                      const SizedBox(height: 16.0),
-                      Text(
-                        'No Properties rented yet',
-                        style: GoogleFonts.montserrat(
-                          fontSize: 20.0,
-                          // fontWeight: FontWeight.bold,
-                          color: const Color(0xff33907c),
+    return Scaffold(
+      body: StreamBuilder(
+          stream: stream,
+          builder: ((context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting &&
+                !isStreamLoaded) {
+              //return skeleton ui
+              return const LandlordPropertiesSkeleton();
+            } else if (!snapshot.hasData) {
+              //return no properties rented
+              return Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: EdgeInsets.only(top: 75, left: 25),
+                    child: Positioned(
+                      top: 30.0,
+                      left: 10.0,
+                      child: GestureDetector(
+                        onTap: () {
+                          Navigator.pop(context);
+                        },
+                        child: Container(
+                          width: 40,
+                          height: 40,
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Color(0xFF33907C),
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                Color(0xff0FA697),
+                                Color(0xff45BF7A),
+                                Color(0xff0DF205),
+                              ],
+                            ),
+                          ),
+                          child: const Icon(
+                            Icons.arrow_back,
+                            size: 20,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
-                    ],
+                    ),
                   ),
-                ),
-              ),
-            );
-          } else {
-            //get data from snapshot
-            try {
-              print('data is ${snapshot.data!.docs[0].data()}}}');
+                  Padding(
+                    padding: EdgeInsets.only(left: 25),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        //add a back button top left corner
+
+                        Icon(
+                          Icons.description,
+                          color: Colors.green,
+                          size: 50,
+                        ),
+                        SizedBox(height: 20),
+                        Text(
+                          'No contract yet',
+                          style: GoogleFonts.montserrat(
+                            fontSize: 24,
+                            color: Colors.green,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              );
+            } else if (snapshot.data!.docs.isEmpty) {
+              //return no properties rented
+              return Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: EdgeInsets.only(top: 75, left: 25),
+                    child: Positioned(
+                      top: 30.0,
+                      left: 10.0,
+                      child: GestureDetector(
+                        onTap: () {
+                          Navigator.pop(context);
+                        },
+                        child: Container(
+                          width: 40,
+                          height: 40,
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Color(0xFF33907C),
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                Color(0xff0FA697),
+                                Color(0xff45BF7A),
+                                Color(0xff0DF205),
+                              ],
+                            ),
+                          ),
+                          child: const Icon(
+                            Icons.arrow_back,
+                            size: 20,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(left: 25),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        //add a back button top left corner
+
+                        Icon(
+                          Icons.description,
+                          color: Colors.green,
+                          size: 50,
+                        ),
+                        SizedBox(height: 20),
+                        Text(
+                          'No contract yet',
+                          style: GoogleFonts.montserrat(
+                            fontSize: 24,
+                            color: Colors.green,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              );
+            } else {
+              //get data from snapshot
+
+              // print('data is ${snapshot.data!.docs[0].data()}}}');
               var propData = snapshot.data!.docs[0].data();
               Property property =
                   Property.fromJson(propData as Map<String, dynamic>);
@@ -137,15 +236,9 @@ class _TenantRentedPropertyPageState extends State<TenantRentedPropertyPage> {
                 address: address,
                 emailOrPhone: emailOrPhone,
               );
-            } catch (e) {
-              print('error is $e');
             }
-
-            //return list of properties rented
-            // return TenantPropertyPage(property: property, firstName: firstName, lastName: lastName, pathToImage: pathToImage, location: location, address: address, uid: uid, isWithdraw: isWithdraw, propertyID: propertyID)
-            return Container();
-          }
-        }));
+          })),
+    );
 
     // TenantPropertyPage(property: property, firstName: firstName, lastName: lastName, pathToImage: pathToImage, location: location, address: address, uid: uid, isWithdraw: isWithdraw, propertyID: propertyID)
   }

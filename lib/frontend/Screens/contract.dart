@@ -28,11 +28,10 @@ class MyScreen extends StatelessWidget {
 
   const MyScreen({Key? key, required this.identifier}) : super(key: key);
 
-  Future<DocumentSnapshot<Map<String, dynamic>>> _getLandlordRef(
-      String id) async {
-    // print('reached here with tenant');
+  Future<DocumentSnapshot<Map<String, dynamic>>> _getLandlordRef() async {
+    print('reached here with tenant');
 
-    // String id = FirebaseAuth.instance.currentUser!.uid;
+    String id = FirebaseAuth.instance.currentUser!.uid;
     DocumentSnapshot<Map<String, dynamic>> tenantSnapshot =
         await FirebaseFirestore.instance.collection('Tenants').doc(id).get();
 
@@ -49,8 +48,8 @@ class MyScreen extends StatelessWidget {
     return contractRef.get();
   }
 
-  Future<DocumentSnapshot<Map<String, dynamic>>> _getContractData(
-      String documentId) async {
+  Future<DocumentSnapshot<Map<String, dynamic>>> _getContractData() async {
+    var documentId = FirebaseAuth.instance.currentUser!.uid;
     return FirebaseFirestore.instance
         .collection('Contracts')
         .doc(documentId)
@@ -59,12 +58,11 @@ class MyScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String id = 'FirebaseAuth.instance.currentUser!.uid';
+    // String id = 'FirebaseAuth.instance.currentUser!.uid';
     // String id = 'K55YzmkUXt09OgFwnDuT'; //TODO isko hatao
 
     return FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-      future:
-          identifier == 'Landlord' ? _getContractData(id) : _getLandlordRef(id),
+      future: identifier == 'Landlord' ? _getContractData() : _getLandlordRef(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           // Show loading indicator while fetching data

@@ -23,7 +23,9 @@ class _LandlordAdvanceRentPageState extends State<LandlordAdvanceRentPage> {
         .doc(widget.uid)
         .get();
 
-    landlord = Landlord.fromJson(myLandlord.data()!);
+    setState(() {
+      landlord = Landlord.fromJson(myLandlord.data()!);
+    });
 
     if (myLandlord.data()?['isApplied'] == true) {
       setState(() {

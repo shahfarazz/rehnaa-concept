@@ -84,15 +84,18 @@ class _DashboardPageState extends State<TenantDashboardPage>
   }
 
   Future<void> isNewVouchers() async {
-    //check for isNew varialbe in the Vouchers collection
-    await FirebaseFirestore.instance
-        .collection('Vouchers')
+    //check for isNew varialbe in the user document
+    // and set the isNewVoucher variable accordingly
+    // also after setting isNewVoucher to true or false, update the isNew variable in the user document
+    // which should now be false
+
+    FirebaseFirestore.instance
+        .collection('Tenants')
         .doc(widget.uid)
         .get()
         .then((value) {
       if (value.exists) {
-        print('data is ${value.data()!['isNew']}');
-        if (value.data()!['isNew'] == true) {
+        if (value.data()!['isNewVouchers'] == true) {
           setState(() {
             isNewVoucher = true;
           });
@@ -494,7 +497,7 @@ class _DashboardPageState extends State<TenantDashboardPage>
                     ),
                     _buildSidebarItem(
                       icon: Icons.discount,
-                      label: 'Discounts',
+                      label: 'Rent Off Winners',
                       onTap: () {
                         Navigator.push(
                           context,
@@ -509,6 +512,14 @@ class _DashboardPageState extends State<TenantDashboardPage>
                       icon: Icons.receipt,
                       label: 'Vouchers',
                       onTap: () {
+                        //firebase call set users isNewVouchers to false
+                        FirebaseFirestore.instance
+                            .collection('Landlords')
+                            .doc(widget.uid)
+                            .update({'isNewVouchers': false});
+                        setState(() {
+                          isNewVoucher = false;
+                        });
                         Navigator.push(
                           context,
                           MaterialPageRoute(
