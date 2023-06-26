@@ -178,7 +178,7 @@ class _LandlordAdvanceRentPageState extends State<LandlordAdvanceRentPage> {
                                   SnackBar(
                                     backgroundColor: Colors.green,
                                     content: Text(
-                                      'Your request for rent advance has been sent to the admin.',
+                                      'Your request for rent advance has been sent to the admin.\nRehaa Team will contact you shortly. Thanks',
                                       style: TextStyle(
                                         fontSize: 18,
                                         fontFamily: 'Montserrat',

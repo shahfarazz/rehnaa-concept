@@ -342,9 +342,9 @@ class _SignUpPageState extends State<SignUpPage> {
     final noSpaces = RegExp(r'^\S*$');
 
     if (firstName.isEmpty) return 'First name cannot be empty';
-    if (!noSpaces.hasMatch(firstName)) {
-      return 'First name cannot contain spaces';
-    }
+    // if (!noSpaces.hasMatch(firstName)) {
+    //   return 'First name cannot contain spaces';
+    // }
 
     if (lastName.isEmpty) return 'Last name cannot be empty';
     if (!noSpaces.hasMatch(lastName)) return 'Last name cannot contain spaces';
