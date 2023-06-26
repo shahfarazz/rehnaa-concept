@@ -919,7 +919,37 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
                   }
                 }
 
-                return Container(); // Placeholder for loading state or empty state
+                // return a good looking card with error
+                return Center(
+                  child: Card(
+                    elevation: 4.0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(
+                            Icons.error_outline_outlined,
+                            size: 48.0,
+                            color: Color(0xff33907c),
+                          ),
+                          const SizedBox(height: 16.0),
+                          Text(
+                            'No notifications to show',
+                            style: GoogleFonts.montserrat(
+                              fontSize: 20.0,
+                              // fontWeight: FontWeight.bold,
+                              color: const Color(0xff33907c),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
               },
             ),
           ),
