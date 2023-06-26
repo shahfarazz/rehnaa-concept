@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:rehnaa/frontend/helper/Landlorddashboard_pages/landlord_propertyinfo.dart';
 
 import '../../../backend/models/propertymodel.dart';
+// import '../../Screens/Admin/admindashboard.dart';
 import '../Landlorddashboard_pages/landlordproperties.dart';
 import 'Tenant_propertyinfo.dart';
 
@@ -76,6 +77,47 @@ class _TenantRentedPropertyPageState extends State<TenantRentedPropertyPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: //add a gradient app bar with gradient backhround with a white back button
+          AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: GestureDetector(
+          onTap: () {
+            Navigator.pop(context);
+          },
+          child: Container(
+            width: 40,
+            height: 40,
+            decoration: const BoxDecoration(
+              shape: BoxShape.circle,
+              color: Color(0xFF33907C),
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Color(0xff0FA697),
+                  Color(0xff45BF7A),
+                  Color(0xff0DF205),
+                ],
+              ),
+            ),
+            child: const Icon(
+              Icons.arrow_back,
+              size: 20,
+              color: Colors.white,
+            ),
+          ),
+        ),
+        title: Text(
+          'Rented Property',
+          style: GoogleFonts.montserrat(
+            fontSize: 24,
+            color: Colors.green,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        centerTitle: true,
+      ),
       body: StreamBuilder(
           stream: stream,
           builder: ((context, snapshot) {
@@ -227,6 +269,7 @@ class _TenantRentedPropertyPageState extends State<TenantRentedPropertyPage> {
                 location: location,
                 address: address,
                 emailOrPhone: emailOrPhone,
+                isTenantCall: true,
               );
             }
           })),

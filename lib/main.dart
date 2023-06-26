@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:rehnaa/frontend/Screens/Landlord/landlord_dashboard.dart';
 import 'package:rehnaa/frontend/Screens/login_page.dart';
 import 'package:rehnaa/frontend/Screens/signup_page.dart';
+import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenant_rented_property.dart';
 import 'backend/services/authentication_service.dart';
 import 'frontend/Screens/Dealer/dealer_dashboard.dart';
 import 'frontend/Screens/Tenant/tenant_dashboard.dart';
@@ -45,8 +46,10 @@ class MyApp extends StatelessWidget {
           // home: LandlordDashboardPage(
           //   uid: 'R88XI7AqrOZBtGZzQwgyX2Wr7Yz1',
           // ),
-          // home: AdminDashboard(),
-          home: const SplashScreen(),
+          home: TenantRentedPropertyPage(
+            uid: 'QvagHQ6kAXgxpRC09Cd11mZBQoo2  ',
+          ),
+          // home: const SplashScreen(),
           // home: DealerDashboardPage(uid: 'fUuFmW7bNaweyP5xkc4c'),
           // home: TenantDashboardPage(
           //   uid: 'K55YzmkUXt09OgFwnDuT',

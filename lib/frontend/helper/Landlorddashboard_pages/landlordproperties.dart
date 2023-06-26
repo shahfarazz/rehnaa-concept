@@ -169,6 +169,7 @@ class _LandlordPropertiesPageState extends State<LandlordPropertiesPage>
                           location: property.location,
                           address: property.address,
                           emailOrPhone: property.landlord?.emailOrPhone ?? '',
+                          isTenantCall: false,
                         ),
                       ),
                     );
