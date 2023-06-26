@@ -84,7 +84,7 @@ class _SignUpPageState extends State<SignUpPage> {
           });
 
           if (selectedOption == 'Landlord') {
-            FirebaseFirestore.instance
+            await FirebaseFirestore.instance
                 .collection('Landlords')
                 .doc(FirebaseAuth.instance.currentUser!.uid)
                 .set({
@@ -103,7 +103,7 @@ class _SignUpPageState extends State<SignUpPage> {
                       uid: FirebaseAuth.instance.currentUser!.uid)),
             );
           } else if (selectedOption == 'Tenant') {
-            FirebaseFirestore.instance
+            await FirebaseFirestore.instance
                 .collection('Tenants')
                 .doc(FirebaseAuth.instance.currentUser!.uid)
                 .set({
@@ -123,12 +123,7 @@ class _SignUpPageState extends State<SignUpPage> {
             );
           }
 
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) =>
-                    LandlordDashboardPage(uid: userCredential.user!.uid)),
-          );
+          _showToast('Sign up successful.', Colors.green);
         }
       });
     } catch (e) {
@@ -243,7 +238,7 @@ class _SignUpPageState extends State<SignUpPage> {
       });
 
       if (selectedOption == 'Landlord') {
-        FirebaseFirestore.instance
+        await FirebaseFirestore.instance
             .collection('Landlords')
             .doc(FirebaseAuth.instance.currentUser!.uid)
             .set({
@@ -262,7 +257,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   uid: FirebaseAuth.instance.currentUser!.uid)),
         );
       } else if (selectedOption == 'Tenant') {
-        FirebaseFirestore.instance
+        await FirebaseFirestore.instance
             .collection('Tenants')
             .doc(FirebaseAuth.instance.currentUser!.uid)
             .set({

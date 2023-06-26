@@ -6,10 +6,12 @@ import 'package:flutter/rendering.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:rehnaa/frontend/Screens/login_page.dart';
 import 'dart:io';
 
 import '../../../backend/services/authentication_service.dart';
 import '../../Screens/signup_page.dart';
+import '../../Screens/splash.dart';
 import '../Landlorddashboard_pages/landlord_profile.dart';
 
 class TenantProfilePage extends StatefulWidget {
@@ -30,6 +32,9 @@ class _TenantProfilePageState extends State<TenantProfilePage> {
   //define two new controllers for the password fields
   final TextEditingController _oldPasswordController = TextEditingController();
   final TextEditingController _newPasswordController = TextEditingController();
+  final TextEditingController _enterPasswordController =
+      TextEditingController();
+  final TextEditingController _enterCodeController = TextEditingController();
 
   Future<void> _uploadImageToFirebase() async {
     final picker = ImagePicker();
@@ -582,7 +587,6 @@ class _TenantProfilePageState extends State<TenantProfilePage> {
                                                       // Reauthenticate the user with the credential
                                                       print(
                                                           'credential is $credential');
-
                                                       await currentUser
                                                           ?.reauthenticateWithCredential(
                                                               credential);
@@ -590,8 +594,6 @@ class _TenantProfilePageState extends State<TenantProfilePage> {
                                                       // Delete the user account
                                                       await currentUser
                                                           ?.delete();
-
-                                                      // Perform any additional actions if needed
 
                                                       // Show a success message to the user
                                                       ScaffoldMessenger.of(
@@ -645,6 +647,8 @@ class _TenantProfilePageState extends State<TenantProfilePage> {
                                                         title: Text(
                                                             'Phone Verification'),
                                                         content: TextFormField(
+                                                          controller:
+                                                              _enterCodeController,
                                                           decoration:
                                                               InputDecoration(
                                                             labelText:
@@ -668,11 +672,85 @@ class _TenantProfilePageState extends State<TenantProfilePage> {
                                                                 Text('Cancel'),
                                                           ),
                                                           TextButton(
-                                                            onPressed: () {
-                                                              Navigator.of(
-                                                                      context)
-                                                                  .pop(
-                                                                      enteredVerificationCode);
+                                                            onPressed:
+                                                                () async {
+                                                              enteredVerificationCode =
+                                                                  _enterCodeController
+                                                                      .text;
+                                                              if (enteredVerificationCode !=
+                                                                  null) {
+                                                                // Create PhoneAuthCredential using the entered verification code
+                                                                PhoneAuthCredential
+                                                                    credential =
+                                                                    PhoneAuthProvider
+                                                                        .credential(
+                                                                  verificationId:
+                                                                      verificationId,
+                                                                  smsCode:
+                                                                      enteredVerificationCode!,
+                                                                );
+
+                                                                try {
+                                                                  // Reauthenticate the user with the credential
+                                                                  await currentUser
+                                                                      ?.reauthenticateWithCredential(
+                                                                          credential);
+
+                                                                  // // Delete the user account
+                                                                  // await currentUser
+                                                                  //     ?.delete();
+
+                                                                  FirebaseFirestore
+                                                                      .instance
+                                                                      .collection(
+                                                                          'users')
+                                                                      .doc(currentUser
+                                                                          ?.uid)
+                                                                      .set({
+                                                                    'isDisabled':
+                                                                        true,
+                                                                  }, SetOptions(merge: true));
+
+                                                                  // Show a success message to the user
+                                                                  ScaffoldMessenger.of(
+                                                                          context)
+                                                                      .showSnackBar(
+                                                                    SnackBar(
+                                                                      content: Text(
+                                                                          'Account deleted successfully.'),
+                                                                    ),
+                                                                  );
+
+                                                                  // Sign out the user
+                                                                  await FirebaseAuth
+                                                                      .instance
+                                                                      .signOut();
+                                                                  // navigate to splash screen
+                                                                  Navigator.of(
+                                                                          context)
+                                                                      .pushReplacement(
+                                                                    MaterialPageRoute(
+                                                                      builder:
+                                                                          (context) =>
+                                                                              SplashScreen(),
+                                                                    ),
+                                                                  );
+                                                                } catch (e) {
+                                                                  // Show an error message if the reauthentication fails
+                                                                  ScaffoldMessenger.of(
+                                                                          context)
+                                                                      .showSnackBar(
+                                                                    SnackBar(
+                                                                      content: Text(e
+                                                                          .toString()
+                                                                          .substring(
+                                                                              30)),
+                                                                    ),
+                                                                  );
+                                                                  print(
+                                                                      'Error: $e');
+                                                                }
+                                                              }
                                                             },
                                                             child:
                                                                 Text('Verify'),
@@ -680,53 +758,6 @@ class _TenantProfilePageState extends State<TenantProfilePage> {
                                                         ],
                                                       ),
                                                     );
-
-                                                    if (enteredVerificationCode !=
-                                                        null) {
-                                                      // Create PhoneAuthCredential using the entered verification code
-                                                      PhoneAuthCredential
-                                                          credential =
-                                                          PhoneAuthProvider
-                                                              .credential(
-                                                        verificationId:
-                                                            verificationId,
-                                                        smsCode:
-                                                            enteredVerificationCode!,
-                                                      );
-
-                                                      try {
-                                                        // Reauthenticate the user with the credential
-                                                        await currentUser
-                                                            ?.reauthenticateWithCredential(
-                                                                credential);
-
-                                                        // Delete the user account
-                                                        await currentUser
-                                                            ?.delete();
-
-                                                        //show a success message to the user
-                                                        ScaffoldMessenger.of(
-                                                                context)
-                                                            .showSnackBar(
-                                                          SnackBar(
-                                                            content: Text(
-                                                                'Account deleted successfully.'),
-                                                          ),
-                                                        );
-                                                      } catch (e) {
-                                                        // Show an error message if the reauthentication fails
-                                                        ScaffoldMessenger.of(
-                                                                context)
-                                                            .showSnackBar(
-                                                          SnackBar(
-                                                            content: Text(e
-                                                                .toString()
-                                                                .substring(30)),
-                                                          ),
-                                                        );
-                                                        print('Error: $e');
-                                                      }
-                                                    }
                                                   },
                                                   codeAutoRetrievalTimeout:
                                                       (String
@@ -744,6 +775,8 @@ class _TenantProfilePageState extends State<TenantProfilePage> {
                                                     title: Text(
                                                         'Password Confirmation'),
                                                     content: TextFormField(
+                                                      controller:
+                                                          _enterPasswordController,
                                                       obscureText: true,
                                                       decoration:
                                                           InputDecoration(
@@ -767,60 +800,83 @@ class _TenantProfilePageState extends State<TenantProfilePage> {
                                                         child: Text('Cancel'),
                                                       ),
                                                       TextButton(
-                                                        onPressed: () {
-                                                          Navigator.of(context)
-                                                              .pop(
-                                                                  enteredPassword);
+                                                        onPressed: () async {
+                                                          enteredPassword =
+                                                              _enterPasswordController
+                                                                  .text;
+                                                          if (enteredPassword !=
+                                                              null) {
+                                                            // Reauthenticate the user with the entered password
+                                                            AuthCredential
+                                                                credential =
+                                                                EmailAuthProvider
+                                                                    .credential(
+                                                              email: currentUser
+                                                                      ?.email ??
+                                                                  '',
+                                                              password:
+                                                                  enteredPassword!,
+                                                            );
+
+                                                            // Delete the user account
+                                                            try {
+                                                              await currentUser
+                                                                  ?.reauthenticateWithCredential(
+                                                                      credential);
+
+                                                              //navigate to splash screen with root context
+                                                              Navigator.of(
+                                                                      context,
+                                                                      rootNavigator:
+                                                                          true)
+                                                                  .pushReplacement(
+                                                                MaterialPageRoute(
+                                                                  builder:
+                                                                      (context) =>
+                                                                          LoginPage(),
+                                                                ),
+                                                              );
+                                                            } catch (e) {
+                                                              ScaffoldMessenger
+                                                                      .of(context)
+                                                                  .showSnackBar(
+                                                                SnackBar(
+                                                                  content: Text(e
+                                                                      .toString()
+                                                                      .substring(
+                                                                          30)),
+                                                                ),
+                                                              );
+                                                              print(
+                                                                  'Error: $e');
+                                                            }
+
+                                                            // firebase isDisabled true
+                                                            await FirebaseFirestore
+                                                                .instance
+                                                                .collection(
+                                                                    'users')
+                                                                .doc(currentUser
+                                                                    ?.uid)
+                                                                .set(
+                                                                    {
+                                                                  'isDisabled':
+                                                                      true,
+                                                                },
+                                                                    SetOptions(
+                                                                        merge:
+                                                                            true));
+
+                                                            // // Sign out the user
+                                                            // await FirebaseAuth.instance
+                                                            //     .signOut();
+                                                          }
                                                         },
                                                         child: Text('Confirm'),
                                                       ),
                                                     ],
                                                   ),
                                                 );
-
-                                                if (enteredPassword != null) {
-                                                  try {
-                                                    // Reauthenticate the user with the entered password
-                                                    AuthCredential credential =
-                                                        EmailAuthProvider
-                                                            .credential(
-                                                      email:
-                                                          currentUser?.email ??
-                                                              '',
-                                                      password: enteredPassword,
-                                                    );
-
-                                                    // Delete the user account
-                                                    await currentUser
-                                                        ?.reauthenticateWithCredential(
-                                                            credential);
-                                                    await currentUser?.delete();
-
-                                                    // Perform any additional actions if needed
-
-                                                    // Show a success message to the user
-                                                    ScaffoldMessenger.of(
-                                                            context)
-                                                        .showSnackBar(
-                                                      SnackBar(
-                                                        content: Text(
-                                                            'Account deleted successfully.'),
-                                                      ),
-                                                    );
-                                                  } catch (e) {
-                                                    // Show an error message if the account deletion fails
-                                                    ScaffoldMessenger.of(
-                                                            context)
-                                                        .showSnackBar(
-                                                      SnackBar(
-                                                        content: Text(e
-                                                            .toString()
-                                                            .substring(30)),
-                                                      ),
-                                                    );
-                                                    print('Error: $e');
-                                                  }
-                                                }
                                               }
                                             },
                                           ),

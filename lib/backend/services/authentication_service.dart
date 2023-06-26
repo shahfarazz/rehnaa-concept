@@ -113,6 +113,16 @@ class AuthenticationService extends ChangeNotifier {
         .where('emailOrPhone', isEqualTo: phoneNumber)
         .get();
 
+    // check in users if account is disabled
+    if (userDoc.size == 1) {
+      final user = userDoc.docs.first;
+      if (user.data()['isDisabled'] == true) {
+        showToast('Your account is disabled. Please contact admin.',
+            Colors.redAccent);
+        return;
+      }
+    }
+
     //show error if userDoc is empty
     if (userDoc.size == 0) {
       showToast('Phone number not found. Please register first.', Colors.red);
@@ -426,6 +436,16 @@ class AuthenticationService extends ChangeNotifier {
           .collection('users')
           .doc(_auth.currentUser!.uid)
           .get();
+
+      // check in users if account is disabled
+      if (userDoc.exists) {
+        final user = userDoc;
+        if (user.data()?['isDisabled'] == true) {
+          showToast('Your account is disabled. Please contact admin.',
+              Colors.redAccent);
+          return;
+        }
+      }
 
       if (userDoc.data()!['type'] == 'Tenant') {
         showToast('Signed in with Email and Password.', Colors.green);

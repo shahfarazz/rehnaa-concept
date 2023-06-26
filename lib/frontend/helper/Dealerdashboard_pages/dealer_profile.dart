@@ -1,7 +1,9 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../../backend/services/authentication_service.dart';
+import '../../Screens/splash.dart';
 import '../Landlorddashboard_pages/landlord_profile.dart';
 
 class DealerProfilePage extends StatefulWidget {
@@ -16,6 +18,9 @@ class DealerProfilePage extends StatefulWidget {
 class _DealerProfilePageState extends State<DealerProfilePage> {
   bool showChangePassword = false;
   bool showDeleteAccount = false;
+  final TextEditingController _enterPasswordController =
+      TextEditingController();
+  final TextEditingController _enterCodeController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -231,56 +236,224 @@ class _DealerProfilePageState extends State<DealerProfilePage> {
                         icon: Icons.delete,
                         title: 'Delete Account',
                         subtitle: 'Click to delete your account',
-                        onTap: () {
-                          showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              String password = '';
+                        onTap: () async {
+                          User? currentUser = FirebaseAuth.instance.currentUser;
+                          String? phoneNumber = currentUser?.phoneNumber;
+                          bool isPhoneNumberLogin = phoneNumber != null;
 
-                              return AlertDialog(
-                                title: const Text('Delete Account'),
-                                content: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    const Text(
-                                        'Enter your password to confirm account deletion:'),
-                                    TextField(
-                                      onChanged: (value) {
-                                        password = value;
-                                      },
-                                      decoration: const InputDecoration(
-                                          hintText: 'Password'),
-                                      obscureText: true,
+                          if (isPhoneNumberLogin) {
+                            String? enteredVerificationCode;
+                            print('phone number is $phoneNumber');
+
+                            // Send verification code via SMS
+                            await FirebaseAuth.instance.verifyPhoneNumber(
+                              phoneNumber: phoneNumber!,
+                              verificationCompleted:
+                                  (PhoneAuthCredential credential) async {
+                                try {
+                                  // Reauthenticate the user with the credential
+                                  print('credential is $credential');
+                                  await currentUser
+                                      ?.reauthenticateWithCredential(
+                                          credential);
+
+                                  // Delete the user account
+                                  await currentUser?.delete();
+
+                                  // Show a success message to the user
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content:
+                                          Text('Account deleted successfully.'),
                                     ),
-                                    if (password.isNotEmpty &&
-                                        password != 'correct_password')
-                                      const Text(
-                                        'Incorrect password',
-                                        style: TextStyle(color: Colors.red),
+                                  );
+                                } catch (e) {
+                                  // Show an error message if the account deletion fails
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(e.toString().substring(30)),
+                                    ),
+                                  );
+                                  print('Error: $e');
+                                }
+                              },
+                              verificationFailed: (FirebaseAuthException e) {
+                                // Handle verification failure
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(e.toString().substring(30)),
+                                  ),
+                                );
+                                print(
+                                    'Phone number verification failed: ${e.message}');
+                              },
+                              codeSent: (String verificationId,
+                                  [int? forceResendingToken]) async {
+                                // Prompt the user to enter the verification code
+                                enteredVerificationCode = await showDialog(
+                                  context: context,
+                                  builder: (context) => AlertDialog(
+                                    title: Text('Phone Verification'),
+                                    content: TextFormField(
+                                      controller: _enterCodeController,
+                                      decoration: InputDecoration(
+                                        labelText:
+                                            'Enter the verification code',
                                       ),
-                                  ],
+                                      validator: (value) {
+                                        if (value == null || value.isEmpty) {
+                                          return 'Please enter the verification code';
+                                        }
+                                        return null;
+                                      },
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () =>
+                                            Navigator.of(context).pop(null),
+                                        child: Text('Cancel'),
+                                      ),
+                                      TextButton(
+                                        onPressed: () {
+                                          enteredVerificationCode =
+                                              _enterCodeController.text;
+                                          Navigator.of(context)
+                                              .pop(enteredVerificationCode);
+                                        },
+                                        child: Text('Verify'),
+                                      ),
+                                    ],
+                                  ),
+                                );
+
+                                if (enteredVerificationCode != null) {
+                                  // Create PhoneAuthCredential using the entered verification code
+                                  PhoneAuthCredential credential =
+                                      PhoneAuthProvider.credential(
+                                    verificationId: verificationId,
+                                    smsCode: enteredVerificationCode!,
+                                  );
+
+                                  try {
+                                    // Reauthenticate the user with the credential
+                                    await currentUser
+                                        ?.reauthenticateWithCredential(
+                                            credential);
+
+                                    // // Delete the user account
+                                    // await currentUser
+                                    //     ?.delete();
+
+                                    FirebaseFirestore.instance
+                                        .collection('users')
+                                        .doc(currentUser?.uid)
+                                        .set({
+                                      'isDisabled': true,
+                                    }, SetOptions(merge: true));
+
+                                    // Show a success message to the user
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                            'Account deleted successfully.'),
+                                      ),
+                                    );
+
+                                    // Sign out the user
+                                    await FirebaseAuth.instance.signOut();
+                                    // navigate to splash screen
+                                    Navigator.of(context).pushReplacement(
+                                      MaterialPageRoute(
+                                        builder: (context) => SplashScreen(),
+                                      ),
+                                    );
+                                  } catch (e) {
+                                    // Show an error message if the reauthentication fails
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content:
+                                            Text(e.toString().substring(30)),
+                                      ),
+                                    );
+                                    print('Error: $e');
+                                  }
+                                }
+                              },
+                              codeAutoRetrievalTimeout:
+                                  (String verificationId) {},
+                            );
+                          } else {
+                            String? enteredPassword;
+
+                            // Show a password prompt dialog to the user
+                            enteredPassword = await showDialog(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                title: Text('Password Confirmation'),
+                                content: TextFormField(
+                                  controller: _enterPasswordController,
+                                  obscureText: true,
+                                  decoration: InputDecoration(
+                                    labelText: 'Enter your password',
+                                  ),
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Please enter your password';
+                                    }
+                                    return null;
+                                  },
                                 ),
                                 actions: [
-                                  ElevatedButton(
-                                    onPressed: () {
-                                      if (password == 'correct_password') {
-                                        // Handle account deletion logic here
-                                        print('Deleting account...');
-                                        Navigator.of(context).pop();
-                                      }
-                                    },
-                                    child: const Text('Delete'),
+                                  TextButton(
+                                    onPressed: () =>
+                                        Navigator.of(context).pop(null),
+                                    child: Text('Cancel'),
                                   ),
                                   TextButton(
                                     onPressed: () {
-                                      Navigator.of(context).pop();
+                                      enteredPassword =
+                                          _enterPasswordController.text;
+                                      Navigator.of(context)
+                                          .pop(enteredPassword);
                                     },
-                                    child: const Text('Cancel'),
+                                    child: Text('Confirm'),
                                   ),
                                 ],
-                              );
-                            },
-                          );
+                              ),
+                            );
+
+                            if (enteredPassword != null) {
+                              try {
+                                // Reauthenticate the user with the entered password
+                                AuthCredential credential =
+                                    EmailAuthProvider.credential(
+                                  email: currentUser?.email ?? '',
+                                  password: enteredPassword!,
+                                );
+
+                                // Delete the user account
+                                await currentUser
+                                    ?.reauthenticateWithCredential(credential);
+                                await currentUser?.delete();
+
+                                // Show a success message to the user
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content:
+                                        Text('Account deleted successfully.'),
+                                  ),
+                                );
+                              } catch (e) {
+                                // Show an error message if the account deletion fails
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(e.toString().substring(30)),
+                                  ),
+                                );
+                                print('Error: $e');
+                              }
+                            }
+                          }
                         },
                       ),
                     ],
