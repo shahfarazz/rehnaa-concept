@@ -213,26 +213,55 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Upload Image'),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                GestureDetector(
-                  child: const Text('Gallery'),
-                  onTap: () {
-                    _uploadImageToFirebase();
-                    Navigator.of(context).pop();
-                  },
+          title: Text('Upload Image'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              GestureDetector(
+                onTap: () {
+                  _uploadImageToFirebase();
+                  Navigator.of(context).pop();
+                },
+                child: Container(
+                  padding: EdgeInsets.symmetric(vertical: 16),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Icon(Icons.photo_library),
+                      SizedBox(width: 10),
+                      Text(
+                        'Choose from Gallery',
+                        style: TextStyle(
+                          fontSize: 16,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-                const SizedBox(height: 10),
-                GestureDetector(
-                  child: const Text('Cancel'),
-                  onTap: () {
-                    Navigator.of(context).pop();
-                  },
+              ),
+              SizedBox(height: 10),
+              GestureDetector(
+                onTap: () {
+                  Navigator.of(context).pop();
+                },
+                child: Container(
+                  padding: EdgeInsets.symmetric(vertical: 16),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Icon(Icons.cancel),
+                      SizedBox(width: 10),
+                      Text(
+                        'Cancel',
+                        style: TextStyle(
+                          fontSize: 16,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         );
       },
@@ -301,13 +330,35 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
                       onTap: () {
                         _openImagePicker();
                       },
-                      child: CircleAvatar(
-                        radius: 80,
-                        backgroundImage: pathToImage != null &&
-                                pathToImage.startsWith('https')
-                            ? NetworkImage(pathToImage)
-                                as ImageProvider<Object>?
-                            : AssetImage('assets/defaulticon.png'),
+                      child: GestureDetector(
+                        onTap: () {
+                          _openImagePicker();
+                        },
+                        child: CircleAvatar(
+                          radius: 80,
+                          backgroundImage: pathToImage != null &&
+                                  pathToImage.startsWith('https')
+                              ? NetworkImage(pathToImage)
+                                  as ImageProvider<Object>?
+                              : AssetImage('assets/defaulticon.png'),
+                          backgroundColor: Colors
+                              .transparent, // Set the background color to transparent
+                          child: ColorFiltered(
+                            colorFilter: ColorFilter.mode(
+                                Colors.transparent,
+                                BlendMode
+                                    .clear), // Apply transparent color filter
+                            child: Container(
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                image: DecorationImage(
+                                  image: AssetImage('assets/defaulticon.png'),
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
                       ),
                     ),
                     IconButton(

@@ -6,21 +6,6 @@ import 'dart:typed_data';
 import 'package:photo_view/photo_view.dart';
 import 'package:rehnaa/frontend/Screens/splash.dart';
 
-void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: VouchersPage(),
-    );
-  }
-}
-
 class Voucher {
   final String url;
   final ImageProvider imageProvider;
@@ -168,7 +153,9 @@ class VouchersPage extends StatelessWidget {
       future: fetchVouchers(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const CircularProgressIndicator();
+          return const CircularProgressIndicator(
+            color: Colors.green,
+          );
         }
         if (snapshot.hasError) {
           return Text('Error: ${snapshot.error}');
@@ -208,8 +195,11 @@ class VouchersPage extends StatelessWidget {
                           progressIndicatorBuilder: (context, url, progress) =>
                               Center(
                             child: progress == null
-                                ? CircularProgressIndicator()
+                                ? CircularProgressIndicator(
+                                    color: Colors.green,
+                                  )
                                 : LinearProgressIndicator(
+                                    color: Colors.green,
                                     value: progress.progress,
                                   ),
                           ),

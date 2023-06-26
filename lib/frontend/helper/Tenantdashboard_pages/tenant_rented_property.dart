@@ -85,15 +85,13 @@ class _TenantRentedPropertyPageState extends State<TenantRentedPropertyPage> {
               return const LandlordPropertiesSkeleton();
             } else if (!snapshot.hasData) {
               //return no properties rented
-              return Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              return Stack(
+                alignment: Alignment.center,
                 children: [
-                  Padding(
-                    padding: EdgeInsets.only(top: 75, left: 25),
-                    child: Positioned(
-                      top: 30.0,
-                      left: 10.0,
-                      child: GestureDetector(
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      GestureDetector(
                         onTap: () {
                           Navigator.pop(context);
                         },
@@ -120,45 +118,41 @@ class _TenantRentedPropertyPageState extends State<TenantRentedPropertyPage> {
                           ),
                         ),
                       ),
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(left: 25),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        //add a back button top left corner
-
-                        Icon(
-                          Icons.description,
-                          color: Colors.green,
-                          size: 50,
+                      Padding(
+                        padding: EdgeInsets.only(left: 25),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.house,
+                              color: Colors.green,
+                              size: 50,
+                            ),
+                            SizedBox(height: 20),
+                            Text(
+                              'No rented property yet',
+                              style: GoogleFonts.montserrat(
+                                fontSize: 24,
+                                color: Colors.green,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
                         ),
-                        SizedBox(height: 20),
-                        Text(
-                          'No contract yet',
-                          style: GoogleFonts.montserrat(
-                            fontSize: 24,
-                            color: Colors.green,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ],
               );
             } else if (snapshot.data!.docs.isEmpty) {
               //return no properties rented
-              return Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              return Stack(
+                alignment: Alignment.center,
                 children: [
-                  Padding(
-                    padding: EdgeInsets.only(top: 75, left: 25),
-                    child: Positioned(
-                      top: 30.0,
-                      left: 10.0,
-                      child: GestureDetector(
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      GestureDetector(
                         onTap: () {
                           Navigator.pop(context);
                         },
@@ -185,31 +179,29 @@ class _TenantRentedPropertyPageState extends State<TenantRentedPropertyPage> {
                           ),
                         ),
                       ),
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(left: 25),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        //add a back button top left corner
-
-                        Icon(
-                          Icons.description,
-                          color: Colors.green,
-                          size: 50,
+                      Padding(
+                        padding: EdgeInsets.only(left: 25),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.house,
+                              color: Colors.green,
+                              size: 50,
+                            ),
+                            SizedBox(height: 20),
+                            Text(
+                              'No rented property yet',
+                              style: GoogleFonts.montserrat(
+                                fontSize: 24,
+                                color: Colors.green,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
                         ),
-                        SizedBox(height: 20),
-                        Text(
-                          'No contract yet',
-                          style: GoogleFonts.montserrat(
-                            fontSize: 24,
-                            color: Colors.green,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ],
               );
