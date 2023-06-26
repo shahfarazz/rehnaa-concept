@@ -49,9 +49,9 @@ class _DealerLandlordOnboardedPageState
       return landlords;
     } catch (e) {
       print(e);
-      setState(() {
-        isLoading = false;
-      });
+      // setState(() {
+      isLoading = false;
+      // });
 
       return [];
     }
