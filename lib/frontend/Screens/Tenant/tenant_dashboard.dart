@@ -39,6 +39,7 @@ class _DashboardPageState extends State<TenantDashboardPage>
   late AnimationController _sidebarController;
   late Stream<DocumentSnapshot<Map<String, dynamic>>> _notificationStream;
   late Stream<DocumentSnapshot<Map<String, dynamic>>> _notificationStream2;
+  bool isNewVoucher = false;
 
   bool _isWithdraw = false;
 
@@ -58,6 +59,7 @@ class _DashboardPageState extends State<TenantDashboardPage>
         .collection('Notifications')
         .doc(widget.uid)
         .snapshots();
+    isNewVouchers();
   }
 
   @override
@@ -79,6 +81,28 @@ class _DashboardPageState extends State<TenantDashboardPage>
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeInOut,
     );
+  }
+
+  Future<void> isNewVouchers() async {
+    //check for isNew varialbe in the Vouchers collection
+    await FirebaseFirestore.instance
+        .collection('Vouchers')
+        .doc(widget.uid)
+        .get()
+        .then((value) {
+      if (value.exists) {
+        print('data is ${value.data()!['isNew']}');
+        if (value.data()!['isNew'] == true) {
+          setState(() {
+            isNewVoucher = true;
+          });
+        } else {
+          setState(() {
+            isNewVoucher = false;
+          });
+        }
+      }
+    });
   }
 
   Future<void> _markNotificationsAsRead() async {
@@ -493,7 +517,7 @@ class _DashboardPageState extends State<TenantDashboardPage>
                         );
                         // _closeSidebar();
                       },
-                      showBadge: true,
+                      showBadge: isNewVoucher,
                     ),
                     _buildSidebarItem(
                       icon: Icons.lock,

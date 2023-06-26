@@ -27,6 +27,7 @@ class _LandlordRentHistoryPageState extends State<LandlordRentHistoryPage>
   String lastName = '';
   bool shouldDisplay = false;
   String searchText = '';
+  String pdfUrl = '';
 
   @override
   bool get wantKeepAlive => true;
@@ -50,6 +51,12 @@ class _LandlordRentHistoryPageState extends State<LandlordRentHistoryPage>
       List<dynamic> rentPaymentRefs = data!['rentpaymentRef'] ?? [];
       firstName = data['firstName'];
       lastName = data['lastName'];
+
+      try {
+        pdfUrl = data['pdfUrl'];
+      } catch (e) {
+        pdfUrl = '';
+      }
 
       // Fetch each rent payment document using the document references
       for (DocumentReference<Map<String, dynamic>> rentPaymentRef
@@ -126,6 +133,7 @@ class _LandlordRentHistoryPageState extends State<LandlordRentHistoryPage>
                 rentPayment: rentPayment,
                 firstName: firstName,
                 lastName: lastName,
+                receiptUrl: pdfUrl,
               ),
             ),
           );

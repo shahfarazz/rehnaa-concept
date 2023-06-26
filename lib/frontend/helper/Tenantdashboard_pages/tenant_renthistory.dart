@@ -26,6 +26,7 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
   String lastName = '';
   bool shouldDisplay = false;
   String searchText = ''; // Variable to store the search query
+  String pdfUrl = '';
 
   @override
   bool get wantKeepAlive => true;
@@ -49,6 +50,12 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
       List<dynamic> rentPaymentRefs = data!['rentPaymentRef'] ?? [];
       firstName = data['firstName'];
       lastName = data['lastName'];
+
+      try {
+        pdfUrl = data['pdfUrl'];
+      } catch (e) {
+        pdfUrl = '';
+      }
 
       setState(() {
         shouldDisplay = true;
@@ -124,6 +131,7 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
                 rentPayment: rentPayment,
                 firstName: firstName,
                 lastName: lastName,
+                receiptUrl: pdfUrl,
               ),
             ),
           );
