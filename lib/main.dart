@@ -43,16 +43,14 @@ class MyApp extends StatelessWidget {
           theme: ThemeData(
             primarySwatch: Colors.blue,
           ),
-          // home: LandlordDashboardPage(
-          //   uid: 'R88XI7AqrOZBtGZzQwgyX2Wr7Yz1',
-          // ),
-          home: TenantRentedPropertyPage(
-            uid: 'QvagHQ6kAXgxpRC09Cd11mZBQoo2  ',
+          home: LandlordDashboardPage(
+            uid: '0RrAUsYh5EO2QH01RVarNP1MIir1',
           ),
+          // home: AdminDashboard(),
           // home: const SplashScreen(),
           // home: DealerDashboardPage(uid: 'fUuFmW7bNaweyP5xkc4c'),
           // home: TenantDashboardPage(
-          //   uid: 'K55YzmkUXt09OgFwnDuT',
+          //   uid: 'GjGmEM8AnvXIebnvKuCvOOkTDpL2',
           // ), //TODO remove this Jugaar
         ),
       ),

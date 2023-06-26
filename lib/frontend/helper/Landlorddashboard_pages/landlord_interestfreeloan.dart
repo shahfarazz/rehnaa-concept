@@ -23,8 +23,6 @@ class InterestFreeLoanPage extends StatefulWidget {
     required this.uid,
   }) : super(key: key);
 
-  // const InterestFreeLoanPage({Key? key}) : super(key: key);
-
   @override
   _InterestFreeLoanPageState createState() => _InterestFreeLoanPageState();
 }
@@ -52,21 +50,17 @@ class _InterestFreeLoanPageState extends State<InterestFreeLoanPage>
   }
 
   Future<Landlord> getLandlordFromFirestore(String uid) async {
-    // try {
-    // Fetch the landlord document from Firestore
     DocumentSnapshot snapshot =
         await FirebaseFirestore.instance.collection('Landlords').doc(uid).get();
     if (kDebugMode) {
       print('Fetched snapshot: ${snapshot.data()}');
     }
 
-    // Convert the snapshot to JSON
     Map<String, dynamic> json = snapshot.data() as Map<String, dynamic>;
     if (kDebugMode) {
       print('Landlord JSON: $json');
     }
 
-    // Use the Landlord.fromJson method to create a Landlord instance
     Landlord landlord = await Landlord.fromJson(json);
 
     if (kDebugMode) {
@@ -74,151 +68,143 @@ class _InterestFreeLoanPageState extends State<InterestFreeLoanPage>
     }
 
     return landlord;
-    // } catch (error) {
-    //   if (kDebugMode) {
-    //     print('Error fetching landlord: $error');
-    //   }
-    //   rethrow;
-    // }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        children: [
-          Positioned(
-            top: 65.0,
-            left: 10.0,
-            child: GestureDetector(
-              onTap: () {
-                Navigator.pop(context);
-              },
-              child: Container(
-                width: 40,
-                height: 40,
-                decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Color(0xFF33907C),
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      Color(0xff0FA697),
-                      Color(0xff45BF7A),
-                      Color(0xff0DF205),
-                    ],
-                  ),
-                ),
-                child: IconButton(
-                  onPressed: () {
+      body: LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints constraints) {
+          return Stack(
+            children: [
+              Positioned(
+                top: constraints.maxHeight * 0.04,
+                left: constraints.maxWidth * 0.02,
+                child: GestureDetector(
+                  onTap: () {
                     Navigator.pop(context);
                   },
-                  icon: const Icon(
-                    Icons.arrow_back,
-                    size: 20,
+                  child: Container(
+                    width: constraints.maxWidth * 0.1,
+                    height: constraints.maxWidth * 0.1,
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Color(0xFF33907C),
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          Color(0xff0FA697),
+                          Color(0xff45BF7A),
+                          Color(0xff0DF205),
+                        ],
+                      ),
+                    ),
+                    child: IconButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      icon: const Icon(
+                        Icons.arrow_back,
+                        size: 20,
+                      ),
+                      color: Colors.white,
+                    ),
                   ),
-                  color: Colors.white,
                 ),
               ),
-            ),
-          ),
-          Column(
-            children: [
-              const SizedBox(height: 30),
-              SizedBox(
-                height: MediaQuery.of(context).size.height * 0.1,
-                child: Image.asset(
-                  'assets/mainlogo.png',
-                  // fit: BoxFit.cover,
-                ),
-              ),
-              const SizedBox(height: 20),
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Center(
-                    child: Padding(
-                      padding: const EdgeInsets.all(20.0),
-                      child: Card(
-                        color: const Color.fromARGB(255, 235, 235, 235),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20.0),
-                        ),
-                        child: Container(
-                          padding: const EdgeInsets.all(16.0),
-                          child: Column(
-                            children: [
-                              const SizedBox(height: 10),
-                              const Text(
-                                "Interest Free Loan",
-                                style: TextStyle(
-                                  fontSize: 24,
-                                  color: Color(0xff33907c),
-                                  fontWeight: FontWeight.bold,
-                                ),
+              Column(
+                children: [
+                  SizedBox(height: constraints.maxHeight * 0.06),
+                  SizedBox(
+                    height: constraints.maxHeight * 0.1,
+                    child: Image.asset(
+                      'assets/mainlogo.png',
+                    ),
+                  ),
+                  SizedBox(height: constraints.maxHeight * 0.04),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Center(
+                        child: Padding(
+                          padding: EdgeInsets.all(constraints.maxWidth * 0.04),
+                          child: Card(
+                            color: const Color.fromARGB(255, 235, 235, 235),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20.0),
+                            ),
+                            child: Container(
+                              padding: EdgeInsets.all(constraints.maxWidth * 0.04),
+                              child: Column(
+                                children: [
+                                  SizedBox(height: constraints.maxHeight * 0.02),
+                                  Text(
+                                    "Interest Free Loan",
+                                    style: TextStyle(
+                                      fontSize: constraints.maxWidth * 0.06,
+                                      color: Color(0xff33907c),
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  SizedBox(height: constraints.maxHeight * 0.03),
+                                  buildTextCard(constraints),
+                                  SizedBox(height: constraints.maxHeight * 0.03),
+                                  buildTextCard2(constraints),
+                                  SizedBox(height: constraints.maxHeight * 0.3),
+                                ],
                               ),
-                              const SizedBox(height: 16),
-                              buildTextCard(),
-                              const SizedBox(height: 16),
-                              buildTextCard2(),
-                              const SizedBox(height: 330),
-                            ],
+                            ),
                           ),
                         ),
                       ),
                     ),
                   ),
-                ),
+                ],
               ),
             ],
-          ),
-        ],
+          );
+        },
       ),
     );
   }
 
-  Widget buildTextCard() {
+  Widget buildTextCard(BoxConstraints constraints) {
     return Card(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20.0),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(20.0),
+        padding: EdgeInsets.all(constraints.maxWidth * 0.05),
         child: SelectableText.rich(
           TextSpan(
             children: <TextSpan>[
               TextSpan(
                 text:
                     'You can apply for one month worth rent as an interest free loan after being a Rehnaa member for six months.',
-                style: TextStyle(fontSize: 16),
+                style: TextStyle(fontSize: constraints.maxWidth * 0.04),
               ),
             ],
           ),
-
-          textAlign: TextAlign.justify, // Justify the text
+          textAlign: TextAlign.justify,
         ),
       ),
     );
   }
 
-  Widget buildTextCard2() {
+  Widget buildTextCard2(BoxConstraints constraints) {
     return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
       stream: _landlordStream,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const LandlordDashboardContentSkeleton();
+          return LandlordDashboardContentSkeleton();
         } else if (snapshot.hasError) {
-          // Handle any error that occurred while fetching the data
           return Text('Error: ${snapshot.error}');
         } else if (snapshot.hasData) {
-          // Convert the snapshot to JSON
-          // print('Snapshot: ${snapshot.data!.data()}');
           Map<String, dynamic> json =
               snapshot.data!.data() as Map<String, dynamic>;
           if (kDebugMode) {
             // print('Landlord JSON: $json');
           }
-          // Use the Landlord.fromJson method to create a Landlord instance
           Landlord landlord = Landlord.fromJson(json);
 
           if (json['isWithdraw'] != null && json['isWithdraw'] == true) {
@@ -235,24 +221,22 @@ class _InterestFreeLoanPageState extends State<InterestFreeLoanPage>
               borderRadius: BorderRadius.circular(20.0),
             ),
             child: Padding(
-              padding: const EdgeInsets.all(20.0),
+              padding: EdgeInsets.all(constraints.maxWidth * 0.05),
               child: SelectableText.rich(
                 TextSpan(
                   children: <TextSpan>[
                     TextSpan(
                       text:
                           ' ${DateFormat('dd MMMMyyyy').format(landlord.dateJoined!.toDate())} \n\n  Date Joined',
-                      style: TextStyle(fontSize: 16),
+                      style: TextStyle(fontSize: constraints.maxWidth * 0.04),
                     ),
                   ],
                 ),
-                textAlign: TextAlign.justify, // Justify the text
+                textAlign: TextAlign.justify,
               ),
             ),
           );
         }
-
-        // By default, return an empty container if no data is available
         return Container();
       },
     );
