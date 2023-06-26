@@ -204,38 +204,42 @@ class _TenantRentAccrualPageState extends State<TenantRentAccrualPage> {
                       ),
                     ],
                   ),
-                  child: Column(
-                    children: [
-                      Row(
-                        children: [
-                          Text(
-                            tenant?.dateJoined
-                                    ?.toDate()
-                                    .toString()
-                                    .substring(0, 10) ??
-                                'Date Joined',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              fontFamily: 'Montserrat',
-                              color: Color(0xff45BF7A),
+                  child: Center(
+                    child: Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              tenant?.dateJoined
+                                      ?.toDate()
+                                      .toString()
+                                      .substring(0, 10) ??
+                                  'Date Joined',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                fontFamily: 'Montserrat',
+                                color: Color(0xff45BF7A),
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 10),
-                      Row(
-                        children: [
-                          Text(
-                            'Date Joined',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontFamily: 'Montserrat',
+                          ],
+                        ),
+                        SizedBox(height: 10),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              'Date Joined',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontFamily: 'Montserrat',
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                    ],
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ],

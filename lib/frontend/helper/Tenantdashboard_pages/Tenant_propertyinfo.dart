@@ -440,24 +440,24 @@ class PropertyDetails extends StatelessWidget {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              '$firstName $lastName', // Replace with the owner's name fetched from Firebase
-                              style: GoogleFonts.montserrat(
-                                color: const Color(0xFF33907C),
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                              ),
-                            ),
+                            // Text(
+                            //   '$firstName $lastName', // Replace with the owner's name fetched from Firebase
+                            //   style: GoogleFonts.montserrat(
+                            //     color: const Color(0xFF33907C),
+                            //     fontWeight: FontWeight.bold,
+                            //     fontSize: 16,
+                            //   ),
+                            // ),
                             // wrap below text in a container and set its width to 200
-                            Container(
-                              width: 150,
-                              child: Text(
-                                emailOrPhone, // Replace with the owner's phone number fetched from Firebase
-                                style: GoogleFonts.montserrat(
-                                  fontSize: 13,
-                                ),
-                              ),
-                            )
+                            // Container(
+                            //   width: 150,
+                            //   child: Text(
+                            //     emailOrPhone, // Replace with the owner's phone number fetched from Firebase
+                            //     style: GoogleFonts.montserrat(
+                            //       fontSize: 13,
+                            //     ),
+                            //   ),
+                            // )
                           ],
                         ),
                         const Spacer(),
