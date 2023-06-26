@@ -9,6 +9,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:rehnaa/backend/models/tenantsmodel.dart';
 import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenantinvoice.dart';
 
+import '../../../backend/models/landlordmodel.dart';
 import '../Landlorddashboard_pages/landlord_dashboard_content.dart';
 
 class TenantDashboardContent extends StatefulWidget {
@@ -192,8 +193,7 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                                         {
                                           'title':
                                               'Payment Request by ${'${tenant.firstName} ${tenant.lastName}'}',
-                                          'amount':
-                                              'Rs${tenant.rent.toString()}',
+                                          'amount': 'Rs${amount}',
                                         }
                                       ]),
                                     }, SetOptions(merge: true));
@@ -223,20 +223,36 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                                       isWithdraw = true;
                                     });
 
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              TenantInvoicePage(
-                                                tenantName:
-                                                    '${tenant.firstName} ${tenant.lastName}',
-                                                // paymentDateTime: DateTime.now(),
-                                                rent: tenant.rent,
-                                                amount: amount,
-                                                selectedOption: selectedOption,
-                                                id: widget.uid,
-                                              )),
-                                    );
+                                    tenant.landlordRef
+                                        ?.get()
+                                        .then((landlordDoc) {
+                                      // print(
+                                      //     'landlordDoc.exists: ${landlordDoc.data()}');
+                                      if (landlordDoc.exists) {
+                                        var landlordJson = landlordDoc.data()
+                                            as Map<String, dynamic>;
+                                        Landlord landlord =
+                                            Landlord.fromJson(landlordJson);
+                                        print(
+                                            'reached here landlord is ${landlord.firstName} ${landlord.lastName}}');
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  TenantInvoicePage(
+                                                    tenantName:
+                                                        '${tenant.firstName} ${tenant.lastName}',
+                                                    // paymentDateTime: DateTime.now(),
+                                                    rent: tenant.rent,
+                                                    amount: amount,
+                                                    selectedOption:
+                                                        selectedOption,
+                                                    id: widget.uid,
+                                                    landlord: landlord,
+                                                  )),
+                                        );
+                                      }
+                                    });
                                   } else {
                                     Fluttertoast.showToast(
                                       msg: 'Invalid withdrawal amount',
@@ -353,11 +369,24 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                       child: CircleAvatar(
                         radius: 75,
                         child: ClipOval(
-                          child: Image.network(
-                            tenant.pathToImage ?? 'assets/defaulticon.png',
-                            width: 150,
-                            height: 150,
-                          ),
+                          child: tenant.pathToImage != null &&
+                                  tenant.pathToImage!.isNotEmpty
+                              ? (tenant.pathToImage!.startsWith('assets')
+                                  ? Image.asset(
+                                      tenant.pathToImage!,
+                                      width: 150,
+                                      height: 150,
+                                    )
+                                  : Image.network(
+                                      tenant.pathToImage!,
+                                      width: 150,
+                                      height: 150,
+                                    ))
+                              : Image.asset(
+                                  'assets/defaulticon.png',
+                                  width: 150,
+                                  height: 150,
+                                ),
                         ),
                       ),
                     ),

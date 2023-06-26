@@ -66,16 +66,16 @@ class _TenantCardWidgetState extends State<TenantCardWidget> {
       return;
     }
 
-    if (selectedImages == null || selectedImages!.isEmpty) {
-      Fluttertoast.showToast(
-        msg: 'Please select at least one image.',
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.CENTER,
-        backgroundColor: Colors.red,
-        textColor: Colors.white,
-      );
-      return;
-    }
+    // if (selectedImages == null || selectedImages!.isEmpty) {
+    //   Fluttertoast.showToast(
+    //     msg: 'Please select at least one image.',
+    //     toastLength: Toast.LENGTH_SHORT,
+    //     gravity: ToastGravity.CENTER,
+    //     backgroundColor: Colors.red,
+    //     textColor: Colors.white,
+    //   );
+    //   return;
+    // }
 
     handleSubmit();
   }

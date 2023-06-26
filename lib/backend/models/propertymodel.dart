@@ -2,25 +2,25 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'landlordmodel.dart';
 
 class Property {
-  final List<String> imagePath;
-  final String type;
-  final int beds;
-  final int baths;
-  final bool garden;
-  final int living;
-  final int floors;
-  final int carspace;
-  final String description;
-  final String title;
-  final String location;
-  final String address;
-  final double price;
-  final DocumentReference<Map<String, dynamic>>? landlordRef;
+  List<String> imagePath;
+  String type;
+  int beds;
+  int baths;
+  bool garden;
+  int living;
+  int floors;
+  int carspace;
+  String description;
+  String title;
+  String location;
+  String address;
+  double price;
+  DocumentReference<Map<String, dynamic>>? landlordRef;
   DocumentReference<Map<String, dynamic>>? tenantRef;
   Landlord? landlord;
-  final double rehnaaRating;
-  final double tenantRating;
-  final String tenantReview;
+  double rehnaaRating;
+  double tenantRating;
+  String tenantReview;
   String? propertyID;
 
   Property({

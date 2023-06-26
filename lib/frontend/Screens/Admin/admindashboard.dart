@@ -10,6 +10,7 @@ import '../../helper/Admindashboard_pages/admin_landlordinput.dart';
 import '../../helper/Admindashboard_pages/admin_propertyinput.dart';
 import '../../helper/Admindashboard_pages/admin_rentoffwinner.dart';
 import '../../helper/Admindashboard_pages/admin_requests_property_contracts.dart';
+import '../../helper/Admindashboard_pages/admin_reviews.dart';
 import '../../helper/Admindashboard_pages/admin_vouchers.dart';
 
 class AdminDashboard extends StatefulWidget {
@@ -742,6 +743,12 @@ class _AdminDashboardState extends State<AdminDashboard> {
                   child: ElevatedButton(
                     onPressed: () {
                       // Handle Add reviews and testimonials button press
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => AdminReviewsTestimonialsPage(),
+                        ),
+                      );
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.transparent,

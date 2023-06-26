@@ -1,17 +1,23 @@
+import 'dart:async';
+
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:rehnaa/backend/models/rentpaymentmodel.dart';
+import 'package:flutter_pdfview/flutter_pdfview.dart';
 
 class RentPaymentInfoPage extends StatelessWidget {
   final RentPayment rentPayment;
   final String firstName;
   final String lastName;
+  final String receiptUrl;
 
   const RentPaymentInfoPage({
     Key? key,
     required this.rentPayment,
     required this.firstName,
     required this.lastName,
+    required this.receiptUrl,
   }) : super(key: key);
 
   @override
@@ -139,6 +145,27 @@ class RentPaymentInfoPage extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 10.0),
+
+                      // make a box where pdf will be shown
+                      GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => PDFScreen(
+                                  path: receiptUrl,
+                                ),
+                              ),
+                            );
+                          },
+                          child: Center(
+                            child: WhiteBox(
+                              icon: Icons.picture_as_pdf,
+                              iconColor: const Color(0xff33907c),
+                              label: 'Payment Receipt',
+                              value: 'Click to view',
+                            ),
+                          ))
                     ],
                   ),
                 ),
@@ -163,6 +190,110 @@ class RentPaymentInfoPage extends StatelessWidget {
       default:
         return Icons.money;
     }
+  }
+}
+
+class PDFScreen extends StatefulWidget {
+  final String? path;
+
+  PDFScreen({Key? key, this.path}) : super(key: key);
+
+  @override
+  _PDFScreenState createState() => _PDFScreenState();
+}
+
+class _PDFScreenState extends State<PDFScreen> with WidgetsBindingObserver {
+  final Completer<PDFViewController> _controller =
+      Completer<PDFViewController>();
+  int? pages = 0;
+  int? currentPage = 0;
+  bool isReady = false;
+  String errorMessage = '';
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Document"),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.share),
+            onPressed: () {},
+          ),
+        ],
+      ),
+      backgroundColor: Colors.red,
+      body: Stack(
+        children: <Widget>[
+          // PDFView(
+          //   filePath: widget.path,
+          //   enableSwipe: false,
+          //   swipeHorizontal: true,
+          //   autoSpacing: false,
+          //   pageFling: true,
+          //   pageSnap: true,
+          //   defaultPage: currentPage!,
+          //   fitPolicy: FitPolicy.BOTH,
+          //   preventLinkNavigation: false,
+          //   onRender: (_pages) {
+          //     setState(() {
+          //       pages = _pages;
+          //       isReady = true;
+          //     });
+          //   },
+          //   onError: (error) {
+          //     setState(() {
+          //       errorMessage = error.toString();
+          //     });
+          //     print(error.toString());
+          //   },
+          //   onPageError: (page, error) {
+          //     setState(() {
+          //       errorMessage = '$page: ${error.toString()}';
+          //     });
+          //     print('$page: ${error.toString()}');
+          //   },
+          //   onViewCreated: (PDFViewController pdfViewController) {
+          //     _controller.complete(pdfViewController);
+          //   },
+          //   onLinkHandler: (String? uri) {
+          //     print('goto uri: $uri');
+          //   },
+          //   onPageChanged: (int? page, int? total) {
+          //     print('page change: $page/$total');
+          //     setState(() {
+          //       currentPage = page;
+          //     });
+          //   },
+          // ),
+
+          errorMessage.isEmpty
+              ? !isReady
+                  ? Center(
+                      child: CircularProgressIndicator(),
+                    )
+                  : Container()
+              : Center(
+                  child: Text(errorMessage),
+                )
+        ],
+      ),
+      floatingActionButton: FutureBuilder<PDFViewController>(
+        future: _controller.future,
+        builder: (context, AsyncSnapshot<PDFViewController> snapshot) {
+          if (snapshot.hasData) {
+            return FloatingActionButton.extended(
+              label: Text("Go to ${pages! ~/ 2}"),
+              onPressed: () async {
+                await snapshot.data!.setPage(pages! ~/ 2);
+              },
+            );
+          }
+
+          return Container();
+        },
+      ),
+    );
   }
 }
 

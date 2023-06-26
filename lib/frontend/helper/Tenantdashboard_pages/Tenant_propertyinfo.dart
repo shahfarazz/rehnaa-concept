@@ -8,7 +8,6 @@ import 'package:rehnaa/frontend/Screens/Tenant/tenant_dashboard.dart';
 import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenant_dashboard_content.dart';
 import 'package:photo_view/photo_view.dart';
 
-
 import '../../../backend/models/propertymodel.dart';
 import '../../../backend/models/tenantsmodel.dart';
 
@@ -22,6 +21,7 @@ class TenantPropertyPage extends StatefulWidget {
   final String uid;
   final String propertyID;
   final bool isWithdraw;
+  final String emailOrPhone;
 
   const TenantPropertyPage({
     super.key,
@@ -34,6 +34,7 @@ class TenantPropertyPage extends StatefulWidget {
     required this.uid,
     required this.isWithdraw,
     required this.propertyID,
+    required this.emailOrPhone,
   });
 
   @override
@@ -76,6 +77,7 @@ class _TenantPropertyPageState extends State<TenantPropertyPage> {
                     location: widget.location,
                     address: widget.address,
                     propertyID: widget.propertyID,
+                    emailOrPhone: widget.emailOrPhone,
                   ),
                 ),
               ],
@@ -122,7 +124,8 @@ class PropertyCarousel extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => ExpandedImageDialog(imageProvider: imagePath),
+                        builder: (_) =>
+                            ExpandedImageDialog(imageProvider: imagePath),
                       ),
                     );
                   },
@@ -221,6 +224,7 @@ class PropertyDetails extends StatelessWidget {
   final String location;
   final String address;
   final String propertyID;
+  final String emailOrPhone;
 
   const PropertyDetails({
     super.key,
@@ -233,6 +237,7 @@ class PropertyDetails extends StatelessWidget {
     required this.location,
     required this.address,
     required this.propertyID,
+    required this.emailOrPhone,
   });
 
   @override
@@ -314,25 +319,25 @@ class PropertyDetails extends StatelessWidget {
                     ),
                     SizedBox(height: screenHeight * 0.02),
                     Text.rich(
-                    TextSpan(
-                      text: "Type: ",
-                      style: GoogleFonts.montserrat(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14,
-                        // color: const Color(0xFF33907C),
-                      ),
-                      children: [
-                        TextSpan(
-                          text: "${property.type}",
-                          style: GoogleFonts.montserrat(
-                            fontWeight: FontWeight.normal,
-                            fontSize: 14,
-                            // color: const Color(0xFF33907C),
-                          ),
+                      TextSpan(
+                        text: "Type: ",
+                        style: GoogleFonts.montserrat(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                          // color: const Color(0xFF33907C),
                         ),
-                      ],
+                        children: [
+                          TextSpan(
+                            text: "${property.type}",
+                            style: GoogleFonts.montserrat(
+                              fontWeight: FontWeight.normal,
+                              fontSize: 14,
+                              // color: const Color(0xFF33907C),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
 
                     SizedBox(height: screenHeight * 0.04),
                     Column(
@@ -443,12 +448,16 @@ class PropertyDetails extends StatelessWidget {
                                 fontSize: 16,
                               ),
                             ),
-                            Text(
-                              '03333295546', // Replace with the owner's phone number fetched from Firebase
-                              style: GoogleFonts.montserrat(
-                                fontSize: 13,
+                            // wrap below text in a container and set its width to 200
+                            Container(
+                              width: 150,
+                              child: Text(
+                                emailOrPhone, // Replace with the owner's phone number fetched from Firebase
+                                style: GoogleFonts.montserrat(
+                                  fontSize: 13,
+                                ),
                               ),
-                            ),
+                            )
                           ],
                         ),
                         const Spacer(),
@@ -522,6 +531,7 @@ class PropertyDetails extends StatelessWidget {
                                               uid: uid,
                                               isWithdraw: isWithdraw,
                                               propertyID: propertyID,
+                                              emailOrPhone: emailOrPhone,
                                             )),
                                   );
                                 },
@@ -738,7 +748,6 @@ class GradientButton extends StatelessWidget {
     );
   }
 }
-
 
 class ExpandedImageDialog extends StatelessWidget {
   final String imageProvider;

@@ -26,6 +26,8 @@ class _SplashScreenState extends State<SplashScreen> {
   Future<void> checkUserLoginStatus() async {
     User? user = FirebaseAuth.instance.currentUser;
 
+    // print('user is $user');
+
     await Future.delayed(const Duration(seconds: 2));
 
     if (user != null) {
@@ -39,6 +41,7 @@ class _SplashScreenState extends State<SplashScreen> {
           .doc(user.uid)
           .get()
           .then((DocumentSnapshot documentSnapshot) {
+        // print('DocumentSnapshot data: ${documentSnapshot.data()}');
         if (documentSnapshot.exists) {
           Map<String, dynamic> data =
               documentSnapshot.data() as Map<String, dynamic>;
@@ -51,8 +54,13 @@ class _SplashScreenState extends State<SplashScreen> {
               builder: (context) => LandlordDashboardPage(uid: user.uid),
             ));
           } else {
-            //do nothing
+            print('User type not found');
           }
+        } else {
+          //edge case , go to login page
+          Navigator.of(context).pushReplacement(MaterialPageRoute(
+            builder: (context) => LoginPage(),
+          ));
         }
       });
     } else {

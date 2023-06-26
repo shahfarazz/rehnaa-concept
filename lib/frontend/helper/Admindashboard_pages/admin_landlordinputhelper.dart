@@ -57,18 +57,18 @@ class _LandlordCardWidgetState extends State<LandlordCardWidget> {
       return;
     }
 
-    if (selectedImages == null || selectedImages!.isEmpty) {
-      // Display error message or perform necessary actions for no selected images
-      // For example, show a snackbar or toast with an error message
-      Fluttertoast.showToast(
-        msg: 'Please select at least one image.',
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.CENTER,
-        backgroundColor: Colors.red,
-        textColor: Colors.white,
-      );
-      return;
-    }
+    // if (selectedImages == null || selectedImages!.isEmpty) {
+    //   // Display error message or perform necessary actions for no selected images
+    //   // For example, show a snackbar or toast with an error message
+    //   Fluttertoast.showToast(
+    //     msg: 'Please select at least one image.',
+    //     toastLength: Toast.LENGTH_SHORT,
+    //     gravity: ToastGravity.CENTER,
+    //     backgroundColor: Colors.red,
+    //     textColor: Colors.white,
+    //   );
+    //   return;
+    // }
 
     // Perform necessary actions for valid inputs
     if (creditPointsController.text.isEmpty ||

@@ -9,6 +9,7 @@ import 'package:rehnaa/frontend/Screens/login_page.dart';
 import 'package:rehnaa/frontend/Screens/vouchers.dart';
 import 'package:rehnaa/frontend/helper/Landlorddashboard_pages/landlord_dashboard_content.dart';
 import 'package:rehnaa/frontend/helper/Landlorddashboard_pages/landlord_profile.dart';
+import '../../helper/Landlorddashboard_pages/landlord_advance_rent.dart';
 import '../../helper/Landlorddashboard_pages/landlord_renthistory.dart';
 import '../../helper/Landlorddashboard_pages/landlord_tenants.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -35,6 +36,7 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
   bool _isWithdraw = false;
   late Stream<DocumentSnapshot<Map<String, dynamic>>> _notificationStream;
   late Stream<DocumentSnapshot<Map<String, dynamic>>> _notificationStream2;
+  bool isNewVoucher = false;
 
   @override
   void initState() {
@@ -51,6 +53,7 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
         .collection('Notifications')
         .doc(widget.uid)
         .snapshots();
+    isNewVouchers();
   }
 
   @override
@@ -71,6 +74,27 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeInOut,
     );
+  }
+
+  Future<void> isNewVouchers() async {
+    //check for isNew varialbe in the Vouchers collection
+    await FirebaseFirestore.instance
+        .collection('Vouchers')
+        .doc(widget.uid)
+        .get()
+        .then((value) {
+      if (value.exists) {
+        if (value.data()!['isNew'] == true) {
+          setState(() {
+            isNewVoucher = true;
+          });
+        } else {
+          setState(() {
+            isNewVoucher = false;
+          });
+        }
+      }
+    });
   }
 
   void _toggleSidebar() {
@@ -108,14 +132,12 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
     super.build(context);
     return Scaffold(
       appBar: _buildAppBar(size),
-      resizeToAvoidBottomInset:
-          false, // Prevent resizing when the keyboard is shown
+      resizeToAvoidBottomInset: false,
       body: GestureDetector(
         onTap: () {
           if (_isSidebarOpen) {
             _closeSidebar();
           }
-          // Close the keyboard
           FocusScope.of(context).unfocus();
         },
         child: Stack(
@@ -135,7 +157,7 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
                       physics: isKeyboardVisible(context)
                           ? NeverScrollableScrollPhysics()
                           : const AlwaysScrollableScrollPhysics(),
-                      itemCount: 5, // Number of pages
+                      itemCount: 5,
                       itemBuilder: (context, index) {
                         switch (index) {
                           case 0:
@@ -424,7 +446,22 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
                         );
                         // _closeSidebar();
                       },
-                      showBadge: true,
+                      showBadge: isNewVoucher,
+                    ),
+                    _buildSidebarItem(
+                      icon: Icons.receipt_long,
+                      label: 'Advance Rent',
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => LandlordAdvanceRentPage(
+                              uid: widget.uid,
+                            ),
+                          ),
+                        );
+                        // _closeSidebar();
+                      },
                     ),
                     _buildSidebarItem(
                       icon: Icons.lock,

@@ -238,8 +238,7 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
                                         {
                                           'title':
                                               'Withdraw Request by ${'${landlord.firstName} ${landlord.lastName}'}',
-                                          'amount':
-                                              'Rs${landlord.balance.toString()}',
+                                          'amount': 'Rs${withdrawalAmount}',
                                         }
                                       ]),
                                     }, SetOptions(merge: true));
@@ -371,7 +370,7 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
           return Text('Error: ${snapshot.error}');
         } else if (snapshot.hasData) {
           // Convert the snapshot to JSON
-          // print('Snapshot: ${snapshot.data!.data()}');
+          print('Snapshot: ${snapshot.data!.data()}');
           Map<String, dynamic> json =
               snapshot.data!.data() as Map<String, dynamic>;
           if (kDebugMode) {
@@ -423,12 +422,24 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
                     child: CircleAvatar(
                       radius: 75,
                       child: ClipOval(
-                        child: Image.asset(
-                          landlord.pathToImage ?? 'assets/defaulticon.png',
-                          width: 150,
-                          height: 150,
-                          fit: BoxFit.cover,
-                        ),
+                        child: landlord.pathToImage != null &&
+                                landlord.pathToImage!.isNotEmpty
+                            ? (landlord.pathToImage!.startsWith('assets')
+                                ? Image.asset(
+                                    landlord.pathToImage!,
+                                    width: 150,
+                                    height: 150,
+                                  )
+                                : Image.network(
+                                    landlord.pathToImage!,
+                                    width: 150,
+                                    height: 150,
+                                  ))
+                            : Image.asset(
+                                'assets/defaulticon.png',
+                                width: 150,
+                                height: 150,
+                              ),
                       ),
                     ),
                   ),

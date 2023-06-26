@@ -1,45 +1,65 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-import '../../../backend/models/tenantsmodel.dart';
+import '../../../backend/models/landlordmodel.dart';
+import '../../Screens/Landlord/landlord_dashboard.dart';
 
-class TenantRentAccrualPage extends StatefulWidget {
-  String uid;
-  TenantRentAccrualPage({Key? key, required this.uid}) : super(key: key);
+class LandlordAdvanceRentPage extends StatefulWidget {
+  final String uid;
+  const LandlordAdvanceRentPage({super.key, required this.uid});
+
   @override
-  _TenantRentAccrualPageState createState() => _TenantRentAccrualPageState();
+  State<LandlordAdvanceRentPage> createState() =>
+      _LandlordAdvanceRentPageState();
 }
 
-class _TenantRentAccrualPageState extends State<TenantRentAccrualPage> {
+class _LandlordAdvanceRentPageState extends State<LandlordAdvanceRentPage> {
   bool isApplied = false;
-  Tenant? tenant;
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    checkIsApplied();
-  }
+  Landlord? landlord;
 
   Future<void> checkIsApplied() async {
-    var myTenant = await FirebaseFirestore.instance
-        .collection('Tenants')
+    var myLandlord = await FirebaseFirestore.instance
+        .collection('Landlords')
         .doc(widget.uid)
         .get();
 
-    tenant = Tenant.fromJson(myTenant.data()!);
+    landlord = Landlord.fromJson(myLandlord.data()!);
 
-    if (myTenant.data()?['isApplied'] == true) {
-      // setState(() {
-      isApplied = true;
-      // });
+    if (myLandlord.data()?['isApplied'] == true) {
+      setState(() {
+        isApplied = true;
+      });
     }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    checkIsApplied();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: //just add a back button
+          AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(
+            Icons.arrow_back_ios,
+            color: Color(0xff45BF7A),
+          ),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => LandlordDashboardPage(uid: widget.uid),
+              ),
+            );
+          },
+        ),
+      ),
       body: SingleChildScrollView(
         child: Container(
           color: Colors.grey[200], // Set the background color
@@ -58,7 +78,7 @@ class _TenantRentAccrualPageState extends State<TenantRentAccrualPage> {
                   child: Column(
                     children: [
                       Text(
-                        'Rent Accrual',
+                        'Rent advance',
                         style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
@@ -80,7 +100,7 @@ class _TenantRentAccrualPageState extends State<TenantRentAccrualPage> {
                     child: Column(
                       children: [
                         const Text(
-                          'After being a Rehnaa member for 6 months, tenants can accrue their rent for a particular month at a 3% interest rate per month.',
+                          'You can apply for three months advance rent at 3% interest rate per month',
                           style: TextStyle(
                             fontSize: 18,
                             fontFamily: 'Montserrat',
@@ -117,26 +137,26 @@ class _TenantRentAccrualPageState extends State<TenantRentAccrualPage> {
                                   isApplied = true;
                                 });
                                 FirebaseFirestore.instance
-                                    .collection('Tenants')
+                                    .collection('Landlords')
                                     .doc(widget.uid)
                                     .set({
                                   'isApplied': true,
                                 }, SetOptions(merge: true));
 
                                 //send an AdminRequest for the tenant
-                                FirebaseFirestore.instance
-                                    .collection('AdminRequests')
-                                    .doc(widget.uid)
-                                    .set({
-                                  'rentAccrualRequest': FieldValue.arrayUnion([
-                                    {
-                                      'fullname':
-                                          '${tenant?.firstName} ${tenant?.lastName}',
-                                      'uid': widget.uid,
-                                    }
-                                  ]),
-                                  'timestamp': Timestamp.now()
-                                }, SetOptions(merge: true));
+                                // FirebaseFirestore.instance
+                                //     .collection('AdminRequests')
+                                //     .doc(widget.uid)
+                                //     .set({
+                                //   'rentAccrualRequest': FieldValue.arrayUnion([
+                                //     {
+                                //       'fullname':
+                                //           '${landlord?.firstName} ${landlord?.lastName}',
+                                //       'uid': widget.uid,
+                                //     }
+                                //   ]),
+                                //   'timestamp': Timestamp.now()
+                                // }, SetOptions(merge: true)); //TODO implement this call
 
                                 //send a notification to the tenant that the request has been sent
                                 FirebaseFirestore.instance
@@ -146,7 +166,7 @@ class _TenantRentAccrualPageState extends State<TenantRentAccrualPage> {
                                   'notifications': FieldValue.arrayUnion([
                                     {
                                       'title':
-                                          'Your request for rent accrual has been sent to the admin.',
+                                          'Your request for rent advance has been sent to the admin.',
                                     }
                                   ])
                                 }, SetOptions(merge: true));
@@ -156,7 +176,7 @@ class _TenantRentAccrualPageState extends State<TenantRentAccrualPage> {
                                   SnackBar(
                                     backgroundColor: Colors.green,
                                     content: Text(
-                                      'Your request for rent accrual has been sent to the admin.',
+                                      'Your request for rent advance has been sent to the admin.',
                                       style: TextStyle(
                                         fontSize: 18,
                                         fontFamily: 'Montserrat',
@@ -209,7 +229,7 @@ class _TenantRentAccrualPageState extends State<TenantRentAccrualPage> {
                       Row(
                         children: [
                           Text(
-                            tenant?.dateJoined
+                            landlord?.dateJoined
                                     ?.toDate()
                                     .toString()
                                     .substring(0, 10) ??

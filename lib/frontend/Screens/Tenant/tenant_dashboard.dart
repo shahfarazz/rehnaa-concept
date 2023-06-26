@@ -39,6 +39,7 @@ class _DashboardPageState extends State<TenantDashboardPage>
   late AnimationController _sidebarController;
   late Stream<DocumentSnapshot<Map<String, dynamic>>> _notificationStream;
   late Stream<DocumentSnapshot<Map<String, dynamic>>> _notificationStream2;
+  bool isNewVoucher = false;
 
   bool _isWithdraw = false;
 
@@ -58,6 +59,7 @@ class _DashboardPageState extends State<TenantDashboardPage>
         .collection('Notifications')
         .doc(widget.uid)
         .snapshots();
+    isNewVouchers();
   }
 
   @override
@@ -79,6 +81,28 @@ class _DashboardPageState extends State<TenantDashboardPage>
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeInOut,
     );
+  }
+
+  Future<void> isNewVouchers() async {
+    //check for isNew varialbe in the Vouchers collection
+    await FirebaseFirestore.instance
+        .collection('Vouchers')
+        .doc(widget.uid)
+        .get()
+        .then((value) {
+      if (value.exists) {
+        print('data is ${value.data()!['isNew']}');
+        if (value.data()!['isNew'] == true) {
+          setState(() {
+            isNewVoucher = true;
+          });
+        } else {
+          setState(() {
+            isNewVoucher = false;
+          });
+        }
+      }
+    });
   }
 
   Future<void> _markNotificationsAsRead() async {
@@ -147,8 +171,7 @@ class _DashboardPageState extends State<TenantDashboardPage>
     super.build(context);
     return Scaffold(
       appBar: _buildAppBar(size),
-      resizeToAvoidBottomInset:
-          false, // Prevent resizing when the keyboard is shown
+      resizeToAvoidBottomInset: false,
       body: StatefulBuilder(
         builder: (BuildContext context, setState) {
           return GestureDetector(
@@ -156,7 +179,6 @@ class _DashboardPageState extends State<TenantDashboardPage>
               if (_isSidebarOpen) {
                 _closeSidebar();
               }
-              // Close the keyboard
               FocusScope.of(context).unfocus();
             },
             child: Stack(
@@ -176,7 +198,7 @@ class _DashboardPageState extends State<TenantDashboardPage>
                           physics: isKeyboardVisible(context)
                               ? NeverScrollableScrollPhysics()
                               : const AlwaysScrollableScrollPhysics(),
-                          itemCount: 5, // Number of pages
+                          itemCount: 5,
                           itemBuilder: (context, index) {
                             switch (index) {
                               case 0:
@@ -495,7 +517,7 @@ class _DashboardPageState extends State<TenantDashboardPage>
                         );
                         // _closeSidebar();
                       },
-                      showBadge: true,
+                      showBadge: isNewVoucher,
                     ),
                     _buildSidebarItem(
                       icon: Icons.lock,
@@ -620,7 +642,7 @@ class _DashboardPageState extends State<TenantDashboardPage>
               stream: _notificationStream2,
               builder: (BuildContext context,
                   AsyncSnapshot<DocumentSnapshot> snapshot) {
-                print('snapshot: $snapshot');
+                // print('snapshot: $snapshot');
                 if (snapshot.hasData && snapshot.data != null) {
                   Map<String, dynamic>? data =
                       snapshot.data!.data() as Map<String, dynamic>?;
@@ -699,204 +721,272 @@ class _DashboardPageState extends State<TenantDashboardPage>
                                         thumbVisibility: true,
                                         child: SingleChildScrollView(
                                           child: Column(
-                                            children: notificationstemp.reversed
-                                                .map((notification) {
-                                              String title =
-                                                  notification['title'] ?? '';
-                                              var amount =
-                                                  notification['amount'] ?? '';
-
-                                              // Generate a unique key for each notification using its index
-                                              Key dismissibleKey = UniqueKey();
-
-                                              return Dismissible(
-                                                key: dismissibleKey,
-                                                direction:
-                                                    DismissDirection.horizontal,
-                                                confirmDismiss: (_) async {
-                                                  return await showDialog(
-                                                    context: context,
-                                                    builder:
-                                                        (BuildContext context) {
-                                                      return AlertDialog(
-                                                        title: const Text(
-                                                            "Delete Notification"),
-                                                        content: const Text(
-                                                            "Are you sure you want to delete this notification?"),
-                                                        actions: <Widget>[
-                                                          TextButton(
-                                                            onPressed: () =>
-                                                                Navigator.of(
-                                                                        context)
-                                                                    .pop(false),
-                                                            child: const Text(
-                                                                "Cancel"),
+                                            children: notificationstemp.isEmpty
+                                                ? [
+                                                    Center(
+                                                      child: Card(
+                                                        elevation: 4.0,
+                                                        shape:
+                                                            RoundedRectangleBorder(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(
+                                                                      20.0),
+                                                        ),
+                                                        child: Container(
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        20.0),
+                                                            color: Colors.white,
                                                           ),
-                                                          TextButton(
-                                                            onPressed: () =>
-                                                                Navigator.of(
-                                                                        context)
-                                                                    .pop(true),
-                                                            child: const Text(
-                                                                "Delete"),
-                                                          ),
-                                                        ],
-                                                      );
-                                                    },
-                                                  );
-                                                },
-                                                onDismissed: (_) {
-                                                  // Remove the notification from the list
-                                                  setState(() {
-                                                    notificationstemp
-                                                        .remove(notification);
-                                                  });
-
-                                                  FirebaseFirestore.instance
-                                                      .collection(
-                                                          'Notifications')
-                                                      .doc(widget.uid)
-                                                      .update({
-                                                    'notifications':
-                                                        FieldValue.arrayRemove(
-                                                            [notification])
-                                                  });
-
-                                                  // Show a snackbar! This snackbar could also contain "Undo" actions
-                                                  ScaffoldMessenger.of(context)
-                                                      .showSnackBar(
-                                                    SnackBar(
-                                                      backgroundColor:
-                                                          Colors.green[400],
-                                                      content: Text(
-                                                          'Notification dismissed'),
-                                                      duration: const Duration(
-                                                          seconds: 2),
-                                                    ),
-                                                  );
-                                                },
-                                                background: Container(
-                                                  color: Colors.red,
-                                                  child: const Icon(
-                                                      Icons.delete,
-                                                      color: Colors.white),
-                                                  alignment:
-                                                      Alignment.centerLeft,
-                                                  padding:
-                                                      const EdgeInsets.only(
-                                                          left: 16),
-                                                ),
-                                                child: Column(
-                                                  children: <Widget>[
-                                                    Padding(
-                                                      padding: const EdgeInsets
-                                                              .symmetric(
-                                                          vertical: 8.0),
-                                                      child: Row(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
-                                                        children: <Widget>[
-                                                          const SizedBox(
-                                                            width: 24.0,
-                                                            child: Padding(
-                                                              padding: EdgeInsets
-                                                                  .only(
-                                                                      left:
-                                                                          8.0),
-                                                              child: Text(
-                                                                '\u2022',
-                                                                style:
-                                                                    TextStyle(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .all(16.0),
+                                                          child: Column(
+                                                            mainAxisSize:
+                                                                MainAxisSize
+                                                                    .min,
+                                                            children: [
+                                                              const Icon(
+                                                                Icons
+                                                                    .error_outline_outlined,
+                                                                size: 48.0,
+                                                                color: Color(
+                                                                    0xff33907c),
+                                                              ),
+                                                              const SizedBox(
+                                                                  height: 16.0),
+                                                              Text(
+                                                                'No notifications to show',
+                                                                style: GoogleFonts
+                                                                    .montserrat(
                                                                   fontSize:
-                                                                      24.0,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
-                                                                  color: Color(
-                                                                      0xFF45BF7A),
+                                                                      20.0,
+                                                                  // fontWeight: FontWeight.bold,
+                                                                  color: const Color(
+                                                                      0xff33907c),
                                                                 ),
                                                               ),
-                                                            ),
+                                                            ],
                                                           ),
-                                                          const SizedBox(
-                                                              width: 12.0),
-                                                          Expanded(
-                                                            child: Column(
+                                                        ),
+                                                      ),
+                                                    )
+                                                  ]
+                                                : notificationstemp.reversed
+                                                    .map((notification) {
+                                                    String title =
+                                                        notification['title'] ??
+                                                            '';
+                                                    var amount = notification[
+                                                            'amount'] ??
+                                                        '';
+
+                                                    // Generate a unique key for each notification using its index
+                                                    Key dismissibleKey =
+                                                        UniqueKey();
+
+                                                    // print(
+                                                    //     'notificanstemp is $notificationstemp');
+
+                                                    return Dismissible(
+                                                      key: dismissibleKey,
+                                                      direction:
+                                                          DismissDirection
+                                                              .horizontal,
+                                                      confirmDismiss:
+                                                          (_) async {
+                                                        return await showDialog(
+                                                          context: context,
+                                                          builder: (BuildContext
+                                                              context) {
+                                                            return AlertDialog(
+                                                              title: const Text(
+                                                                  "Delete Notification"),
+                                                              content: const Text(
+                                                                  "Are you sure you want to delete this notification?"),
+                                                              actions: <Widget>[
+                                                                TextButton(
+                                                                  onPressed: () =>
+                                                                      Navigator.of(
+                                                                              context)
+                                                                          .pop(
+                                                                              false),
+                                                                  child: const Text(
+                                                                      "Cancel"),
+                                                                ),
+                                                                TextButton(
+                                                                  onPressed: () =>
+                                                                      Navigator.of(
+                                                                              context)
+                                                                          .pop(
+                                                                              true),
+                                                                  child: const Text(
+                                                                      "Delete"),
+                                                                ),
+                                                              ],
+                                                            );
+                                                          },
+                                                        );
+                                                      },
+                                                      onDismissed: (_) {
+                                                        // Remove the notification from the list
+                                                        setState(() {
+                                                          notificationstemp
+                                                              .remove(
+                                                                  notification);
+                                                        });
+
+                                                        FirebaseFirestore
+                                                            .instance
+                                                            .collection(
+                                                                'Notifications')
+                                                            .doc(widget.uid)
+                                                            .update({
+                                                          'notifications':
+                                                              FieldValue
+                                                                  .arrayRemove([
+                                                            notification
+                                                          ])
+                                                        });
+
+                                                        // Show a snackbar! This snackbar could also contain "Undo" actions
+                                                        ScaffoldMessenger.of(
+                                                                context)
+                                                            .showSnackBar(
+                                                          SnackBar(
+                                                            backgroundColor:
+                                                                Colors
+                                                                    .green[400],
+                                                            content: Text(
+                                                                'Notification dismissed'),
+                                                            duration:
+                                                                const Duration(
+                                                                    seconds: 2),
+                                                          ),
+                                                        );
+                                                      },
+                                                      background: Container(
+                                                        color: Colors.red,
+                                                        child: const Icon(
+                                                            Icons.delete,
+                                                            color:
+                                                                Colors.white),
+                                                        alignment: Alignment
+                                                            .centerLeft,
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .only(left: 16),
+                                                      ),
+                                                      child: Column(
+                                                        children: <Widget>[
+                                                          Padding(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                        .symmetric(
+                                                                    vertical:
+                                                                        8.0),
+                                                            child: Row(
                                                               crossAxisAlignment:
                                                                   CrossAxisAlignment
                                                                       .start,
-                                                              children: [
-                                                                Text(
-                                                                  title,
-                                                                  style:
-                                                                      const TextStyle(
-                                                                    fontSize:
-                                                                        18.0,
-                                                                    fontFamily:
-                                                                        'Montserrat',
-                                                                  ),
-                                                                ),
-                                                                if (amount
-                                                                    .isNotEmpty)
-                                                                  Padding(
-                                                                    padding:
-                                                                        const EdgeInsets
-                                                                            .only(
-                                                                      left:
-                                                                          24.0,
-                                                                      top: 4.0,
-                                                                    ),
-                                                                    child:
-                                                                        RichText(
-                                                                      text:
-                                                                          TextSpan(
-                                                                        style:
-                                                                            const TextStyle(
-                                                                          fontSize:
-                                                                              16.0,
-                                                                          fontFamily:
-                                                                              'Montserrat',
-                                                                          color:
-                                                                              Colors.black,
-                                                                        ),
-                                                                        children: [
-                                                                          const TextSpan(
-                                                                            text:
-                                                                                'Amount: ',
-                                                                            style:
-                                                                                TextStyle(
-                                                                              fontFamily: 'Montserrat',
-                                                                            ),
-                                                                          ),
-                                                                          TextSpan(
-                                                                            text:
-                                                                                amount,
-                                                                            style:
-                                                                                const TextStyle(
-                                                                              fontWeight: FontWeight.bold,
-                                                                              color: Color(0xFF45BF7A),
-                                                                              fontFamily: 'Montserrat',
-                                                                            ),
-                                                                          ),
-                                                                        ],
+                                                              children: <Widget>[
+                                                                const SizedBox(
+                                                                  width: 24.0,
+                                                                  child:
+                                                                      Padding(
+                                                                    padding: EdgeInsets
+                                                                        .only(
+                                                                            left:
+                                                                                8.0),
+                                                                    child: Text(
+                                                                      '\u2022',
+                                                                      style:
+                                                                          TextStyle(
+                                                                        fontSize:
+                                                                            24.0,
+                                                                        fontWeight:
+                                                                            FontWeight.bold,
+                                                                        color: Color(
+                                                                            0xFF45BF7A),
                                                                       ),
                                                                     ),
                                                                   ),
+                                                                ),
+                                                                const SizedBox(
+                                                                    width:
+                                                                        12.0),
+                                                                Expanded(
+                                                                  child: Column(
+                                                                    crossAxisAlignment:
+                                                                        CrossAxisAlignment
+                                                                            .start,
+                                                                    children: [
+                                                                      Text(
+                                                                        title,
+                                                                        style:
+                                                                            const TextStyle(
+                                                                          fontSize:
+                                                                              18.0,
+                                                                          fontFamily:
+                                                                              'Montserrat',
+                                                                        ),
+                                                                      ),
+                                                                      if (amount
+                                                                          .isNotEmpty)
+                                                                        Padding(
+                                                                          padding:
+                                                                              const EdgeInsets.only(
+                                                                            left:
+                                                                                24.0,
+                                                                            top:
+                                                                                4.0,
+                                                                          ),
+                                                                          child:
+                                                                              RichText(
+                                                                            text:
+                                                                                TextSpan(
+                                                                              style: const TextStyle(
+                                                                                fontSize: 16.0,
+                                                                                fontFamily: 'Montserrat',
+                                                                                color: Colors.black,
+                                                                              ),
+                                                                              children: [
+                                                                                const TextSpan(
+                                                                                  text: 'Amount: ',
+                                                                                  style: TextStyle(
+                                                                                    fontFamily: 'Montserrat',
+                                                                                  ),
+                                                                                ),
+                                                                                TextSpan(
+                                                                                  text: amount,
+                                                                                  style: const TextStyle(
+                                                                                    fontWeight: FontWeight.bold,
+                                                                                    color: Color(0xFF45BF7A),
+                                                                                    fontFamily: 'Montserrat',
+                                                                                  ),
+                                                                                ),
+                                                                              ],
+                                                                            ),
+                                                                          ),
+                                                                        ),
+                                                                    ],
+                                                                  ),
+                                                                ),
                                                               ],
                                                             ),
                                                           ),
+                                                          const Divider(
+                                                            height: 0,
+                                                            color: Colors.grey,
+                                                          ),
                                                         ],
                                                       ),
-                                                    ),
-                                                    const Divider(
-                                                      height: 0,
-                                                      color: Colors.grey,
-                                                    ),
-                                                  ],
-                                                ),
-                                              );
-                                            }).toList(),
+                                                    );
+                                                  }).toList(),
                                           ),
                                         ))),
                               ),
