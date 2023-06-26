@@ -10,6 +10,7 @@ import 'package:rehnaa/frontend/Screens/vouchers.dart';
 import 'package:rehnaa/frontend/helper/Landlorddashboard_pages/landlord_dashboard_content.dart';
 import 'package:rehnaa/frontend/helper/Landlorddashboard_pages/landlord_profile.dart';
 import '../../helper/Landlorddashboard_pages/landlord_advance_rent.dart';
+import '../../helper/Landlorddashboard_pages/landlord_interestfreeloan.dart';
 import '../../helper/Landlorddashboard_pages/landlord_renthistory.dart';
 import '../../helper/Landlorddashboard_pages/landlord_tenants.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -472,6 +473,20 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
                             builder: (context) => LandlordAdvanceRentPage(
                               uid: widget.uid,
                             ),
+                          ),
+                        );
+                        // _closeSidebar();
+                      },
+                    ),
+                    _buildSidebarItem(
+                      icon: Icons.receipt,
+                      label: 'Interest Free Loan',
+                      onTap: () {
+                        //firebase call set users isNewVouchers to false
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => InterestFreeLoanPage(uid : widget.uid),
                           ),
                         );
                         // _closeSidebar();
