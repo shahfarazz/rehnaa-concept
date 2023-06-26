@@ -369,11 +369,24 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                       child: CircleAvatar(
                         radius: 75,
                         child: ClipOval(
-                          child: Image.network(
-                            tenant.pathToImage ?? 'assets/defaulticon.png',
-                            width: 150,
-                            height: 150,
-                          ),
+                          child: tenant.pathToImage != null &&
+                                  tenant.pathToImage!.isNotEmpty
+                              ? (tenant.pathToImage!.startsWith('assets')
+                                  ? Image.asset(
+                                      tenant.pathToImage!,
+                                      width: 150,
+                                      height: 150,
+                                    )
+                                  : Image.network(
+                                      tenant.pathToImage!,
+                                      width: 150,
+                                      height: 150,
+                                    ))
+                              : Image.asset(
+                                  'assets/defaulticon.png',
+                                  width: 150,
+                                  height: 150,
+                                ),
                         ),
                       ),
                     ),

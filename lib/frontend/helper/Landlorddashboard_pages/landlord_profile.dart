@@ -296,8 +296,13 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
                         _openImagePicker();
                       },
                       child: CircleAvatar(
-                          radius: 80,
-                          backgroundImage: NetworkImage(pathToImage)),
+                        radius: 80,
+                        backgroundImage: pathToImage != null &&
+                                pathToImage.startsWith('https')
+                            ? NetworkImage(pathToImage)
+                                as ImageProvider<Object>?
+                            : AssetImage('assets/defaulticon.png'),
+                      ),
                     ),
                     IconButton(
                       icon: const Icon(

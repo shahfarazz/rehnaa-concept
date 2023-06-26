@@ -88,7 +88,10 @@ class _DealerProfilePageState extends State<DealerProfilePage> {
                 const SizedBox(height: 40),
                 CircleAvatar(
                   radius: 80,
-                  backgroundImage: AssetImage(pathToImage),
+                  backgroundImage:
+                      pathToImage != null && pathToImage.startsWith('https')
+                          ? NetworkImage(pathToImage) as ImageProvider<Object>?
+                          : AssetImage('assets/defaulticon.png'),
                 ),
                 const SizedBox(height: 20),
                 Text(
