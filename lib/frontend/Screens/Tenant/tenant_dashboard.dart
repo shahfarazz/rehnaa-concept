@@ -494,7 +494,7 @@ class _DashboardPageState extends State<TenantDashboardPage>
                     ),
                     _buildSidebarItem(
                       icon: Icons.discount,
-                      label: 'Discounts',
+                      label: 'Rent Off Winners',
                       onTap: () {
                         Navigator.push(
                           context,
