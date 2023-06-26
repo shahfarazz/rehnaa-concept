@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
@@ -14,10 +16,30 @@ class Voucher {
   Voucher(this.url, this.ref, this.imageProvider);
 }
 
-class VouchersPage extends StatelessWidget {
+class VouchersPage extends StatefulWidget {
   const VouchersPage({Key? key}) : super(key: key);
 
-  Future<List<Voucher>> fetchVouchers() async {
+  @override
+  _VouchersPageState createState() => _VouchersPageState();
+}
+
+class _VouchersPageState extends State<VouchersPage> {
+  Stream<List<Voucher>>? _vouchersStream;
+  Timer? _debounceTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    _vouchersStream = _fetchVouchers().asStream();
+  }
+
+  @override
+  void dispose() {
+    _debounceTimer?.cancel();
+    super.dispose();
+  }
+
+  Future<List<Voucher>> _fetchVouchers() async {
     try {
       firebase_storage.ListResult listResult = await firebase_storage
           .FirebaseStorage.instance
@@ -37,6 +59,15 @@ class VouchersPage extends StatelessWidget {
     }
   }
 
+  void _debounceFetchVouchers() {
+    _debounceTimer?.cancel();
+    _debounceTimer = Timer(const Duration(milliseconds: 500), () {
+      setState(() {
+        _vouchersStream = _fetchVouchers().asStream();
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -47,13 +78,7 @@ class VouchersPage extends StatelessWidget {
             left: 10.0,
             child: GestureDetector(
               onTap: () {
-                // push with a set state
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const SplashScreen(),
-                  ),
-                );
+                Navigator.pop(context);
               },
               child: Container(
                 width: 40,
@@ -65,20 +90,15 @@ class VouchersPage extends StatelessWidget {
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      Color(0xff0FA697),
-                      Color(0xff45BF7A),
-                      Color(0xff0DF205),
+                      Color(0xFF0FA697),
+                      Color(0xFF45BF7A),
+                      Color(0xFF0DF205),
                     ],
                   ),
                 ),
                 child: IconButton(
                   onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const SplashScreen(),
-                      ),
-                    );
+                    Navigator.pop(context);
                   },
                   icon: const Icon(
                     Icons.arrow_back,
@@ -96,7 +116,6 @@ class VouchersPage extends StatelessWidget {
                 height: MediaQuery.of(context).size.height * 0.1,
                 child: Image.asset(
                   'assets/mainlogo.png',
-                  // fit: BoxFit.cover,
                 ),
               ),
               const SizedBox(height: 20),
@@ -119,7 +138,7 @@ class VouchersPage extends StatelessWidget {
                                 "Vouchers",
                                 style: TextStyle(
                                   fontSize: 24,
-                                  color: Color(0xff33907c),
+                                  color: Color(0xFF33907C),
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
@@ -140,21 +159,13 @@ class VouchersPage extends StatelessWidget {
     );
   }
 
-  Future<int> getImageCount() async {
-    firebase_storage.ListResult result = await firebase_storage
-        .FirebaseStorage.instance
-        .ref('images/vouchers/')
-        .listAll();
-    return result.items.length;
-  }
-
   Widget buildRoundedImageCards(BuildContext context) {
-    return FutureBuilder<List<Voucher>>(
-      future: fetchVouchers(),
+    return StreamBuilder<List<Voucher>>(
+      stream: _vouchersStream,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const CircularProgressIndicator(
-            color: Colors.green,
+            valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF45BF7A)),
           );
         }
         if (snapshot.hasError) {
@@ -183,7 +194,8 @@ class VouchersPage extends StatelessWidget {
                           context,
                           MaterialPageRoute(
                             builder: (context) => ExpandedImageDialog(
-                                imageProvider: voucher.imageProvider),
+                              imageProvider: voucher.imageProvider,
+                            ),
                           ),
                         );
                       },
@@ -191,16 +203,17 @@ class VouchersPage extends StatelessWidget {
                         width: 200,
                         height: 200,
                         child: CachedNetworkImage(
-                          //add a progress indicator here not circular
                           progressIndicatorBuilder: (context, url, progress) =>
                               Center(
                             child: progress == null
                                 ? CircularProgressIndicator(
-                                    color: Colors.green,
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                        Color(0xFF45BF7A)),
                                   )
                                 : LinearProgressIndicator(
-                                    color: Colors.green,
                                     value: progress.progress,
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                        Color(0xFF45BF7A)),
                                   ),
                           ),
                           imageUrl: voucher.url,
@@ -263,9 +276,9 @@ class ExpandedImageDialog extends StatelessWidget {
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      Color(0xff0FA697),
-                      Color(0xff45BF7A),
-                      Color(0xff0DF205),
+                      Color(0xFF0FA697),
+                      Color(0xFF45BF7A),
+                      Color(0xFF0DF205),
                     ],
                   ),
                 ),
