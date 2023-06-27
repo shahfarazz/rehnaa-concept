@@ -11,6 +11,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:rehnaa/backend/models/landlordmodel.dart';
 import 'package:rehnaa/frontend/Screens/faq.dart';
 import 'package:rehnaa/frontend/helper/Landlorddashboard_pages/landlordinvoice.dart';
+import 'package:responsive_framework/responsive_scaled_box.dart';
 import 'skeleton.dart';
 
 class LandlordDashboardContent extends StatefulWidget {
@@ -394,160 +395,161 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
               NumberFormat('#,##0').format(landlord.balance);
 
           // Return the widget tree with the fetched data
-
-          return SingleChildScrollView(
-              // child: AnimatedContainer(
-              //     duration: Duration(milliseconds: 500),
-              //     curve: Curves.easeInOut,
-              //     height:
-              //         _showContent ? size.height : 0, // Show/hide the content
-              child: Column(
-            children: <Widget>[
-              SizedBox(height: size.height * 0.05),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Text(
-                      'Welcome ${landlord.firstName}!',
-                      style: GoogleFonts.montserrat(
-                        fontSize: 26,
-                        color: Colors.black,
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 8.0),
-                    child: CircleAvatar(
-                      radius: 75,
-                      child: ClipOval(
-                        child: landlord.pathToImage != null &&
-                                landlord.pathToImage!.isNotEmpty
-                            ? (landlord.pathToImage!.startsWith('assets')
-                                ? Image.asset(
-                                    landlord.pathToImage!,
-                                    width: 150,
-                                    height: 150,
-                                  )
-                                : Image.network(
-                                    landlord.pathToImage!,
-                                    width: 150,
-                                    height: 150,
-                                  ))
-                            : Image.asset(
-                                'assets/defaulticon.png',
-                                width: 150,
-                                height: 150,
-                              ),
-                      ),
-                    ),
-                  ),
+          return ResponsiveScaledBox(
+              width: size.width,
+              child: SingleChildScrollView(
+                  // child: AnimatedContainer(
+                  //     duration: Duration(milliseconds: 500),
+                  //     curve: Curves.easeInOut,
+                  //     height:
+                  //         _showContent ? size.height : 0, // Show/hide the content
+                  child: Column(
+                children: <Widget>[
                   SizedBox(height: size.height * 0.05),
-                ],
-              ),
-              Center(
-                child: Container(
-                  width: size.width * 0.8,
-                  height: size.height * 0.4, // Adjust the height as needed
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.4),
-                        spreadRadius: 2,
-                        blurRadius: 8,
-                        offset:
-                            const Offset(0, 4), // changes position of shadow
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Text(
+                          'Welcome ${landlord.firstName}!',
+                          style: GoogleFonts.montserrat(
+                            fontSize: 26,
+                            color: Colors.black,
+                          ),
+                        ),
                       ),
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 8.0),
+                        child: CircleAvatar(
+                          radius: 75,
+                          child: ClipOval(
+                            child: landlord.pathToImage != null &&
+                                    landlord.pathToImage!.isNotEmpty
+                                ? (landlord.pathToImage!.startsWith('assets')
+                                    ? Image.asset(
+                                        landlord.pathToImage!,
+                                        width: 150,
+                                        height: 150,
+                                      )
+                                    : Image.network(
+                                        landlord.pathToImage!,
+                                        width: 150,
+                                        height: 150,
+                                      ))
+                                : Image.asset(
+                                    'assets/defaulticon.png',
+                                    width: 150,
+                                    height: 150,
+                                  ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: size.height * 0.05),
                     ],
                   ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(20),
-                    child: BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.9),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                              Text(
-                                'Available Balance',
-                                style: GoogleFonts.montserrat(
-                                  fontSize: size.width * 0.05,
-                                  fontWeight: FontWeight.w400,
-                                  color: const Color.fromARGB(150, 0, 0, 0),
-                                ),
-                              ),
-                              Text(
-                                'PKR $formattedBalance',
-                                style: GoogleFonts.montserrat(
-                                  fontSize: size.width * 0.07,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.green,
-                                ),
-                              ),
-                              SizedBox(height: size.height * 0.05),
-                              Container(
-                                width: size.width *
-                                    0.6, // Increase the width as needed
-                                height: size.height * 0.06,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(20),
-                                  gradient: LinearGradient(
-                                    begin: Alignment.topLeft,
-                                    end: Alignment.bottomRight,
-                                    colors: isWithdraw
-                                        ? [
-                                            Colors.grey,
-                                            Colors.grey,
-                                            Colors.grey,
-                                          ]
-                                        : [
-                                            const Color(0xff0FA697),
-                                            const Color(0xff45BF7A),
-                                            const Color(0xff0DF205),
-                                          ],
+                  Center(
+                    child: Container(
+                      width: size.width * 0.8,
+                      height: size.height * 0.4, // Adjust the height as needed
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.4),
+                            spreadRadius: 2,
+                            blurRadius: 8,
+                            offset: const Offset(
+                                0, 4), // changes position of shadow
+                          ),
+                        ],
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(20),
+                        child: BackdropFilter(
+                          filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.9),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  Text(
+                                    'Available Balance',
+                                    style: GoogleFonts.montserrat(
+                                      fontSize: size.width * 0.05,
+                                      fontWeight: FontWeight.w400,
+                                      color: const Color.fromARGB(150, 0, 0, 0),
+                                    ),
                                   ),
-                                ),
-                                child: Material(
-                                  color: Colors.transparent,
-                                  child: InkWell(
-                                    borderRadius: BorderRadius.circular(20),
-                                    onTap: () {
-                                      isWithdraw
-                                          ? someFunction(landlord)
-                                          : someFunction(
-                                              landlord); // Show the option dialog
-                                    },
-                                    child: Center(
-                                      child: Text(
-                                        isWithdraw
-                                            ? "Withdraw Requested"
-                                            : "Withdraw",
-                                        style: GoogleFonts.montserrat(
-                                          color: Colors.white,
-                                          fontSize: 18,
+                                  Text(
+                                    'PKR $formattedBalance',
+                                    style: GoogleFonts.montserrat(
+                                      fontSize: size.width * 0.07,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.green,
+                                    ),
+                                  ),
+                                  SizedBox(height: size.height * 0.05),
+                                  Container(
+                                    width: size.width *
+                                        0.6, // Increase the width as needed
+                                    height: size.height * 0.06,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(20),
+                                      gradient: LinearGradient(
+                                        begin: Alignment.topLeft,
+                                        end: Alignment.bottomRight,
+                                        colors: isWithdraw
+                                            ? [
+                                                Colors.grey,
+                                                Colors.grey,
+                                                Colors.grey,
+                                              ]
+                                            : [
+                                                const Color(0xff0FA697),
+                                                const Color(0xff45BF7A),
+                                                const Color(0xff0DF205),
+                                              ],
+                                      ),
+                                    ),
+                                    child: Material(
+                                      color: Colors.transparent,
+                                      child: InkWell(
+                                        borderRadius: BorderRadius.circular(20),
+                                        onTap: () {
+                                          isWithdraw
+                                              ? someFunction(landlord)
+                                              : someFunction(
+                                                  landlord); // Show the option dialog
+                                        },
+                                        child: Center(
+                                          child: Text(
+                                            isWithdraw
+                                                ? "Withdraw Requested"
+                                                : "Withdraw",
+                                            style: GoogleFonts.montserrat(
+                                              color: Colors.white,
+                                              fontSize: 18,
+                                            ),
+                                          ),
                                         ),
                                       ),
                                     ),
                                   ),
-                                ),
+                                ],
                               ),
-                            ],
+                            ),
                           ),
                         ),
                       ),
                     ),
                   ),
-                ),
-              ),
-            ],
-          ));
+                ],
+              )));
           // )));
         }
 

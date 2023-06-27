@@ -1,12 +1,12 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:http/http.dart' as http;
-import 'dart:typed_data';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:photo_view/photo_view.dart';
-import 'package:rehnaa/frontend/Screens/splash.dart';
 
 class Voucher {
   final String url;
@@ -23,7 +23,8 @@ class VouchersPage extends StatefulWidget {
   _VouchersPageState createState() => _VouchersPageState();
 }
 
-class _VouchersPageState extends State<VouchersPage> {
+class _VouchersPageState extends State<VouchersPage>
+    with AutomaticKeepAliveClientMixin {
   Stream<List<Voucher>>? _vouchersStream;
   Timer? _debounceTimer;
 
@@ -32,6 +33,9 @@ class _VouchersPageState extends State<VouchersPage> {
     super.initState();
     _vouchersStream = _fetchVouchers().asStream();
   }
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void dispose() {
@@ -49,7 +53,7 @@ class _VouchersPageState extends State<VouchersPage> {
       for (var ref in listResult.items) {
         String url = await ref.getDownloadURL();
         final response = await http.get(Uri.parse(url));
-        Uint8List imageData = response.bodyBytes;
+        Uint8List imageData = await compressImage(response.bodyBytes);
         vouchersList.add(Voucher(url, ref, MemoryImage(imageData)));
       }
       return vouchersList;
@@ -57,6 +61,16 @@ class _VouchersPageState extends State<VouchersPage> {
       print('Error fetching vouchers: $error');
       return [];
     }
+  }
+
+  Future<Uint8List> compressImage(Uint8List imageData) async {
+    final compressedImage = await FlutterImageCompress.compressWithList(
+      imageData,
+      minHeight: 1920,
+      minWidth: 1080,
+      quality: 70,
+    );
+    return Uint8List.fromList(compressedImage!);
   }
 
   void _debounceFetchVouchers() {
@@ -70,24 +84,16 @@ class _VouchersPageState extends State<VouchersPage> {
 
   @override
   Widget build(BuildContext context) {
-      final Size size = MediaQuery.of(context).size;
-    
+    super.build(context);
+    final Size size = MediaQuery.of(context).size;
+
     return Scaffold(
       appBar: _buildAppBar(size, context),
-
       body: Stack(
         children: [
-          
           Column(
             children: [
               const SizedBox(height: 30),
-              // SizedBox(
-              //   height: MediaQuery.of(context).size.height * 0.1,
-              //   child: Image.asset(
-              //     'assets/mainlogo.png',
-              //   ),
-              // ),
-              const SizedBox(height: 20),
               Expanded(
                 child: SingleChildScrollView(
                   child: Center(
@@ -131,6 +137,7 @@ class _VouchersPageState extends State<VouchersPage> {
   Widget buildRoundedImageCards(BuildContext context) {
     return StreamBuilder<List<Voucher>>(
       stream: _vouchersStream,
+      initialData: [], // Provide initial data
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const CircularProgressIndicator(
@@ -172,21 +179,15 @@ class _VouchersPageState extends State<VouchersPage> {
                         width: 200,
                         height: 200,
                         child: CachedNetworkImage(
-                          progressIndicatorBuilder: (context, url, progress) =>
-                              Center(
-                            child: progress == null
-                                ? CircularProgressIndicator(
-                                    valueColor: AlwaysStoppedAnimation<Color>(
-                                        Color(0xFF45BF7A)),
-                                  )
-                                : LinearProgressIndicator(
-                                    value: progress.progress,
-                                    valueColor: AlwaysStoppedAnimation<Color>(
-                                        Color(0xFF45BF7A)),
-                                  ),
-                          ),
                           imageUrl: voucher.url,
                           fit: BoxFit.cover,
+                          placeholder: (context, url) =>
+                              CircularProgressIndicator(
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                                Color(0xFF45BF7A)),
+                          ),
+                          errorWidget: (context, url, error) =>
+                              Icon(Icons.error),
                         ),
                       ),
                     ),
@@ -265,75 +266,66 @@ class ExpandedImageDialog extends StatelessWidget {
   }
 }
 
-
 PreferredSizeWidget _buildAppBar(Size size, context) {
-    return AppBar(
-      toolbarHeight: 70,
-      
-      title: Padding(
-        padding: EdgeInsets.only(
-        // top: MediaQuery.of(context).size.height * 0.02, // 2% of the page height
-        right: MediaQuery.of(context).size.width * 0.14, // 55% of the page width
+  return AppBar(
+    toolbarHeight: 70,
+    title: Padding(
+      padding: EdgeInsets.only(
+        right: MediaQuery.of(context).size.width * 0.14,
       ),
-
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Stack(
-              children: [
-                ClipPath(
-                  clipper: HexagonClipper(),
-                  child: Transform.scale(
-                    scale: 0.87,
-                    child: Container(
-                      color: Colors.white,
-                      width: 60,
-                      height: 60,
-                    ),
-                  ),
-                ),
-                ClipPath(
-                  clipper: HexagonClipper(),
-                  child: Image.asset(
-                    'assets/mainlogo.png',
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Stack(
+            children: [
+              ClipPath(
+                clipper: HexagonClipper(),
+                child: Transform.scale(
+                  scale: 0.87,
+                  child: Container(
+                    color: Colors.white,
                     width: 60,
                     height: 60,
-                    fit: BoxFit.cover,
                   ),
                 ),
-              ],
-            ),
-            // const SizedBox(width: 8),
+              ),
+              ClipPath(
+                clipper: HexagonClipper(),
+                child: Image.asset(
+                  'assets/mainlogo.png',
+                  width: 60,
+                  height: 60,
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    ),
+    actions: <Widget>[
+      Padding(
+        padding: const EdgeInsets.only(top: 15.0),
+        child: Stack(
+          children: [],
+        ),
+      ),
+    ],
+    flexibleSpace: Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Color(0xFF0FA697),
+            Color(0xFF45BF7A),
+            Color(0xFF0DF205),
           ],
         ),
       ),
-      actions: <Widget>[
-        Padding(
-          padding: const EdgeInsets.only(top: 15.0),
-          child: Stack(
-            children: [
-              
-              
-            ],
-          ),
-        ),
-      ],
-      flexibleSpace: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Color(0xff0FA697),
-              Color(0xff45BF7A),
-              Color(0xff0DF205),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
+    ),
+  );
+}
 
 class HexagonClipper extends CustomClipper<Path> {
   @override
@@ -350,9 +342,9 @@ class HexagonClipper extends CustomClipper<Path> {
     path.close();
     return path;
   }
+
   @override
   bool shouldReclip(CustomClipper<Path> oldClipper) {
     return false;
   }
 }
-

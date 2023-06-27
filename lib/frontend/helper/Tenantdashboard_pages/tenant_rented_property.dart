@@ -77,47 +77,48 @@ class _TenantRentedPropertyPageState extends State<TenantRentedPropertyPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: //add a gradient app bar with gradient backhround with a white back button
-          AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: GestureDetector(
-          onTap: () {
-            Navigator.pop(context);
-          },
-          child: Container(
-            width: 40,
-            height: 40,
-            decoration: const BoxDecoration(
-              shape: BoxShape.circle,
-              color: Color(0xFF33907C),
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  Color(0xff0FA697),
-                  Color(0xff45BF7A),
-                  Color(0xff0DF205),
-                ],
-              ),
-            ),
-            child: const Icon(
-              Icons.arrow_back,
-              size: 20,
-              color: Colors.white,
-            ),
-          ),
-        ),
-        title: Text(
-          'Rented Property',
-          style: GoogleFonts.montserrat(
-            fontSize: 24,
-            color: Colors.green,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        centerTitle: true,
-      ),
+      // appBar: //add a gradient app bar with gradient backhround with a white back button
+      //     AppBar(
+      //   backgroundColor: Colors.transparent,
+      //   elevation: 0,
+      //   leading: GestureDetector(
+      //     onTap: () {
+      //       Navigator.pop(context);
+      //     },
+      //     child: Container(
+      //       width: 40,
+      //       height: 40,
+      //       decoration: const BoxDecoration(
+      //         shape: BoxShape.circle,
+      //         color: Color(0xFF33907C),
+      //         gradient: LinearGradient(
+      //           begin: Alignment.topLeft,
+      //           end: Alignment.bottomRight,
+      //           colors: [
+      //             Color(0xff0FA697),
+      //             Color(0xff45BF7A),
+      //             Color(0xff0DF205),
+      //           ],
+      //         ),
+      //       ),
+      //       child: const Icon(
+      //         Icons.arrow_back,
+      //         size: 20,
+      //         color: Colors.white,
+      //       ),
+      //     ),
+      //   ),
+      //   title: Text(
+      //     'Rented Property',
+      //     style: GoogleFonts.montserrat(
+      //       fontSize: 24,
+      //       color: Colors.green,
+      //       fontWeight: FontWeight.bold,
+      //     ),
+      //   ),
+      //   centerTitle: true,
+      // ),
+
       body: StreamBuilder(
           stream: stream,
           builder: ((context, snapshot) {
@@ -125,66 +126,63 @@ class _TenantRentedPropertyPageState extends State<TenantRentedPropertyPage> {
                 !isStreamLoaded) {
               //return skeleton ui
               return const LandlordPropertiesSkeleton();
-            } 
-            else if (snapshot.data!.docs.isEmpty || !snapshot.hasData) {
-            
-        final Size size = MediaQuery.of(context).size;
+            } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+              final Size size = MediaQuery.of(context).size;
 
-    
-    return Scaffold(
-      appBar: _buildAppBar(size, context),
-    body: Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        
-        Padding(
-          padding: EdgeInsets.only(left: 65,),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Column(
-                children: [
-                  const SizedBox(height: 50),
-                  Card(
-                    elevation: 4.0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20.0),
-                    ),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20.0),
-                        color: Colors.white,
+              return Scaffold(
+                appBar: _buildAppBar(size, context),
+                body: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.only(
+                        left: 65,
                       ),
-                      padding: const EdgeInsets.all(16.0),
                       child: Column(
-                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Icon(
-                            Icons.house,
-                            size: 48.0,
-                            color: Color(0xff33907c),
-                          ),
-                          const SizedBox(height: 16.0),
-                          Text(
-                            'No rented property yet',
-                            style: GoogleFonts.montserrat(
-                              fontSize: 20.0,
-                              color: const Color(0xff33907c),
-                            ),
+                          Column(
+                            children: [
+                              const SizedBox(height: 50),
+                              Card(
+                                elevation: 4.0,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20.0),
+                                ),
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(20.0),
+                                    color: Colors.white,
+                                  ),
+                                  padding: const EdgeInsets.all(16.0),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      const Icon(
+                                        Icons.house,
+                                        size: 48.0,
+                                        color: Color(0xff33907c),
+                                      ),
+                                      const SizedBox(height: 16.0),
+                                      Text(
+                                        'No rented property yet',
+                                        style: GoogleFonts.montserrat(
+                                          fontSize: 20.0,
+                                          color: const Color(0xff33907c),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              )
+                            ],
                           ),
                         ],
                       ),
                     ),
-                  )
-                ],
-              ),
-            ],
-          ),
-        ),
-      ],
-    ),
-  );
-
+                  ],
+                ),
+              );
             } else {
               //get data from snapshot
 
@@ -218,72 +216,67 @@ class _TenantRentedPropertyPageState extends State<TenantRentedPropertyPage> {
 }
 
 PreferredSizeWidget _buildAppBar(Size size, context) {
-    return AppBar(
-      toolbarHeight: 70,
-      
-      title: Padding(
-        padding: EdgeInsets.only(
-        right: MediaQuery.of(context).size.width * 0.14, // 55% of the page width
+  return AppBar(
+    toolbarHeight: 70,
+    title: Padding(
+      padding: EdgeInsets.only(
+        right:
+            MediaQuery.of(context).size.width * 0.14, // 55% of the page width
       ),
-
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Stack(
-              children: [
-                ClipPath(
-                  clipper: HexagonClipper(),
-                  child: Transform.scale(
-                    scale: 0.87,
-                    child: Container(
-                      color: Colors.white,
-                      width: 60,
-                      height: 60,
-                    ),
-                  ),
-                ),
-                ClipPath(
-                  clipper: HexagonClipper(),
-                  child: Image.asset(
-                    'assets/mainlogo.png',
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Stack(
+            children: [
+              ClipPath(
+                clipper: HexagonClipper(),
+                child: Transform.scale(
+                  scale: 0.87,
+                  child: Container(
+                    color: Colors.white,
                     width: 60,
                     height: 60,
-                    fit: BoxFit.cover,
                   ),
                 ),
-              ],
-            ),
-            // const SizedBox(width: 8),
+              ),
+              ClipPath(
+                clipper: HexagonClipper(),
+                child: Image.asset(
+                  'assets/mainlogo.png',
+                  width: 60,
+                  height: 60,
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ],
+          ),
+          // const SizedBox(width: 8),
+        ],
+      ),
+    ),
+    actions: <Widget>[
+      Padding(
+        padding: const EdgeInsets.only(top: 15.0),
+        child: Stack(
+          children: [],
+        ),
+      ),
+    ],
+    flexibleSpace: Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Color(0xff0FA697),
+            Color(0xff45BF7A),
+            Color(0xff0DF205),
           ],
         ),
       ),
-      actions: <Widget>[
-        Padding(
-          padding: const EdgeInsets.only(top: 15.0),
-          child: Stack(
-            children: [
-              
-              
-            ],
-          ),
-        ),
-      ],
-      flexibleSpace: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Color(0xff0FA697),
-              Color(0xff45BF7A),
-              Color(0xff0DF205),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
+    ),
+  );
+}
 
 class HexagonClipper extends CustomClipper<Path> {
   @override
@@ -300,6 +293,7 @@ class HexagonClipper extends CustomClipper<Path> {
     path.close();
     return path;
   }
+
   @override
   bool shouldReclip(CustomClipper<Path> oldClipper) {
     return false;

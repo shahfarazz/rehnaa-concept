@@ -44,20 +44,19 @@ class _LandlordAdvanceRentPageState extends State<LandlordAdvanceRentPage> {
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
 
-    
     return Scaffold(
       appBar: _buildAppBar(size, context),
-
       body: SingleChildScrollView(
         child: Container(
           color: Colors.grey[200], // Set the background color
-          padding: const EdgeInsets.symmetric(
-            vertical: 100.0,
-            horizontal: 16.0,
-          ), // Updated padding
+          padding: EdgeInsets.symmetric(
+            vertical: size.height * 0.1, // Updated vertical padding
+            horizontal: size.width * 0.04, // Updated horizontal padding
+          ),
           child: Card(
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20.0),
+              borderRadius: BorderRadius.circular(
+                  size.width * 0.1), // Updated border radius
             ),
             child: Column(
               children: [
@@ -77,14 +76,16 @@ class _LandlordAdvanceRentPageState extends State<LandlordAdvanceRentPage> {
                     ],
                   ),
                 ),
-                const SizedBox(height: 20),
+                SizedBox(height: size.height * 0.02),
                 Card(
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20.0),
-                    side: const BorderSide(color: Colors.grey, width: 0.1),
+                    borderRadius: BorderRadius.circular(
+                        size.width * 0.1), // Updated border radius
+                    side: BorderSide(color: Colors.grey, width: 0.1),
                   ),
                   child: Container(
-                    padding: const EdgeInsets.all(16.0),
+                    padding:
+                        EdgeInsets.all(size.width * 0.04), // Updated padding
                     child: Column(
                       children: [
                         const Text(
@@ -97,9 +98,10 @@ class _LandlordAdvanceRentPageState extends State<LandlordAdvanceRentPage> {
                         ),
                         const SizedBox(height: 20),
                         Container(
-                          width: MediaQuery.of(context).size.width * 0.6,
+                          width: size.width * 0.6,
                           decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(30.0),
+                            borderRadius: BorderRadius.circular(
+                                size.width * 0.1), // Updated border radius
                             gradient: LinearGradient(
                               begin: Alignment.topLeft,
                               end: Alignment.bottomRight,
@@ -115,7 +117,8 @@ class _LandlordAdvanceRentPageState extends State<LandlordAdvanceRentPage> {
                           child: Material(
                             color: Colors.transparent,
                             child: InkWell(
-                              borderRadius: BorderRadius.circular(30.0),
+                              borderRadius: BorderRadius.circular(
+                                  size.width * 0.1), // Updated border radius
                               onTap: () {
                                 if (isApplied) {
                                   return;
@@ -174,9 +177,11 @@ class _LandlordAdvanceRentPageState extends State<LandlordAdvanceRentPage> {
                                 );
                               },
                               child: Ink(
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 16.0,
-                                  horizontal: 32.0,
+                                padding: EdgeInsets.symmetric(
+                                  vertical:
+                                      size.width * 0.04, // Updated padding
+                                  horizontal:
+                                      size.width * 0.08, // Updated padding
                                 ),
                                 child: Center(
                                   child: Text(
@@ -200,25 +205,29 @@ class _LandlordAdvanceRentPageState extends State<LandlordAdvanceRentPage> {
                 const SizedBox(height: 20),
                 Center(
                   child: Container(
-                    padding: const EdgeInsets.all(16.0),
+                    padding:
+                        EdgeInsets.all(size.width * 0.04), // Updated padding
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(20.0),
+                      borderRadius: BorderRadius.circular(
+                          size.width * 0.1), // Updated border radius
                       boxShadow: [
                         BoxShadow(
                           color: Colors.grey.withOpacity(0.3),
                           spreadRadius: 2,
                           blurRadius: 5,
-                          offset: const Offset(0, 3),
+                          offset: Offset(0, 3),
                         ),
                       ],
                     ),
                     child: Column(
-                      mainAxisAlignment: MainAxisAlignment
-                          .center, // Align contents vertically in the center
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Row(
                           children: [
+                            Padding(
+                                padding:
+                                    EdgeInsets.only(left: size.width * 0.27)),
                             Text(
                               landlord?.dateJoined
                                       ?.toDate()
@@ -234,9 +243,12 @@ class _LandlordAdvanceRentPageState extends State<LandlordAdvanceRentPage> {
                             ),
                           ],
                         ),
-                        SizedBox(height: 10),
+                        SizedBox(height: size.height * 0.02),
                         Row(
                           children: [
+                            Padding(
+                                padding:
+                                    EdgeInsets.only(left: size.width * 0.27)),
                             Text(
                               'Date Joined',
                               style: TextStyle(
@@ -259,75 +271,69 @@ class _LandlordAdvanceRentPageState extends State<LandlordAdvanceRentPage> {
   }
 }
 
-
 PreferredSizeWidget _buildAppBar(Size size, context) {
-    return AppBar(
-      toolbarHeight: 70,
-      
-      title: Padding(
-        padding: EdgeInsets.only(
+  return AppBar(
+    toolbarHeight: 70,
+    title: Padding(
+      padding: EdgeInsets.only(
         // top: MediaQuery.of(context).size.height * 0.02, // 2% of the page height
-        right: MediaQuery.of(context).size.width * 0.14, // 55% of the page width
+        right:
+            MediaQuery.of(context).size.width * 0.14, // 55% of the page width
       ),
-
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Stack(
-              children: [
-                ClipPath(
-                  clipper: HexagonClipper(),
-                  child: Transform.scale(
-                    scale: 0.87,
-                    child: Container(
-                      color: Colors.white,
-                      width: 60,
-                      height: 60,
-                    ),
-                  ),
-                ),
-                ClipPath(
-                  clipper: HexagonClipper(),
-                  child: Image.asset(
-                    'assets/mainlogo.png',
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Stack(
+            children: [
+              ClipPath(
+                clipper: HexagonClipper(),
+                child: Transform.scale(
+                  scale: 0.87,
+                  child: Container(
+                    color: Colors.white,
                     width: 60,
                     height: 60,
-                    fit: BoxFit.cover,
                   ),
                 ),
-              ],
-            ),
-            // const SizedBox(width: 8),
+              ),
+              ClipPath(
+                clipper: HexagonClipper(),
+                child: Image.asset(
+                  'assets/mainlogo.png',
+                  width: 60,
+                  height: 60,
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ],
+          ),
+          // const SizedBox(width: 8),
+        ],
+      ),
+    ),
+    actions: <Widget>[
+      Padding(
+        padding: const EdgeInsets.only(top: 15.0),
+        child: Stack(
+          children: [],
+        ),
+      ),
+    ],
+    flexibleSpace: Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Color(0xff0FA697),
+            Color(0xff45BF7A),
+            Color(0xff0DF205),
           ],
         ),
       ),
-      actions: <Widget>[
-        Padding(
-          padding: const EdgeInsets.only(top: 15.0),
-          child: Stack(
-            children: [
-              
-              
-            ],
-          ),
-        ),
-      ],
-      flexibleSpace: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Color(0xff0FA697),
-              Color(0xff45BF7A),
-              Color(0xff0DF205),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
+    ),
+  );
+}
 
 class HexagonClipper extends CustomClipper<Path> {
   @override
@@ -344,10 +350,9 @@ class HexagonClipper extends CustomClipper<Path> {
     path.close();
     return path;
   }
+
   @override
   bool shouldReclip(CustomClipper<Path> oldClipper) {
     return false;
   }
 }
-
-

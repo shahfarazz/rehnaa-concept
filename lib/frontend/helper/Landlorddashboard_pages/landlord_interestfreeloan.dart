@@ -29,7 +29,7 @@ class InterestFreeLoanPage extends StatefulWidget {
 
 class _InterestFreeLoanPageState extends State<InterestFreeLoanPage>
     with AutomaticKeepAliveClientMixin<InterestFreeLoanPage> {
-  late Future<Landlord> _landlordFuture;
+  // late Future<Landlord> _landlordFuture;
   late Stream<DocumentSnapshot<Map<String, dynamic>>> _landlordStream;
 
   @override
@@ -73,59 +73,114 @@ class _InterestFreeLoanPageState extends State<InterestFreeLoanPage>
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
+
     return Scaffold(
       appBar: _buildAppBar(size, context),
-
-      body: LayoutBuilder(
-        builder: (BuildContext context, BoxConstraints constraints) {
-          return Stack(
-            children: [
-              
-              Column(
-                children: [
-                  
-                  SizedBox(height: constraints.maxHeight * 0.06),
-                  Expanded(
-                    child: SingleChildScrollView(
-                      child: Center(
-                        child: Padding(
-                          padding: EdgeInsets.all(constraints.maxWidth * 0.04),
-                          child: Card(
-                            color: const Color.fromARGB(255, 235, 235, 235),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20.0),
+      body: SingleChildScrollView(
+        child: Container(
+          color: Colors.grey[200], // Set the background color
+          padding: const EdgeInsets.symmetric(
+            vertical: 100.0,
+            horizontal: 16.0,
+          ), // Updated padding
+          child: Card(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20.0),
+            ),
+            child: Column(
+              children: [
+                const Padding(
+                  padding: EdgeInsets.all(16.0),
+                  child: Column(
+                    children: [
+                      Text(
+                        'Interest Free Loan',
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Montserrat',
+                          color: Color(0xff45BF7A),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Card(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20.0),
+                    side: const BorderSide(color: Colors.grey, width: 0.1),
+                  ),
+                  child: Container(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      children: [
+                        const Text(
+                          'You can apply for one month worth rent as an interest free loan after being a Rehnaa member for 6 months.',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontFamily: 'Montserrat',
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 20),
+                        Container(
+                          width: MediaQuery.of(context).size.width * 0.6,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(30.0),
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                Color(0xff0FA697),
+                                Color(0xff45BF7A),
+                                Color(0xff0DF205),
+                              ],
                             ),
-                            child: Container(
-                              padding: EdgeInsets.all(constraints.maxWidth * 0.04),
-                              child: Column(
-                                children: [
-                                  SizedBox(height: constraints.maxHeight * 0.02),
-                                  Text(
-                                    "Interest Free Loan",
+                          ),
+                          child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              borderRadius: BorderRadius.circular(30.0),
+                              onTap: () {
+                                //TODO in the future
+                              },
+                              child: Ink(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 16.0,
+                                  horizontal: 32.0,
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    'Apply',
                                     style: TextStyle(
-                                      fontSize: constraints.maxWidth * 0.06,
-                                      color: Color(0xff33907c),
+                                      fontSize: 18,
                                       fontWeight: FontWeight.bold,
+                                      fontFamily: 'Montserrat',
+                                      color: Colors.white,
                                     ),
                                   ),
-                                  SizedBox(height: constraints.maxHeight * 0.03),
-                                  buildTextCard(constraints),
-                                  SizedBox(height: constraints.maxHeight * 0.03),
-                                  buildTextCard2(constraints),
-                                  SizedBox(height: constraints.maxHeight * 0.3),
-                                ],
+                                ),
                               ),
                             ),
                           ),
                         ),
-                      ),
+                      ],
                     ),
                   ),
-                ],
-              ),
-            ],
-          );
-        },
+                ),
+                const SizedBox(height: 20),
+                Center(
+                  child: buildTextCard2(
+                    BoxConstraints(
+                      maxWidth: size.width * 0.8,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -189,8 +244,18 @@ class _InterestFreeLoanPageState extends State<InterestFreeLoanPage>
                   children: <TextSpan>[
                     TextSpan(
                       text:
-                          ' ${DateFormat('dd MMMMyyyy').format(landlord.dateJoined!.toDate())} \n\n  Date Joined',
-                      style: TextStyle(fontSize: constraints.maxWidth * 0.04),
+                          ' ${DateFormat('dd MMMM yyyy').format(landlord.dateJoined!.toDate())}',
+                      style: TextStyle(
+                        fontSize: constraints.maxWidth * 0.04,
+                        color: Colors.green,
+                      ),
+                    ),
+                    TextSpan(
+                      text: '\n\n  Date Joined',
+                      style: TextStyle(
+                        fontSize: constraints.maxWidth * 0.04,
+                        // color: Colors.green,
+                      ),
                     ),
                   ],
                 ),
@@ -206,91 +271,65 @@ class _InterestFreeLoanPageState extends State<InterestFreeLoanPage>
 }
 
 PreferredSizeWidget _buildAppBar(Size size, context) {
-    return AppBar(
-      toolbarHeight: 70,
-      
-      title: Padding(
-        padding: EdgeInsets.only(
+  return AppBar(
+    toolbarHeight: 70,
+    title: Padding(
+      padding: EdgeInsets.only(
         top: MediaQuery.of(context).size.height * 0.02, // 2% of the page height
-        right: MediaQuery.of(context).size.width * 0.14, // 55% of the page width
+        right:
+            MediaQuery.of(context).size.width * 0.14, // 55% of the page width
       ),
-
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Stack(
-              children: [
-                ClipPath(
-                  clipper: HexagonClipper(),
-                  child: Transform.scale(
-                    scale: 0.87,
-                    child: Container(
-                      color: Colors.white,
-                      width: 60,
-                      height: 60,
-                    ),
-                  ),
-                ),
-                ClipPath(
-                  clipper: HexagonClipper(),
-                  child: Image.asset(
-                    'assets/mainlogo.png',
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Stack(
+            children: [
+              ClipPath(
+                clipper: HexagonClipper(),
+                child: Transform.scale(
+                  scale: 0.87,
+                  child: Container(
+                    color: Colors.white,
                     width: 60,
                     height: 60,
-                    fit: BoxFit.cover,
                   ),
                 ),
-              ],
-            ),
-            // const SizedBox(width: 8),
+              ),
+              ClipPath(
+                clipper: HexagonClipper(),
+                child: Image.asset(
+                  'assets/mainlogo.png',
+                  width: 60,
+                  height: 60,
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ],
+          ),
+          // const SizedBox(width: 8),
+        ],
+      ),
+    ),
+    actions: <Widget>[
+      Padding(
+        padding: const EdgeInsets.only(top: 15.0),
+        child: Stack(
+          children: [],
+        ),
+      ),
+    ],
+    flexibleSpace: Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Color(0xff0FA697),
+            Color(0xff45BF7A),
+            Color(0xff0DF205),
           ],
         ),
       ),
-      actions: <Widget>[
-        Padding(
-          padding: const EdgeInsets.only(top: 15.0),
-          child: Stack(
-            children: [
-              
-              
-            ],
-          ),
-        ),
-      ],
-      flexibleSpace: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Color(0xff0FA697),
-              Color(0xff45BF7A),
-              Color(0xff0DF205),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-
-class HexagonClipper extends CustomClipper<Path> {
-  @override
-  Path getClip(Size size) {
-    final path = Path();
-    final double controlPointOffset = size.height / 6;
-
-    path.moveTo(size.width / 2, 0);
-    path.lineTo(size.width, size.height / 2 - controlPointOffset);
-    path.lineTo(size.width, size.height / 2 + controlPointOffset);
-    path.lineTo(size.width / 2, size.height);
-    path.lineTo(0, size.height / 2 + controlPointOffset);
-    path.lineTo(0, size.height / 2 - controlPointOffset);
-    path.close();
-    return path;
-  }
-  @override
-  bool shouldReclip(CustomClipper<Path> oldClipper) {
-    return false;
-  }
+    ),
+  );
 }

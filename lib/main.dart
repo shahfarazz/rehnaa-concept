@@ -13,6 +13,7 @@ import 'frontend/Screens/Tenant/tenantsignupdetails.dart';
 import 'frontend/Screens/splash.dart';
 import 'firebase_options.dart';
 import 'frontend/helper/Tenantdashboard_pages/tenant_profile.dart';
+import 'package:responsive_framework/responsive_framework.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -38,20 +39,29 @@ class MyApp extends StatelessWidget {
       child: ChangeNotifierProvider(
         create: (context) => AuthenticationService(),
         child: MaterialApp(
+          builder: (context, child) => ResponsiveBreakpoints.builder(
+            child: BouncingScrollWrapper.builder(context, child!),
+            breakpoints: [
+              const Breakpoint(start: 0, end: 450, name: MOBILE),
+              const Breakpoint(start: 451, end: 800, name: TABLET),
+              const Breakpoint(start: 801, end: 1920, name: DESKTOP),
+              const Breakpoint(start: 1921, end: double.infinity, name: '4K'),
+            ],
+          ),
           debugShowCheckedModeBanner: false,
           title: 'Rehnaa',
           theme: ThemeData(
             primarySwatch: Colors.blue,
           ),
-          home: LandlordDashboardPage(
-            uid: '0RrAUsYh5EO2QH01RVarNP1MIir1',
-          ),
+          // home: LandlordDashboardPage(
+          //   uid: '0RrAUsYh5EO2QH01RVarNP1MIir1',
+          // ),
           // home: AdminDashboard(),
           // home: const SplashScreen(),
           // home: DealerDashboardPage(uid: 'fUuFmW7bNaweyP5xkc4c'),
-          // home: TenantDashboardPage(
-          //   uid: 'GjGmEM8AnvXIebnvKuCvOOkTDpL2',
-          // ), //TODO remove this Jugaar
+          home: TenantDashboardPage(
+            uid: 'GjGmEM8AnvXIebnvKuCvOOkTDpL2',
+          ), //TODO remove this Jugaar
         ),
       ),
     );
