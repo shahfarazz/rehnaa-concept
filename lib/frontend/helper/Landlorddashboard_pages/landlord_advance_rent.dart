@@ -42,26 +42,12 @@ class _LandlordAdvanceRentPageState extends State<LandlordAdvanceRentPage> {
 
   @override
   Widget build(BuildContext context) {
+    final Size size = MediaQuery.of(context).size;
+
+    
     return Scaffold(
-      appBar: //just add a back button
-          AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back_ios,
-            color: Color(0xff45BF7A),
-          ),
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => LandlordDashboardPage(uid: widget.uid),
-              ),
-            );
-          },
-        ),
-      ),
+      appBar: _buildAppBar(size, context),
+
       body: SingleChildScrollView(
         child: Container(
           color: Colors.grey[200], // Set the background color
@@ -272,3 +258,96 @@ class _LandlordAdvanceRentPageState extends State<LandlordAdvanceRentPage> {
     );
   }
 }
+
+
+PreferredSizeWidget _buildAppBar(Size size, context) {
+    return AppBar(
+      toolbarHeight: 70,
+      
+      title: Padding(
+        padding: EdgeInsets.only(
+        // top: MediaQuery.of(context).size.height * 0.02, // 2% of the page height
+        right: MediaQuery.of(context).size.width * 0.14, // 55% of the page width
+      ),
+
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Stack(
+              children: [
+                ClipPath(
+                  clipper: HexagonClipper(),
+                  child: Transform.scale(
+                    scale: 0.87,
+                    child: Container(
+                      color: Colors.white,
+                      width: 60,
+                      height: 60,
+                    ),
+                  ),
+                ),
+                ClipPath(
+                  clipper: HexagonClipper(),
+                  child: Image.asset(
+                    'assets/mainlogo.png',
+                    width: 60,
+                    height: 60,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ],
+            ),
+            // const SizedBox(width: 8),
+          ],
+        ),
+      ),
+      actions: <Widget>[
+        Padding(
+          padding: const EdgeInsets.only(top: 15.0),
+          child: Stack(
+            children: [
+              
+              
+            ],
+          ),
+        ),
+      ],
+      flexibleSpace: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Color(0xff0FA697),
+              Color(0xff45BF7A),
+              Color(0xff0DF205),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+
+class HexagonClipper extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    final path = Path();
+    final double controlPointOffset = size.height / 6;
+
+    path.moveTo(size.width / 2, 0);
+    path.lineTo(size.width, size.height / 2 - controlPointOffset);
+    path.lineTo(size.width, size.height / 2 + controlPointOffset);
+    path.lineTo(size.width / 2, size.height);
+    path.lineTo(0, size.height / 2 + controlPointOffset);
+    path.lineTo(0, size.height / 2 - controlPointOffset);
+    path.close();
+    return path;
+  }
+  @override
+  bool shouldReclip(CustomClipper<Path> oldClipper) {
+    return false;
+  }
+}
+
+
