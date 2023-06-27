@@ -139,7 +139,7 @@ class _DealerDashboardPageState extends State<DealerDashboardPage>
                       physics: isKeyboardVisible(context)
                           ? NeverScrollableScrollPhysics()
                           : const AlwaysScrollableScrollPhysics(),
-                      itemCount: 5, // Number of pages
+                      itemCount: 4, // Number of pages
                       itemBuilder: (context, index) {
                         switch (index) {
                           case 0:
@@ -974,7 +974,7 @@ class _DealerDashboardPageState extends State<DealerDashboardPage>
       child: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         backgroundColor: Colors.white,
-        selectedItemColor: Colors.black,
+        selectedItemColor: Colors.green,
         unselectedItemColor: Colors.grey,
         showSelectedLabels: true,
         showUnselectedLabels: true,

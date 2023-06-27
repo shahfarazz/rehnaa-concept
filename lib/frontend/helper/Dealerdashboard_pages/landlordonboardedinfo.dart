@@ -137,15 +137,8 @@ class LandlordsOnboardedInfoPage extends StatelessWidget {
                                   fontSize: 28,
                                   color: Color(0xff33907c),
                                   // fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              SizedBox(height: 16),
-                              Text(
-                                "Arshad Ali",
-                                style: TextStyle(
-                                  fontSize: 24,
-                                  color: Color(0xff33907c),
-                                  fontWeight: FontWeight.bold,
+                                  fontFamily:
+                                      GoogleFonts.montserrat().fontFamily,
                                 ),
                               ),
                               SizedBox(height: 20),
@@ -159,10 +152,10 @@ class LandlordsOnboardedInfoPage extends StatelessWidget {
                               ContractCard(
                                 icon: Icons.person,
                                 label: 'Tenant Name:',
-                                data: landlord.tenant == null || landlord.tenant!.isEmpty
-                                ? 'No tenant yet'
-                                : landlord.tenant![0].firstName ?? '',
-
+                                data: landlord.tenant == null ||
+                                        landlord.tenant!.isEmpty
+                                    ? 'No tenant yet'
+                                    : landlord.tenant![0].firstName ?? '',
                               ),
                               SizedBox(height: 16),
                               ContractCard(

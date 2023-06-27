@@ -96,12 +96,28 @@ class _DealerLandlordOnboardedPageState
 
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
     return Scaffold(
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
           child: Column(
             children: [
+              // const SizedBox(height: 60),
+              SizedBox(
+                height: size.height * 0.05,
+              ),
+              Container(
+                child: Text("Landlords Onboarded",
+                    style: GoogleFonts.montserrat(
+                      fontSize: 24,
+                      color: const Color(0xff33907c),
+                      fontWeight: FontWeight.bold,
+                    )),
+              ),
+              SizedBox(
+                height: size.height * 0.05,
+              ),
               Container(
                 decoration: BoxDecoration(
                   color: Colors.white,
@@ -130,15 +146,7 @@ class _DealerLandlordOnboardedPageState
                   ),
                 ),
               ),
-              const SizedBox(height: 60),
-              Container(
-                child: Text("Landlords Onboarded",
-                    style: GoogleFonts.montserrat(
-                      fontSize: 24,
-                      color: const Color(0xff33907c),
-                      fontWeight: FontWeight.bold,
-                    )),
-              ),
+
               // const SizedBox(height: 40),
               // if (isLoading)
               //   const Center(
@@ -148,8 +156,9 @@ class _DealerLandlordOnboardedPageState
               //   ),
               Expanded(
                 child: filteredLandlords.isEmpty
-                    ? Center(
-                        child: Card(
+                    ? Column(children: [
+                        SizedBox(height: size.height * 0.05),
+                        Card(
                           elevation: 4.0,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(20.0),
@@ -170,10 +179,10 @@ class _DealerLandlordOnboardedPageState
                                 ),
                                 const SizedBox(height: 16.0),
                                 Text(
-                                  'Oops! Nothing to show here...',
+                                  'No Landlords onboarded yet',
                                   style: GoogleFonts.montserrat(
                                     fontSize: 20.0,
-                                    fontWeight: FontWeight.bold,
+                                    // fontWeight: FontWeight.bold,
                                     color: const Color(0xff33907c),
                                   ),
                                 ),
@@ -181,7 +190,7 @@ class _DealerLandlordOnboardedPageState
                             ),
                           ),
                         ),
-                      )
+                      ])
                     : ListView.builder(
                         itemCount: filteredLandlords.length,
                         itemBuilder: (context, index) {
@@ -210,11 +219,17 @@ class _DealerLandlordOnboardedPageState
                                     landlord.firstName +
                                         " " +
                                         landlord.lastName,
-                                    style: const TextStyle(
+                                    style: TextStyle(
+                                        fontFamily:
+                                            GoogleFonts.montserrat().fontFamily,
                                         fontWeight: FontWeight.bold)),
                                 trailing: Text(landlord.balance.toString(),
-                                    style: const TextStyle(color: Colors.grey)),
-                                subtitle: Text('dummy'),
+                                    style: TextStyle(
+                                      color: Colors.grey,
+                                      fontFamily:
+                                          GoogleFonts.montserrat().fontFamily,
+                                    )),
+                                // subtitle: Text('dummy'),
                               ),
                             ),
                           );

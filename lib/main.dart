@@ -58,10 +58,10 @@ class MyApp extends StatelessWidget {
           // ),
           // home: AdminDashboard(),
           // home: const SplashScreen(),
-          // home: DealerDashboardPage(uid: 'fUuFmW7bNaweyP5xkc4c'),
-          home: TenantDashboardPage(
-            uid: 'GjGmEM8AnvXIebnvKuCvOOkTDpL2',
-          ), //TODO remove this Jugaar
+          home: DealerDashboardPage(uid: 'fUuFmW7bNaweyP5xkc4c'),
+          // home: TenantDashboardPage(
+          //   uid: 'GjGmEM8AnvXIebnvKuCvOOkTDpL2',
+          // ), //TODO remove this Jugaar
         ),
       ),
     );
