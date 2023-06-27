@@ -100,12 +100,26 @@ class _LandlordPropertiesPageState extends State<LandlordPropertiesPage>
     return StreamBuilder<List<DocumentSnapshot<Map<String, dynamic>>>>(
       stream: _propertyStream,
       builder: (context, snapshot) {
+        Size size = MediaQuery.of(context).size;
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const LandlordPropertiesSkeleton();
         } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
           return Column(
             children: [
-              const SizedBox(height: 50),
+              SizedBox(height: size.height * 0.03),
+              Container(
+                padding: const EdgeInsets.symmetric(vertical: 16.0),
+                alignment: Alignment.center,
+                child: Text(
+                  'Properties',
+                  style: GoogleFonts.montserrat(
+                    fontSize: 24.0,
+                    fontWeight: FontWeight.bold,
+                    color: const Color(0xff33907c),
+                  ),
+                ),
+              ),
+              SizedBox(height: size.height * 0.03),
               Card(
                 elevation: 4.0,
                 shape: RoundedRectangleBorder(

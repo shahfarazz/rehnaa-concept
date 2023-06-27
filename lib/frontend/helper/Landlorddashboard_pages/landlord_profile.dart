@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:rehnaa/backend/services/authentication_service.dart';
 
 import '../../Screens/login_page.dart';
@@ -232,8 +233,8 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
                       Text(
                         'Choose from Gallery',
                         style: TextStyle(
-                          fontSize: 16,
-                        ),
+                            fontSize: 16,
+                            fontFamily: GoogleFonts.montserrat().fontFamily),
                       ),
                     ],
                   ),
@@ -254,8 +255,8 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
                       Text(
                         'Cancel',
                         style: TextStyle(
-                          fontSize: 16,
-                        ),
+                            fontSize: 16,
+                            fontFamily: GoogleFonts.montserrat().fontFamily),
                       ),
                     ],
                   ),
@@ -278,6 +279,7 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
             .doc(widget.uid)
             .get(),
         builder: (context, snapshot) {
+          Size size = MediaQuery.of(context).size;
           if (snapshot.connectionState == ConnectionState.waiting) {
             // While data is being fetched, show a loading indicator
             return const Center(child: CircularProgressIndicator());
@@ -322,7 +324,8 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const SizedBox(height: 40),
+                // const SizedBox(height: 40),
+                SizedBox(height: size.height * 0.01),
                 Stack(
                   alignment: Alignment.bottomRight,
                   children: [
@@ -372,22 +375,22 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 20),
+                SizedBox(height: size.height * 0.02),
                 Text(
                   '$firstName $lastName',
-                  style: const TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: GoogleFonts.montserrat().fontFamily),
                 ),
                 Text(
                   description,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    color: Colors.grey,
-                  ),
+                  style: TextStyle(
+                      fontSize: 18,
+                      color: Colors.grey,
+                      fontFamily: GoogleFonts.montserrat().fontFamily),
                 ),
-                const SizedBox(height: 20),
+                SizedBox(height: size.height * 0.02),
                 const Divider(),
                 ProfileInfoItem(
                   icon: Icons.email,
@@ -422,27 +425,29 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     const SizedBox(height: 18),
-                                    const Text(
+                                    Text(
                                       'Additional Settings',
                                       style: TextStyle(
-                                        fontSize: 16,
-                                        color: Colors.black,
-                                        fontWeight: FontWeight.bold,
-                                      ),
+                                          fontSize: 16,
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.bold,
+                                          fontFamily: GoogleFonts.montserrat()
+                                              .fontFamily),
                                     ),
-                                    const SizedBox(height: 4),
+                                    SizedBox(height: size.height * 0.005),
                                     Text(
                                       'Click to access additional settings',
                                       style: TextStyle(
-                                        fontSize: 14,
-                                        color: Colors.grey[700],
-                                      ),
+                                          fontSize: 14,
+                                          color: Colors.grey[700],
+                                          fontFamily: GoogleFonts.montserrat()
+                                              .fontFamily),
                                     ),
                                   ],
                                 ),
                               ),
                               SizedBox(
-                                height: 20,
+                                height: size.height * 0.05,
                                 child: LayoutBuilder(
                                   builder: (context, constraints) {
                                     return AnimatedSwitcher(
@@ -946,11 +951,14 @@ class ProfileInfoItem extends StatelessWidget {
       leading: Icon(icon),
       title: Text(
         title,
-        style: const TextStyle(
-          fontWeight: FontWeight.bold,
-        ),
+        style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontFamily: GoogleFonts.montserrat().fontFamily),
       ),
-      subtitle: Text(subtitle),
+      subtitle: Text(
+        subtitle,
+        style: TextStyle(fontFamily: GoogleFonts.montserrat().fontFamily),
+      ),
       onTap: onTap,
     );
   }

@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../../../backend/services/authentication_service.dart';
 import '../../Screens/splash.dart';
@@ -101,17 +102,17 @@ class _DealerProfilePageState extends State<DealerProfilePage> {
                 const SizedBox(height: 20),
                 Text(
                   '$firstName $lastName',
-                  style: const TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: GoogleFonts.montserrat().fontFamily),
                 ),
                 Text(
                   description,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    color: Colors.grey,
-                  ),
+                  style: TextStyle(
+                      fontSize: 18,
+                      color: Colors.grey,
+                      fontFamily: GoogleFonts.montserrat().fontFamily),
                 ),
                 const SizedBox(height: 20),
                 const Divider(),
@@ -140,21 +141,23 @@ class _DealerProfilePageState extends State<DealerProfilePage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             const SizedBox(height: 18),
-                            const Text(
+                            Text(
                               'Additional Settings',
                               style: TextStyle(
-                                fontSize: 16,
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold,
-                              ),
+                                  fontSize: 16,
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                  fontFamily:
+                                      GoogleFonts.montserrat().fontFamily),
                             ),
                             const SizedBox(height: 4),
                             Text(
                               'Click to access additional settings',
                               style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.grey[700],
-                              ),
+                                  fontSize: 14,
+                                  color: Colors.grey[700],
+                                  fontFamily:
+                                      GoogleFonts.montserrat().fontFamily),
                             ),
                           ],
                         ),
@@ -487,9 +490,9 @@ class ProfileInfoItem extends StatelessWidget {
       leading: Icon(icon),
       title: Text(
         title,
-        style: const TextStyle(
-          fontWeight: FontWeight.bold,
-        ),
+        style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontFamily: GoogleFonts.montserrat().fontFamily),
       ),
       subtitle: Text(subtitle),
       onTap: onTap,

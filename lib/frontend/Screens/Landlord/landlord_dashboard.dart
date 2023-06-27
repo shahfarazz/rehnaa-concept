@@ -311,9 +311,10 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
                         notificationsCount == 0
                             ? ''
                             : notificationsCount.toString(),
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: Colors.white,
                           fontSize: 10,
+                          fontFamily: GoogleFonts.montserrat().fontFamily,
                         ),
                         textAlign: TextAlign.center,
                       ),
@@ -486,7 +487,8 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => InterestFreeLoanPage(uid : widget.uid),
+                            builder: (context) =>
+                                InterestFreeLoanPage(uid: widget.uid),
                           ),
                         );
                         // _closeSidebar();
@@ -601,8 +603,8 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
           Expanded(
             child: Text(
               label,
-              style: const TextStyle(
-                fontFamily: 'Montserrat',
+              style: TextStyle(
+                fontFamily: GoogleFonts.montserrat().fontFamily,
                 fontSize: 18,
               ),
             ),
@@ -615,11 +617,12 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
                 color: Colors.red,
                 borderRadius: BorderRadius.circular(8.0),
               ),
-              child: const Text(
+              child: Text(
                 'new',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 12.0,
+                  fontFamily: GoogleFonts.montserrat().fontFamily,
                 ),
               ),
             ),
@@ -686,7 +689,7 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: <Widget>[
-                                  const Hero(
+                                  Hero(
                                     tag: 'notificationTitle',
                                     child: Text(
                                       'Notifications',
@@ -694,7 +697,8 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
                                         fontSize: 20,
                                         fontWeight: FontWeight.bold,
                                         color: Colors.white,
-                                        fontFamily: 'Montserrat',
+                                        fontFamily:
+                                            GoogleFonts.montserrat().fontFamily,
                                       ),
                                     ),
                                   ),
@@ -823,7 +827,7 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
                                                             CrossAxisAlignment
                                                                 .start,
                                                         children: <Widget>[
-                                                          const SizedBox(
+                                                          SizedBox(
                                                             width: 24.0,
                                                             child: Padding(
                                                               padding: EdgeInsets
@@ -836,6 +840,9 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
                                                                     TextStyle(
                                                                   fontSize:
                                                                       24.0,
+                                                                  fontFamily: GoogleFonts
+                                                                          .montserrat()
+                                                                      .fontFamily,
                                                                   fontWeight:
                                                                       FontWeight
                                                                           .bold,
@@ -856,11 +863,12 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
                                                                 Text(
                                                                   title,
                                                                   style:
-                                                                      const TextStyle(
+                                                                      TextStyle(
                                                                     fontSize:
                                                                         18.0,
                                                                     fontFamily:
-                                                                        'Montserrat',
+                                                                        GoogleFonts.montserrat()
+                                                                            .fontFamily,
                                                                   ),
                                                                 ),
                                                                 if (amount
@@ -878,31 +886,31 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
                                                                       text:
                                                                           TextSpan(
                                                                         style:
-                                                                            const TextStyle(
+                                                                            TextStyle(
                                                                           fontSize:
                                                                               16.0,
                                                                           fontFamily:
-                                                                              'Montserrat',
+                                                                              GoogleFonts.montserrat().fontFamily,
                                                                           color:
                                                                               Colors.black,
                                                                         ),
                                                                         children: [
-                                                                          const TextSpan(
+                                                                          TextSpan(
                                                                             text:
                                                                                 'Amount: ',
                                                                             style:
                                                                                 TextStyle(
-                                                                              fontFamily: 'Montserrat',
+                                                                              fontFamily: GoogleFonts.montserrat().fontFamily,
                                                                             ),
                                                                           ),
                                                                           TextSpan(
                                                                             text:
                                                                                 amount,
                                                                             style:
-                                                                                const TextStyle(
+                                                                                TextStyle(
                                                                               fontWeight: FontWeight.bold,
                                                                               color: Color(0xFF45BF7A),
-                                                                              fontFamily: 'Montserrat',
+                                                                              fontFamily: GoogleFonts.montserrat().fontFamily,
                                                                             ),
                                                                           ),
                                                                         ],
@@ -986,7 +994,7 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
       child: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         backgroundColor: Colors.white,
-        selectedItemColor: Colors.black,
+        selectedItemColor: Colors.green,
         unselectedItemColor: Colors.grey,
         showSelectedLabels: true,
         showUnselectedLabels: true,
