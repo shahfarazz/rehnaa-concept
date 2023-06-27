@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../../../backend/models/landlordmodel.dart';
 import '../../Screens/Landlord/landlord_dashboard.dart';
@@ -59,7 +60,7 @@ class _LandlordAdvanceRentPageState extends State<LandlordAdvanceRentPage> {
             ),
             child: Column(
               children: [
-                const Padding(
+                Padding(
                   padding: EdgeInsets.all(16.0),
                   child: Column(
                     children: [
@@ -67,8 +68,8 @@ class _LandlordAdvanceRentPageState extends State<LandlordAdvanceRentPage> {
                         'Rent advance',
                         style: TextStyle(
                           fontSize: 22,
+                          fontFamily: GoogleFonts.montserrat().fontFamily,
                           fontWeight: FontWeight.bold,
-                          fontFamily: 'Montserrat',
                           color: Color(0xff45BF7A),
                         ),
                       ),
@@ -85,11 +86,11 @@ class _LandlordAdvanceRentPageState extends State<LandlordAdvanceRentPage> {
                     padding: const EdgeInsets.all(16.0),
                     child: Column(
                       children: [
-                        const Text(
+                        Text(
                           'You can apply for three months advance rent at 3% interest rate per month',
                           style: TextStyle(
                             fontSize: 18,
-                            fontFamily: 'Montserrat',
+                            fontFamily: GoogleFonts.montserrat().fontFamily,
                           ),
                           textAlign: TextAlign.center,
                         ),
@@ -165,7 +166,8 @@ class _LandlordAdvanceRentPageState extends State<LandlordAdvanceRentPage> {
                                       'Your request for rent advance has been sent to the admin.\nRehnaa team will contact you shortly. Thanks',
                                       style: TextStyle(
                                         fontSize: 18,
-                                        fontFamily: 'Montserrat',
+                                        fontFamily:
+                                            GoogleFonts.montserrat().fontFamily,
                                       ),
                                     ),
                                   ),
@@ -182,7 +184,8 @@ class _LandlordAdvanceRentPageState extends State<LandlordAdvanceRentPage> {
                                     style: TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.bold,
-                                      fontFamily: 'Montserrat',
+                                      fontFamily:
+                                          GoogleFonts.montserrat().fontFamily,
                                       color: Colors.white,
                                     ),
                                   ),
@@ -229,7 +232,7 @@ class _LandlordAdvanceRentPageState extends State<LandlordAdvanceRentPage> {
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
-                                fontFamily: 'Montserrat',
+                                fontFamily: GoogleFonts.montserrat().fontFamily,
                                 color: Color(0xff45BF7A),
                               ),
                             ),
@@ -245,7 +248,7 @@ class _LandlordAdvanceRentPageState extends State<LandlordAdvanceRentPage> {
                               'Date Joined',
                               style: TextStyle(
                                 fontSize: 16,
-                                fontFamily: 'Montserrat',
+                                fontFamily: GoogleFonts.montserrat().fontFamily,
                               ),
                             ),
                           ],

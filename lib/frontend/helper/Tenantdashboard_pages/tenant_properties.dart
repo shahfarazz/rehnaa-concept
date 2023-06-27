@@ -237,7 +237,9 @@ class PropertyCard extends StatelessWidget {
                     SizedBox(height: screenHeight * 0.005),
                     Text(
                       '$location\n$address',
-                      style: TextStyle(fontSize: screenWidth * 0.035),
+                      style: TextStyle(
+                          fontSize: screenWidth * 0.035,
+                          fontFamily: GoogleFonts.montserrat().fontFamily),
                     ),
                     SizedBox(height: screenHeight * 0.01),
                     Row(
@@ -247,14 +249,18 @@ class PropertyCard extends StatelessWidget {
                         SizedBox(width: screenWidth * 0.01),
                         Text(
                           '${property.beds} Bed',
-                          style: TextStyle(fontSize: screenWidth * 0.035),
+                          style: TextStyle(
+                              fontSize: screenWidth * 0.035,
+                              fontFamily: GoogleFonts.montserrat().fontFamily),
                         ),
                         SizedBox(width: screenWidth * 0.02),
                         Icon(Icons.bathtub_outlined, size: screenWidth * 0.035),
                         SizedBox(width: screenWidth * 0.01),
                         Text(
                           '${property.baths} Bath',
-                          style: TextStyle(fontSize: screenWidth * 0.035),
+                          style: TextStyle(
+                              fontSize: screenWidth * 0.035,
+                              fontFamily: GoogleFonts.montserrat().fontFamily),
                         ),
                       ],
                     ),
@@ -270,12 +276,17 @@ class PropertyCard extends StatelessWidget {
                         SizedBox(width: screenWidth * 0.01),
                         Text(
                           '$firstName $lastName',
-                          style: TextStyle(fontSize: screenWidth * 0.035),
+                          style: TextStyle(
+                              fontSize: screenWidth * 0.035,
+                              fontFamily: GoogleFonts.montserrat().fontFamily),
                         ),
                         SizedBox(width: screenWidth * 0.01),
                         Text(
                           '($type)',
-                          style: TextStyle(fontSize: screenWidth * 0.035),
+                          style: TextStyle(
+                            fontSize: screenWidth * 0.035,
+                            fontFamily: GoogleFonts.montserrat().fontFamily,
+                          ),
                         ),
                       ],
                     ),

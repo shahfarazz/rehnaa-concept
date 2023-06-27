@@ -139,11 +139,14 @@ class _TenantRentedPropertyPageState extends State<TenantRentedPropertyPage> {
                         left: 65,
                       ),
                       child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           Column(
                             children: [
-                              const SizedBox(height: 50),
+                              // const SizedBox(height: 50),
+                              Padding(
+                                  padding:
+                                      EdgeInsets.only(top: size.height * 0.1)),
                               Card(
                                 elevation: 4.0,
                                 shape: RoundedRectangleBorder(

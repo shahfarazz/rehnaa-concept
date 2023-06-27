@@ -58,13 +58,15 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
           builder: (BuildContext context, StateSetter setState) {
             // Your AlertDialog code goes here...
             return AlertDialog(
-              title: const Padding(
+              title: Padding(
                 padding:
                     EdgeInsets.only(top: 16.0), // Adjust the value as needed
                 child: Text(
                   'Withdraw Options',
-                  style:
-                      TextStyle(fontSize: 20.0, fontWeight: FontWeight.normal),
+                  style: TextStyle(
+                      fontSize: 20.0,
+                      fontWeight: FontWeight.normal,
+                      fontFamily: GoogleFonts.montserrat().fontFamily),
                 ),
               ),
 
@@ -373,8 +375,7 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                           padding: const EdgeInsets.only(bottom: 8.0),
                           child: CircleAvatar(
                             radius: 75,
-                            backgroundColor: Colors
-                                .transparent, // Set the background color to transparent
+                            backgroundColor: Colors.transparent,
                             child: ClipOval(
                               child: tenant.pathToImage != null &&
                                       tenant.pathToImage!.isNotEmpty
@@ -388,6 +389,24 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                                           tenant.pathToImage!,
                                           width: 150,
                                           height: 150,
+                                          loadingBuilder: (context, child,
+                                              loadingProgress) {
+                                            if (loadingProgress == null)
+                                              return child;
+                                            return Center(
+                                              child: CircularProgressIndicator(
+                                                color: Colors.green,
+                                                value: loadingProgress
+                                                            .expectedTotalBytes !=
+                                                        null
+                                                    ? loadingProgress
+                                                            .cumulativeBytesLoaded /
+                                                        loadingProgress
+                                                            .expectedTotalBytes!
+                                                    : null,
+                                              ),
+                                            );
+                                          },
                                         ))
                                   : Image.asset(
                                       'assets/defaulticon.png',

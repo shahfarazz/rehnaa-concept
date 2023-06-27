@@ -31,7 +31,7 @@ class MyScreen extends StatelessWidget {
   Future<DocumentSnapshot<Map<String, dynamic>>> _getLandlordRef() async {
     print('reached here with tenant');
 
-    String id = FirebaseAuth.instance.currentUser!.uid;
+    String? id = FirebaseAuth.instance.currentUser?.uid;
     DocumentSnapshot<Map<String, dynamic>> tenantSnapshot =
         await FirebaseFirestore.instance.collection('Tenants').doc(id).get();
 
@@ -73,96 +73,61 @@ class MyScreen extends StatelessWidget {
           print('contractFields: $contractFields');
 
           if (contractFields == null) {
-        final Size size = MediaQuery.of(context).size;
+            final Size size = MediaQuery.of(context).size;
 
-    
-    return Scaffold(
-      appBar: _buildAppBar(size, context),
-    body: Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Padding(
-        //   padding: EdgeInsets.only(top: 75, left: 25),
-        //   child: Positioned(
-        //     top: 30.0,
-        //     left: 10.0,
-        //     child: GestureDetector(
-        //       onTap: () {
-        //         Navigator.pop(context);
-        //       },
-        //       child: Container(
-        //         width: 40,
-        //         height: 40,
-        //         decoration: const BoxDecoration(
-        //           shape: BoxShape.circle,
-        //           color: Color(0xFF33907C),
-        //           gradient: LinearGradient(
-        //             begin: Alignment.topLeft,
-        //             end: Alignment.bottomRight,
-        //             colors: [
-        //               Color(0xff0FA697),
-        //               Color(0xff45BF7A),
-        //               Color(0xff0DF205),
-        //             ],
-        //           ),
-        //         ),
-        //         child: const Icon(
-        //           Icons.arrow_back,
-        //           size: 20,
-        //           color: Colors.white,
-        //         ),
-        //       ),
-        //     ),
-        //   ),
-        // ),
-        Padding(
-          padding: EdgeInsets.only(left: 70,),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Column(
+            return Scaffold(
+              appBar: _buildAppBar(size, context),
+              body: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(height: 50),
-                  Card(
-                    elevation: 4.0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20.0),
+                  Padding(
+                    padding: EdgeInsets.only(
+                      left: 70,
                     ),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20.0),
-                        color: Colors.white,
-                      ),
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(
-                            Icons.description,
-                            size: 48.0,
-                            color: Color(0xff33907c),
+                    child: Column(
+                      // mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Padding(
+                            padding: EdgeInsets.only(top: size.height * 0.1)),
+                        // const SizedBox(height: 50),
+                        Card(
+                          elevation: 4.0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20.0),
                           ),
-                          const SizedBox(height: 16.0),
-                          Text(
-                            'No contracts to show',
-                            style: GoogleFonts.montserrat(
-                              fontSize: 20.0,
-                              color: const Color(0xff33907c),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20.0),
+                              color: Colors.white,
+                            ),
+                            padding: const EdgeInsets.all(16.0),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(
+                                  Icons.description,
+                                  size: 48.0,
+                                  color: Color(0xff33907c),
+                                ),
+                                const SizedBox(height: 16.0),
+                                Text(
+                                  'No contracts to show',
+                                  style: GoogleFonts.montserrat(
+                                    fontSize: 20.0,
+                                    color: const Color(0xff33907c),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                        ],
-                      ),
+                        )
+                      ],
                     ),
-                  )
+                  ),
                 ],
               ),
-            ],
-          ),
-        ),
-      ],
-    ),
-  );
-}
+            );
+          }
 
           return Column(
             children: [
@@ -534,73 +499,68 @@ class _ZoomedScreenState extends State<ZoomedScreen> {
   }
 }
 
-
 PreferredSizeWidget _buildAppBar(Size size, context) {
-    return AppBar(
-      toolbarHeight: 70,
-      
-      title: Padding(
-        padding: EdgeInsets.only(
-        right: MediaQuery.of(context).size.width * 0.14, // 55% of the page width
+  return AppBar(
+    toolbarHeight: 70,
+    title: Padding(
+      padding: EdgeInsets.only(
+        right:
+            MediaQuery.of(context).size.width * 0.14, // 55% of the page width
       ),
-
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Stack(
-              children: [
-                ClipPath(
-                  clipper: HexagonClipper(),
-                  child: Transform.scale(
-                    scale: 0.87,
-                    child: Container(
-                      color: Colors.white,
-                      width: 60,
-                      height: 60,
-                    ),
-                  ),
-                ),
-                ClipPath(
-                  clipper: HexagonClipper(),
-                  child: Image.asset(
-                    'assets/mainlogo.png',
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Stack(
+            children: [
+              ClipPath(
+                clipper: HexagonClipper(),
+                child: Transform.scale(
+                  scale: 0.87,
+                  child: Container(
+                    color: Colors.white,
                     width: 60,
                     height: 60,
-                    fit: BoxFit.cover,
                   ),
                 ),
-              ],
-            ),
-            // const SizedBox(width: 8),
+              ),
+              ClipPath(
+                clipper: HexagonClipper(),
+                child: Image.asset(
+                  'assets/mainlogo.png',
+                  width: 60,
+                  height: 60,
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ],
+          ),
+          // const SizedBox(width: 8),
+        ],
+      ),
+    ),
+    actions: <Widget>[
+      Padding(
+        padding: const EdgeInsets.only(top: 15.0),
+        child: Stack(
+          children: [],
+        ),
+      ),
+    ],
+    flexibleSpace: Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Color(0xff0FA697),
+            Color(0xff45BF7A),
+            Color(0xff0DF205),
           ],
         ),
       ),
-      actions: <Widget>[
-        Padding(
-          padding: const EdgeInsets.only(top: 15.0),
-          child: Stack(
-            children: [
-              
-              
-            ],
-          ),
-        ),
-      ],
-      flexibleSpace: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Color(0xff0FA697),
-              Color(0xff45BF7A),
-              Color(0xff0DF205),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
+    ),
+  );
+}
 
 class HexagonClipper extends CustomClipper<Path> {
   @override
@@ -617,6 +577,7 @@ class HexagonClipper extends CustomClipper<Path> {
     path.close();
     return path;
   }
+
   @override
   bool shouldReclip(CustomClipper<Path> oldClipper) {
     return false;

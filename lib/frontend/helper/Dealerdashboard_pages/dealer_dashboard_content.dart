@@ -31,8 +31,7 @@ class DealerDashboardContent extends StatefulWidget {
 
   @override
   // ignore: library_private_types_in_public_api
-  _DealerDashboardContentState createState() =>
-      _DealerDashboardContentState();
+  _DealerDashboardContentState createState() => _DealerDashboardContentState();
 }
 
 class _DealerDashboardContentState extends State<DealerDashboardContent>
@@ -104,13 +103,15 @@ class _DealerDashboardContentState extends State<DealerDashboardContent>
           builder: (BuildContext context, StateSetter setState) {
             // Your AlertDialog code goes here...
             return AlertDialog(
-              title: const Padding(
+              title: Padding(
                 padding:
                     EdgeInsets.only(top: 16.0), // Adjust the value as needed
                 child: Text(
                   'Withdraw Options',
-                  style:
-                      TextStyle(fontSize: 20.0, fontWeight: FontWeight.normal),
+                  style: TextStyle(
+                      fontSize: 20.0,
+                      fontWeight: FontWeight.normal,
+                      fontFamily: GoogleFonts.montserrat().fontFamily),
                 ),
               ),
 
@@ -431,14 +432,14 @@ class _DealerDashboardContentState extends State<DealerDashboardContent>
                           dealer.pathToImage != null
                               ? dealer.pathToImage!
                               : 'assets/defaulticon.png',
-                               width: 170,
-                               height: 170, 
-                            
-                        //   dealer.pathToImage ?? 'assets/defaulticon.png',
+                          width: 170,
+                          height: 170,
 
-                        //   width: 150,
-                        //   height: 150,
-                        //   fit: BoxFit.cover,
+                          //   dealer.pathToImage ?? 'assets/defaulticon.png',
+
+                          //   width: 150,
+                          //   height: 150,
+                          //   fit: BoxFit.cover,
                         ),
                       ),
                     ),
