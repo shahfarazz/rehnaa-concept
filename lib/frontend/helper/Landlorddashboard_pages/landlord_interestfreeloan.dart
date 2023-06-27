@@ -89,7 +89,7 @@ class _InterestFreeLoanPageState extends State<InterestFreeLoanPage>
             ),
             child: Column(
               children: [
-                const Padding(
+                Padding(
                   padding: EdgeInsets.all(16.0),
                   child: Column(
                     children: [
@@ -98,7 +98,7 @@ class _InterestFreeLoanPageState extends State<InterestFreeLoanPage>
                         style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
-                          fontFamily: 'Montserrat',
+                          fontFamily: GoogleFonts.montserrat().fontFamily,
                           color: Color(0xff45BF7A),
                         ),
                       ),
@@ -115,11 +115,11 @@ class _InterestFreeLoanPageState extends State<InterestFreeLoanPage>
                     padding: const EdgeInsets.all(16.0),
                     child: Column(
                       children: [
-                        const Text(
+                        Text(
                           'You can apply for one month worth rent as an interest free loan after being a Rehnaa member for 6 months.',
                           style: TextStyle(
                             fontSize: 18,
-                            fontFamily: 'Montserrat',
+                            fontFamily: GoogleFonts.montserrat().fontFamily,
                           ),
                           textAlign: TextAlign.center,
                         ),
@@ -156,7 +156,8 @@ class _InterestFreeLoanPageState extends State<InterestFreeLoanPage>
                                     style: TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.bold,
-                                      fontFamily: 'Montserrat',
+                                      fontFamily:
+                                          GoogleFonts.montserrat().fontFamily,
                                       color: Colors.white,
                                     ),
                                   ),
@@ -180,29 +181,6 @@ class _InterestFreeLoanPageState extends State<InterestFreeLoanPage>
               ],
             ),
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget buildTextCard(BoxConstraints constraints) {
-    return Card(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20.0),
-      ),
-      child: Padding(
-        padding: EdgeInsets.all(constraints.maxWidth * 0.05),
-        child: SelectableText.rich(
-          TextSpan(
-            children: <TextSpan>[
-              TextSpan(
-                text:
-                    'You can apply for one month worth rent as an interest free loan after being a Rehnaa member for six months.',
-                style: TextStyle(fontSize: constraints.maxWidth * 0.04),
-              ),
-            ],
-          ),
-          textAlign: TextAlign.justify,
         ),
       ),
     );
@@ -246,14 +224,17 @@ class _InterestFreeLoanPageState extends State<InterestFreeLoanPage>
                       text:
                           ' ${DateFormat('dd MMMM yyyy').format(landlord.dateJoined!.toDate())}',
                       style: TextStyle(
-                        fontSize: constraints.maxWidth * 0.04,
+                        fontSize: 16,
                         color: Colors.green,
+                        fontFamily: GoogleFonts.montserrat().fontFamily,
                       ),
                     ),
                     TextSpan(
                       text: '\n\n  Date Joined',
                       style: TextStyle(
-                        fontSize: constraints.maxWidth * 0.04,
+                        fontSize: 16,
+                        fontFamily: GoogleFonts.montserrat().fontFamily,
+
                         // color: Colors.green,
                       ),
                     ),

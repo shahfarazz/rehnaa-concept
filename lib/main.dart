@@ -53,11 +53,11 @@ class MyApp extends StatelessWidget {
           theme: ThemeData(
             primarySwatch: Colors.blue,
           ),
-          // home: LandlordDashboardPage(
-          //   uid: '0RrAUsYh5EO2QH01RVarNP1MIir1',
-          // ),
+          home: LandlordDashboardPage(
+            uid: '0RrAUsYh5EO2QH01RVarNP1MIir1',
+          ),
           // home: AdminDashboard(),
-          home: const SplashScreen(),
+          // home: const SplashScreen(),
           // home: DealerDashboardPage(uid: 'fUuFmW7bNaweyP5xkc4c'),
           // home: TenantDashboardPage(
           //   uid: 'GjGmEM8AnvXIebnvKuCvOOkTDpL2',

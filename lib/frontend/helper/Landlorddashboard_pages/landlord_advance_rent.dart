@@ -217,6 +217,9 @@ class _LandlordAdvanceRentPageState extends State<LandlordAdvanceRentPage> {
                       children: [
                         Row(
                           children: [
+                            Padding(
+                                padding:
+                                    EdgeInsets.only(left: size.width * 0.27)),
                             Text(
                               landlord?.dateJoined
                                       ?.toDate()
@@ -235,6 +238,9 @@ class _LandlordAdvanceRentPageState extends State<LandlordAdvanceRentPage> {
                         SizedBox(height: 10),
                         Row(
                           children: [
+                            Padding(
+                                padding:
+                                    EdgeInsets.only(left: size.width * 0.27)),
                             Text(
                               'Date Joined',
                               style: TextStyle(

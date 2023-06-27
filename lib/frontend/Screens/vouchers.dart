@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:photo_view/photo_view.dart';
@@ -109,12 +110,14 @@ class _VouchersPageState extends State<VouchersPage>
                           child: Column(
                             children: [
                               const SizedBox(height: 10),
-                              const Text(
+                              Text(
                                 "Vouchers",
                                 style: TextStyle(
                                   fontSize: 24,
                                   color: Color(0xFF33907C),
                                   fontWeight: FontWeight.bold,
+                                  fontFamily:
+                                      GoogleFonts.montserrat().fontFamily,
                                 ),
                               ),
                               const SizedBox(height: 16),
