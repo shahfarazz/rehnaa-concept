@@ -124,57 +124,17 @@ class _InterestFreeLoanPageState extends State<InterestFreeLoanPage>
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 20),
-                        Container(
-                          width: MediaQuery.of(context).size.width * 0.6,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(30.0),
-                            gradient: LinearGradient(
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                              colors: [
-                                Color(0xff0FA697),
-                                Color(0xff45BF7A),
-                                Color(0xff0DF205),
-                              ],
-                            ),
-                          ),
-                          child: Material(
-                            color: Colors.transparent,
-                            child: InkWell(
-                              borderRadius: BorderRadius.circular(30.0),
-                              onTap: () {
-                                //TODO in the future
-                              },
-                              child: Ink(
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 16.0,
-                                  horizontal: 32.0,
-                                ),
-                                child: Center(
-                                  child: Text(
-                                    'Apply',
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                      fontFamily:
-                                          GoogleFonts.montserrat().fontFamily,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
+                        
                       ],
                     ),
                   ),
                 ),
                 const SizedBox(height: 20),
+                
                 Center(
                   child: buildTextCard2(
                     BoxConstraints(
-                      maxWidth: size.width * 0.8,
+                      maxWidth: size.width * 1,
                     ),
                   ),
                 ),
@@ -187,6 +147,8 @@ class _InterestFreeLoanPageState extends State<InterestFreeLoanPage>
   }
 
   Widget buildTextCard2(BoxConstraints constraints) {
+        final Size size = MediaQuery.of(context).size;
+
     return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
       stream: _landlordStream,
       builder: (context, snapshot) {
@@ -211,39 +173,64 @@ class _InterestFreeLoanPageState extends State<InterestFreeLoanPage>
               }
             });
           }
-          return Card(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20.0),
-            ),
-            child: Padding(
-              padding: EdgeInsets.all(constraints.maxWidth * 0.05),
-              child: SelectableText.rich(
-                TextSpan(
-                  children: <TextSpan>[
-                    TextSpan(
-                      text:
-                          ' ${DateFormat('dd MMMM yyyy').format(landlord.dateJoined!.toDate())}',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.green,
-                        fontFamily: GoogleFonts.montserrat().fontFamily,
-                      ),
+          return Center(
+                  child: Container(
+                    padding: const EdgeInsets.all(16.0),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(20.0),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.3),
+                          spreadRadius: 2,
+                          blurRadius: 5,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
                     ),
-                    TextSpan(
-                      text: '\n\n  Date Joined',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontFamily: GoogleFonts.montserrat().fontFamily,
-
-                        // color: Colors.green,
-                      ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment
+                          .center, // Align contents vertically in the center
+                      children: [
+                        Row(
+                          children: [
+                            Padding(
+                                padding:
+                                    EdgeInsets.only(left: size.width * 0.27)),
+                            Text(
+                              landlord?.dateJoined
+                                      ?.toDate()
+                                      .toString()
+                                      .substring(0, 10) ??
+                                  'Date Joined',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                fontFamily: GoogleFonts.montserrat().fontFamily,
+                                color: Color(0xff45BF7A),
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 10),
+                        Row(
+                          children: [
+                            Padding(
+                                padding:
+                                    EdgeInsets.only(left: size.width * 0.27)),
+                            Text(
+                              'Date Joined',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontFamily: GoogleFonts.montserrat().fontFamily,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-                textAlign: TextAlign.justify,
-              ),
-            ),
-          );
+                  ),
+                );
         }
         return Container();
       },
