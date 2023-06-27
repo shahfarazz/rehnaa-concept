@@ -198,11 +198,7 @@ class _InterestFreeLoanPageState extends State<InterestFreeLoanPage>
                                 padding:
                                     EdgeInsets.only(left: size.width * 0.27)),
                             Text(
-                              landlord?.dateJoined
-                                      ?.toDate()
-                                      .toString()
-                                      .substring(0, 10) ??
-                                  'Date Joined',
+                               DateFormat('dd MMMM yyyy').format(landlord?.dateJoined?.toDate() ?? DateTime.now()),
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
