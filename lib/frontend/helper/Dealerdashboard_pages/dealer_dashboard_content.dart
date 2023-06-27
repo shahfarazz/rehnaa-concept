@@ -450,7 +450,7 @@ class _DealerDashboardContentState extends State<DealerDashboardContent>
               Center(
                 child: Container(
                   width: size.width * 0.8,
-                  height: size.height * 0.4, // Adjust the height as needed
+                  height: size.height * 0.3, // Adjust the height as needed
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(20),
                     boxShadow: [
