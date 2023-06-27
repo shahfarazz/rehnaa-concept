@@ -86,7 +86,7 @@ class _TenantRentedPropertyPageState extends State<TenantRentedPropertyPage> {
               //return skeleton ui
               return const LandlordPropertiesSkeleton();
             } 
-            else if (snapshot.data!.docs.isEmpty || !snapshot.hasData) {
+        else if (snapshot.data?.docs.isEmpty == true || !snapshot.hasData) {
             
         final Size size = MediaQuery.of(context).size;
 
