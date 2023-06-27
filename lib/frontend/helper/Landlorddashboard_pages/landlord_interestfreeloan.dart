@@ -1,296 +1,252 @@
-import 'package:flutter/material.dart';
-import 'dart:ui';
-
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:rehnaa/backend/models/landlordmodel.dart';
-import 'package:rehnaa/frontend/Screens/faq.dart';
-import 'package:rehnaa/frontend/helper/Landlorddashboard_pages/landlordinvoice.dart';
-import 'landlord_dashboard_content.dart';
-import 'skeleton.dart';
+import 'package:flutter/material.dart';
+
+import '../../../backend/models/landlordmodel.dart';
+import '../../Screens/Landlord/landlord_dashboard.dart';
 
 class InterestFreeLoanPage extends StatefulWidget {
-  final String uid;
+final String uid;
+const InterestFreeLoanPage({super.key, required this.uid});
 
-  InterestFreeLoanPage({
-    Key? key,
-    required this.uid,
-  }) : super(key: key);
-
-  @override
-  _InterestFreeLoanPageState createState() => _InterestFreeLoanPageState();
+@override
+State<InterestFreeLoanPage> createState() =>
+    _InterestFreeLoanPageState();
 }
 
-class _InterestFreeLoanPageState extends State<InterestFreeLoanPage>
-    with AutomaticKeepAliveClientMixin<InterestFreeLoanPage> {
-  late Future<Landlord> _landlordFuture;
-  late Stream<DocumentSnapshot<Map<String, dynamic>>> _landlordStream;
+class _InterestFreeLoanPageState extends State<InterestFreeLoanPage> {
+bool isApplied = false;
+Landlord? landlord;
 
-  @override
-  bool get wantKeepAlive => true;
-  bool isWithdraw = false;
+Future<void> checkIsApplied() async {
+  var myLandlord = await FirebaseFirestore.instance
+      .collection('Landlords')
+      .doc(widget.uid)
+      .get();
 
-  @override
-  void initState() {
-    super.initState();
-    // Fetch landlord data from Firestore
-    // _landlordFuture = getLandlordFromFirestore(widget.uid);
-    // Establish the Firestore stream for the landlord document
-    print('widget.uid is ${widget.uid}');
-    _landlordStream = FirebaseFirestore.instance
-        .collection('Landlords')
-        .doc(widget.uid)
-        .snapshots();
-  }
+  setState(() {
+    landlord = Landlord.fromJson(myLandlord.data()!);
+  });
 
-  Future<Landlord> getLandlordFromFirestore(String uid) async {
-    DocumentSnapshot snapshot =
-        await FirebaseFirestore.instance.collection('Landlords').doc(uid).get();
-    if (kDebugMode) {
-      print('Fetched snapshot: ${snapshot.data()}');
-    }
+}
 
-    Map<String, dynamic> json = snapshot.data() as Map<String, dynamic>;
-    if (kDebugMode) {
-      print('Landlord JSON: $json');
-    }
+@override
+Widget build(BuildContext context) {
+  final Size size = MediaQuery.of(context).size;
 
-    Landlord landlord = await Landlord.fromJson(json);
+  
+  return Scaffold(
+    appBar: _buildAppBar(size, context),
 
-    if (kDebugMode) {
-      print('Created landlord: $landlord');
-    }
-
-    return landlord;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final Size size = MediaQuery.of(context).size;
-    return Scaffold(
-      appBar: _buildAppBar(size, context),
-
-      body: LayoutBuilder(
-        builder: (BuildContext context, BoxConstraints constraints) {
-          return Stack(
-            children: [
-              
-              Column(
-                children: [
-                  
-                  SizedBox(height: constraints.maxHeight * 0.06),
-                  Expanded(
-                    child: SingleChildScrollView(
-                      child: Center(
-                        child: Padding(
-                          padding: EdgeInsets.all(constraints.maxWidth * 0.04),
-                          child: Card(
-                            color: const Color.fromARGB(255, 235, 235, 235),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20.0),
-                            ),
-                            child: Container(
-                              padding: EdgeInsets.all(constraints.maxWidth * 0.04),
-                              child: Column(
-                                children: [
-                                  SizedBox(height: constraints.maxHeight * 0.02),
-                                  Text(
-                                    "Interest Free Loan",
-                                    style: TextStyle(
-                                      fontSize: constraints.maxWidth * 0.06,
-                                      color: Color(0xff33907c),
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  SizedBox(height: constraints.maxHeight * 0.03),
-                                  buildTextCard(constraints),
-                                  SizedBox(height: constraints.maxHeight * 0.03),
-                                  buildTextCard2(constraints),
-                                  SizedBox(height: constraints.maxHeight * 0.3),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          );
-        },
-      ),
-    );
-  }
-
-  Widget buildTextCard(BoxConstraints constraints) {
-    return Card(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20.0),
-      ),
-      child: Padding(
-        padding: EdgeInsets.all(constraints.maxWidth * 0.05),
-        child: SelectableText.rich(
-          TextSpan(
-            children: <TextSpan>[
-              TextSpan(
-                text:
-                    'You can apply for one month worth rent as an interest free loan after being a Rehnaa member for six months.',
-                style: TextStyle(fontSize: constraints.maxWidth * 0.04),
-              ),
-            ],
+    body: SingleChildScrollView(
+      child: Container(
+        color: Colors.grey[200], // Set the background color
+        padding: const EdgeInsets.symmetric(
+          vertical: 100.0,
+          horizontal: 16.0,
+        ), // Updated padding
+        child: Card(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20.0),
           ),
-          textAlign: TextAlign.justify,
-        ),
-      ),
-    );
-  }
-
-  Widget buildTextCard2(BoxConstraints constraints) {
-    return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-      stream: _landlordStream,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return LandlordDashboardContentSkeleton();
-        } else if (snapshot.hasError) {
-          return Text('Error: ${snapshot.error}');
-        } else if (snapshot.hasData) {
-          Map<String, dynamic> json =
-              snapshot.data!.data() as Map<String, dynamic>;
-          if (kDebugMode) {
-            // print('Landlord JSON: $json');
-          }
-          Landlord landlord = Landlord.fromJson(json);
-
-          if (json['isWithdraw'] != null && json['isWithdraw'] == true) {
-            SchedulerBinding.instance!.addPostFrameCallback((_) {
-              if (mounted) {
-                setState(() {
-                  isWithdraw = true;
-                });
-              }
-            });
-          }
-          return Card(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20.0),
-            ),
-            child: Padding(
-              padding: EdgeInsets.all(constraints.maxWidth * 0.05),
-              child: SelectableText.rich(
-                TextSpan(
-                  children: <TextSpan>[
-                    TextSpan(
-                      text:
-                          ' ${DateFormat('dd MMMMyyyy').format(landlord.dateJoined!.toDate())} \n\n  Date Joined',
-                      style: TextStyle(fontSize: constraints.maxWidth * 0.04),
+          child: Column(
+            children: [
+              const Padding(
+                padding: EdgeInsets.all(16.0),
+                child: Column(
+                  children: [
+                    Text(
+                      'Interest Free Loan',
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Montserrat',
+                        color: Color(0xff45BF7A),
+                      ),
                     ),
                   ],
                 ),
-                textAlign: TextAlign.justify,
               ),
-            ),
-          );
-        }
-        return Container();
-      },
-    );
-  }
+              const SizedBox(height: 20),
+              Card(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20.0),
+                  side: const BorderSide(color: Colors.grey, width: 0.1),
+                ),
+                child: Container(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    children: [
+                      const Text(
+                        'You can apply for one month worth rent as an interest free loan after being a Rehnaa member for six months',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontFamily: 'Montserrat',
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 20),
+                     
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              Center(
+                child: Container(
+                  padding: const EdgeInsets.all(16.0),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20.0),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.3),
+                        spreadRadius: 2,
+                        blurRadius: 5,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    
+                    mainAxisAlignment: MainAxisAlignment
+                        .center, // Align contents vertically in the center
+                    children: [
+                      Row(
+                        children: [
+                      const SizedBox(width: 127),
+
+                          Text(
+                            landlord?.dateJoined
+                                    ?.toDate()
+                                    .toString()
+                                    .substring(0, 10) ??
+                                'Date Joined',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'Montserrat',
+                              color: Color(0xff45BF7A),
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 10),
+                      
+                      Row(
+                        children: [
+                      const SizedBox(width: 127),
+
+                          Text(
+                            'Date Joined',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontFamily: 'Montserrat',
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    ),
+  );
+}
 }
 
-PreferredSizeWidget _buildAppBar(Size size, context) {
-    return AppBar(
-      toolbarHeight: 70,
-      
-      title: Padding(
-        padding: EdgeInsets.only(
-        top: MediaQuery.of(context).size.height * 0.02, // 2% of the page height
-        right: MediaQuery.of(context).size.width * 0.14, // 55% of the page width
-      ),
 
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Stack(
-              children: [
-                ClipPath(
-                  clipper: HexagonClipper(),
-                  child: Transform.scale(
-                    scale: 0.87,
-                    child: Container(
-                      color: Colors.white,
-                      width: 60,
-                      height: 60,
-                    ),
-                  ),
-                ),
-                ClipPath(
-                  clipper: HexagonClipper(),
-                  child: Image.asset(
-                    'assets/mainlogo.png',
+PreferredSizeWidget _buildAppBar(Size size, context) {
+  return AppBar(
+    toolbarHeight: 70,
+    
+    title: Padding(
+      padding: EdgeInsets.only(
+      // top: MediaQuery.of(context).size.height * 0.02, // 2% of the page height
+      right: MediaQuery.of(context).size.width * 0.14, // 55% of the page width
+    ),
+
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Stack(
+            children: [
+              ClipPath(
+                clipper: HexagonClipper(),
+                child: Transform.scale(
+                  scale: 0.87,
+                  child: Container(
+                    color: Colors.white,
                     width: 60,
                     height: 60,
-                    fit: BoxFit.cover,
                   ),
                 ),
-              ],
-            ),
-            // const SizedBox(width: 8),
+              ),
+              ClipPath(
+                clipper: HexagonClipper(),
+                child: Image.asset(
+                  'assets/mainlogo.png',
+                  width: 60,
+                  height: 60,
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ],
+          ),
+          // const SizedBox(width: 8),
+        ],
+      ),
+    ),
+    actions: <Widget>[
+      Padding(
+        padding: const EdgeInsets.only(top: 15.0),
+        child: Stack(
+          children: [
+            
+            
           ],
         ),
       ),
-      actions: <Widget>[
-        Padding(
-          padding: const EdgeInsets.only(top: 15.0),
-          child: Stack(
-            children: [
-              
-              
-            ],
-          ),
-        ),
-      ],
-      flexibleSpace: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Color(0xff0FA697),
-              Color(0xff45BF7A),
-              Color(0xff0DF205),
-            ],
-          ),
+    ],
+    flexibleSpace: Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Color(0xff0FA697),
+            Color(0xff45BF7A),
+            Color(0xff0DF205),
+          ],
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 
 
 class HexagonClipper extends CustomClipper<Path> {
-  @override
-  Path getClip(Size size) {
-    final path = Path();
-    final double controlPointOffset = size.height / 6;
+@override
+Path getClip(Size size) {
+  final path = Path();
+  final double controlPointOffset = size.height / 6;
 
-    path.moveTo(size.width / 2, 0);
-    path.lineTo(size.width, size.height / 2 - controlPointOffset);
-    path.lineTo(size.width, size.height / 2 + controlPointOffset);
-    path.lineTo(size.width / 2, size.height);
-    path.lineTo(0, size.height / 2 + controlPointOffset);
-    path.lineTo(0, size.height / 2 - controlPointOffset);
-    path.close();
-    return path;
-  }
-  @override
-  bool shouldReclip(CustomClipper<Path> oldClipper) {
-    return false;
-  }
+  path.moveTo(size.width / 2, 0);
+  path.lineTo(size.width, size.height / 2 - controlPointOffset);
+  path.lineTo(size.width, size.height / 2 + controlPointOffset);
+  path.lineTo(size.width / 2, size.height);
+  path.lineTo(0, size.height / 2 + controlPointOffset);
+  path.lineTo(0, size.height / 2 - controlPointOffset);
+  path.close();
+  return path;
 }
+@override
+bool shouldReclip(CustomClipper<Path> oldClipper) {
+  return false;
+}
+}
+
+

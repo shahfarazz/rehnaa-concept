@@ -346,7 +346,7 @@ class PropertyDetails extends StatelessWidget {
                         Text(
                           'Specifications',
                           style: GoogleFonts.montserrat(
-                            fontStyle: FontStyle.italic,
+                            // fontStyle: FontStyle.italic,
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                           ),
@@ -413,7 +413,7 @@ class PropertyDetails extends StatelessWidget {
                         Text(
                           'Owner Details',
                           style: GoogleFonts.montserrat(
-                            fontStyle: FontStyle.italic,
+                            // fontStyle: FontStyle.italic,
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                           ),
@@ -517,7 +517,7 @@ class PropertyDetails extends StatelessWidget {
                     Text(
                       'Ratings',
                       style: GoogleFonts.montserrat(
-                        fontStyle: FontStyle.italic,
+                        // fontStyle: FontStyle.italic,
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
@@ -581,7 +581,7 @@ class PropertyDetails extends StatelessWidget {
                     Text(
                       'Monthly Rent',
                       style: GoogleFonts.montserrat(
-                        fontStyle: FontStyle.italic,
+                        // fontStyle: FontStyle.italic,
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
