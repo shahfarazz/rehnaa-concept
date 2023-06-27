@@ -49,14 +49,13 @@ class _LandlordAdvanceRentPageState extends State<LandlordAdvanceRentPage> {
       body: SingleChildScrollView(
         child: Container(
           color: Colors.grey[200], // Set the background color
-          padding: EdgeInsets.symmetric(
-            vertical: size.height * 0.1, // Updated vertical padding
-            horizontal: size.width * 0.04, // Updated horizontal padding
-          ),
+          padding: const EdgeInsets.symmetric(
+            vertical: 100.0,
+            horizontal: 16.0,
+          ), // Updated padding
           child: Card(
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(
-                  size.width * 0.1), // Updated border radius
+              borderRadius: BorderRadius.circular(20.0),
             ),
             child: Column(
               children: [
@@ -76,16 +75,14 @@ class _LandlordAdvanceRentPageState extends State<LandlordAdvanceRentPage> {
                     ],
                   ),
                 ),
-                SizedBox(height: size.height * 0.02),
+                const SizedBox(height: 20),
                 Card(
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(
-                        size.width * 0.1), // Updated border radius
-                    side: BorderSide(color: Colors.grey, width: 0.1),
+                    borderRadius: BorderRadius.circular(20.0),
+                    side: const BorderSide(color: Colors.grey, width: 0.1),
                   ),
                   child: Container(
-                    padding:
-                        EdgeInsets.all(size.width * 0.04), // Updated padding
+                    padding: const EdgeInsets.all(16.0),
                     child: Column(
                       children: [
                         const Text(
@@ -98,10 +95,9 @@ class _LandlordAdvanceRentPageState extends State<LandlordAdvanceRentPage> {
                         ),
                         const SizedBox(height: 20),
                         Container(
-                          width: size.width * 0.6,
+                          width: MediaQuery.of(context).size.width * 0.6,
                           decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(
-                                size.width * 0.1), // Updated border radius
+                            borderRadius: BorderRadius.circular(30.0),
                             gradient: LinearGradient(
                               begin: Alignment.topLeft,
                               end: Alignment.bottomRight,
@@ -117,8 +113,7 @@ class _LandlordAdvanceRentPageState extends State<LandlordAdvanceRentPage> {
                           child: Material(
                             color: Colors.transparent,
                             child: InkWell(
-                              borderRadius: BorderRadius.circular(
-                                  size.width * 0.1), // Updated border radius
+                              borderRadius: BorderRadius.circular(30.0),
                               onTap: () {
                                 if (isApplied) {
                                   return;
@@ -177,11 +172,9 @@ class _LandlordAdvanceRentPageState extends State<LandlordAdvanceRentPage> {
                                 );
                               },
                               child: Ink(
-                                padding: EdgeInsets.symmetric(
-                                  vertical:
-                                      size.width * 0.04, // Updated padding
-                                  horizontal:
-                                      size.width * 0.08, // Updated padding
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 16.0,
+                                  horizontal: 32.0,
                                 ),
                                 child: Center(
                                   child: Text(
@@ -205,29 +198,25 @@ class _LandlordAdvanceRentPageState extends State<LandlordAdvanceRentPage> {
                 const SizedBox(height: 20),
                 Center(
                   child: Container(
-                    padding:
-                        EdgeInsets.all(size.width * 0.04), // Updated padding
+                    padding: const EdgeInsets.all(16.0),
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(
-                          size.width * 0.1), // Updated border radius
+                      borderRadius: BorderRadius.circular(20.0),
                       boxShadow: [
                         BoxShadow(
                           color: Colors.grey.withOpacity(0.3),
                           spreadRadius: 2,
                           blurRadius: 5,
-                          offset: Offset(0, 3),
+                          offset: const Offset(0, 3),
                         ),
                       ],
                     ),
                     child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment
+                          .center, // Align contents vertically in the center
                       children: [
                         Row(
                           children: [
-                            Padding(
-                                padding:
-                                    EdgeInsets.only(left: size.width * 0.27)),
                             Text(
                               landlord?.dateJoined
                                       ?.toDate()
@@ -243,12 +232,9 @@ class _LandlordAdvanceRentPageState extends State<LandlordAdvanceRentPage> {
                             ),
                           ],
                         ),
-                        SizedBox(height: size.height * 0.02),
+                        SizedBox(height: 10),
                         Row(
                           children: [
-                            Padding(
-                                padding:
-                                    EdgeInsets.only(left: size.width * 0.27)),
                             Text(
                               'Date Joined',
                               style: TextStyle(
