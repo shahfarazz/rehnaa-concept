@@ -101,7 +101,7 @@ class _DealerLandlordOnboardedPageState
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
-          child: Column(
+          child: ListView(
             children: [
               // const SizedBox(height: 60),
               SizedBox(
@@ -109,6 +109,7 @@ class _DealerLandlordOnboardedPageState
               ),
               Container(
                 child: Text("Landlords Onboarded",
+                    textAlign: TextAlign.center,
                     style: GoogleFonts.montserrat(
                       fontSize: 24,
                       color: const Color(0xff33907c),
@@ -139,7 +140,10 @@ class _DealerLandlordOnboardedPageState
                     color: Colors.black,
                   ),
                   decoration: const InputDecoration(
-                    prefixIcon: Icon(Icons.search),
+                    prefixIcon: Icon(
+                      Icons.search,
+                      color: Colors.green,
+                    ),
                     hintText: 'Search by name',
                     border: InputBorder.none,
                     contentPadding: EdgeInsets.all(20),
@@ -180,6 +184,7 @@ class _DealerLandlordOnboardedPageState
                                 const SizedBox(height: 16.0),
                                 Text(
                                   'No Landlords onboarded yet',
+                                  textAlign: TextAlign.center,
                                   style: GoogleFonts.montserrat(
                                     fontSize: 20.0,
                                     // fontWeight: FontWeight.bold,

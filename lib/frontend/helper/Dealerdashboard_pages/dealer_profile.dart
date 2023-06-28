@@ -33,12 +33,15 @@ class _DealerProfilePageState extends State<DealerProfilePage> {
   bool _obscurePassword = true; // Track whether the password is obscured or not
   bool _obscurePassword2 =
       true; // Track whether the password is obscured or not
+
+  // bool isUploadLoading = false;
   //define two new controllers for the password fields
   final TextEditingController _oldPasswordController = TextEditingController();
   final TextEditingController _newPasswordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
     final authService = AuthenticationService();
 
     void toggleChangePassword() {
@@ -102,12 +105,72 @@ class _DealerProfilePageState extends State<DealerProfilePage> {
       }
     }
 
+    Future<bool> openCamera() async {
+      final picker = ImagePicker();
+      final pickedImage = await picker.pickImage(source: ImageSource.camera);
+
+      if (pickedImage == null) {
+        return false;
+      }
+
+      final File imageFile = File(pickedImage.path);
+      final String fileName = 'users/${widget.uid}/profile_image.jpg';
+
+      try {
+        // Upload the image to Firebase Storage
+        final Reference storageReference =
+            FirebaseStorage.instance.ref().child(fileName);
+        final UploadTask uploadTask = storageReference.putFile(imageFile);
+        final TaskSnapshot taskSnapshot = await uploadTask.whenComplete(() {});
+
+        // Get the download URL of the uploaded image
+        final String downloadURL = await taskSnapshot.ref.getDownloadURL();
+
+        // Update the 'pathToImage' property in the 'Dealers' collection
+        await FirebaseFirestore.instance
+            .collection('Dealers')
+            .doc(widget.uid)
+            .update({'pathToImage': downloadURL});
+
+        // Show a success toast
+        Fluttertoast.showToast(
+          msg: 'Image uploaded successfully',
+          toastLength: Toast.LENGTH_LONG,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.green,
+          textColor: Colors.white,
+          fontSize: 16.0,
+        );
+        return true;
+      } catch (e) {
+        // Show an error toast
+        Fluttertoast.showToast(
+          msg: 'Failed to upload image',
+          toastLength: Toast.LENGTH_LONG,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0,
+        );
+        print('Error uploading image: $e');
+        return false;
+      }
+    }
+
     Future<void> _openImagePicker() async {
       showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text('Upload Image'),
+            title: Text('Upload Image',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.green,
+                  fontSize: 20,
+                  fontFamily: GoogleFonts.montserrat().fontFamily,
+                )),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
@@ -117,26 +180,97 @@ class _DealerProfilePageState extends State<DealerProfilePage> {
                     Navigator.of(context).pop();
                   },
                   child: Container(
-                    padding: EdgeInsets.symmetric(vertical: 16),
+                    // padding: EdgeInsets.symmetric(vertical: 16),
+                    alignment: Alignment.center,
+                    width: size.width,
                     child: Row(
+                      mainAxisSize: MainAxisSize.max,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
                         Icon(
                           Icons.photo_library,
                           color: Colors.green,
                         ),
-                        SizedBox(width: 10),
+                        SizedBox(width: size.width * 0.009),
                         Text(
                           'Choose from Gallery',
+                          textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 16,
+                            fontFamily: GoogleFonts.montserrat().fontFamily,
                           ),
                         ),
                       ],
                     ),
                   ),
                 ),
-                SizedBox(height: 10),
+                SizedBox(height: size.height * 0.02),
+                GestureDetector(
+                  onTap: () async {
+                    showDialog(
+                      context: context,
+                      barrierDismissible: false,
+                      builder: (BuildContext context) {
+                        return WillPopScope(
+                          onWillPop: () async => Future.value(
+                              false), // Disable back button during upload
+                          child: AlertDialog(
+                            title: Text(
+                              'Uploading Image',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Colors.green,
+                                fontSize: 20,
+                                fontFamily: GoogleFonts.montserrat().fontFamily,
+                              ),
+                            ),
+                            content: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: <Widget>[
+                                CircularProgressIndicator(color: Colors.green),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    );
+
+                    bool isUploadSuccess = await openCamera();
+                    setState(() {});
+
+                    // Dismiss the dialog
+                    Navigator.of(context).pop();
+
+                    if (isUploadSuccess) {
+                      Navigator.of(context).pop();
+                    }
+                  },
+                  child: Container(
+                    // padding: EdgeInsets.symmetric(vertical: 16),
+                    alignment: Alignment.center,
+                    width: size.width,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: <Widget>[
+                        Icon(
+                          Icons.camera_alt,
+                          color: Colors.green,
+                        ),
+                        SizedBox(width: size.width * 0.009),
+                        Text(
+                          'Take a Photo',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontFamily: GoogleFonts.montserrat().fontFamily,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                SizedBox(height: size.height * 0.01),
                 GestureDetector(
                   onTap: () {
                     Navigator.of(context).pop();
@@ -154,6 +288,7 @@ class _DealerProfilePageState extends State<DealerProfilePage> {
                         Text(
                           'Cancel',
                           style: TextStyle(
+                            fontFamily: GoogleFonts.montserrat().fontFamily,
                             fontSize: 16,
                           ),
                         ),
@@ -343,30 +478,69 @@ class _DealerProfilePageState extends State<DealerProfilePage> {
                         onTap: () {
                           _openImagePicker();
                         },
-                        child: CircleAvatar(
-                          radius: 80,
-                          backgroundImage: pathToImage != null &&
-                                  pathToImage.startsWith('https')
-                              ? NetworkImage(pathToImage)
-                                  as ImageProvider<Object>?
-                              : AssetImage('assets/defaulticon.png'),
-                          backgroundColor: Colors
-                              .transparent, // Set the background color to transparent
-                          child: ColorFiltered(
-                            colorFilter: ColorFilter.mode(
-                                Colors.transparent,
-                                BlendMode
-                                    .clear), // Apply transparent color filter
-                            child: Container(
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                image: DecorationImage(
-                                  image: AssetImage('assets/defaulticon.png'),
-                                  fit: BoxFit.cover,
+                        child: Stack(
+                          children: [
+                            CircleAvatar(
+                              radius: 75,
+                              backgroundColor: Colors.transparent,
+                              child: ClipOval(
+                                child: pathToImage != null &&
+                                        pathToImage!.isNotEmpty
+                                    ? (pathToImage!.startsWith('assets')
+                                        ? Image.asset(
+                                            pathToImage!,
+                                            width: 150,
+                                            height: 150,
+                                          )
+                                        : Image.network(
+                                            fit: BoxFit.fill,
+                                            pathToImage!,
+                                            width: 150,
+                                            height: 150,
+                                            loadingBuilder: (context, child,
+                                                loadingProgress) {
+                                              if (loadingProgress == null)
+                                                return child;
+                                              return Center(
+                                                child:
+                                                    CircularProgressIndicator(
+                                                  color: Colors.green,
+                                                  value: loadingProgress
+                                                              .expectedTotalBytes !=
+                                                          null
+                                                      ? loadingProgress
+                                                              .cumulativeBytesLoaded /
+                                                          loadingProgress
+                                                              .expectedTotalBytes!
+                                                      : null,
+                                                ),
+                                              );
+                                            },
+                                          ))
+                                    : Image.asset(
+                                        'assets/defaulticon.png',
+                                        width: 150,
+                                        height: 150,
+                                      ),
+                              ),
+                            ),
+                            Positioned(
+                              bottom: 0,
+                              right: 0,
+                              child: Container(
+                                padding: EdgeInsets.all(6),
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Colors.white,
+                                ),
+                                child: Icon(
+                                  Icons.camera_alt,
+                                  color: Colors.green,
+                                  size: 20,
                                 ),
                               ),
                             ),
-                          ),
+                          ],
                         ),
                       ),
                       const SizedBox(height: 20),

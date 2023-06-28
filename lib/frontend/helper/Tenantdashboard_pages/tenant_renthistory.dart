@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:rehnaa/backend/models/rentpaymentmodel.dart';
 import 'package:rehnaa/backend/services/helperfunctions.dart';
+import 'package:responsive_framework/responsive_scaled_box.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 import '../../Screens/rentpayment_info.dart';
@@ -366,92 +367,99 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
     final Size size = MediaQuery.of(context).size;
     final int pageCount = (_filteredRentPayments().length / _pageSize).ceil();
 
-    return SingleChildScrollView(
+    return ResponsiveScaledBox(
+      width: size.width,
       child: Scaffold(
-        body: Column(
-          children: [
-            Row(
+          body: ListView(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Padding(padding: EdgeInsets.fromLTRB(size.width * 0.2, 20, 0, 0)),
+              Text(
+                'Payment History',
+                style: GoogleFonts.montserrat(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 24.0,
+                  color: const Color(0xff33907c),
+                ),
+              ),
+              SizedBox(width: size.width * 0.04),
+              _buildRefreshButton(),
+            ],
+          ),
+          SizedBox(height: size.height * 0.03),
+          Text(
+            'All Tenant Rentals',
+            style: GoogleFonts.montserrat(
+              fontWeight: FontWeight.bold,
+              // fontStyle: FontStyle.italic,
+              fontSize: size.width * 0.045,
+              color: const Color(0xff33907c),
+            ),
+            textAlign: TextAlign.center,
+          ),
+          SizedBox(height: size.height * 0.01),
+          Center(
+            child: Column(
               children: [
-                Padding(
-                    padding: EdgeInsets.fromLTRB(size.width * 0.2, 20, 0, 0)),
-                Text(
-                  'Payment History',
-                  style: GoogleFonts.montserrat(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 24.0,
-                    color: const Color(0xff33907c),
+                SizedBox(height: size.height * 0.02),
+                Container(
+                  width: 300,
+                  height: 50,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    border:
+                        Border.all(width: 1, color: const Color(0xff33907c)),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: TextFormField(
+                    decoration: const InputDecoration(
+                      labelText: "Search",
+                      suffixIcon: Icon(Icons.search),
+                      border: InputBorder.none,
+                      contentPadding: EdgeInsets.all(10),
+                    ),
+                    onChanged: (value) {
+                      setState(() {
+                        searchText = value; // Update the search query
+                      });
+                    },
                   ),
                 ),
-                SizedBox(width: size.width * 0.04),
-                _buildRefreshButton(),
+                SizedBox(height: size.height * 0.02),
+                _buildLatestMonthWidget(),
               ],
             ),
-            SizedBox(height: size.height * 0.03),
-            Text(
-              'All Tenant Rentals',
-              style: GoogleFonts.montserrat(
-                fontWeight: FontWeight.bold,
-                // fontStyle: FontStyle.italic,
-                fontSize: size.width * 0.045,
-                color: const Color(0xff33907c),
-              ),
-            ),
-            SizedBox(height: size.height * 0.01),
-            Center(
+          ),
+          _rentPaymentSelectorWidget(context),
+          Expanded(
+            child: SingleChildScrollView(
               child: Column(
-                children: [
-                  SizedBox(height: size.height * 0.02),
-                  Container(
-                    width: 300,
-                    height: 50,
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      border:
-                          Border.all(width: 1, color: const Color(0xff33907c)),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: TextFormField(
-                      decoration: const InputDecoration(
-                        labelText: "Search",
-                        suffixIcon: Icon(Icons.search),
-                        border: InputBorder.none,
-                        contentPadding: EdgeInsets.all(10),
-                      ),
-                      onChanged: (value) {
-                        setState(() {
-                          searchText = value; // Update the search query
-                        });
-                      },
-                    ),
-                  ),
-                  SizedBox(height: size.height * 0.02),
-                  _buildLatestMonthWidget(),
-                ],
+                children: _buildRentPaymentCards(0),
               ),
             ),
-            _rentPaymentSelectorWidget(context),
-            Expanded(
-              child: SingleChildScrollView(
-                child: Column(
-                  children: _buildRentPaymentCards(0),
+          ),
+          SizedBox(height: size.height * 0.01),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SmoothPageIndicator(
+                controller: _pageController,
+                count: pageCount,
+                effect: const WormEffect(
+                  dotColor: Colors.grey,
+                  activeDotColor: Color(0xff33907c),
+                  dotHeight: 10.0,
+                  dotWidth: 10.0,
+                  spacing: 8.0,
                 ),
               ),
-            ),
-            SmoothPageIndicator(
-              controller: _pageController,
-              count: pageCount,
-              effect: const WormEffect(
-                dotColor: Colors.grey,
-                activeDotColor: Color(0xff33907c),
-                dotHeight: 10.0,
-                dotWidth: 10.0,
-                spacing: 8.0,
-              ),
-            ),
-            SizedBox(height: size.height * 0.03),
-          ],
-        ),
-      ),
+            ],
+          ),
+          SizedBox(height: size.height * 0.03),
+        ],
+      )),
     );
   }
 

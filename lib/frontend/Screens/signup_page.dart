@@ -7,6 +7,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:crypto/crypto.dart';
+import 'package:google_fonts/google_fonts.dart';
 // import 'package:rehnaa/frontend/helper/Admindashboard_pages/admin_landlordinputhelper.dart';
 
 import 'Landlord/landlord_dashboard.dart';
@@ -284,7 +285,7 @@ class _SignUpPageState extends State<SignUpPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: false,
+      resizeToAvoidBottomInset: true,
       body: SingleChildScrollView(
         child: Container(
           padding: const EdgeInsets.fromLTRB(16.0, 40.0, 16.0, 40.0),
@@ -393,10 +394,11 @@ class _SignUpPageState extends State<SignUpPage> {
     return Text(
       text,
       textAlign: TextAlign.center,
-      style: const TextStyle(
+      style: TextStyle(
         color: Color(0xff33907c),
         fontSize: 22,
         fontWeight: FontWeight.bold,
+        fontFamily: GoogleFonts.montserrat().fontFamily,
       ),
     );
   }
@@ -404,9 +406,10 @@ class _SignUpPageState extends State<SignUpPage> {
   Widget buildSubtitle(String text) {
     return Text(
       text,
-      style: const TextStyle(
+      style: TextStyle(
         color: Color(0xff33907c),
         fontSize: 18,
+        fontFamily: GoogleFonts.montserrat().fontFamily,
       ),
     );
   }
@@ -415,16 +418,18 @@ class _SignUpPageState extends State<SignUpPage> {
       {required Function(String) onChanged, String? errorText}) {
     return TextField(
       onChanged: onChanged,
-      style: const TextStyle(
+      style: TextStyle(
         color: Color(0xff33907c),
         fontSize: 18,
+        fontFamily: GoogleFonts.montserrat().fontFamily,
       ),
       decoration: InputDecoration(
         errorText: errorText,
         labelText: label,
-        labelStyle: const TextStyle(
+        labelStyle: TextStyle(
           color: Color(0xff33907c),
           fontSize: 18,
+          fontFamily: GoogleFonts.montserrat().fontFamily,
         ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(24),
@@ -453,17 +458,19 @@ class _SignUpPageState extends State<SignUpPage> {
     return TextField(
       onChanged: onChanged,
       obscureText: !showPassword,
-      style: const TextStyle(
+      style: TextStyle(
         color: Color(0xff33907c),
         fontSize: 18,
+        fontFamily: GoogleFonts.montserrat().fontFamily,
       ),
       decoration: InputDecoration(
         contentPadding:
             const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
         labelText: label,
-        labelStyle: const TextStyle(
+        labelStyle: TextStyle(
           color: Color(0xff33907c),
           fontSize: 18,
+          fontFamily: GoogleFonts.montserrat().fontFamily,
         ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(24),
@@ -537,6 +544,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   ? Colors.white
                   : const Color(0xff33907c),
               fontSize: 16,
+              fontFamily: GoogleFonts.montserrat().fontFamily,
             ),
           ),
         ),
@@ -575,12 +583,13 @@ class _SignUpPageState extends State<SignUpPage> {
               }
             }
           },
-          child: const Center(
+          child: Center(
             child: Text(
               "Create",
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 18,
+                fontFamily: GoogleFonts.montserrat().fontFamily,
               ),
             ),
           ),
@@ -594,17 +603,19 @@ class _SignUpPageState extends State<SignUpPage> {
       textAlign: TextAlign.center,
       text: TextSpan(
         text: "Already have an account? ",
-        style: const TextStyle(
+        style: TextStyle(
           color: Color(0xff33907c),
           fontSize: 18,
+          fontFamily: GoogleFonts.montserrat().fontFamily,
         ),
         children: <TextSpan>[
           TextSpan(
             text: 'Sign in',
-            style: const TextStyle(
+            style: TextStyle(
               color: Color(0xff33907c),
               fontSize: 18,
               fontWeight: FontWeight.bold,
+              fontFamily: GoogleFonts.montserrat().fontFamily,
             ),
             recognizer: TapGestureRecognizer()
               ..onTap = () {

@@ -428,19 +428,42 @@ class _DealerDashboardContentState extends State<DealerDashboardContent>
                     child: CircleAvatar(
                       radius: 75,
                       child: ClipOval(
-                        child: Image.asset(
-                          dealer.pathToImage != null
-                              ? dealer.pathToImage!
-                              : 'assets/defaulticon.png',
-                          width: 170,
-                          height: 170,
-
-                          //   dealer.pathToImage ?? 'assets/defaulticon.png',
-
-                          //   width: 150,
-                          //   height: 150,
-                          //   fit: BoxFit.cover,
-                        ),
+                        child: dealer.pathToImage != null &&
+                                dealer.pathToImage!.isNotEmpty
+                            ? (dealer.pathToImage!.startsWith('assets')
+                                ? Image.asset(
+                                    dealer.pathToImage!,
+                                    width: 150,
+                                    height: 150,
+                                  )
+                                : Image.network(
+                                    fit: BoxFit.fill,
+                                    dealer.pathToImage!,
+                                    width: 150,
+                                    height: 150,
+                                    loadingBuilder:
+                                        (context, child, loadingProgress) {
+                                      if (loadingProgress == null) return child;
+                                      return Center(
+                                        child: CircularProgressIndicator(
+                                          color: Colors.green,
+                                          value: loadingProgress
+                                                      .expectedTotalBytes !=
+                                                  null
+                                              ? loadingProgress
+                                                      .cumulativeBytesLoaded /
+                                                  loadingProgress
+                                                      .expectedTotalBytes!
+                                              : null,
+                                        ),
+                                      );
+                                    },
+                                  ))
+                            : Image.asset(
+                                'assets/defaulticon.png',
+                                width: 150,
+                                height: 150,
+                              ),
                       ),
                     ),
                   ),

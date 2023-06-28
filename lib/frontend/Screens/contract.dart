@@ -78,51 +78,46 @@ class MyScreen extends StatelessWidget {
             return Scaffold(
               appBar: _buildAppBar(size, context),
               body: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Padding(
-                    padding: EdgeInsets.only(
-                      left: 70,
-                    ),
-                    child: Column(
-                      // mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Padding(
-                            padding: EdgeInsets.only(top: size.height * 0.1)),
-                        // const SizedBox(height: 50),
-                        Card(
-                          elevation: 4.0,
-                          shape: RoundedRectangleBorder(
+                  Column(
+                    // mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Padding(padding: EdgeInsets.only(top: size.height * 0.1)),
+                      // const SizedBox(height: 50),
+                      Card(
+                        elevation: 4.0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20.0),
+                        ),
+                        child: Container(
+                          decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(20.0),
+                            color: Colors.white,
                           ),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(20.0),
-                              color: Colors.white,
-                            ),
-                            padding: const EdgeInsets.all(16.0),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const Icon(
-                                  Icons.description,
-                                  size: 48.0,
-                                  color: Color(0xff33907c),
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(
+                                Icons.description,
+                                size: 48.0,
+                                color: Color(0xff33907c),
+                              ),
+                              const SizedBox(height: 16.0),
+                              Text(
+                                'No contracts to show',
+                                style: GoogleFonts.montserrat(
+                                  fontSize: 20.0,
+                                  color: const Color(0xff33907c),
                                 ),
-                                const SizedBox(height: 16.0),
-                                Text(
-                                  'No contracts to show',
-                                  style: GoogleFonts.montserrat(
-                                    fontSize: 20.0,
-                                    color: const Color(0xff33907c),
-                                  ),
-                                ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
-                        )
-                      ],
-                    ),
+                        ),
+                      )
+                    ],
                   ),
                 ],
               ),

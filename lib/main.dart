@@ -39,20 +39,29 @@ class MyApp extends StatelessWidget {
       child: ChangeNotifierProvider(
         create: (context) => AuthenticationService(),
         child: MaterialApp(
-          builder: (context, child) => ResponsiveBreakpoints.builder(
-            child: BouncingScrollWrapper.builder(context, child!),
-            breakpoints: [
-              const Breakpoint(start: 0, end: 450, name: MOBILE),
-              const Breakpoint(start: 451, end: 800, name: TABLET),
-              const Breakpoint(start: 801, end: 1920, name: DESKTOP),
-              const Breakpoint(start: 1921, end: double.infinity, name: '4K'),
-            ],
-          ),
+          builder: ((context, child) => MediaQuery(
+                data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+                child: ResponsiveBreakpoints.builder(
+                  child: BouncingScrollWrapper.builder(context, child!),
+                  breakpoints: [
+                    const Breakpoint(start: 0, end: 450, name: MOBILE),
+                    const Breakpoint(start: 451, end: 800, name: TABLET),
+                    const Breakpoint(start: 801, end: 1920, name: DESKTOP),
+                    const Breakpoint(
+                        start: 1921, end: double.infinity, name: '4K'),
+                  ],
+                ),
+              )),
+
           debugShowCheckedModeBanner: false,
           title: 'Rehnaa',
           theme: ThemeData(
-            primarySwatch: Colors.blue,
-          ),
+              primarySwatch: Colors.blue,
+              textTheme: const TextTheme(
+                bodyLarge: TextStyle(fontSize: 16),
+                bodyMedium: TextStyle(fontSize: 14),
+                bodySmall: TextStyle(fontSize: 12),
+              )),
           home: LandlordDashboardPage(
             uid: '0RrAUsYh5EO2QH01RVarNP1MIir1',
           ),

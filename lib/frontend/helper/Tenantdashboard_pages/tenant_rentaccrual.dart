@@ -40,19 +40,21 @@ class _TenantRentAccrualPageState extends State<TenantRentAccrualPage> {
 
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
     return Scaffold(
       body: SingleChildScrollView(
         child: Container(
           color: Colors.grey[200], // Set the background color
-          padding: const EdgeInsets.symmetric(
-            vertical: 100.0,
-            horizontal: 16.0,
+          padding: EdgeInsets.symmetric(
+            vertical: size.height * 0.05,
+            horizontal: size.width * 0.05,
           ), // Updated padding
           child: Card(
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20.0),
             ),
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 Padding(
                   padding: EdgeInsets.all(16.0),

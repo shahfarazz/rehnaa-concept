@@ -133,55 +133,51 @@ class _TenantRentedPropertyPageState extends State<TenantRentedPropertyPage> {
                 appBar: _buildAppBar(size, context),
                 body: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Padding(
-                      padding: EdgeInsets.only(
-                        left: 65,
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Column(
-                            children: [
-                              // const SizedBox(height: 50),
-                              Padding(
-                                  padding:
-                                      EdgeInsets.only(top: size.height * 0.1)),
-                              Card(
-                                elevation: 4.0,
-                                shape: RoundedRectangleBorder(
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Column(
+                          children: [
+                            // const SizedBox(height: 50),
+                            Padding(
+                                padding:
+                                    EdgeInsets.only(top: size.height * 0.1)),
+                            Card(
+                              elevation: 4.0,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20.0),
+                              ),
+                              child: Container(
+                                decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(20.0),
+                                  color: Colors.white,
                                 ),
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(20.0),
-                                    color: Colors.white,
-                                  ),
-                                  padding: const EdgeInsets.all(16.0),
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      const Icon(
-                                        Icons.house,
-                                        size: 48.0,
-                                        color: Color(0xff33907c),
+                                padding: const EdgeInsets.all(16.0),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const Icon(
+                                      Icons.house,
+                                      size: 48.0,
+                                      color: Color(0xff33907c),
+                                    ),
+                                    const SizedBox(height: 16.0),
+                                    Text(
+                                      'No rented property yet',
+                                      style: GoogleFonts.montserrat(
+                                        fontSize: 20.0,
+                                        color: const Color(0xff33907c),
                                       ),
-                                      const SizedBox(height: 16.0),
-                                      Text(
-                                        'No rented property yet',
-                                        style: GoogleFonts.montserrat(
-                                          fontSize: 20.0,
-                                          color: const Color(0xff33907c),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
+                                    ),
+                                  ],
                                 ),
-                              )
-                            ],
-                          ),
-                        ],
-                      ),
+                              ),
+                            )
+                          ],
+                        ),
+                      ],
                     ),
                   ],
                 ),
