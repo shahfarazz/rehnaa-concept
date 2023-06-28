@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:rehnaa/backend/models/rentpaymentmodel.dart';
 import 'package:rehnaa/backend/services/helperfunctions.dart';
+import 'package:responsive_framework/responsive_scaled_box.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 import '../Landlorddashboard_pages/skeleton.dart';
@@ -23,7 +24,9 @@ class _DealerRentHistoryPageState extends State<DealerRentHistoryPage>
   List<RentPayment> _rentPayments = [];
   String firstName = '';
   String lastName = '';
+  String searchText = '';
   bool shouldDisplay = false;
+  String pdfUrl = '';
 
   @override
   bool get wantKeepAlive => true;
@@ -225,6 +228,18 @@ class _DealerRentHistoryPageState extends State<DealerRentHistoryPage>
         .toList();
   }
 
+  List<RentPayment> _filteredRentPayments() {
+    if (searchText.isEmpty) {
+      return _rentPayments;
+    } else {
+      final String query = searchText.toLowerCase();
+      return _rentPayments.where((rentPayment) {
+        final String fullName = '${firstName} ${lastName}'.toLowerCase();
+        return fullName.contains(query);
+      }).toList();
+    }
+  }
+
   Widget _buildLatestMonthWidget() {
     final Size size = MediaQuery.of(context).size;
 
@@ -243,6 +258,94 @@ class _DealerRentHistoryPageState extends State<DealerRentHistoryPage>
     } else {
       return Container();
     }
+  }
+
+  Future<void> _loadRentPayments() async {
+    try {
+      // Fetch landlord data from Firestore
+      DocumentSnapshot<Map<String, dynamic>> landlordSnapshot =
+          await FirebaseFirestore.instance
+              .collection('Landlords')
+              .doc(widget.uid)
+              .get();
+
+      Map<String, dynamic>? data = landlordSnapshot.data();
+      List<dynamic> rentPaymentRefs = data!['rentpaymentRef'] ?? [];
+      firstName = data['firstName'];
+      lastName = data['lastName'];
+
+      try {
+        pdfUrl = data['pdfUrl'];
+      } catch (e) {
+        pdfUrl = '';
+      }
+
+      // Fetch each rent payment document using the document references
+      for (DocumentReference<Map<String, dynamic>> rentPaymentRef
+          in rentPaymentRefs) {
+        DocumentSnapshot<Map<String, dynamic>> rentPaymentSnapshot =
+            await rentPaymentRef.get();
+
+        Map<String, dynamic>? data = rentPaymentSnapshot.data();
+
+        if (data != null) {
+          RentPayment rentPayment = await RentPayment.fromJson(data);
+          _rentPayments.add(rentPayment);
+        }
+      }
+      setState(() {
+        shouldDisplay = true;
+      });
+
+      if (kDebugMode) {
+        print('Rent payments: $_rentPayments');
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error fetching rent payments: $e');
+        rethrow;
+      }
+    }
+
+    setState(() {
+      // Update the state to trigger a rebuild with the fetched rent payments
+      _rentPayments = _rentPayments;
+    });
+  }
+
+  Widget _buildRefreshButton() {
+    final Size size = MediaQuery.of(context).size;
+
+    return InkWell(
+      borderRadius: BorderRadius.circular(20),
+      onTap: () {
+        setState(() {
+          _rentPayments.clear();
+          _loadRentPayments();
+          shouldDisplay = false;
+        });
+      },
+      child: Center(
+        child: ShaderMask(
+          shaderCallback: (Rect bounds) {
+            return const LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Color(0xff0FA697),
+                Color(0xff45BF7A),
+                Color(0xff0DF205),
+              ],
+            ).createShader(bounds);
+          },
+          child: Icon(
+            Icons.refresh,
+            color: Colors.white,
+            size: size.width * 0.08,
+          ),
+        ),
+      ),
+    );
   }
 
   Widget _rentPaymentSelectorWidget(BuildContext context) {
@@ -277,10 +380,10 @@ class _DealerRentHistoryPageState extends State<DealerRentHistoryPage>
                 ),
                 const SizedBox(height: 16.0),
                 Text(
-                  'Oops! Nothing to show here...',
+                  'No transactions to show',
                   style: GoogleFonts.montserrat(
                     fontSize: 20.0,
-                    fontWeight: FontWeight.bold,
+                    // fontWeight: FontWeight.bold,
                     color: const Color(0xff33907c),
                   ),
                 ),
@@ -303,28 +406,39 @@ class _DealerRentHistoryPageState extends State<DealerRentHistoryPage>
     super.build(context); // Ensure the mixin's build method is called
 
     final Size size = MediaQuery.of(context).size;
-    final int pageCount = (_rentPayments.length / _pageSize).ceil();
+    final int pageCount = (_filteredRentPayments().length / _pageSize).ceil();
 
-    return Scaffold(
-      body: Column(
+    return ResponsiveScaledBox(
+      width: size.width,
+      child: Scaffold(
+          body: ListView(
         children: [
-          SizedBox(height: size.height * 0.03),
-          Text(
-            'Payment History',
-            style: GoogleFonts.montserrat(
-              fontWeight: FontWeight.bold,
-              fontSize: size.width * 0.05,
-              color: const Color(0xff33907c),
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Padding(padding: EdgeInsets.fromLTRB(size.width * 0.2, 20, 0, 0)),
+              Text(
+                'Payment History',
+                style: GoogleFonts.montserrat(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 24.0,
+                  color: const Color(0xff33907c),
+                ),
+              ),
+              SizedBox(width: size.width * 0.04),
+              _buildRefreshButton(),
+            ],
           ),
           SizedBox(height: size.height * 0.03),
           Text(
             'All Tenant Rentals',
             style: GoogleFonts.montserrat(
               fontWeight: FontWeight.bold,
+              // fontStyle: FontStyle.italic,
               fontSize: size.width * 0.045,
               color: const Color(0xff33907c),
             ),
+            textAlign: TextAlign.center,
           ),
           SizedBox(height: size.height * 0.01),
           Center(
@@ -347,6 +461,11 @@ class _DealerRentHistoryPageState extends State<DealerRentHistoryPage>
                       border: InputBorder.none,
                       contentPadding: EdgeInsets.all(10),
                     ),
+                    onChanged: (value) {
+                      setState(() {
+                        searchText = value; // Update the search query
+                      });
+                    },
                   ),
                 ),
                 SizedBox(height: size.height * 0.02),
@@ -362,20 +481,26 @@ class _DealerRentHistoryPageState extends State<DealerRentHistoryPage>
               ),
             ),
           ),
-          SmoothPageIndicator(
-            controller: _pageController,
-            count: pageCount,
-            effect: const WormEffect(
-              dotColor: Colors.grey,
-              activeDotColor: Color(0xff33907c),
-              dotHeight: 10.0,
-              dotWidth: 10.0,
-              spacing: 8.0,
-            ),
+          SizedBox(height: size.height * 0.01),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SmoothPageIndicator(
+                controller: _pageController,
+                count: pageCount,
+                effect: const WormEffect(
+                  dotColor: Colors.grey,
+                  activeDotColor: Color(0xff33907c),
+                  dotHeight: 10.0,
+                  dotWidth: 10.0,
+                  spacing: 8.0,
+                ),
+              ),
+            ],
           ),
           SizedBox(height: size.height * 0.03),
         ],
-      ),
+      )),
     );
   }
 

@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:rehnaa/frontend/Screens/Landlord/landlord_dashboard.dart';
 import 'package:rehnaa/frontend/Screens/login_page.dart';
 import 'package:rehnaa/frontend/Screens/signup_page.dart';
+import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenant_rented_property.dart';
 import 'backend/services/authentication_service.dart';
 import 'frontend/Screens/Dealer/dealer_dashboard.dart';
 import 'frontend/Screens/Tenant/tenant_dashboard.dart';
@@ -12,6 +13,7 @@ import 'frontend/Screens/Tenant/tenantsignupdetails.dart';
 import 'frontend/Screens/splash.dart';
 import 'firebase_options.dart';
 import 'frontend/helper/Tenantdashboard_pages/tenant_profile.dart';
+import 'package:responsive_framework/responsive_framework.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -37,19 +39,37 @@ class MyApp extends StatelessWidget {
       child: ChangeNotifierProvider(
         create: (context) => AuthenticationService(),
         child: MaterialApp(
+          builder: ((context, child) => MediaQuery(
+                data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+                child: ResponsiveBreakpoints.builder(
+                  child: BouncingScrollWrapper.builder(context, child!),
+                  breakpoints: [
+                    const Breakpoint(start: 0, end: 450, name: MOBILE),
+                    const Breakpoint(start: 451, end: 800, name: TABLET),
+                    const Breakpoint(start: 801, end: 1920, name: DESKTOP),
+                    const Breakpoint(
+                        start: 1921, end: double.infinity, name: '4K'),
+                  ],
+                ),
+              )),
+
           debugShowCheckedModeBanner: false,
           title: 'Rehnaa',
           theme: ThemeData(
-            primarySwatch: Colors.blue,
+              primarySwatch: Colors.blue,
+              textTheme: const TextTheme(
+                bodyLarge: TextStyle(fontSize: 16),
+                bodyMedium: TextStyle(fontSize: 14),
+                bodySmall: TextStyle(fontSize: 12),
+              )),
+          home: LandlordDashboardPage(
+            uid: '0RrAUsYh5EO2QH01RVarNP1MIir1',
           ),
-          // home: LandlordDashboardPage(
-          //   uid: 'R88XI7AqrOZBtGZzQwgyX2Wr7Yz1',
-          // ),
           // home: AdminDashboard(),
-          home: const SplashScreen(),
+          // home: const SplashScreen(),
           // home: DealerDashboardPage(uid: 'fUuFmW7bNaweyP5xkc4c'),
           // home: TenantDashboardPage(
-          //   uid: 'K55YzmkUXt09OgFwnDuT',
+          //   uid: 'GjGmEM8AnvXIebnvKuCvOOkTDpL2',
           // ), //TODO remove this Jugaar
         ),
       ),

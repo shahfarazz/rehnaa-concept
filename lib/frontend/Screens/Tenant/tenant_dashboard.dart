@@ -186,52 +186,59 @@ class _DashboardPageState extends State<TenantDashboardPage>
             },
             child: Stack(
               children: [
-                Transform.translate(
-                  offset: Offset(_isSidebarOpen ? size.width * 0.7 : 0, 0),
-                  child: Column(
-                    children: [
-                      Expanded(
-                        child: PageView.builder(
-                          controller: _pageController,
-                          onPageChanged: (index) {
-                            setState(() {
-                              _currentIndex = index;
-                            });
-                          },
-                          physics: isKeyboardVisible(context)
-                              ? NeverScrollableScrollPhysics()
-                              : const AlwaysScrollableScrollPhysics(),
-                          itemCount: 5,
-                          itemBuilder: (context, index) {
-                            switch (index) {
-                              case 0:
-                                return TenantDashboardContent(
-                                  uid: widget.uid,
-                                  isWithdraw: _isWithdraw,
-                                  onUpdateWithdrawState: updateWithdrawState,
-                                );
-                              case 1:
-                                return TenantRentAccrualPage(
-                                  uid: widget.uid,
-                                );
-                              case 2:
-                                return TenantPropertiesPage(
-                                  uid: widget.uid,
-                                  isWithdraw: _isWithdraw,
-                                );
-                              case 3:
-                                return TenantRentHistoryPage(uid: widget.uid);
-                              case 4:
-                                return TenantProfilePage(uid: widget.uid);
-                              default:
-                                return Container();
-                            }
-                          },
-                        ),
+                LayoutBuilder(
+                  builder: (BuildContext context, BoxConstraints constraints) {
+                    return FractionallySizedBox(
+                      widthFactor: _isSidebarOpen ? 0.7 : 1.0,
+                      alignment: Alignment.centerLeft,
+                      child: Column(
+                        children: [
+                          Expanded(
+                            child: PageView.builder(
+                              controller: _pageController,
+                              onPageChanged: (index) {
+                                setState(() {
+                                  _currentIndex = index;
+                                });
+                              },
+                              physics: isKeyboardVisible(context)
+                                  ? NeverScrollableScrollPhysics()
+                                  : const AlwaysScrollableScrollPhysics(),
+                              itemCount: 5,
+                              itemBuilder: (context, index) {
+                                switch (index) {
+                                  case 0:
+                                    return TenantDashboardContent(
+                                      uid: widget.uid,
+                                      isWithdraw: _isWithdraw,
+                                      onUpdateWithdrawState:
+                                          updateWithdrawState,
+                                    );
+                                  case 1:
+                                    return TenantRentAccrualPage(
+                                      uid: widget.uid,
+                                    );
+                                  case 2:
+                                    return TenantPropertiesPage(
+                                      uid: widget.uid,
+                                      isWithdraw: _isWithdraw,
+                                    );
+                                  case 3:
+                                    return TenantRentHistoryPage(
+                                        uid: widget.uid);
+                                  case 4:
+                                    return TenantProfilePage(uid: widget.uid);
+                                  default:
+                                    return Container();
+                                }
+                              },
+                            ),
+                          ),
+                          _buildBottomNavigationBar(),
+                        ],
                       ),
-                      _buildBottomNavigationBar(),
-                    ],
-                  ),
+                    );
+                  },
                 ),
                 if (_isSidebarOpen) _buildSidebar(size),
               ],
@@ -352,10 +359,10 @@ class _DashboardPageState extends State<TenantDashboardPage>
                         notificationsCount == 0
                             ? ''
                             : notificationsCount.toString(),
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 10,
-                        ),
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                            fontFamily: GoogleFonts.montserrat().fontFamily),
                         textAlign: TextAlign.center,
                       ),
                     );
@@ -608,8 +615,8 @@ class _DashboardPageState extends State<TenantDashboardPage>
           Expanded(
             child: Text(
               label,
-              style: const TextStyle(
-                fontFamily: 'Montserrat',
+              style: TextStyle(
+                fontFamily: GoogleFonts.montserrat().fontFamily,
                 fontSize: 18,
               ),
             ),
@@ -622,12 +629,12 @@ class _DashboardPageState extends State<TenantDashboardPage>
                 color: Colors.red,
                 borderRadius: BorderRadius.circular(8.0),
               ),
-              child: const Text(
+              child: Text(
                 'new',
                 style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 12.0,
-                ),
+                    color: Colors.white,
+                    fontSize: 12.0,
+                    fontFamily: GoogleFonts.montserrat().fontFamily),
               ),
             ),
         ],
@@ -693,16 +700,16 @@ class _DashboardPageState extends State<TenantDashboardPage>
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: <Widget>[
-                                  const Hero(
+                                  Hero(
                                     tag: 'notificationTitle',
                                     child: Text(
                                       'Notifications',
                                       style: TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                        fontFamily: 'Montserrat',
-                                      ),
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                          fontFamily: GoogleFonts.montserrat()
+                                              .fontFamily),
                                     ),
                                   ),
                                   IconButton(
@@ -905,7 +912,7 @@ class _DashboardPageState extends State<TenantDashboardPage>
                                                                   CrossAxisAlignment
                                                                       .start,
                                                               children: <Widget>[
-                                                                const SizedBox(
+                                                                SizedBox(
                                                                   width: 24.0,
                                                                   child:
                                                                       Padding(
@@ -921,6 +928,8 @@ class _DashboardPageState extends State<TenantDashboardPage>
                                                                             24.0,
                                                                         fontWeight:
                                                                             FontWeight.bold,
+                                                                        fontFamily:
+                                                                            GoogleFonts.montserrat().fontFamily,
                                                                         color: Color(
                                                                             0xFF45BF7A),
                                                                       ),
@@ -938,13 +947,11 @@ class _DashboardPageState extends State<TenantDashboardPage>
                                                                     children: [
                                                                       Text(
                                                                         title,
-                                                                        style:
-                                                                            const TextStyle(
-                                                                          fontSize:
-                                                                              18.0,
-                                                                          fontFamily:
-                                                                              'Montserrat',
-                                                                        ),
+                                                                        style: TextStyle(
+                                                                            fontSize:
+                                                                                18.0,
+                                                                            fontFamily:
+                                                                                GoogleFonts.montserrat().fontFamily),
                                                                       ),
                                                                       if (amount
                                                                           .isNotEmpty)
@@ -960,25 +967,19 @@ class _DashboardPageState extends State<TenantDashboardPage>
                                                                               RichText(
                                                                             text:
                                                                                 TextSpan(
-                                                                              style: const TextStyle(
+                                                                              style: TextStyle(
                                                                                 fontSize: 16.0,
-                                                                                fontFamily: 'Montserrat',
+                                                                                fontFamily: GoogleFonts.montserrat().fontFamily,
                                                                                 color: Colors.black,
                                                                               ),
                                                                               children: [
-                                                                                const TextSpan(
+                                                                                TextSpan(
                                                                                   text: 'Amount: ',
-                                                                                  style: TextStyle(
-                                                                                    fontFamily: 'Montserrat',
-                                                                                  ),
+                                                                                  style: TextStyle(fontFamily: GoogleFonts.montserrat().fontFamily),
                                                                                 ),
                                                                                 TextSpan(
                                                                                   text: amount,
-                                                                                  style: const TextStyle(
-                                                                                    fontWeight: FontWeight.bold,
-                                                                                    color: Color(0xFF45BF7A),
-                                                                                    fontFamily: 'Montserrat',
-                                                                                  ),
+                                                                                  style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF45BF7A), fontFamily: GoogleFonts.montserrat().fontFamily),
                                                                                 ),
                                                                               ],
                                                                             ),
@@ -1009,7 +1010,37 @@ class _DashboardPageState extends State<TenantDashboardPage>
                   }
                 }
 
-                return Container(); // Placeholder for loading state or empty state
+                // return a good looking card with error
+                return Center(
+                  child: Card(
+                    elevation: 4.0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(
+                            Icons.error_outline_outlined,
+                            size: 48.0,
+                            color: Color(0xff33907c),
+                          ),
+                          const SizedBox(height: 16.0),
+                          Text(
+                            'No notifications to show',
+                            style: GoogleFonts.montserrat(
+                              fontSize: 20.0,
+                              // fontWeight: FontWeight.bold,
+                              color: const Color(0xff33907c),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
               },
             ),
           ),
@@ -1031,7 +1062,7 @@ class _DashboardPageState extends State<TenantDashboardPage>
       child: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         backgroundColor: Colors.white,
-        selectedItemColor: Colors.black,
+        selectedItemColor: Colors.green,
         unselectedItemColor: Colors.grey,
         showSelectedLabels: true,
         showUnselectedLabels: true,

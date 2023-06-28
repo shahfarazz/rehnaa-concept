@@ -10,6 +10,7 @@ import 'package:rehnaa/frontend/Screens/vouchers.dart';
 import 'package:rehnaa/frontend/helper/Landlorddashboard_pages/landlord_dashboard_content.dart';
 import 'package:rehnaa/frontend/helper/Landlorddashboard_pages/landlord_profile.dart';
 import '../../helper/Landlorddashboard_pages/landlord_advance_rent.dart';
+import '../../helper/Landlorddashboard_pages/landlord_interestfreeloan.dart';
 import '../../helper/Landlorddashboard_pages/landlord_renthistory.dart';
 import '../../helper/Landlorddashboard_pages/landlord_tenants.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -310,9 +311,10 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
                         notificationsCount == 0
                             ? ''
                             : notificationsCount.toString(),
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: Colors.white,
                           fontSize: 10,
+                          fontFamily: GoogleFonts.montserrat().fontFamily,
                         ),
                         textAlign: TextAlign.center,
                       ),
@@ -478,6 +480,21 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
                       },
                     ),
                     _buildSidebarItem(
+                      icon: Icons.receipt,
+                      label: 'Interest Free Loan',
+                      onTap: () {
+                        //firebase call set users isNewVouchers to false
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                InterestFreeLoanPage(uid: widget.uid),
+                          ),
+                        );
+                        // _closeSidebar();
+                      },
+                    ),
+                    _buildSidebarItem(
                       icon: Icons.lock,
                       label: 'Privacy Policy',
                       onTap: () {
@@ -586,8 +603,8 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
           Expanded(
             child: Text(
               label,
-              style: const TextStyle(
-                fontFamily: 'Montserrat',
+              style: TextStyle(
+                fontFamily: GoogleFonts.montserrat().fontFamily,
                 fontSize: 18,
               ),
             ),
@@ -600,11 +617,12 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
                 color: Colors.red,
                 borderRadius: BorderRadius.circular(8.0),
               ),
-              child: const Text(
+              child: Text(
                 'new',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 12.0,
+                  fontFamily: GoogleFonts.montserrat().fontFamily,
                 ),
               ),
             ),
@@ -671,7 +689,7 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: <Widget>[
-                                  const Hero(
+                                  Hero(
                                     tag: 'notificationTitle',
                                     child: Text(
                                       'Notifications',
@@ -679,7 +697,8 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
                                         fontSize: 20,
                                         fontWeight: FontWeight.bold,
                                         color: Colors.white,
-                                        fontFamily: 'Montserrat',
+                                        fontFamily:
+                                            GoogleFonts.montserrat().fontFamily,
                                       ),
                                     ),
                                   ),
@@ -808,7 +827,7 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
                                                             CrossAxisAlignment
                                                                 .start,
                                                         children: <Widget>[
-                                                          const SizedBox(
+                                                          SizedBox(
                                                             width: 24.0,
                                                             child: Padding(
                                                               padding: EdgeInsets
@@ -821,6 +840,9 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
                                                                     TextStyle(
                                                                   fontSize:
                                                                       24.0,
+                                                                  fontFamily: GoogleFonts
+                                                                          .montserrat()
+                                                                      .fontFamily,
                                                                   fontWeight:
                                                                       FontWeight
                                                                           .bold,
@@ -841,11 +863,12 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
                                                                 Text(
                                                                   title,
                                                                   style:
-                                                                      const TextStyle(
+                                                                      TextStyle(
                                                                     fontSize:
                                                                         18.0,
                                                                     fontFamily:
-                                                                        'Montserrat',
+                                                                        GoogleFonts.montserrat()
+                                                                            .fontFamily,
                                                                   ),
                                                                 ),
                                                                 if (amount
@@ -863,31 +886,31 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
                                                                       text:
                                                                           TextSpan(
                                                                         style:
-                                                                            const TextStyle(
+                                                                            TextStyle(
                                                                           fontSize:
                                                                               16.0,
                                                                           fontFamily:
-                                                                              'Montserrat',
+                                                                              GoogleFonts.montserrat().fontFamily,
                                                                           color:
                                                                               Colors.black,
                                                                         ),
                                                                         children: [
-                                                                          const TextSpan(
+                                                                          TextSpan(
                                                                             text:
                                                                                 'Amount: ',
                                                                             style:
                                                                                 TextStyle(
-                                                                              fontFamily: 'Montserrat',
+                                                                              fontFamily: GoogleFonts.montserrat().fontFamily,
                                                                             ),
                                                                           ),
                                                                           TextSpan(
                                                                             text:
                                                                                 amount,
                                                                             style:
-                                                                                const TextStyle(
+                                                                                TextStyle(
                                                                               fontWeight: FontWeight.bold,
                                                                               color: Color(0xFF45BF7A),
-                                                                              fontFamily: 'Montserrat',
+                                                                              fontFamily: GoogleFonts.montserrat().fontFamily,
                                                                             ),
                                                                           ),
                                                                         ],
@@ -919,7 +942,37 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
                   }
                 }
 
-                return Container(); // Placeholder for loading state or empty state
+                // return a good looking card with error
+                return Center(
+                  child: Card(
+                    elevation: 4.0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(
+                            Icons.error_outline_outlined,
+                            size: 48.0,
+                            color: Color(0xff33907c),
+                          ),
+                          const SizedBox(height: 16.0),
+                          Text(
+                            'No notifications to show',
+                            style: GoogleFonts.montserrat(
+                              fontSize: 20.0,
+                              // fontWeight: FontWeight.bold,
+                              color: const Color(0xff33907c),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
               },
             ),
           ),
@@ -941,7 +994,7 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
       child: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         backgroundColor: Colors.white,
-        selectedItemColor: Colors.black,
+        selectedItemColor: Colors.green,
         unselectedItemColor: Colors.grey,
         showSelectedLabels: true,
         showUnselectedLabels: true,

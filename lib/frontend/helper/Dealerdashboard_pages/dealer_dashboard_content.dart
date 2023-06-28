@@ -31,8 +31,7 @@ class DealerDashboardContent extends StatefulWidget {
 
   @override
   // ignore: library_private_types_in_public_api
-  _DealerDashboardContentState createState() =>
-      _DealerDashboardContentState();
+  _DealerDashboardContentState createState() => _DealerDashboardContentState();
 }
 
 class _DealerDashboardContentState extends State<DealerDashboardContent>
@@ -104,13 +103,15 @@ class _DealerDashboardContentState extends State<DealerDashboardContent>
           builder: (BuildContext context, StateSetter setState) {
             // Your AlertDialog code goes here...
             return AlertDialog(
-              title: const Padding(
+              title: Padding(
                 padding:
                     EdgeInsets.only(top: 16.0), // Adjust the value as needed
                 child: Text(
                   'Withdraw Options',
-                  style:
-                      TextStyle(fontSize: 20.0, fontWeight: FontWeight.normal),
+                  style: TextStyle(
+                      fontSize: 20.0,
+                      fontWeight: FontWeight.normal,
+                      fontFamily: GoogleFonts.montserrat().fontFamily),
                 ),
               ),
 
@@ -427,19 +428,42 @@ class _DealerDashboardContentState extends State<DealerDashboardContent>
                     child: CircleAvatar(
                       radius: 75,
                       child: ClipOval(
-                        child: Image.asset(
-                          dealer.pathToImage != null
-                              ? dealer.pathToImage!
-                              : 'assets/defaulticon.png',
-                               width: 170,
-                               height: 170, 
-                            
-                        //   dealer.pathToImage ?? 'assets/defaulticon.png',
-
-                        //   width: 150,
-                        //   height: 150,
-                        //   fit: BoxFit.cover,
-                        ),
+                        child: dealer.pathToImage != null &&
+                                dealer.pathToImage!.isNotEmpty
+                            ? (dealer.pathToImage!.startsWith('assets')
+                                ? Image.asset(
+                                    dealer.pathToImage!,
+                                    width: 150,
+                                    height: 150,
+                                  )
+                                : Image.network(
+                                    fit: BoxFit.fill,
+                                    dealer.pathToImage!,
+                                    width: 150,
+                                    height: 150,
+                                    loadingBuilder:
+                                        (context, child, loadingProgress) {
+                                      if (loadingProgress == null) return child;
+                                      return Center(
+                                        child: CircularProgressIndicator(
+                                          color: Colors.green,
+                                          value: loadingProgress
+                                                      .expectedTotalBytes !=
+                                                  null
+                                              ? loadingProgress
+                                                      .cumulativeBytesLoaded /
+                                                  loadingProgress
+                                                      .expectedTotalBytes!
+                                              : null,
+                                        ),
+                                      );
+                                    },
+                                  ))
+                            : Image.asset(
+                                'assets/defaulticon.png',
+                                width: 150,
+                                height: 150,
+                              ),
                       ),
                     ),
                   ),
@@ -449,7 +473,7 @@ class _DealerDashboardContentState extends State<DealerDashboardContent>
               Center(
                 child: Container(
                   width: size.width * 0.8,
-                  height: size.height * 0.4, // Adjust the height as needed
+                  height: size.height * 0.3, // Adjust the height as needed
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(20),
                     boxShadow: [

@@ -22,30 +22,39 @@ class _DealerLandlordOnboardedPageState
   bool isLoading = true;
 
   Future<List<Landlord>> fetchLandlords() async {
-    DocumentSnapshot<Map<String, dynamic>> documentSnapshot =
-        await FirebaseFirestore.instance
-            .collection('Dealers')
-            .doc(widget.uid)
-            .get();
-
-    Map<String, dynamic>? data = documentSnapshot.data()!;
-    List<dynamic>? landlordRef = data['landlordRef'];
-
-    List<Landlord> landlordList = [];
-
-    for (var landlordID in landlordRef!) {
+    try {
       DocumentSnapshot<Map<String, dynamic>> documentSnapshot =
-          await landlordID.get();
-      Landlord landlord = await Landlord.fromJson(documentSnapshot.data());
-      landlordList.add(landlord);
-    }
+          await FirebaseFirestore.instance
+              .collection('Dealers')
+              .doc(widget.uid)
+              .get();
 
-    setState(() {
-      landlords = landlordList;
-      filteredLandlords = List.from(landlords);
+      Map<String, dynamic>? data = documentSnapshot.data()!;
+      List<dynamic>? landlordRef = data['landlordRef'];
+
+      List<Landlord> landlordList = [];
+
+      for (var landlordID in landlordRef!) {
+        DocumentSnapshot<Map<String, dynamic>> documentSnapshot =
+            await landlordID.get();
+        Landlord landlord = Landlord.fromJson(documentSnapshot.data());
+        landlordList.add(landlord);
+      }
+
+      setState(() {
+        landlords = landlordList;
+        filteredLandlords = List.from(landlords);
+        isLoading = false;
+      });
+      return landlords;
+    } catch (e) {
+      print(e);
+      // setState(() {
       isLoading = false;
-    });
-    return landlords;
+      // });
+
+      return [];
+    }
   }
 
   List<Landlord> filteredLandlords = [];
@@ -87,12 +96,29 @@ class _DealerLandlordOnboardedPageState
 
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
     return Scaffold(
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
-          child: Column(
+          child: ListView(
             children: [
+              // const SizedBox(height: 60),
+              SizedBox(
+                height: size.height * 0.05,
+              ),
+              Container(
+                child: Text("Landlords Onboarded",
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.montserrat(
+                      fontSize: 24,
+                      color: const Color(0xff33907c),
+                      fontWeight: FontWeight.bold,
+                    )),
+              ),
+              SizedBox(
+                height: size.height * 0.05,
+              ),
               Container(
                 decoration: BoxDecoration(
                   color: Colors.white,
@@ -114,63 +140,106 @@ class _DealerLandlordOnboardedPageState
                     color: Colors.black,
                   ),
                   decoration: const InputDecoration(
-                    prefixIcon: Icon(Icons.search),
+                    prefixIcon: Icon(
+                      Icons.search,
+                      color: Colors.green,
+                    ),
                     hintText: 'Search by name',
                     border: InputBorder.none,
                     contentPadding: EdgeInsets.all(20),
                   ),
                 ),
               ),
-              const SizedBox(height: 60),
-              Container(
-                child: Text("Landlords Onboarded",
-                    style: GoogleFonts.montserrat(
-                      fontSize: 24,
-                      color: const Color(0xff33907c),
-                      fontWeight: FontWeight.bold,
-                    )),
-              ),
-              const SizedBox(height: 40),
-              if (isLoading)
-                const Center(
-                  child: CircularProgressIndicator(),
-                ),
+
+              // const SizedBox(height: 40),
+              // if (isLoading)
+              //   const Center(
+              //     child: CircularProgressIndicator(
+              //       color: Colors.green,
+              //     ),
+              //   ),
               Expanded(
-                child: ListView.builder(
-                  itemCount: filteredLandlords.length,
-                  itemBuilder: (context, index) {
-                    final landlord = filteredLandlords[index];
-                    return GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => LandlordsOnboardedInfoPage(
-                              landlord: landlord,
+                child: filteredLandlords.isEmpty
+                    ? Column(children: [
+                        SizedBox(height: size.height * 0.05),
+                        Card(
+                          elevation: 4.0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20.0),
+                          ),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20.0),
+                              color: Colors.white,
+                            ),
+                            padding: const EdgeInsets.all(16.0),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(
+                                  Icons.error_outline,
+                                  size: 48.0,
+                                  color: Color(0xff33907c),
+                                ),
+                                const SizedBox(height: 16.0),
+                                Text(
+                                  'No Landlords onboarded yet',
+                                  textAlign: TextAlign.center,
+                                  style: GoogleFonts.montserrat(
+                                    fontSize: 20.0,
+                                    // fontWeight: FontWeight.bold,
+                                    color: const Color(0xff33907c),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                        );
-                      },
-                      child: Card(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.0),
                         ),
-                        elevation: 5.0,
-                        child: ListTile(
-                          contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 20.0, vertical: 10.0),
-                          title: Text(
-                              landlord.firstName + " " + landlord.lastName,
-                              style:
-                                  const TextStyle(fontWeight: FontWeight.bold)),
-                          trailing: Text(landlord.balance.toString(),
-                              style: const TextStyle(color: Colors.grey)),
-                          subtitle: Text('dummy'),
-                        ),
+                      ])
+                    : ListView.builder(
+                        itemCount: filteredLandlords.length,
+                        itemBuilder: (context, index) {
+                          final landlord = filteredLandlords[index];
+                          return GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      LandlordsOnboardedInfoPage(
+                                    landlord: landlord,
+                                  ),
+                                ),
+                              );
+                            },
+                            child: Card(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10.0),
+                              ),
+                              elevation: 5.0,
+                              child: ListTile(
+                                contentPadding: const EdgeInsets.symmetric(
+                                    horizontal: 20.0, vertical: 10.0),
+                                title: Text(
+                                    landlord.firstName +
+                                        " " +
+                                        landlord.lastName,
+                                    style: TextStyle(
+                                        fontFamily:
+                                            GoogleFonts.montserrat().fontFamily,
+                                        fontWeight: FontWeight.bold)),
+                                trailing: Text(landlord.balance.toString(),
+                                    style: TextStyle(
+                                      color: Colors.grey,
+                                      fontFamily:
+                                          GoogleFonts.montserrat().fontFamily,
+                                    )),
+                                // subtitle: Text('dummy'),
+                              ),
+                            ),
+                          );
+                        },
                       ),
-                    );
-                  },
-                ),
               ),
             ],
           ),

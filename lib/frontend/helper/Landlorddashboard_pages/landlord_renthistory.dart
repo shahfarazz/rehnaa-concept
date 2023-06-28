@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:rehnaa/backend/models/rentpaymentmodel.dart';
 import 'package:rehnaa/backend/services/helperfunctions.dart';
 import 'package:rehnaa/frontend/helper/Dealerdashboard_pages/dealer_renthistory.dart';
+import 'package:responsive_framework/responsive_scaled_box.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 import '../../Screens/rentpayment_info.dart';
@@ -377,12 +378,15 @@ class _LandlordRentHistoryPageState extends State<LandlordRentHistoryPage>
     final Size size = MediaQuery.of(context).size;
     final int pageCount = (_filteredRentPayments().length / _pageSize).ceil();
 
-    return Scaffold(
-      body: Column(
+    return ResponsiveScaledBox(
+      width: size.width,
+      child: Scaffold(
+          body: ListView(
         children: [
           Row(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Padding(padding: EdgeInsets.fromLTRB(size.width * 0.2, 20, 0, 0)),
+              // Padding(padding: EdgeInsets.fromLTRB(size.width * 0.2, 20, 0, 0)),
               Text(
                 'Payment History',
                 style: GoogleFonts.montserrat(
@@ -397,12 +401,14 @@ class _LandlordRentHistoryPageState extends State<LandlordRentHistoryPage>
           ),
           SizedBox(height: size.height * 0.03),
           Text(
-            'All Tenant Property',
+            'All Tenant Rentals',
             style: GoogleFonts.montserrat(
               fontWeight: FontWeight.bold,
+              // fontStyle: FontStyle.italic,
               fontSize: size.width * 0.045,
               color: const Color(0xff33907c),
             ),
+            textAlign: TextAlign.center,
           ),
           SizedBox(height: size.height * 0.01),
           Center(
@@ -427,7 +433,7 @@ class _LandlordRentHistoryPageState extends State<LandlordRentHistoryPage>
                     ),
                     onChanged: (value) {
                       setState(() {
-                        searchText = value;
+                        searchText = value; // Update the search query
                       });
                     },
                   ),
@@ -445,20 +451,26 @@ class _LandlordRentHistoryPageState extends State<LandlordRentHistoryPage>
               ),
             ),
           ),
-          SmoothPageIndicator(
-            controller: _pageController,
-            count: pageCount,
-            effect: const WormEffect(
-              dotColor: Colors.grey,
-              activeDotColor: Color(0xff33907c),
-              dotHeight: 10.0,
-              dotWidth: 10.0,
-              spacing: 8.0,
-            ),
+          SizedBox(height: size.height * 0.01),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SmoothPageIndicator(
+                controller: _pageController,
+                count: pageCount,
+                effect: const WormEffect(
+                  dotColor: Colors.grey,
+                  activeDotColor: Color(0xff33907c),
+                  dotHeight: 10.0,
+                  dotWidth: 10.0,
+                  spacing: 8.0,
+                ),
+              ),
+            ],
           ),
           SizedBox(height: size.height * 0.03),
         ],
-      ),
+      )),
     );
   }
 

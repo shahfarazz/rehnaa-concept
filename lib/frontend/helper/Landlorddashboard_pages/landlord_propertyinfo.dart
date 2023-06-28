@@ -15,6 +15,7 @@ class PropertyPage extends StatefulWidget {
   final String location;
   final String address;
   final String emailOrPhone;
+  final bool isTenantCall;
 
   const PropertyPage(
       {super.key,
@@ -24,7 +25,8 @@ class PropertyPage extends StatefulWidget {
       required this.pathToImage,
       required this.location,
       required this.address,
-      required this.emailOrPhone});
+      required this.emailOrPhone,
+      required this.isTenantCall});
 
   @override
   // ignore: library_private_types_in_public_api
@@ -62,6 +64,7 @@ class _PropertyPageState extends State<PropertyPage> {
                     lastName: widget.lastName,
                     pathToImage: widget.pathToImage,
                     emailOrPhone: widget.emailOrPhone,
+                    isTenantCall: widget.isTenantCall,
                   ),
                 ),
               ],
@@ -204,6 +207,7 @@ class PropertyDetails extends StatelessWidget {
   final String lastName;
   final String pathToImage;
   final String emailOrPhone;
+  final bool isTenantCall;
 
   const PropertyDetails(
       {super.key,
@@ -211,7 +215,8 @@ class PropertyDetails extends StatelessWidget {
       required this.firstName,
       required this.lastName,
       required this.pathToImage,
-      required this.emailOrPhone});
+      required this.emailOrPhone,
+      required this.isTenantCall});
 
   @override
   Widget build(BuildContext context) {
@@ -298,7 +303,7 @@ class PropertyDetails extends StatelessWidget {
                   Text(
                     'Specifications',
                     style: GoogleFonts.montserrat(
-                      fontStyle: FontStyle.italic,
+                      // fontStyle: FontStyle.italic,
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
@@ -362,75 +367,79 @@ class PropertyDetails extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 25),
-                  Text(
-                    'Owner Details',
-                    style: GoogleFonts.montserrat(
-                      fontStyle: FontStyle.italic,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+                  isTenantCall
+                      ? Container()
+                      : Text(
+                          'Owner Details',
+                          style: GoogleFonts.montserrat(
+                            // fontStyle: FontStyle.italic,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                   const SizedBox(height: 10),
                 ],
               ),
               const SizedBox(height: 12),
-              Row(
-                children: [
-                  Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(color: Colors.black, width: 2),
-                    ),
-                    child: const CircleAvatar(
-                      // Replace with the owner's image
-                      backgroundImage: AssetImage('assets/userimage.jpg'),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        // 'hello',
-                        '$firstName $lastName', // Replace with the owner's name fetched from Firebase
-                        style: GoogleFonts.montserrat(
-                          color: const Color(0xFF33907C),
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
-                      ),
-                      Container(
-                        width: 150,
-                        child: Text(
-                          emailOrPhone, // Replace with the owner's phone number fetched from Firebase
-                          style: GoogleFonts.montserrat(
-                            fontSize: 13,
+              isTenantCall
+                  ? Container()
+                  : Row(
+                      children: [
+                        Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(color: Colors.black, width: 2),
+                          ),
+                          child: const CircleAvatar(
+                            // Replace with the owner's image
+                            backgroundImage: AssetImage('assets/userimage.jpg'),
                           ),
                         ),
-                      )
-                    ],
-                  ),
-                  const Spacer(),
-                  // GradientButton(
-                  //   onPressed: () {
-                  //     // handle request button press
-                  //   },
-                  //   text: 'Request',
-                  //   gradientColors: const [
-                  //     Color(0xff0FA697),
-                  //     Color(0xff45BF7A),
-                  //     Color(0xff0DF205),
-                  //   ],
-                  // ),
-                ],
-              ),
+                        const SizedBox(width: 8),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              // 'hello',
+                              '$firstName $lastName', // Replace with the owner's name fetched from Firebase
+                              style: GoogleFonts.montserrat(
+                                color: const Color(0xFF33907C),
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                            ),
+                            Container(
+                              width: 150,
+                              child: Text(
+                                emailOrPhone, // Replace with the owner's phone number fetched from Firebase
+                                style: GoogleFonts.montserrat(
+                                  fontSize: 13,
+                                ),
+                              ),
+                            )
+                          ],
+                        ),
+                        const Spacer(),
+                        // GradientButton(
+                        //   onPressed: () {
+                        //     // handle request button press
+                        //   },
+                        //   text: 'Request',
+                        //   gradientColors: const [
+                        //     Color(0xff0FA697),
+                        //     Color(0xff45BF7A),
+                        //     Color(0xff0DF205),
+                        //   ],
+                        // ),
+                      ],
+                    ),
               SizedBox(height: screenHeight * 0.03),
               Text(
                 'Ratings',
                 style: GoogleFonts.montserrat(
-                  fontStyle: FontStyle.italic,
+                  // fontStyle: FontStyle.italic,
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
@@ -475,7 +484,7 @@ class PropertyDetails extends StatelessWidget {
               Text(
                 'Past Tenant Review',
                 style: GoogleFonts.montserrat(
-                  fontStyle: FontStyle.italic,
+                  // fontStyle: FontStyle.italic,
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),

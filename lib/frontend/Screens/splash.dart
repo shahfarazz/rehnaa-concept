@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:rehnaa/frontend/Screens/Dealer/dealer_dashboard.dart';
 import 'Tenant/tenant_dashboard.dart';
 import 'login_page.dart'; // Import your login page
 import 'Landlord/landlord_dashboard.dart'; // Import your main dashboard page
@@ -52,6 +53,10 @@ class _SplashScreenState extends State<SplashScreen> {
           } else if (data['type'] == 'Landlord') {
             Navigator.of(context).pushReplacement(MaterialPageRoute(
               builder: (context) => LandlordDashboardPage(uid: user.uid),
+            ));
+          } else if (data['type'] == 'Dealer') {
+            Navigator.of(context).pushReplacement(MaterialPageRoute(
+              builder: (context) => DealerDashboardPage(uid: user.uid),
             ));
           } else {
             print('User type not found');

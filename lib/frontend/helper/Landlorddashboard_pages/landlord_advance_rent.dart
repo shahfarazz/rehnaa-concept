@@ -1,5 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
+
 
 import '../../../backend/models/landlordmodel.dart';
 import '../../Screens/Landlord/landlord_dashboard.dart';
@@ -42,26 +45,10 @@ class _LandlordAdvanceRentPageState extends State<LandlordAdvanceRentPage> {
 
   @override
   Widget build(BuildContext context) {
+    final Size size = MediaQuery.of(context).size;
+
     return Scaffold(
-      appBar: //just add a back button
-          AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back_ios,
-            color: Color(0xff45BF7A),
-          ),
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => LandlordDashboardPage(uid: widget.uid),
-              ),
-            );
-          },
-        ),
-      ),
+      appBar: _buildAppBar(size, context),
       body: SingleChildScrollView(
         child: Container(
           color: Colors.grey[200], // Set the background color
@@ -75,7 +62,7 @@ class _LandlordAdvanceRentPageState extends State<LandlordAdvanceRentPage> {
             ),
             child: Column(
               children: [
-                const Padding(
+                Padding(
                   padding: EdgeInsets.all(16.0),
                   child: Column(
                     children: [
@@ -83,8 +70,8 @@ class _LandlordAdvanceRentPageState extends State<LandlordAdvanceRentPage> {
                         'Rent advance',
                         style: TextStyle(
                           fontSize: 22,
+                          fontFamily: GoogleFonts.montserrat().fontFamily,
                           fontWeight: FontWeight.bold,
-                          fontFamily: 'Montserrat',
                           color: Color(0xff45BF7A),
                         ),
                       ),
@@ -101,11 +88,11 @@ class _LandlordAdvanceRentPageState extends State<LandlordAdvanceRentPage> {
                     padding: const EdgeInsets.all(16.0),
                     child: Column(
                       children: [
-                        const Text(
+                        Text(
                           'You can apply for three months advance rent at 3% interest rate per month',
                           style: TextStyle(
                             fontSize: 18,
-                            fontFamily: 'Montserrat',
+                            fontFamily: GoogleFonts.montserrat().fontFamily,
                           ),
                           textAlign: TextAlign.center,
                         ),
@@ -181,7 +168,8 @@ class _LandlordAdvanceRentPageState extends State<LandlordAdvanceRentPage> {
                                       'Your request for rent advance has been sent to the admin.\nRehnaa team will contact you shortly. Thanks',
                                       style: TextStyle(
                                         fontSize: 18,
-                                        fontFamily: 'Montserrat',
+                                        fontFamily:
+                                            GoogleFonts.montserrat().fontFamily,
                                       ),
                                     ),
                                   ),
@@ -198,7 +186,8 @@ class _LandlordAdvanceRentPageState extends State<LandlordAdvanceRentPage> {
                                     style: TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.bold,
-                                      fontFamily: 'Montserrat',
+                                      fontFamily:
+                                          GoogleFonts.montserrat().fontFamily,
                                       color: Colors.white,
                                     ),
                                   ),
@@ -233,16 +222,17 @@ class _LandlordAdvanceRentPageState extends State<LandlordAdvanceRentPage> {
                       children: [
                         Row(
                           children: [
+                            Padding(
+                                padding:
+                                    EdgeInsets.only(left: size.width * 0.27)),
                             Text(
-                              landlord?.dateJoined
-                                      ?.toDate()
-                                      .toString()
-                                      .substring(0, 10) ??
-                                  'Date Joined',
+                              DateFormat('dd MMMM yyyy').format(landlord?.dateJoined?.toDate() ?? DateTime.now()),
+
+                                  // 'Date Joined',
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
-                                fontFamily: 'Montserrat',
+                                fontFamily: GoogleFonts.montserrat().fontFamily,
                                 color: Color(0xff45BF7A),
                               ),
                             ),
@@ -251,11 +241,14 @@ class _LandlordAdvanceRentPageState extends State<LandlordAdvanceRentPage> {
                         SizedBox(height: 10),
                         Row(
                           children: [
+                            Padding(
+                                padding:
+                                    EdgeInsets.only(left: size.width * 0.27)),
                             Text(
                               'Date Joined',
                               style: TextStyle(
                                 fontSize: 16,
-                                fontFamily: 'Montserrat',
+                                fontFamily: GoogleFonts.montserrat().fontFamily,
                               ),
                             ),
                           ],
@@ -270,5 +263,91 @@ class _LandlordAdvanceRentPageState extends State<LandlordAdvanceRentPage> {
         ),
       ),
     );
+  }
+}
+
+PreferredSizeWidget _buildAppBar(Size size, context) {
+  return AppBar(
+    toolbarHeight: 70,
+    title: Padding(
+      padding: EdgeInsets.only(
+        // top: MediaQuery.of(context).size.height * 0.02, // 2% of the page height
+        right:
+            MediaQuery.of(context).size.width * 0.14, // 55% of the page width
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Stack(
+            children: [
+              ClipPath(
+                clipper: HexagonClipper(),
+                child: Transform.scale(
+                  scale: 0.87,
+                  child: Container(
+                    color: Colors.white,
+                    width: 60,
+                    height: 60,
+                  ),
+                ),
+              ),
+              ClipPath(
+                clipper: HexagonClipper(),
+                child: Image.asset(
+                  'assets/mainlogo.png',
+                  width: 60,
+                  height: 60,
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ],
+          ),
+          // const SizedBox(width: 8),
+        ],
+      ),
+    ),
+    actions: <Widget>[
+      Padding(
+        padding: const EdgeInsets.only(top: 15.0),
+        child: Stack(
+          children: [],
+        ),
+      ),
+    ],
+    flexibleSpace: Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Color(0xff0FA697),
+            Color(0xff45BF7A),
+            Color(0xff0DF205),
+          ],
+        ),
+      ),
+    ),
+  );
+}
+
+class HexagonClipper extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    final path = Path();
+    final double controlPointOffset = size.height / 6;
+
+    path.moveTo(size.width / 2, 0);
+    path.lineTo(size.width, size.height / 2 - controlPointOffset);
+    path.lineTo(size.width, size.height / 2 + controlPointOffset);
+    path.lineTo(size.width / 2, size.height);
+    path.lineTo(0, size.height / 2 + controlPointOffset);
+    path.lineTo(0, size.height / 2 - controlPointOffset);
+    path.close();
+    return path;
+  }
+
+  @override
+  bool shouldReclip(CustomClipper<Path> oldClipper) {
+    return false;
   }
 }

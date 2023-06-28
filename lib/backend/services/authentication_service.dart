@@ -5,6 +5,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:rehnaa/frontend/Screens/Landlord/landlord_dashboard.dart';
 
+import '../../frontend/Screens/Dealer/dealer_dashboard.dart';
 import '../../frontend/Screens/Tenant/tenant_dashboard.dart';
 import '../../frontend/Screens/signup_page.dart';
 // import 'package:rehnaa/frontend/helper/Admindashboard_pages/admin_landlordinputhelper.dart';
@@ -190,6 +191,14 @@ class AuthenticationService extends ChangeNotifier {
                     builder: (context) =>
                         LandlordDashboardPage(uid: _auth.currentUser!.uid)),
               );
+            } else if (userDoc.data()!['type'] == 'Dealer') {
+              //push to dealer dashboard
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) =>
+                        DealerDashboardPage(uid: _auth.currentUser!.uid)),
+              );
             }
             isSignInCompleted = true; // Mark sign-in as completed
           },
@@ -257,6 +266,14 @@ class AuthenticationService extends ChangeNotifier {
                               context,
                               MaterialPageRoute(
                                   builder: (context) => LandlordDashboardPage(
+                                      uid: _auth.currentUser!.uid)),
+                            );
+                          } else if (userDoc.data()!['type'] == 'Dealer') {
+                            //push to dealer dashboard
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => DealerDashboardPage(
                                       uid: _auth.currentUser!.uid)),
                             );
                           }
@@ -329,6 +346,14 @@ class AuthenticationService extends ChangeNotifier {
                 builder: (context) =>
                     LandlordDashboardPage(uid: _auth.currentUser!.uid)),
           );
+        } else if (userDoc.data()!['type'] == 'Dealer') {
+          //push to dealer dashboard
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) =>
+                    DealerDashboardPage(uid: _auth.currentUser!.uid)),
+          );
         }
         isSignInCompleted = true; // Mark sign-in as completed
       },
@@ -390,6 +415,14 @@ class AuthenticationService extends ChangeNotifier {
                           context,
                           MaterialPageRoute(
                               builder: (context) => LandlordDashboardPage(
+                                  uid: _auth.currentUser!.uid)),
+                        );
+                      } else if (userDoc.data()!['type'] == 'Dealer') {
+                        //push to dealer dashboard
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => DealerDashboardPage(
                                   uid: _auth.currentUser!.uid)),
                         );
                       }
@@ -465,6 +498,14 @@ class AuthenticationService extends ChangeNotifier {
           MaterialPageRoute(
               builder: (context) =>
                   LandlordDashboardPage(uid: _auth.currentUser!.uid)),
+        );
+      } else if (userDoc.data()!['type'] == 'Dealer') {
+        //push to dealer dashboard
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) =>
+                  DealerDashboardPage(uid: _auth.currentUser!.uid)),
         );
       }
     } catch (e) {
