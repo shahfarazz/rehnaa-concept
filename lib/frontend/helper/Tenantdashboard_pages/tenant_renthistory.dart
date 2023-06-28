@@ -469,7 +469,7 @@ class TenantRentSkeleton extends StatelessWidget {
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
 
-    return SingleChildScrollView(
+    return Expanded(
       child: Column(
         children: <Widget>[
           SizedBox(height: size.height * 0.03),

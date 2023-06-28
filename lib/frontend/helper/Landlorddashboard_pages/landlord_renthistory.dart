@@ -377,7 +377,7 @@ class _LandlordRentHistoryPageState extends State<LandlordRentHistoryPage>
     final Size size = MediaQuery.of(context).size;
     final int pageCount = (_filteredRentPayments().length / _pageSize).ceil();
 
-    return SingleChildScrollView(
+    return Expanded(
       child: Scaffold(
         body: Column(
           children: [

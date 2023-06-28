@@ -305,76 +305,78 @@ class _DealerRentHistoryPageState extends State<DealerRentHistoryPage>
     final Size size = MediaQuery.of(context).size;
     final int pageCount = (_rentPayments.length / _pageSize).ceil();
 
-    return Scaffold(
-      body: Column(
-        children: [
-          SizedBox(height: size.height * 0.03),
-          Text(
-            'Payment History',
-            style: GoogleFonts.montserrat(
-              fontWeight: FontWeight.bold,
-              fontSize: size.width * 0.05,
-              color: const Color(0xff33907c),
-            ),
-          ),
-          SizedBox(height: size.height * 0.03),
-          Text(
-            'All Tenant Rentals',
-            style: GoogleFonts.montserrat(
-              fontWeight: FontWeight.bold,
-              fontSize: size.width * 0.045,
-              color: const Color(0xff33907c),
-            ),
-          ),
-          SizedBox(height: size.height * 0.01),
-          Center(
-            child: Column(
-              children: [
-                SizedBox(height: size.height * 0.02),
-                Container(
-                  width: 300,
-                  height: 50,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    border:
-                        Border.all(width: 1, color: const Color(0xff33907c)),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: TextFormField(
-                    decoration: const InputDecoration(
-                      labelText: "Search",
-                      suffixIcon: Icon(Icons.search),
-                      border: InputBorder.none,
-                      contentPadding: EdgeInsets.all(10),
-                    ),
-                  ),
-                ),
-                SizedBox(height: size.height * 0.02),
-                _buildLatestMonthWidget(),
-              ],
-            ),
-          ),
-          _rentPaymentSelectorWidget(context),
-          Expanded(
-            child: SingleChildScrollView(
-              child: Column(
-                children: _buildRentPaymentCards(0),
+    return Expanded(
+      child: Scaffold(
+        body: Column(
+          children: [
+            SizedBox(height: size.height * 0.03),
+            Text(
+              'Payment History',
+              style: GoogleFonts.montserrat(
+                fontWeight: FontWeight.bold,
+                fontSize: size.width * 0.05,
+                color: const Color(0xff33907c),
               ),
             ),
-          ),
-          SmoothPageIndicator(
-            controller: _pageController,
-            count: pageCount,
-            effect: const WormEffect(
-              dotColor: Colors.grey,
-              activeDotColor: Color(0xff33907c),
-              dotHeight: 10.0,
-              dotWidth: 10.0,
-              spacing: 8.0,
+            SizedBox(height: size.height * 0.03),
+            Text(
+              'All Tenant Rentals',
+              style: GoogleFonts.montserrat(
+                fontWeight: FontWeight.bold,
+                fontSize: size.width * 0.045,
+                color: const Color(0xff33907c),
+              ),
             ),
-          ),
-          SizedBox(height: size.height * 0.03),
-        ],
+            SizedBox(height: size.height * 0.01),
+            Center(
+              child: Column(
+                children: [
+                  SizedBox(height: size.height * 0.02),
+                  Container(
+                    width: 300,
+                    height: 50,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      border:
+                          Border.all(width: 1, color: const Color(0xff33907c)),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: TextFormField(
+                      decoration: const InputDecoration(
+                        labelText: "Search",
+                        suffixIcon: Icon(Icons.search),
+                        border: InputBorder.none,
+                        contentPadding: EdgeInsets.all(10),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: size.height * 0.02),
+                  _buildLatestMonthWidget(),
+                ],
+              ),
+            ),
+            _rentPaymentSelectorWidget(context),
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: _buildRentPaymentCards(0),
+                ),
+              ),
+            ),
+            SmoothPageIndicator(
+              controller: _pageController,
+              count: pageCount,
+              effect: const WormEffect(
+                dotColor: Colors.grey,
+                activeDotColor: Color(0xff33907c),
+                dotHeight: 10.0,
+                dotWidth: 10.0,
+                spacing: 8.0,
+              ),
+            ),
+            SizedBox(height: size.height * 0.03),
+          ],
+        ),
       ),
     );
   }
