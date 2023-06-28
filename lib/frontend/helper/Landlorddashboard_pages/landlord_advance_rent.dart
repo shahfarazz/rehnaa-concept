@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
+
 
 import '../../../backend/models/landlordmodel.dart';
 import '../../Screens/Landlord/landlord_dashboard.dart';
@@ -224,11 +226,9 @@ class _LandlordAdvanceRentPageState extends State<LandlordAdvanceRentPage> {
                                 padding:
                                     EdgeInsets.only(left: size.width * 0.27)),
                             Text(
-                              landlord?.dateJoined
-                                      ?.toDate()
-                                      .toString()
-                                      .substring(0, 10) ??
-                                  'Date Joined',
+                              DateFormat('dd MMMM yyyy').format(landlord?.dateJoined?.toDate() ?? DateTime.now()),
+
+                                  // 'Date Joined',
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
