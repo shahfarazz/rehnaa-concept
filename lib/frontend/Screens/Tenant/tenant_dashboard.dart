@@ -89,23 +89,27 @@ class _DashboardPageState extends State<TenantDashboardPage>
     // also after setting isNewVoucher to true or false, update the isNew variable in the user document
     // which should now be false
 
-    FirebaseFirestore.instance
-        .collection('Tenants')
-        .doc(widget.uid)
-        .get()
-        .then((value) {
-      if (value.exists) {
-        if (value.data()!['isNewVouchers'] == true) {
-          setState(() {
-            isNewVoucher = true;
-          });
-        } else {
-          setState(() {
-            isNewVoucher = false;
-          });
+    try {
+      FirebaseFirestore.instance
+          .collection('Tenants')
+          .doc(widget.uid)
+          .get()
+          .then((value) {
+        if (value.exists) {
+          if (value.data()!['isNewVouchers'] == true) {
+            setState(() {
+              isNewVoucher = true;
+            });
+          } else {
+            setState(() {
+              isNewVoucher = false;
+            });
+          }
         }
-      }
-    });
+      });
+    } catch (e) {
+      print('error is $e');
+    }
   }
 
   Future<void> _markNotificationsAsRead() async {
@@ -521,9 +525,12 @@ class _DashboardPageState extends State<TenantDashboardPage>
                       onTap: () {
                         //firebase call set users isNewVouchers to false
                         FirebaseFirestore.instance
-                            .collection('Landlords')
+                            .collection('Tenants')
                             .doc(widget.uid)
-                            .update({'isNewVouchers': false});
+                            .set({
+                          'isNewVouchers': false,
+                        }, SetOptions(merge: true));
+
                         setState(() {
                           isNewVoucher = false;
                         });

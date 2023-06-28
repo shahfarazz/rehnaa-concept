@@ -83,23 +83,27 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
     // also after setting isNewVoucher to true or false, update the isNew variable in the user document
     // which should now be false
 
-    FirebaseFirestore.instance
-        .collection('Landlords')
-        .doc(widget.uid)
-        .get()
-        .then((value) {
-      if (value.exists) {
-        if (value.data()!['isNewVouchers'] == true) {
-          setState(() {
-            isNewVoucher = true;
-          });
-        } else {
-          setState(() {
-            isNewVoucher = false;
-          });
+    try {
+      FirebaseFirestore.instance
+          .collection('Landlords')
+          .doc(widget.uid)
+          .get()
+          .then((value) {
+        if (value.exists) {
+          if (value.data()!['isNewVouchers'] == true) {
+            setState(() {
+              isNewVoucher = true;
+            });
+          } else {
+            setState(() {
+              isNewVoucher = false;
+            });
+          }
         }
-      }
-    });
+      });
+    } on Exception catch (e) {
+      print('Error is $e');
+    }
   }
 
   void _toggleSidebar() {

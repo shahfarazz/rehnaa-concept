@@ -157,8 +157,38 @@ class _TenantProfilePageState extends State<TenantProfilePage> {
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               GestureDetector(
-                onTap: () {
-                  _uploadImageToFirebase();
+                onTap: () async {
+                  showDialog(
+                    context: context,
+                    barrierDismissible: false,
+                    builder: (BuildContext context) {
+                      return WillPopScope(
+                        onWillPop: () async => Future.value(
+                            false), // Disable back button during upload
+                        child: AlertDialog(
+                          title: Text(
+                            'Uploading Image',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: Colors.green,
+                              fontSize: 20,
+                              fontFamily: GoogleFonts.montserrat().fontFamily,
+                            ),
+                          ),
+                          content: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: <Widget>[
+                              CircularProgressIndicator(color: Colors.green),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  );
+
+                  await _uploadImageToFirebase();
+                  setState(() {});
+                  Navigator.of(context).pop();
                   Navigator.of(context).pop();
                 },
                 child: Container(

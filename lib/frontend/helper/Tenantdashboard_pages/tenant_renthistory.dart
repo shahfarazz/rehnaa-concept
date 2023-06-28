@@ -317,9 +317,7 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
         ),
       );
     } else if (_rentPayments.isEmpty && !shouldDisplay) {
-      return const Expanded(
-        child: TenantRentSkeleton(),
-      );
+      return const TenantRentSkeleton();
     } else {
       return SizedBox(height: size.height * 0.02);
     }
