@@ -544,7 +544,7 @@ class _DealerDashboardContentState extends State<DealerDashboardContent>
                                     borderRadius: BorderRadius.circular(20),
                                     onTap: () {
                                       isWithdraw
-                                          ? someFunction(dealer)
+                                          ? null
                                           : someFunction(
                                               dealer); // Show the option dialog
                                     },

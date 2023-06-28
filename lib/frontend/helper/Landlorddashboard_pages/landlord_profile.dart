@@ -290,7 +290,7 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
                   width: size.width,
                   child: Row(
                     mainAxisSize: MainAxisSize.max,
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.start,
                     children: <Widget>[
                       Icon(
                         Icons.photo_library,

@@ -167,7 +167,7 @@ class _TenantProfilePageState extends State<TenantProfilePage> {
                   width: size.width,
                   child: Row(
                     mainAxisSize: MainAxisSize.max,
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.start,
                     children: <Widget>[
                       Icon(
                         Icons.photo_library,
