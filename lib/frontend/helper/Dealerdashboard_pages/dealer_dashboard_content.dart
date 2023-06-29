@@ -207,7 +207,15 @@ class _DealerDashboardContentState extends State<DealerDashboardContent>
                           double withdrawalAmount = 0.0;
 
                           return AlertDialog(
-                            title: Text('Enter Withdrawal Amount'),
+                            title: Text(
+                              'Enter Withdrawal Amount',
+                              style: TextStyle(
+                                fontSize: 20.0,
+                                fontWeight: FontWeight.normal,
+                                fontFamily: GoogleFonts.montserrat().fontFamily,
+                                color: Colors.green,
+                              ),
+                            ),
                             content: TextField(
                               keyboardType: TextInputType.number,
                               onChanged: (value) {
@@ -217,13 +225,27 @@ class _DealerDashboardContentState extends State<DealerDashboardContent>
                             ),
                             actions: <Widget>[
                               TextButton(
-                                child: Text('Cancel'),
+                                child: Text(
+                                  'Cancel',
+                                  style: TextStyle(
+                                    color: Colors.green,
+                                    fontFamily:
+                                        GoogleFonts.montserrat().fontFamily,
+                                  ),
+                                ),
                                 onPressed: () {
                                   Navigator.of(context).pop();
                                 },
                               ),
                               TextButton(
-                                child: Text('Submit'),
+                                child: Text(
+                                  'Submit',
+                                  style: TextStyle(
+                                    color: Colors.green,
+                                    fontFamily:
+                                        GoogleFonts.montserrat().fontFamily,
+                                  ),
+                                ),
                                 onPressed: () {
                                   if (withdrawalAmount > 0 &&
                                       withdrawalAmount <= dealer.balance) {

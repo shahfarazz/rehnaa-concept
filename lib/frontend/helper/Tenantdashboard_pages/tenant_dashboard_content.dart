@@ -162,7 +162,15 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                           double amount = 0.0;
 
                           return AlertDialog(
-                            title: Text('Enter Payment Amount'),
+                            title: Text(
+                              'Enter Payment Amount',
+                              style: TextStyle(
+                                fontSize: 20.0,
+                                fontWeight: FontWeight.normal,
+                                fontFamily: GoogleFonts.montserrat().fontFamily,
+                                color: Colors.green,
+                              ),
+                            ),
                             content: TextField(
                               keyboardType: TextInputType.number,
                               onChanged: (value) {
@@ -171,13 +179,27 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                             ),
                             actions: <Widget>[
                               TextButton(
-                                child: Text('Cancel'),
+                                child: Text(
+                                  'Cancel',
+                                  style: TextStyle(
+                                    color: Colors.green,
+                                    fontFamily:
+                                        GoogleFonts.montserrat().fontFamily,
+                                  ),
+                                ),
                                 onPressed: () {
                                   Navigator.of(context).pop();
                                 },
                               ),
                               TextButton(
-                                child: Text('Submit'),
+                                child: Text(
+                                  'Submit',
+                                  style: TextStyle(
+                                    color: Colors.green,
+                                    fontFamily:
+                                        GoogleFonts.montserrat().fontFamily,
+                                  ),
+                                ),
                                 onPressed: () {
                                   if (amount > 0 && amount <= tenant.rent) {
                                     Fluttertoast.showToast(

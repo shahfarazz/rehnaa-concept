@@ -12,6 +12,7 @@ import 'package:rehnaa/backend/models/landlordmodel.dart';
 import 'package:rehnaa/frontend/Screens/faq.dart';
 import 'package:rehnaa/frontend/helper/Landlorddashboard_pages/landlordinvoice.dart';
 import 'package:responsive_framework/responsive_scaled_box.dart';
+import '../../Screens/pdfediter.dart';
 import 'skeleton.dart';
 
 class LandlordDashboardContent extends StatefulWidget {
@@ -206,7 +207,15 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
                           double withdrawalAmount = 0.0;
 
                           return AlertDialog(
-                            title: Text('Enter Withdrawal Amount'),
+                            title: Text(
+                              'Enter Withdrawal Amount',
+                              style: TextStyle(
+                                fontSize: 20.0,
+                                fontWeight: FontWeight.normal,
+                                fontFamily: GoogleFonts.montserrat().fontFamily,
+                                color: Colors.green,
+                              ),
+                            ),
                             content: TextField(
                               keyboardType: TextInputType.number,
                               onChanged: (value) {
@@ -216,13 +225,27 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
                             ),
                             actions: <Widget>[
                               TextButton(
-                                child: Text('Cancel'),
+                                child: Text(
+                                  'Cancel',
+                                  style: TextStyle(
+                                    color: Colors.green,
+                                    fontFamily:
+                                        GoogleFonts.montserrat().fontFamily,
+                                  ),
+                                ),
                                 onPressed: () {
                                   Navigator.of(context).pop();
                                 },
                               ),
                               TextButton(
-                                child: Text('Submit'),
+                                child: Text(
+                                  'Submit',
+                                  style: TextStyle(
+                                    color: Colors.green,
+                                    fontFamily:
+                                        GoogleFonts.montserrat().fontFamily,
+                                  ),
+                                ),
                                 onPressed: () {
                                   if (withdrawalAmount > 0 &&
                                       withdrawalAmount <= landlord.balance) {
@@ -551,7 +574,11 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
                                         borderRadius: BorderRadius.circular(20),
                                         onTap: () {
                                           isWithdraw
-                                              ? null
+                                              ? Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          PDFEditorPage()))
                                               : someFunction(
                                                   landlord); // Show the option dialog
                                         },
