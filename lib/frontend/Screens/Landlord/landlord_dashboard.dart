@@ -670,20 +670,18 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
 
                     return Stack(
                       children: <Widget>[
-                        Positioned.fill(
-                          child: Container(
-                            decoration: BoxDecoration(
-                              gradient: const LinearGradient(
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                                colors: [
-                                  Color(0xFF0FA697),
-                                  Color(0xFF45BF7A),
-                                  Color(0xFF0DF205),
-                                ],
-                              ),
-                              borderRadius: BorderRadius.circular(25.0),
+                        Container(
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                Color(0xFF0FA697),
+                                Color(0xFF45BF7A),
+                                Color(0xFF0DF205),
+                              ],
                             ),
+                            borderRadius: BorderRadius.circular(25.0),
                           ),
                         ),
                         Column(

@@ -60,6 +60,7 @@ dependencies:
     flutter_image_compress: ^2.0.3
     geolocator: ^9.0.2
     permission_handler: ^10.4.0
+    geocoding: ^2.1.0
 
     # open_file: ^3.2.1
     # flutter_pdfview: ^1.2.7

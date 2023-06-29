@@ -14,6 +14,7 @@ import 'dart:io';
 import '../../Screens/splash.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:geocoding/geocoding.dart';
 
 class LandlordProfilePage extends StatefulWidget {
   final String uid;
@@ -443,6 +444,32 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
     );
   }
 
+  Future<String> _getLocation() async {
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        return "";
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      // Permissions are denied forever, handle appropriately.
+      return "";
+    }
+
+    // When we reach here, permissions are granted and we can get the location
+    Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+
+    // Geocoding
+    List<Placemark> placemarks =
+        await placemarkFromCoordinates(position.latitude, position.longitude);
+    Placemark place = placemarks[0];
+
+    return '${place.locality}, ${place.administrativeArea}';
+  }
+
   @override
   Widget build(BuildContext context) {
     final authService = AuthenticationService();
@@ -595,10 +622,24 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
                         title: isEmail ? 'Email' : 'Contact',
                         subtitle: contactInfo,
                       ),
-                      const ProfileInfoItem(
-                        icon: Icons.location_on,
-                        title: 'Location',
-                        subtitle: 'Lahore, Punjab',
+                      FutureBuilder<String>(
+                        future: _getLocation(),
+                        builder: (BuildContext context,
+                            AsyncSnapshot<String> snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return CircularProgressIndicator();
+                          } else if (snapshot.hasError ||
+                              snapshot.data == null) {
+                            return Container(); // Empty container, the item will not be shown
+                          } else {
+                            return ProfileInfoItem(
+                              icon: Icons.location_on,
+                              title: 'Location',
+                              subtitle: snapshot.data ?? '', // The location
+                            );
+                          }
+                        },
                       ),
                       StatefulBuilder(
                         builder: (BuildContext context, StateSetter setState) {

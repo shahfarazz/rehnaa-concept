@@ -94,11 +94,12 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        print('Firebase auth id is: ${FirebaseAuth.instance.currentUser!.uid}');
+        // print('Firebase auth id is: ${FirebaseAuth.instance.currentUser!.uid}');
         String selectedOption = '';
 
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setState) {
+            Size size = MediaQuery.of(context).size;
             // Your AlertDialog code goes here...
             return AlertDialog(
               title: Padding(
@@ -113,9 +114,9 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
                 ),
               ),
 
-              titlePadding: const EdgeInsets.fromLTRB(
-                  20.0, 16.0, 16.0, 0.0), // padding above title
-              contentPadding: const EdgeInsets.fromLTRB(16.0, 20.0, 16.0, 8.0),
+              // titlePadding: const EdgeInsets.fromLTRB(
+              //     20.0, 16.0, 16.0, 0.0), // padding above title
+              // contentPadding: const EdgeInsets.fromLTRB(.0, 20.0, 16.0, 8.0),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
@@ -331,6 +332,7 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
     String optionImage = "",
     String optionName = "",
     VoidCallback? onTap,
+    Size? size,
   }) {
     return ListTile(
       leading: selectedOption == optionName
@@ -346,8 +348,13 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
             width: 50,
             height: 30,
           ),
-          const SizedBox(width: 20),
-          Text(optionName),
+          const SizedBox(width: 8.0), // Add some spacing
+          Expanded(
+            child: Text(
+              optionName,
+              style: TextStyle(fontFamily: GoogleFonts.montserrat().fontFamily),
+            ),
+          ),
         ],
       ),
       onTap: onTap,
