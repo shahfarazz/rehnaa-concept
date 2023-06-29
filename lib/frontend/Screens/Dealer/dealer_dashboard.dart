@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:rehnaa/frontend/Screens/contract.dart';
+import 'package:rehnaa/frontend/Screens/new_vouchers.dart';
 import 'package:rehnaa/frontend/Screens/privacypolicy.dart';
 import 'package:rehnaa/frontend/Screens/faq.dart';
 import 'package:rehnaa/frontend/Screens/login_page.dart';
@@ -11,6 +12,7 @@ import 'package:rehnaa/frontend/helper/Dealerdashboard_pages/dealer_dashboard_co
 import 'package:rehnaa/frontend/helper/Dealerdashboard_pages/dealer_renthistory.dart';
 import 'package:rehnaa/frontend/helper/Landlorddashboard_pages/landlord_dashboard_content.dart';
 import 'package:rehnaa/frontend/helper/Landlorddashboard_pages/landlord_profile.dart';
+import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenant_renthistory.dart';
 import '../../helper/Dealerdashboard_pages/dealer_profile.dart';
 import '../../helper/Dealerdashboard_pages/dealerlandlordonboarded.dart';
 import '../../helper/Landlorddashboard_pages/landlord_renthistory.dart';
@@ -153,8 +155,9 @@ class _DealerDashboardPageState extends State<DealerDashboardPage>
                               uid: widget.uid,
                             );
                           case 2:
-                            return DealerRentHistoryPage(
+                            return TenantRentHistoryPage(
                               uid: widget.uid,
+                              callerType: 'Dealers',
                             );
                           case 3:
                             return DealerProfilePage(uid: widget.uid);
@@ -409,7 +412,7 @@ class _DealerDashboardPageState extends State<DealerDashboardPage>
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const VouchersPage(),
+                            builder: (context) => const NewVouchersPage(),
                           ),
                         );
                         // _closeSidebar();

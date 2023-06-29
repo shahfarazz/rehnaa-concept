@@ -48,8 +48,7 @@ class RentPayment {
       if (propertyRef != null) {
         DocumentSnapshot<Map<String, dynamic>> propertySnapshot =
             await propertyRef.get();
-        rentPayment.property =
-            await Property.fromJson(propertySnapshot.data()!);
+        rentPayment.property = Property.fromJson(propertySnapshot.data()!);
       }
 
       // if (tenantRef != null) {

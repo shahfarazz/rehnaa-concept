@@ -15,6 +15,8 @@ import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenant_dashboard_co
 import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenantmonthlyrentoff.dart';
 
 import '../../helper/Tenantdashboard_pages/tenant_rented_property.dart';
+import '../../helper/Tenantdashboard_pages/tenant_security_deposit.dart';
+import '../new_vouchers.dart';
 import '../privacypolicy.dart';
 import '../login_page.dart';
 
@@ -229,7 +231,9 @@ class _DashboardPageState extends State<TenantDashboardPage>
                                     );
                                   case 3:
                                     return TenantRentHistoryPage(
-                                        uid: widget.uid);
+                                      uid: widget.uid,
+                                      callerType: 'Tenants',
+                                    );
                                   case 4:
                                     return TenantProfilePage(uid: widget.uid);
                                   default:
@@ -507,6 +511,21 @@ class _DashboardPageState extends State<TenantDashboardPage>
                       },
                     ),
                     _buildSidebarItem(
+                      icon: Icons.security,
+                      label: 'Security Deposit',
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => TenantSecurityDepositPage(
+                              uid: widget.uid,
+                            ),
+                          ),
+                        );
+                        // _closeSidebar();
+                      },
+                    ),
+                    _buildSidebarItem(
                       icon: Icons.discount,
                       label: 'Rent Off Winners',
                       onTap: () {
@@ -537,10 +556,9 @@ class _DashboardPageState extends State<TenantDashboardPage>
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const VouchersPage(),
+                            builder: (context) => const NewVouchersPage(),
                           ),
                         );
-                        // _closeSidebar();
                       },
                       showBadge: isNewVoucher,
                     ),

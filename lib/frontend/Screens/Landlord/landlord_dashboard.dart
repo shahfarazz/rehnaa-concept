@@ -3,12 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:rehnaa/frontend/Screens/contract.dart';
+import 'package:rehnaa/frontend/Screens/new_vouchers.dart';
 import 'package:rehnaa/frontend/Screens/privacypolicy.dart';
 import 'package:rehnaa/frontend/Screens/faq.dart';
 import 'package:rehnaa/frontend/Screens/login_page.dart';
 import 'package:rehnaa/frontend/Screens/vouchers.dart';
 import 'package:rehnaa/frontend/helper/Landlorddashboard_pages/landlord_dashboard_content.dart';
 import 'package:rehnaa/frontend/helper/Landlorddashboard_pages/landlord_profile.dart';
+import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenant_renthistory.dart';
 import '../../helper/Landlorddashboard_pages/landlord_advance_rent.dart';
 import '../../helper/Landlorddashboard_pages/landlord_interestfreeloan.dart';
 import '../../helper/Landlorddashboard_pages/landlord_renthistory.dart';
@@ -185,7 +187,8 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
                               // isWithdraw: _isWithdraw,
                             );
                           case 3:
-                            return LandlordRentHistoryPage(uid: widget.uid);
+                            return TenantRentHistoryPage(
+                                uid: widget.uid, callerType: 'Landlords');
                           case 4:
                             return LandlordProfilePage(uid: widget.uid);
                           default:
@@ -461,7 +464,7 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const VouchersPage(),
+                            builder: (context) => const NewVouchersPage(),
                           ),
                         );
                         // _closeSidebar();

@@ -3,35 +3,41 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
-import '../../../backend/models/landlordmodel.dart';
+import '../../../backend/models/tenantsmodel.dart';
 import '../../Screens/Landlord/landlord_dashboard.dart';
 
-class LandlordAdvanceRentPage extends StatefulWidget {
+class TenantSecurityDepositPage extends StatefulWidget {
   final String uid;
-  const LandlordAdvanceRentPage({super.key, required this.uid});
+  const TenantSecurityDepositPage({super.key, required this.uid});
 
   @override
-  State<LandlordAdvanceRentPage> createState() =>
-      _LandlordAdvanceRentPageState();
+  State<TenantSecurityDepositPage> createState() =>
+      _TenantSecurityDepositPageState();
 }
 
-class _LandlordAdvanceRentPageState extends State<LandlordAdvanceRentPage> {
-  bool isApplied = false;
-  Landlord? landlord;
+class _TenantSecurityDepositPageState extends State<TenantSecurityDepositPage> {
+  Tenant? tenant;
+  bool isApplySecurity = false;
+  var depositAmount = 100000;
 
-  Future<void> checkIsApplied() async {
-    var myLandlord = await FirebaseFirestore.instance
-        .collection('Landlords')
+  Future<void> checkisApplySecurity() async {
+    var myTenant = await FirebaseFirestore.instance
+        .collection('Tenants')
         .doc(widget.uid)
         .get();
 
     setState(() {
-      landlord = Landlord.fromJson(myLandlord.data()!);
+      tenant = Tenant.fromJson(myTenant.data()!);
     });
 
-    if (myLandlord.data()?['isApplied'] == true) {
+    if (myTenant.data()?['isApplySecurity'] == true) {
       setState(() {
-        isApplied = true;
+        isApplySecurity = true;
+      });
+    }
+    if (myTenant.data()?['depositAmount'] != null) {
+      setState(() {
+        depositAmount = myTenant.data()?['depositAmount'];
       });
     }
   }
@@ -39,7 +45,7 @@ class _LandlordAdvanceRentPageState extends State<LandlordAdvanceRentPage> {
   @override
   void initState() {
     super.initState();
-    checkIsApplied();
+    checkisApplySecurity();
   }
 
   @override
@@ -66,7 +72,7 @@ class _LandlordAdvanceRentPageState extends State<LandlordAdvanceRentPage> {
                   child: Column(
                     children: [
                       Text(
-                        'Rent advance',
+                        'Security Deposit',
                         style: TextStyle(
                           fontSize: 22,
                           fontFamily: GoogleFonts.montserrat().fontFamily,
@@ -77,7 +83,7 @@ class _LandlordAdvanceRentPageState extends State<LandlordAdvanceRentPage> {
                     ],
                   ),
                 ),
-                const SizedBox(height: 20),
+                // const SizedBox(height: 20),
                 Card(
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20.0),
@@ -87,10 +93,53 @@ class _LandlordAdvanceRentPageState extends State<LandlordAdvanceRentPage> {
                     padding: const EdgeInsets.all(16.0),
                     child: Column(
                       children: [
+                        Container(
+                          width: MediaQuery.of(context).size.width * 0.6,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(30.0),
+                            gradient: const LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                Color(0xff0FA697),
+                                Color(0xff45BF7A),
+                                Color(0xff0DF205),
+                              ],
+                            ),
+                          ),
+                          child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              borderRadius: BorderRadius.circular(30.0),
+                              onTap: //nothing
+                                  () {},
+                              child: Ink(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 16.0,
+                                  horizontal: 32.0,
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    // isApplySecurity ? 'Applied' :
+                                    'PKR ${NumberFormat('#,##0').format(depositAmount)}',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      fontFamily:
+                                          GoogleFonts.montserrat().fontFamily,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: size.height * 0.02),
                         Text(
-                          'You can apply for three months advance rent at 3% interest rate per month',
+                          '1 month Security Deposit to Rehnaa can only be withdrawn at the end of the contract from Rehnaa.',
                           style: TextStyle(
-                            fontSize: 18,
+                            fontSize: 16,
                             fontFamily: GoogleFonts.montserrat().fontFamily,
                           ),
                           textAlign: TextAlign.center,
@@ -103,8 +152,12 @@ class _LandlordAdvanceRentPageState extends State<LandlordAdvanceRentPage> {
                             gradient: LinearGradient(
                               begin: Alignment.topLeft,
                               end: Alignment.bottomRight,
-                              colors: isApplied
-                                  ? [Colors.grey, Colors.grey, Colors.grey]
+                              colors: isApplySecurity
+                                  ? [
+                                      Colors.grey,
+                                      Colors.grey,
+                                      Colors.grey,
+                                    ]
                                   : [
                                       Color(0xff0FA697),
                                       Color(0xff45BF7A),
@@ -117,36 +170,41 @@ class _LandlordAdvanceRentPageState extends State<LandlordAdvanceRentPage> {
                             child: InkWell(
                               borderRadius: BorderRadius.circular(30.0),
                               onTap: () {
-                                if (isApplied) {
+                                if (isApplySecurity) {
                                   return;
                                 }
                                 // Handle button press
                                 setState(() {
-                                  isApplied = true;
+                                  isApplySecurity = true;
                                 });
                                 FirebaseFirestore.instance
-                                    .collection('Landlords')
+                                    .collection('Tenants')
                                     .doc(widget.uid)
                                     .set({
-                                  'isApplied': true,
+                                  'isApplySecurity': true,
                                 }, SetOptions(merge: true));
 
-                                //send an AdminRequest for the tenant
+                                // //send an AdminRequest for the tenant
                                 // FirebaseFirestore.instance
                                 //     .collection('AdminRequests')
                                 //     .doc(widget.uid)
-                                //     .set({
-                                //   'rentAccrualRequest': FieldValue.arrayUnion([
-                                //     {
-                                //       'fullname':
-                                //           '${landlord?.firstName} ${landlord?.lastName}',
-                                //       'uid': widget.uid,
-                                //     }
-                                //   ]),
-                                //   'timestamp': Timestamp.now()
-                                // }, SetOptions(merge: true)); //TODO implement this call
+                                //     .set(
+                                //         {
+                                //       'rentAccrualRequest':
+                                //           FieldValue.arrayUnion([
+                                //         {
+                                //           'fullname':
+                                //               '${tenant?.firstName} ${tenant?.lastName}',
+                                //           'uid': widget.uid,
+                                //         }
+                                //       ]),
+                                //       'timestamp': Timestamp.now()
+                                //     },
+                                //         SetOptions(
+                                //             merge:
+                                //                 true)); //TODO implement this call
 
-                                //send a notification to the tenant that the request has been sent
+                                // //send a notification to the tenant that the request has been sent
                                 FirebaseFirestore.instance
                                     .collection('Notifications')
                                     .doc(widget.uid)
@@ -154,17 +212,17 @@ class _LandlordAdvanceRentPageState extends State<LandlordAdvanceRentPage> {
                                   'notifications': FieldValue.arrayUnion([
                                     {
                                       'title':
-                                          'Your request for rent advance has been sent to the admin.',
+                                          'Your request for security deposit withdrawal has been sent to the admin.',
                                     }
                                   ])
                                 }, SetOptions(merge: true));
 
-                                // show in green snackbar that the request has been sent
+                                // // show in green snackbar that the request has been sent
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
                                     backgroundColor: Colors.green,
                                     content: Text(
-                                      'Your request for rent advance has been sent to the admin.\nRehnaa team will contact you shortly. Thanks',
+                                      'Your request for security deposit withdrawal has been sent to the admin.\nRehnaa team will contact you shortly. Thanks',
                                       style: TextStyle(
                                         fontSize: 18,
                                         fontFamily:
@@ -181,7 +239,8 @@ class _LandlordAdvanceRentPageState extends State<LandlordAdvanceRentPage> {
                                 ),
                                 child: Center(
                                   child: Text(
-                                    isApplied ? 'Applied' : 'Apply',
+                                    // isApplySecurity ? 'Applied' :
+                                    'Withdraw',
                                     style: TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.bold,
@@ -227,7 +286,7 @@ class _LandlordAdvanceRentPageState extends State<LandlordAdvanceRentPage> {
                             //         EdgeInsets.only(left: size.width * 0.27)),
                             Text(
                               DateFormat('dd MMMM yyyy').format(
-                                  landlord?.dateJoined?.toDate() ??
+                                  tenant?.dateJoined?.toDate() ??
                                       DateTime.now()),
 
                               // 'Date Joined',
@@ -331,26 +390,4 @@ PreferredSizeWidget _buildAppBar(Size size, context) {
       ),
     ),
   );
-}
-
-class HexagonClipper extends CustomClipper<Path> {
-  @override
-  Path getClip(Size size) {
-    final path = Path();
-    final double controlPointOffset = size.height / 6;
-
-    path.moveTo(size.width / 2, 0);
-    path.lineTo(size.width, size.height / 2 - controlPointOffset);
-    path.lineTo(size.width, size.height / 2 + controlPointOffset);
-    path.lineTo(size.width / 2, size.height);
-    path.lineTo(0, size.height / 2 + controlPointOffset);
-    path.lineTo(0, size.height / 2 - controlPointOffset);
-    path.close();
-    return path;
-  }
-
-  @override
-  bool shouldReclip(CustomClipper<Path> oldClipper) {
-    return false;
-  }
 }

@@ -73,10 +73,45 @@ class LandlordTenantInfoPage extends StatelessWidget {
                 children: [
                   SizedBox(height: size.height * 0.08),
                   CircleAvatar(
-                    radius: size.width * 0.2,
                     backgroundColor: Colors.white,
-                    backgroundImage: AssetImage(
-                      tenant.pathToImage ?? 'assets/defaulticon.png',
+                    radius: 75,
+                    child: ClipOval(
+                      child: tenant.pathToImage != null &&
+                              tenant.pathToImage!.isNotEmpty
+                          ? (tenant.pathToImage!.startsWith('assets')
+                              ? Image.asset(
+                                  tenant.pathToImage!,
+                                  width: 150,
+                                  height: 150,
+                                )
+                              : Image.network(
+                                  fit: BoxFit.fill,
+                                  tenant.pathToImage!,
+                                  width: 150,
+                                  height: 150,
+                                  loadingBuilder:
+                                      (context, child, loadingProgress) {
+                                    if (loadingProgress == null) return child;
+                                    return Center(
+                                      child: CircularProgressIndicator(
+                                        color: Colors.green,
+                                        value: loadingProgress
+                                                    .expectedTotalBytes !=
+                                                null
+                                            ? loadingProgress
+                                                    .cumulativeBytesLoaded /
+                                                loadingProgress
+                                                    .expectedTotalBytes!
+                                            : null,
+                                      ),
+                                    );
+                                  },
+                                ))
+                          : Image.asset(
+                              'assets/defaulticon.png',
+                              width: 150,
+                              height: 150,
+                            ),
                     ),
                   ),
                   const SizedBox(height: 20.0),

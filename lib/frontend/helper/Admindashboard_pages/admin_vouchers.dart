@@ -76,6 +76,16 @@ class _AdminVouchersPageState extends State<AdminVouchersPage> {
         await uploadTask;
         String imageUrl = await storageReference.getDownloadURL();
 
+        //create or update a new collection called Vouchers and add the imageurl to firestore
+
+        await FirebaseFirestore.instance
+            .collection('Vouchers')
+            .doc('voucherkey')
+            .set({
+          //add the url to a list of urls
+          'urls': FieldValue.arrayUnion([imageUrl])
+        }, SetOptions(merge: true));
+
         setState(() {
           isLoading = false;
           Navigator.pushReplacement(
@@ -140,6 +150,12 @@ class _AdminVouchersPageState extends State<AdminVouchersPage> {
           .delete();
       setState(() {
         vouchers.removeAt(index);
+      });
+      FirebaseFirestore.instance
+          .collection('Vouchers')
+          .doc('voucherkey')
+          .update({
+        'urls': FieldValue.arrayRemove([vouchers[index].url])
       });
     } catch (error) {
       print('Error deleting voucher: $error');

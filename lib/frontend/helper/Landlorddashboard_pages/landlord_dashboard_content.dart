@@ -425,6 +425,7 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
                         padding: const EdgeInsets.only(bottom: 8.0),
                         child: CircleAvatar(
                           radius: 75,
+                          backgroundColor: Colors.transparent,
                           child: ClipOval(
                             child: landlord.pathToImage != null &&
                                     landlord.pathToImage!.isNotEmpty

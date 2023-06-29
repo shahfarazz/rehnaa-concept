@@ -2,12 +2,14 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:photo_view/photo_view.dart';
+import 'package:rehnaa/frontend/helper/Landlorddashboard_pages/landlord_tenants.dart';
 
 class Voucher {
   final String url;
@@ -18,7 +20,8 @@ class Voucher {
 }
 
 class VouchersPage extends StatefulWidget {
-  const VouchersPage({Key? key}) : super(key: key);
+  final bool isNewVoucher; // Add isNewVoucher parameter
+  const VouchersPage({Key? key, this.isNewVoucher = false}) : super(key: key);
 
   @override
   _VouchersPageState createState() => _VouchersPageState();
@@ -26,42 +29,50 @@ class VouchersPage extends StatefulWidget {
 
 class _VouchersPageState extends State<VouchersPage>
     with AutomaticKeepAliveClientMixin {
-  Stream<List<Voucher>>? _vouchersStream;
-  Timer? _debounceTimer;
+  late Future<List<Voucher>> _vouchersFuture;
 
   @override
   void initState() {
     super.initState();
-    _vouchersStream = _fetchVouchers().asStream();
+    _vouchersFuture = _fetchVouchers();
   }
 
   @override
   bool get wantKeepAlive => true;
 
-  @override
-  void dispose() {
-    _debounceTimer?.cancel();
-    super.dispose();
-  }
-
   Future<List<Voucher>> _fetchVouchers() async {
     try {
-      firebase_storage.ListResult listResult = await firebase_storage
-          .FirebaseStorage.instance
-          .ref('images/vouchers/')
-          .listAll();
-      List<Voucher> vouchersList = [];
-      for (var ref in listResult.items) {
-        String url = await ref.getDownloadURL();
-        final response = await http.get(Uri.parse(url));
-        Uint8List imageData = await compressImage(response.bodyBytes);
-        vouchersList.add(Voucher(url, ref, MemoryImage(imageData)));
+      // Fetch voucher document from Firestore
+      DocumentSnapshot<Map<String, dynamic>> voucherSnapshot =
+          await FirebaseFirestore.instance
+              .collection('Vouchers')
+              .doc('voucherkey')
+              .get();
+
+      Map<String, dynamic>? data = voucherSnapshot.data();
+      List<dynamic> voucherUrls = data!['urls'] ?? [];
+
+      List<Future<Voucher>> downloadTasks = [];
+
+      for (String url in voucherUrls) {
+        firebase_storage.Reference ref =
+            firebase_storage.FirebaseStorage.instance.refFromURL(url);
+        downloadTasks.add(_fetchVoucher(ref));
       }
+
+      List<Voucher> vouchersList = await Future.wait(downloadTasks);
       return vouchersList;
     } catch (error) {
       print('Error fetching vouchers: $error');
       return [];
     }
+  }
+
+  Future<Voucher> _fetchVoucher(firebase_storage.Reference ref) async {
+    String url = await ref.getDownloadURL();
+    final response = await http.get(Uri.parse(url));
+    Uint8List imageData = await compressImage(response.bodyBytes);
+    return Voucher(url, ref, MemoryImage(imageData));
   }
 
   Future<Uint8List> compressImage(Uint8List imageData) async {
@@ -72,15 +83,6 @@ class _VouchersPageState extends State<VouchersPage>
       quality: 70,
     );
     return Uint8List.fromList(compressedImage!);
-  }
-
-  void _debounceFetchVouchers() {
-    _debounceTimer?.cancel();
-    _debounceTimer = Timer(const Duration(milliseconds: 500), () {
-      setState(() {
-        _vouchersStream = _fetchVouchers().asStream();
-      });
-    });
   }
 
   @override
@@ -138,14 +140,11 @@ class _VouchersPageState extends State<VouchersPage>
   }
 
   Widget buildRoundedImageCards(BuildContext context) {
-    return StreamBuilder<List<Voucher>>(
-      stream: _vouchersStream,
-      initialData: [], // Provide initial data
+    return FutureBuilder<List<Voucher>>(
+      future: _vouchersFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF45BF7A)),
-          );
+          return LandlordTenantSkeleton();
         }
         if (snapshot.hasError) {
           return Text('Error: ${snapshot.error}');
