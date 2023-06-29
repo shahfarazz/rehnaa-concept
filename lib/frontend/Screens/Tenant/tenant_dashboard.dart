@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:rehnaa/frontend/Screens/contract.dart';
 import 'package:rehnaa/frontend/Screens/faq.dart';
 import 'package:rehnaa/frontend/Screens/vouchers.dart';
+import 'package:rehnaa/frontend/helper/Landlorddashboard_pages/landlord_profile.dart';
 import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenant_profile.dart';
 import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenant_properties.dart';
 import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenant_rentaccrual.dart';
@@ -235,7 +236,10 @@ class _DashboardPageState extends State<TenantDashboardPage>
                                       callerType: 'Tenants',
                                     );
                                   case 4:
-                                    return TenantProfilePage(uid: widget.uid);
+                                    return LandlordProfilePage(
+                                      uid: widget.uid,
+                                      callerType: 'Tenants',
+                                    );
                                   default:
                                     return Container();
                                 }

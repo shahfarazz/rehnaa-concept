@@ -72,6 +72,7 @@ class _NewVouchersPageState extends State<NewVouchersPage> {
               ],
             )
           : ListView.builder(
+              addAutomaticKeepAlives: true,
               itemCount: images.length,
               itemBuilder: (context, index) {
                 return Column(

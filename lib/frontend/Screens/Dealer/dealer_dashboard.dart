@@ -160,7 +160,10 @@ class _DealerDashboardPageState extends State<DealerDashboardPage>
                               callerType: 'Dealers',
                             );
                           case 3:
-                            return DealerProfilePage(uid: widget.uid);
+                            return LandlordProfilePage(
+                              uid: widget.uid,
+                              callerType: 'Dealers',
+                            );
                           default:
                             return Container();
                         }

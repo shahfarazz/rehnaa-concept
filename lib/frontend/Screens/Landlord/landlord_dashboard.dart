@@ -190,7 +190,10 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
                             return TenantRentHistoryPage(
                                 uid: widget.uid, callerType: 'Landlords');
                           case 4:
-                            return LandlordProfilePage(uid: widget.uid);
+                            return LandlordProfilePage(
+                              uid: widget.uid,
+                              callerType: 'Landlords',
+                            );
                           default:
                             return Container();
                         }
