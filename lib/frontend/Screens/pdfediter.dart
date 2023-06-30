@@ -256,7 +256,7 @@ class _PDFEditorPageState extends State<PDFEditorPage> {
                       fontFamily: GoogleFonts.montserrat().fontFamily,
                     ),
                   ),
-                  SizedBox(height: size.height * 0.05),
+                  SizedBox(height: size.height * 0.03),
                   Container(
                     height: 300, // Adjust the height and width as needed
                     width: 300,

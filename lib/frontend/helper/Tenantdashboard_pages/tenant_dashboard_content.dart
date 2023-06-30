@@ -7,7 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:rehnaa/backend/models/tenantsmodel.dart';
-import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenantinvoice.dart';
+// import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenantinvoice.dart';
 
 import 'package:responsive_framework/responsive_framework.dart';
 import '../../../backend/models/landlordmodel.dart';
@@ -38,6 +38,9 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
   @override
   bool get wantKeepAlive => true;
   bool isWithdraw = false;
+  double? temp_amount;
+  String? temp_option;
+  Landlord? temp_landlord;
 
   @override
   void initState() {
@@ -534,7 +537,33 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                                               BorderRadius.circular(20),
                                           onTap: () {
                                             isWithdraw
-                                                ? null
+                                                ?
+                                                // temp_option.isEmpty?
+                                                Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            PDFEditorPage(
+                                                              tenantName:
+                                                                  '${tenant.firstName} ${tenant.lastName}',
+                                                              balance: tenant
+                                                                  .rent
+                                                                  .toDouble(),
+                                                              landlordName:
+                                                                  '${temp_landlord?.firstName} ${temp_landlord?.lastName}',
+                                                              amount:
+                                                                  temp_amount!,
+                                                              paymentMode:
+                                                                  temp_option!,
+                                                              uid: widget.uid,
+                                                              landlordAddress:
+                                                                  temp_landlord
+                                                                      ?.address,
+                                                              tenantAddress:
+                                                                  tenant
+                                                                      .address,
+                                                            )),
+                                                  )
                                                 : someFunction(tenant);
                                             // Show the option dialog
                                           },
