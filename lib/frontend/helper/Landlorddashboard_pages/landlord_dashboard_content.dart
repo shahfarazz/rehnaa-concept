@@ -1,6 +1,5 @@
 import 'dart:ui';
 
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -9,7 +8,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:rehnaa/backend/models/landlordmodel.dart';
-import 'package:rehnaa/frontend/Screens/faq.dart';
 import 'package:rehnaa/frontend/helper/Landlorddashboard_pages/landlordinvoice.dart';
 import 'package:responsive_framework/responsive_scaled_box.dart';
 import '../../Screens/pdfediter.dart';
@@ -35,7 +33,7 @@ class LandlordDashboardContent extends StatefulWidget {
 
 class _LandlordDashboardContentState extends State<LandlordDashboardContent>
     with AutomaticKeepAliveClientMixin<LandlordDashboardContent> {
-  late Future<Landlord> _landlordFuture;
+  // late Future<Landlord> _landlordFuture;
   late Stream<DocumentSnapshot<Map<String, dynamic>>> _landlordStream;
 
   @override
@@ -574,11 +572,12 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
                                         borderRadius: BorderRadius.circular(20),
                                         onTap: () {
                                           isWithdraw
-                                              ? Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          PDFEditorPage()))
+                                              ? null
+                                              // Navigator.push(
+                                              //     context,
+                                              //     MaterialPageRoute(
+                                              //         builder: (context) =>
+                                              //             PDFEditorPage()))
                                               : someFunction(
                                                   landlord); // Show the option dialog
                                         },

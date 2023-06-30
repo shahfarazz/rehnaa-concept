@@ -21,6 +21,7 @@ class Tenant {
   String? pathToImage;
   String? tempID;
   Timestamp? dateJoined;
+  String? address;
 
   Tenant(
       {required this.firstName,
@@ -41,7 +42,8 @@ class Tenant {
       this.tempID,
       this.propertyRef,
       this.dateJoined,
-      this.rentpaymentRef});
+      this.rentpaymentRef,
+      this.address});
 
   factory Tenant.fromJson(Map<String, dynamic> json) {
     return Tenant(
@@ -49,7 +51,7 @@ class Tenant {
       lastName: json['lastName'],
       description: json['description'] ?? 'No description',
       rating: json['rating'] ?? 0.0,
-      rent: json['rent'] ?? 0.0,
+      rent: json['balance'] ?? 0.0,
       creditPoints: json['creditPoints'] ?? 0,
       // propertyDetails: json['propertyDetails'] ?? 'No property details',
       cnicNumber: json['cnicNumber'] ?? 'N/A',
@@ -64,6 +66,7 @@ class Tenant {
           ? List<DocumentReference<Map<String, dynamic>>>.from(
               json['rentpaymentRef'].map((ref) => ref as DocumentReference))
           : null,
+      address: json['address'] ?? '',
     );
   }
 

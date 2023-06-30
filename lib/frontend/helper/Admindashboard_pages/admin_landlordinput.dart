@@ -1,23 +1,23 @@
 import 'dart:async';
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/foundation.dart';
+// import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-import 'dart:io';
+// import 'package:image_picker/image_picker.dart';
+// import 'package:firebase_storage/firebase_storage.dart';
+// import 'dart:io';
 import 'package:flutter/services.dart' show rootBundle;
-import 'package:path_provider/path_provider.dart';
+// import 'package:path_provider/path_provider.dart';
 // ignore: avoid_web_libraries_in_flutter
 
-import 'package:crypto/crypto.dart';
-import 'dart:convert';
-import 'dart:html' as html;
+// import 'package:crypto/crypto.dart';
+// import 'dart:convert';
+// import 'dart:html' as html;
 
 import '../../../backend/models/landlordmodel.dart';
-import '../../../backend/models/propertymodel.dart';
+// import '../../../backend/models/propertymodel.dart';
 import 'admin_landlordinputhelper.dart';
 
 class AdminLandlordInputPage extends StatefulWidget {
@@ -49,7 +49,7 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
     List<Landlord> landlordList = [];
 
     for (var doc in querySnapshot.docs) {
-      Landlord landlord = await Landlord.fromJson(doc.data());
+      Landlord landlord = Landlord.fromJson(doc.data());
       landlord.tempID = doc.id;
       landlordList.add(landlord);
     }
@@ -139,6 +139,15 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
                         ),
                       ),
                     ),
+                    ListTile(
+                      leading: const Icon(Icons.home),
+                      title: Text(
+                        'Address: ${landlord.address}',
+                        style: const TextStyle(
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
                     const SizedBox(height: 10),
                     const Text(
                       'Image:',
@@ -206,6 +215,8 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
         TextEditingController(text: landlord.accountNumber ?? '');
     final TextEditingController ibanController =
         TextEditingController(text: landlord.iban ?? '');
+    final TextEditingController addressController =
+        TextEditingController(text: landlord.address ?? '');
 
     final hashedCnic = hashString(cnicController.text);
     final hashedBankName = hashString(bankNameController.text);
@@ -313,6 +324,10 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
                   decoration: const InputDecoration(labelText: 'CNIC'),
                 ),
                 TextField(
+                  controller: addressController,
+                  decoration: const InputDecoration(labelText: 'Address'),
+                ),
+                TextField(
                   controller: bankNameController,
                   decoration: const InputDecoration(labelText: 'Bank Name'),
                 ),
@@ -339,7 +354,7 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
                     FirebaseFirestore.instance
                         .collection('Landlords')
                         .doc(landlord.tempID)
-                        .update({
+                        .set({
                       'firstName': firstNameController.text,
                       'lastName': lastNameController.text,
                       'balance': double.tryParse(balanceController.text) ?? 0.0,
@@ -364,7 +379,10 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
                       'iban': ibanController.text.isNotEmpty
                           ? hashedIban
                           : FieldValue.delete(),
-                    }).then((_) {
+                      'address': addressController.text.isNotEmpty
+                          ? addressController.text
+                          : FieldValue.delete(),
+                    }, SetOptions(merge: true)).then((_) {
                       Fluttertoast.showToast(
                         msg: 'Landlord details updated successfully!',
                         toastLength: Toast.LENGTH_SHORT,

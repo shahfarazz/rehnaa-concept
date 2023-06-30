@@ -11,6 +11,7 @@ import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenantinvoice.dart'
 
 import 'package:responsive_framework/responsive_framework.dart';
 import '../../../backend/models/landlordmodel.dart';
+import '../../Screens/pdfediter.dart';
 import '../Landlorddashboard_pages/landlord_dashboard_content.dart';
 
 class TenantDashboardContent extends StatefulWidget {
@@ -264,16 +265,31 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                                           context,
                                           MaterialPageRoute(
                                               builder: (context) =>
-                                                  TenantInvoicePage(
+                                                  // TenantInvoicePage(
+                                                  //   tenantName:
+                                                  //       '${tenant.firstName} ${tenant.lastName}',
+                                                  //   // paymentDateTime: DateTime.now(),
+                                                  //   rent: tenant.rent,
+                                                  //   amount: amount,
+                                                  //   selectedOption:
+                                                  //       selectedOption,
+                                                  //   id: widget.uid,
+                                                  //   landlord: landlord,
+                                                  // )
+                                                  PDFEditorPage(
                                                     tenantName:
                                                         '${tenant.firstName} ${tenant.lastName}',
-                                                    // paymentDateTime: DateTime.now(),
-                                                    rent: tenant.rent,
+                                                    balance:
+                                                        tenant.rent.toDouble(),
+                                                    landlordName:
+                                                        '${landlord.firstName} ${landlord.lastName}',
                                                     amount: amount,
-                                                    selectedOption:
-                                                        selectedOption,
-                                                    id: widget.uid,
-                                                    landlord: landlord,
+                                                    paymentMode: selectedOption,
+                                                    uid: widget.uid,
+                                                    landlordAddress:
+                                                        landlord.address,
+                                                    tenantAddress:
+                                                        tenant.address,
                                                   )),
                                         );
                                       }
@@ -311,7 +327,7 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
   void someFunction(Tenant tenant) {
     showOptionDialog(() {
       // setState(() {
-      //   isWithdraw = true;
+      isWithdraw = true;
       // });
       widget.onUpdateWithdrawState(false);
     }, tenant);

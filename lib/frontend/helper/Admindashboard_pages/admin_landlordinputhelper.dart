@@ -41,6 +41,7 @@ class _LandlordCardWidgetState extends State<LandlordCardWidget> {
   final TextEditingController raastIdController = TextEditingController();
   final TextEditingController accountNumberController = TextEditingController();
   final TextEditingController ibanController = TextEditingController();
+  final TextEditingController addressController = TextEditingController();
 
   void validateInputs() {
     // Validate input fields and perform necessary actions
@@ -102,7 +103,19 @@ class _LandlordCardWidgetState extends State<LandlordCardWidget> {
       // Display error message or perform necessary actions for empty bank name
       // For example, show a snackbar or toast with an error message
       Fluttertoast.showToast(
-        msg: 'Please select a bank name.',
+        msg: 'Please add a bank name.',
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+      );
+      return;
+    }
+    if (addressController.text.isEmpty) {
+      // Display error message or perform necessary actions for empty bank name
+      // For example, show a snackbar or toast with an error message
+      Fluttertoast.showToast(
+        msg: 'Please enter an address',
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.CENTER,
         backgroundColor: Colors.red,
@@ -168,6 +181,7 @@ class _LandlordCardWidgetState extends State<LandlordCardWidget> {
     final hashedRaastId = hashString(raastIdController.text);
     final hashedAccountNumber = hashString(accountNumberController.text);
     final hashedIban = hashString(ibanController.text);
+    final hashedAddress = hashString(addressController.text);
 
     // Add landlord details to Firestore
     DocumentReference<Map<String, dynamic>> landlordDocRef =
@@ -184,6 +198,7 @@ class _LandlordCardWidgetState extends State<LandlordCardWidget> {
       'raastId': hashedRaastId,
       'accountNumber': hashedAccountNumber,
       'iban': hashedIban,
+      'address': hashedAddress,
     });
 
     // Set landlord reference for the selected dealer
@@ -342,6 +357,10 @@ class _LandlordCardWidgetState extends State<LandlordCardWidget> {
                   TextField(
                     controller: cnicController,
                     decoration: const InputDecoration(labelText: 'CNIC Number'),
+                  ),
+                  TextField(
+                    controller: addressController,
+                    decoration: const InputDecoration(labelText: 'Address'),
                   ),
                   TextField(
                     controller: bankNameController,
