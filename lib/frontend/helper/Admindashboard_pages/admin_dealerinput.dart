@@ -1,7 +1,9 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'dart:html' as html;
@@ -23,7 +25,8 @@ class _AdminDealerInputPageState extends State<AdminDealerInputPage> {
   int itemsPerPage = 10;
   List<html.File>? selectedImages = [];
   String buttonLabel = 'Select Images';
-  String? pathToImage;
+  String pathToImage = '';
+  bool isUploading = false;
 
   //function to fetch the current dealers from firestore
   Future<void> fetchDealers() async {
@@ -57,6 +60,8 @@ class _AdminDealerInputPageState extends State<AdminDealerInputPage> {
       setState(() {
         selectedImages = input.files;
         buttonLabel = 'Images Selected (${selectedImages!.length})';
+        isUploading = true; // start uploading
+        uploadImages(); // Upload images after selecting
       });
     }
   }
@@ -85,6 +90,7 @@ class _AdminDealerInputPageState extends State<AdminDealerInputPage> {
 
         setState(() {
           pathToImage = imageUrl;
+          isUploading = false; // end uploading
         });
       }
     }
@@ -277,74 +283,130 @@ class _AdminDealerInputPageState extends State<AdminDealerInputPage> {
     final TextEditingController firstNameController = TextEditingController();
     final TextEditingController lastNameController = TextEditingController();
     final TextEditingController balanceController = TextEditingController();
-    // final TextEditingController pathToImageController = TextEditingController();
+    bool isUploading =
+        false; // to control if we're currently uploading the image or not
+
+    void validateInputs() {
+      if (firstNameController.text.isEmpty ||
+          lastNameController.text.isEmpty ||
+          balanceController.text.isEmpty ||
+          pathToImage.isEmpty) {
+        return;
+      }
+    }
 
     showDialog(
       context: context,
       builder: (context) {
-        return Dialog(
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const ListTile(
-                  title: Text('Add New Dealer'),
-                ),
-                TextField(
-                  controller: firstNameController,
-                  decoration: const InputDecoration(labelText: 'First Name'),
-                ),
-                TextField(
-                  controller: lastNameController,
-                  decoration: const InputDecoration(labelText: 'Last Name'),
-                ),
-                TextField(
-                  controller: balanceController,
-                  decoration:
-                      const InputDecoration(labelText: 'Dealer Balance'),
-                ),
+        return StatefulBuilder(
+            // Wrap the dialog in a StatefulBuilder to enable updating the state
+            builder: (BuildContext context, setState) {
+          return Dialog(
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const ListTile(
+                    title: Text('Add New Dealer'),
+                  ),
+                  TextField(
+                    controller: firstNameController,
+                    decoration: const InputDecoration(labelText: 'First Name'),
+                  ),
+                  TextField(
+                    controller: lastNameController,
+                    decoration: const InputDecoration(labelText: 'Last Name'),
+                  ),
+                  TextField(
+                    controller: balanceController,
+                    decoration:
+                        const InputDecoration(labelText: 'Dealer Balance'),
+                  ),
 
-                //button to upload image to firebase storage and get the path to image
-                ElevatedButton(
-                  onPressed: selectImages,
-                  child: Text(buttonLabel),
-                ),
-                const SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () async {
-                    // Update the tenant details in Firebase
+                  //button to upload image to firebase storage and get the path to image
+                  ElevatedButton(
+                    onPressed: selectImages,
+                    child: Text(buttonLabel),
+                  ),
+                  if (isUploading)
+                    CircularProgressIndicator(), // show progress indicator when image is uploading
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: !isUploading
+                        ? () async {
+                            var balanceInt =
+                                int.tryParse(balanceController.text) ?? 0;
 
-                    var balanceInt = int.tryParse(balanceController.text) ?? 0;
+                            validateInputs();
 
-                    //before saving call the input validation function
-                    //if input is valid then save the data to firebase
-                    //else show error message
+                            // Generate a random email and password for the dealer
+                            String randomEmail =
+                                "dealer${Random().nextInt(10000)}@example.com"; // ensure it's a unique email
+                            String randomPassword =
+                                "password${Random().nextInt(10000)}"; // simple password, consider making it more complex
 
-                    FirebaseFirestore.instance.collection('Dealers').add({
-                      'firstName': firstNameController.text,
-                      'lastName': lastNameController.text,
-                      'balance': balanceInt,
-                      'pathToImage': pathToImage,
-                    });
+                            try {
+                              // Create a user with the random email and password
+                              UserCredential userCredential = await FirebaseAuth
+                                  .instance
+                                  .createUserWithEmailAndPassword(
+                                email: randomEmail,
+                                password: randomPassword,
+                              );
 
-                    setState(() {
-                      // Update the tenant details in the local list
-                      dealers.add(Dealer(
-                        firstName: firstNameController.text,
-                        lastName: lastNameController.text,
-                        balance: balanceInt.toDouble(),
-                        pathToImage: pathToImage,
-                      ));
-                    });
+                              // Get the uid of the newly created user
+                              String uid = userCredential.user!.uid;
 
-                    Navigator.of(context).pop(); // Close the dialog
-                  },
-                  child: const Text('Save'),
-                ),
-              ],
+                              // Now that the user has been created in Firebase Auth, add them to the Dealers collection in Firestore
+                              FirebaseFirestore.instance
+                                  .collection('Dealers')
+                                  .doc(uid)
+                                  .set({
+                                'firstName': firstNameController.text,
+                                'lastName': lastNameController.text,
+                                'balance': balanceInt,
+                                'pathToImage': pathToImage,
+                                'email':
+                                    randomEmail, // save the email to the Firestore document
+                                'password':
+                                    randomPassword, // save the password to the Firestore document
+                                'uid':
+                                    uid, // save the uid to the Firestore document
+                              }, SetOptions(merge: true));
+
+                              setState(() {
+                                dealers.add(Dealer(
+                                  firstName: firstNameController.text,
+                                  lastName: lastNameController.text,
+                                  balance: balanceInt.toDouble(),
+                                  pathToImage: pathToImage,
+                                  // email:
+                                  //     randomEmail, // optional, if you need it in your Dealer model
+                                  // password:
+                                  //     randomPassword, // optional, if you need it in your Dealer model
+                                  // uid:
+                                  //     uid, // optional, if you need it in your Dealer model
+                                ));
+                              });
+
+                              Navigator.push(context, MaterialPageRoute(
+                                builder: (context) {
+                                  return const AdminDealerInputPage();
+                                },
+                              ));
+                            } catch (e) {
+                              // Handle error
+                              print(e);
+                            }
+                          }
+                        : null,
+                    child: const Text('Save'),
+                  ),
+                ],
+              ),
             ),
-          ),
-        );
+          );
+        });
       },
     );
   }
@@ -448,14 +510,7 @@ class _AdminDealerInputPageState extends State<AdminDealerInputPage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // showDialog(
-          //   context: context,
-          //   builder: (context) {
-          //     return Dialog(
-          //       child: TenantCardWidget(),
-          //     );
-          //   },
-          // );
+          _addNewDealerDialog();
         },
         backgroundColor: const Color(0xff0FA697),
         child: const Icon(Icons.add),
