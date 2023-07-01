@@ -25,13 +25,13 @@ class _AdminRequestsPageState extends State<AdminRequestsPage> {
             print('withdraw request found doc is ${doc["withdrawRequest"]}');
             for (var i = 0; i < doc["withdrawRequest"].length; i++) {
               // add each request to the adminRequests list
-              var withdrawRequest = doc["withdrawRequest"][i];
-              print('data of this is ${withdrawRequest}');
-              print('data of this is ${withdrawRequest["fullname"]}');
-              print('data of this is ${withdrawRequest["amount"].toString()}');
-              print('data of this is ${withdrawRequest["uid"]}');
-              print('data of this is ${withdrawRequest["paymentMethod"]}');
-              print('data of this is ${withdrawRequest["invoiceNumber"]}');
+              // var withdrawRequest = doc["withdrawRequest"][i];
+              // print('data of this is ${withdrawRequest}');
+              // print('data of this is ${withdrawRequest["fullname"]}');
+              // print('data of this is ${withdrawRequest["amount"].toString()}');
+              // print('data of this is ${withdrawRequest["uid"]}');
+              // print('data of this is ${withdrawRequest["paymentMethod"]}');
+              // print('data of this is ${withdrawRequest["invoiceNumber"]}');
               // print('data of this is  ${doc["withdrawRequest"][i]["requestID"]}');
 
               adminRequests.add(
