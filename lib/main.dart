@@ -62,11 +62,11 @@ class MyApp extends StatelessWidget {
                 bodyMedium: TextStyle(fontSize: 14),
                 bodySmall: TextStyle(fontSize: 12),
               )),
-          // home: LandlordDashboardPage(
-          //   uid: '9l1ZrmtJ0lRSSIazEpFf7xWau952',
-          // ),
+          home: LandlordDashboardPage(
+            uid: '9l1ZrmtJ0lRSSIazEpFf7xWau952',
+          ),
           // home: AdminDashboard(),
-          home: const SplashScreen(),
+          // home: const SplashScreen(),
           // home: DealerDashboardPage(uid: 'fUuFmW7bNaweyP5xkc4c'),
           // home: TenantDashboardPage(
           //   uid: 'b8F8kl7Hf2h4dOii1jzUFHsNvzw2',

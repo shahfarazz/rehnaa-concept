@@ -81,6 +81,8 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
         shouldDisplay = true;
       });
 
+      // print('reached here with landlord data as $data');
+
       List<RentPayment> newRentPayments = []; // Store the new rent payments
 
       // Fetch each rent payment document using the document references
@@ -97,6 +99,8 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
               .doc(rentPayment.invoiceNumber)
               .get()
               .then((value) => value.data()!['url']);
+
+          print('rentpayment found and is ${rentPayment}');
           newRentPayments.add(rentPayment); // Add the new rent payment
         }
       }
