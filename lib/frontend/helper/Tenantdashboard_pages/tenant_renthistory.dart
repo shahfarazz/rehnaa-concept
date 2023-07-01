@@ -353,37 +353,6 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
     }
   }
 
-  Widget _buildRefreshButton() {
-    final Size size = MediaQuery.of(context).size;
-
-    return InkWell(
-      borderRadius: BorderRadius.circular(20),
-      onTap: () {
-        _tenantRentPayments(); // Fetch new data on button tap
-      },
-      child: Center(
-        child: ShaderMask(
-          shaderCallback: (Rect bounds) {
-            return const LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Color(0xff0FA697),
-                Color(0xff45BF7A),
-                Color(0xff0DF205),
-              ],
-            ).createShader(bounds);
-          },
-          child: Icon(
-            Icons.refresh,
-            color: Colors.white,
-            size: size.width * 0.08,
-          ),
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     super.build(context); // Ensure the mixin's build method is called
@@ -394,7 +363,7 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
     return ResponsiveScaledBox(
       width: size.width,
       child: Scaffold(
-        body: ListView(
+        body: Column(
           children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -432,8 +401,10 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
                     height: 50,
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
-                      border:
-                          Border.all(width: 1, color: const Color(0xff33907c)),
+                      border: Border.all(
+                        width: 1,
+                        color: const Color(0xff33907c),
+                      ),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: TextFormField(
@@ -457,30 +428,47 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
             ),
             _rentPaymentSelectorWidget(context),
             Expanded(
+              // Wrap the Column with Expanded
               child: SingleChildScrollView(
                 child: Column(
-                  children: _buildRentPaymentCards(0),
+                  mainAxisSize: MainAxisSize.max,
+                  children: [
+                    Container(
+                      height: size.height * 0.5, // Replace with desired height
+                      child: PageView.builder(
+                        itemCount: pageCount,
+                        controller: _pageController,
+                        itemBuilder: (context, index) {
+                          return SingleChildScrollView(
+                            child: Column(
+                              children: _buildRentPaymentCards(index),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    SizedBox(height: size.height * 0.01),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SmoothPageIndicator(
+                          controller: _pageController,
+                          count: pageCount,
+                          effect: const WormEffect(
+                            dotColor: Colors.grey,
+                            activeDotColor: Color(0xff33907c),
+                            dotHeight: 10.0,
+                            dotWidth: 10.0,
+                            spacing: 8.0,
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: size.height * 0.03),
+                  ],
                 ),
               ),
             ),
-            SizedBox(height: size.height * 0.01),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SmoothPageIndicator(
-                  controller: _pageController,
-                  count: pageCount,
-                  effect: const WormEffect(
-                    dotColor: Colors.grey,
-                    activeDotColor: Color(0xff33907c),
-                    dotHeight: 10.0,
-                    dotWidth: 10.0,
-                    spacing: 8.0,
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: size.height * 0.03),
           ],
         ),
       ),

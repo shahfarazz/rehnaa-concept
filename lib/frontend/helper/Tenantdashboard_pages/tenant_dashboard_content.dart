@@ -13,7 +13,8 @@ import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenantinvoice.dart'
 
 import 'package:responsive_framework/responsive_framework.dart';
 import '../../../backend/models/landlordmodel.dart';
-import '../../Screens/pdfeditor.dart';
+import '../../Screens/pdf_landlord.dart';
+import '../../Screens/pdf_tenant.dart';
 import '../Landlorddashboard_pages/landlord_dashboard_content.dart';
 
 class TenantDashboardContent extends StatefulWidget {
@@ -283,22 +284,24 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                                           context,
                                           MaterialPageRoute(
                                               builder: (context) =>
-                                                  PDFEditorPage(
+                                                  PDFEditorTenantPage(
                                                     tenantName:
                                                         '${tenant.firstName} ${tenant.lastName}',
-                                                    balance:
-                                                        tenant.rent.toDouble(),
                                                     landlordName:
                                                         '${landlord.firstName} ${landlord.lastName}',
                                                     amount: amount,
+                                                    invoiceNumber:
+                                                        invoiceNumber,
+                                                    balance:
+                                                        tenant.rent.toDouble(),
                                                     paymentMode: selectedOption,
                                                     uid: widget.uid,
                                                     landlordAddress:
                                                         landlord.address,
                                                     tenantAddress:
                                                         tenant.address,
-                                                    invoiceNumber:
-                                                        invoiceNumber,
+                                                    cnic: landlord.cnic ??
+                                                        'No cnic provided',
                                                   )),
                                         );
                                       }
@@ -390,7 +393,7 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
           return Text('Error: ${snapshot.error}');
         } else if (snapshot.hasData) {
           Map<String, dynamic> json =
-              snapshot.data!.data() as Map<String, dynamic>;
+              snapshot.data?.data() as Map<String, dynamic>;
           // Fetch tenant
           Tenant tenant = Tenant.fromJson(json);
           if (json['isWithdraw'] != null && json['isWithdraw'] == true) {

@@ -35,6 +35,7 @@ class _AdminRequestsPageState extends State<AdminRequestsPage> {
                       ["paymentMethod"],
                   requestID: doc.id,
                   requestType: 'Landlord Withdraw Request',
+                  invoiceNumber: doc["paymentRequest"][i]["invoiceNumber"],
                 ),
               );
             }
@@ -508,6 +509,7 @@ class LandlordWithdrawalCard extends StatelessWidget {
                         'landlordRef': FirebaseFirestore.instance
                             .collection('Landlords')
                             .doc(data.uid),
+                        'invoiceNumber': data.invoiceNumber
                       });
 
                       //reset the state of the page
@@ -687,6 +689,16 @@ class LandlordWithdrawalCard extends StatelessWidget {
                         }
                       ])
                     });
+
+                    //get property's address from the property's document
+                    // store in a local variable
+
+                    var propAddress = await FirebaseFirestore.instance
+                        .collection('Properties')
+                        .doc(data.propertyID)
+                        .get()
+                        .then((value) => value.data()!['address']);
+
                     // set isWithdraw in Tenant's document to false and set propertyRef to the property's document reference
                     FirebaseFirestore.instance
                         .collection('Tenants')
@@ -696,6 +708,7 @@ class LandlordWithdrawalCard extends StatelessWidget {
                       'propertyRef': FirebaseFirestore.instance
                           .collection('Properties')
                           .doc(data.propertyID),
+                      'address': propAddress ?? 'No address provided',
                     }, SetOptions(merge: true));
 
                     //set properties tenantref to the tenant's document reference

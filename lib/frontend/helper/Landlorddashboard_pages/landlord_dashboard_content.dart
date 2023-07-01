@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
@@ -10,7 +11,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:rehnaa/backend/models/landlordmodel.dart';
 import 'package:rehnaa/frontend/helper/Landlorddashboard_pages/landlordinvoice.dart';
 import 'package:responsive_framework/responsive_scaled_box.dart';
-import '../../Screens/pdfeditor.dart';
+import '../../../backend/models/tenantsmodel.dart';
+import '../../Screens/pdf_landlord.dart';
 import 'skeleton.dart';
 
 class LandlordDashboardContent extends StatefulWidget {
@@ -87,6 +89,16 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
     //   }
     //   rethrow;
     // }
+  }
+
+  String generateInvoiceNumber() {
+    var rng = Random();
+    // Generate a random number between 10000 and 99999.
+    int randomNumber = rng.nextInt(90000) + 10000;
+    // Combine the prefix and the random number to form the invoice number.
+    String invoiceNumber =
+        'INV' + DateTime.now().year.toString() + randomNumber.toString();
+    return invoiceNumber;
   }
 
   void showOptionDialog(Function callback, Landlord landlord) {
@@ -245,6 +257,8 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
                                   ),
                                 ),
                                 onPressed: () {
+                                  String invoiceNumber =
+                                      generateInvoiceNumber();
                                   if (withdrawalAmount > 0 &&
                                       withdrawalAmount <= landlord.balance) {
                                     Fluttertoast.showToast(
@@ -284,7 +298,8 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
                                               '${landlord.firstName} ${landlord.lastName}',
                                           'amount': withdrawalAmount,
                                           'paymentMethod': selectedOption,
-                                          'uid': widget.uid
+                                          'uid': widget.uid,
+                                          'invoiceNumber': invoiceNumber,
                                           // Convert to desired format
                                         }
                                       ]),
@@ -295,20 +310,100 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
                                       isWithdraw = true;
                                     });
 
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              LandlordInvoicePage(
-                                                landlordName:
-                                                    '${landlord.firstName} ${landlord.lastName}',
-                                                // paymentDateTime: DateTime.now(),
-                                                balance: landlord.balance,
-                                                amount: withdrawalAmount,
-                                                transactionMode: selectedOption,
-                                                id: widget.uid,
-                                              )),
-                                    );
+                                    //showdialog box let user select particular tenant and then show pdf editor page
+                                    // because we have to use landlord.tenantref.get() and then use that snapshot to get tenant data
+                                    // first listview of tenantref list then futurebuilder to get each tenantref.get() and then use that snapshot to get tenant data
+
+                                    showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return AlertDialog(
+                                            title: Text('Select Tenant'),
+                                            content: Container(
+                                              height: 300,
+                                              width: 300,
+                                              child: ListView.builder(
+                                                itemCount:
+                                                    landlord.tenantRef?.length,
+                                                itemBuilder: (context, index) {
+                                                  return FutureBuilder(
+                                                    future: landlord
+                                                        .tenantRef?[index]
+                                                        .get(),
+                                                    builder:
+                                                        (context, snapshot) {
+                                                      if (snapshot.hasData) {
+                                                        Tenant tenant = Tenant
+                                                            .fromJson(snapshot
+                                                                    .data
+                                                                    ?.data()
+                                                                as Map<String,
+                                                                    dynamic>);
+                                                        return ListTile(
+                                                          title: Text(
+                                                              '${tenant.firstName} ${tenant.lastName}'),
+                                                          onTap: () {
+                                                            Navigator.pop(
+                                                                context);
+                                                            Navigator.push(
+                                                              context,
+                                                              MaterialPageRoute(
+                                                                  builder:
+                                                                      (context) =>
+                                                                          PDFEditorPage(
+                                                                            tenantName:
+                                                                                '${tenant.firstName} ${tenant.lastName}',
+                                                                            balance:
+                                                                                tenant.rent.toDouble(),
+                                                                            landlordName:
+                                                                                '${landlord.firstName} ${landlord.lastName}',
+                                                                            amount:
+                                                                                withdrawalAmount,
+                                                                            paymentMode:
+                                                                                selectedOption,
+                                                                            uid:
+                                                                                widget.uid,
+                                                                            landlordAddress:
+                                                                                landlord.address,
+                                                                            tenantAddress:
+                                                                                tenant.address,
+                                                                            invoiceNumber:
+                                                                                invoiceNumber,
+                                                                          )),
+                                                            );
+                                                          },
+                                                        );
+                                                      } else {
+                                                        return Center(
+                                                            child:
+                                                                CircularProgressIndicator());
+                                                      }
+                                                    },
+                                                  );
+                                                },
+                                              ),
+                                            ),
+                                          );
+                                        });
+
+                                    // Navigator.push(
+                                    //   context,
+                                    //   MaterialPageRoute(
+                                    //       builder: (context) => PDFEditorPage(
+                                    //             tenantName:
+                                    //                 '${tenant.firstName} ${tenant.lastName}',
+                                    //             balance: tenant.rent.toDouble(),
+                                    //             landlordName:
+                                    //                 '${landlord.firstName} ${landlord.lastName}',
+                                    //             amount: withdrawalAmount,
+                                    //             paymentMode: selectedOption,
+                                    //             uid: widget.uid,
+                                    //             landlordAddress:
+                                    //                 landlord.address,
+                                    //             tenantAddress: tenant.address,
+                                    //             invoiceNumber: invoiceNumber,
+                                    //           )),
+                                    // );
                                   } else {
                                     Fluttertoast.showToast(
                                       msg: 'Invalid withdrawal amount',
@@ -418,8 +513,7 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
                 });
               }
             });
-          }
-          else{
+          } else {
             SchedulerBinding.instance!.addPostFrameCallback((_) {
               if (mounted) {
                 setState(() {
