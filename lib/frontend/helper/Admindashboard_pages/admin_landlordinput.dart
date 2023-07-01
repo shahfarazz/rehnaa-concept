@@ -126,7 +126,10 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
                     ListTile(
                       leading: const Icon(Icons.home),
                       title: Text(
-                        'Property Ref: ${landlord.propertyRef.toString()}',
+                        // if property ref exists show yes otherwise no
+
+                        'PropertyRef: ${landlord.propertyRef != null ? 'Yes' : 'No'}',
+                        // 'Property Ref: ${landlord.propertyRef.toString()}',
                         style: const TextStyle(
                           fontSize: 16,
                         ),
@@ -135,7 +138,9 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
                     ListTile(
                       leading: const Icon(Icons.receipt),
                       title: Text(
-                        'Rent Payment Ref: ${landlord.rentpaymentRef?.toString() ?? ''}',
+                        // if rent payment ref exists show yes otherwise no
+                        'RentPaymentRef: ${landlord.rentpaymentRef != null ? 'Yes' : 'No'}',
+                        // 'Rent Payment Ref: ${landlord.rentpaymentRef?.toString() ?? ''}',
                         style: const TextStyle(
                           fontSize: 16,
                         ),
