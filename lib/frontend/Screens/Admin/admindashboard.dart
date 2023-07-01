@@ -6,6 +6,7 @@ import 'package:rehnaa/frontend/helper/Admindashboard_pages/admin_tenantinput.da
 
 import '../../../backend/services/helperfunctions.dart';
 import '../../helper/Admindashboard_pages/admin_analytics.dart';
+import '../../helper/Admindashboard_pages/admin_dealerinput.dart';
 import '../../helper/Admindashboard_pages/admin_landlord_tenant_info.dart';
 import '../../helper/Admindashboard_pages/admin_landlordinput.dart';
 import '../../helper/Admindashboard_pages/admin_propertyinput.dart';
@@ -411,7 +412,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                   CustomButton(
                     color: Colors.teal,
                     icon: Icons.input,
-                    text: 'Landlord Input\nin Dealers Dashboard',
+                    text: 'Landlord Input',
                     onPressed: () {
                       Navigator.push(
                         context,
@@ -442,9 +443,9 @@ class _AdminDashboardState extends State<AdminDashboard> {
                   ),
                   const SizedBox(width: 20),
                   CustomButton(
-                    color: Colors.yellow,
+                    color: Colors.deepPurpleAccent,
                     icon: Icons.person_add,
-                    text: 'More\nTenant Profiles',
+                    text: 'Tenant Input',
                     onPressed: () {
                       Navigator.push(
                         context,
@@ -475,21 +476,34 @@ class _AdminDashboardState extends State<AdminDashboard> {
                   ),
                   const SizedBox(width: 20),
                   CustomButton(
-                    color: Colors.grey,
-                    icon: Icons.visibility_off,
-                    text: 'Hide Profiles\nfrom Each Other',
+                    color: Colors.indigoAccent,
+                    icon: Icons.person_add_alt_1,
+                    text: 'Dealer Input',
                     onPressed: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => AdminPropertyContractsPage(
-                            landlordID: '',
-                            tenantID: '',
-                          ),
+                          builder: (context) => AdminDealerInputPage(),
                         ),
                       );
                     },
                   ),
+                  // CustomButton(
+                  //   color: Colors.grey,
+                  //   icon: Icons.visibility_off,
+                  //   text: 'Hide Profiles\nfrom Each Other',
+                  //   onPressed: () {
+                  //     // Navigator.push(
+                  //     //   context,
+                  //     //   MaterialPageRoute(
+                  //     //     builder: (context) => AdminPropertyContractsPage(
+                  //     //       landlordID: '',
+                  //     //       tenantID: '',
+                  //     //     ),
+                  //     //   ),
+                  //     // );
+                  //   },
+                  // ),
                 ],
               ),
               const SizedBox(height: 20),
