@@ -35,6 +35,7 @@ class _AdminRequestsPageState extends State<AdminRequestsPage> {
                       ["paymentMethod"],
                   requestID: doc.id,
                   requestType: 'Landlord Withdraw Request',
+                  invoiceNumber: doc["paymentRequest"][i]["invoiceNumber"],
                 ),
               );
             }
@@ -59,6 +60,7 @@ class _AdminRequestsPageState extends State<AdminRequestsPage> {
                   cashOrBankTransfer: doc["paymentRequest"][i]["paymentMethod"],
                   requestID: doc.id,
                   requestType: 'Tenant Payment Request',
+                  invoiceNumber: doc["paymentRequest"][i]["invoiceNumber"],
                 ),
               );
             }
@@ -320,6 +322,7 @@ class AdminRequestData {
   final String requestID;
   DocumentReference<Map<String, dynamic>>? propertyLandlordRef;
   String? propertyID;
+  String? invoiceNumber;
 
   AdminRequestData({
     required this.name,
@@ -332,6 +335,7 @@ class AdminRequestData {
     required this.requestID,
     this.propertyLandlordRef,
     this.propertyID,
+    this.invoiceNumber,
   });
 }
 
@@ -505,6 +509,7 @@ class LandlordWithdrawalCard extends StatelessWidget {
                         'landlordRef': FirebaseFirestore.instance
                             .collection('Landlords')
                             .doc(data.uid),
+                        'invoiceNumber': data.invoiceNumber
                       });
 
                       //reset the state of the page
@@ -533,7 +538,7 @@ class LandlordWithdrawalCard extends StatelessWidget {
                           .doc(data.uid)
                           .update({
                         'balance': FieldValue.increment(
-                            int.parse(data.requestedAmount!)),
+                            -int.parse(data.requestedAmount!)),
                       });
                       //remove the payment request
                       FirebaseFirestore.instance
@@ -585,6 +590,7 @@ class LandlordWithdrawalCard extends StatelessWidget {
                             .collection('Tenants')
                             .doc(data.uid),
                         'landlordRef': null,
+                        'invoiceNumber': data.invoiceNumber
                       });
 
                       // set the tenant's rentPaymentRef to tenant's own id reference which is data.requestID
@@ -596,6 +602,14 @@ class LandlordWithdrawalCard extends StatelessWidget {
                           rentPaymentRef,
                         ])
                       });
+
+                      //reset the state of the page
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const AdminRequestsPage(),
+                        ),
+                      );
                     }
                   } else if (data.requestType == 'Tenant Rental Request') {
                     //rental request
@@ -675,6 +689,16 @@ class LandlordWithdrawalCard extends StatelessWidget {
                         }
                       ])
                     });
+
+                    //get property's address from the property's document
+                    // store in a local variable
+
+                    var propAddress = await FirebaseFirestore.instance
+                        .collection('Properties')
+                        .doc(data.propertyID)
+                        .get()
+                        .then((value) => value.data()!['address']);
+
                     // set isWithdraw in Tenant's document to false and set propertyRef to the property's document reference
                     FirebaseFirestore.instance
                         .collection('Tenants')
@@ -684,6 +708,7 @@ class LandlordWithdrawalCard extends StatelessWidget {
                       'propertyRef': FirebaseFirestore.instance
                           .collection('Properties')
                           .doc(data.propertyID),
+                      'address': propAddress ?? 'No address provided',
                     }, SetOptions(merge: true));
 
                     //set properties tenantref to the tenant's document reference

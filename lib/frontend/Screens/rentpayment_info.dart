@@ -1,10 +1,15 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:rehnaa/backend/models/rentpaymentmodel.dart';
-import 'package:flutter_pdfview/flutter_pdfview.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
+
+import '../helper/Landlorddashboard_pages/landlord_advance_rent.dart';
 
 class RentPaymentInfoPage extends StatelessWidget {
   final RentPayment rentPayment;
@@ -149,6 +154,7 @@ class RentPaymentInfoPage extends StatelessWidget {
                       // make a box where pdf will be shown
                       GestureDetector(
                           onTap: () {
+                            print('receiptUrl: $receiptUrl');
                             Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -202,99 +208,110 @@ class PDFScreen extends StatefulWidget {
   _PDFScreenState createState() => _PDFScreenState();
 }
 
-class _PDFScreenState extends State<PDFScreen> with WidgetsBindingObserver {
-  final Completer<PDFViewController> _controller =
-      Completer<PDFViewController>();
-  int? pages = 0;
-  int? currentPage = 0;
-  bool isReady = false;
-  String errorMessage = '';
+class _PDFScreenState extends State<PDFScreen> {
+  String localPath = '';
+
+  @override
+  void initState() {
+    super.initState();
+    loadPdf();
+  }
+
+  Future<void> loadPdf() async {
+    // Download the PDF from Firebase and save it to the local file system
+    var file;
+    try {
+      final pdfUrl = widget.path;
+      final pdfRef = FirebaseStorage.instance.refFromURL(pdfUrl!);
+      final bytes = await pdfRef.getData();
+      final dir = await getApplicationDocumentsDirectory();
+      file = File('${dir.path}/temp.pdf');
+      await file.writeAsBytes(bytes!);
+    } catch (e) {
+      print('error was $e');
+      print('pdf url was ${widget.path}');
+    }
+
+    // Update the local path state
+    setState(() {
+      localPath = file.path;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Document"),
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.share),
-            onPressed: () {},
+      appBar: _buildAppBar(MediaQuery.of(context).size, context),
+      body: localPath.isEmpty
+          ? Center(child: CircularProgressIndicator())
+          : SfPdfViewer.file(
+              File(localPath),
+              canShowScrollHead: false,
+              canShowScrollStatus: false,
+            ),
+    );
+  }
+}
+
+PreferredSizeWidget _buildAppBar(Size size, context) {
+  return AppBar(
+    toolbarHeight: 70,
+    title: Padding(
+      padding: EdgeInsets.only(
+        right: MediaQuery.of(context).size.width * 0.14,
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Stack(
+            children: [
+              ClipPath(
+                clipper: HexagonClipper(),
+                child: Transform.scale(
+                  scale: 0.87,
+                  child: Container(
+                    color: Colors.white,
+                    width: 60,
+                    height: 60,
+                  ),
+                ),
+              ),
+              ClipPath(
+                clipper: HexagonClipper(),
+                child: Image.asset(
+                  'assets/mainlogo.png',
+                  width: 60,
+                  height: 60,
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ],
           ),
         ],
       ),
-      backgroundColor: Colors.red,
-      body: Stack(
-        children: <Widget>[
-          // PDFView(
-          //   filePath: widget.path,
-          //   enableSwipe: false,
-          //   swipeHorizontal: true,
-          //   autoSpacing: false,
-          //   pageFling: true,
-          //   pageSnap: true,
-          //   defaultPage: currentPage!,
-          //   fitPolicy: FitPolicy.BOTH,
-          //   preventLinkNavigation: false,
-          //   onRender: (_pages) {
-          //     setState(() {
-          //       pages = _pages;
-          //       isReady = true;
-          //     });
-          //   },
-          //   onError: (error) {
-          //     setState(() {
-          //       errorMessage = error.toString();
-          //     });
-          //     print(error.toString());
-          //   },
-          //   onPageError: (page, error) {
-          //     setState(() {
-          //       errorMessage = '$page: ${error.toString()}';
-          //     });
-          //     print('$page: ${error.toString()}');
-          //   },
-          //   onViewCreated: (PDFViewController pdfViewController) {
-          //     _controller.complete(pdfViewController);
-          //   },
-          //   onLinkHandler: (String? uri) {
-          //     print('goto uri: $uri');
-          //   },
-          //   onPageChanged: (int? page, int? total) {
-          //     print('page change: $page/$total');
-          //     setState(() {
-          //       currentPage = page;
-          //     });
-          //   },
-          // ),
-
-          errorMessage.isEmpty
-              ? !isReady
-                  ? Center(
-                      child: CircularProgressIndicator(),
-                    )
-                  : Container()
-              : Center(
-                  child: Text(errorMessage),
-                )
-        ],
+    ),
+    actions: <Widget>[
+      Padding(
+        padding: const EdgeInsets.only(top: 15.0),
+        child: Stack(
+          children: [],
+        ),
       ),
-      floatingActionButton: FutureBuilder<PDFViewController>(
-        future: _controller.future,
-        builder: (context, AsyncSnapshot<PDFViewController> snapshot) {
-          if (snapshot.hasData) {
-            return FloatingActionButton.extended(
-              label: Text("Go to ${pages! ~/ 2}"),
-              onPressed: () async {
-                await snapshot.data!.setPage(pages! ~/ 2);
-              },
-            );
-          }
-
-          return Container();
-        },
+    ],
+    flexibleSpace: Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Color(0xFF0FA697),
+            Color(0xFF45BF7A),
+            Color(0xFF0DF205),
+          ],
+        ),
       ),
-    );
-  }
+    ),
+  );
 }
 
 class WhiteBox extends StatelessWidget {

@@ -3,12 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:rehnaa/frontend/Screens/contract.dart';
+import 'package:rehnaa/frontend/Screens/new_vouchers.dart';
 import 'package:rehnaa/frontend/Screens/privacypolicy.dart';
 import 'package:rehnaa/frontend/Screens/faq.dart';
 import 'package:rehnaa/frontend/Screens/login_page.dart';
 import 'package:rehnaa/frontend/Screens/vouchers.dart';
 import 'package:rehnaa/frontend/helper/Landlorddashboard_pages/landlord_dashboard_content.dart';
 import 'package:rehnaa/frontend/helper/Landlorddashboard_pages/landlord_profile.dart';
+import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenant_renthistory.dart';
 import '../../helper/Landlorddashboard_pages/landlord_advance_rent.dart';
 import '../../helper/Landlorddashboard_pages/landlord_interestfreeloan.dart';
 import '../../helper/Landlorddashboard_pages/landlord_renthistory.dart';
@@ -83,23 +85,27 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
     // also after setting isNewVoucher to true or false, update the isNew variable in the user document
     // which should now be false
 
-    FirebaseFirestore.instance
-        .collection('Landlords')
-        .doc(widget.uid)
-        .get()
-        .then((value) {
-      if (value.exists) {
-        if (value.data()!['isNewVouchers'] == true) {
-          setState(() {
-            isNewVoucher = true;
-          });
-        } else {
-          setState(() {
-            isNewVoucher = false;
-          });
+    try {
+      FirebaseFirestore.instance
+          .collection('Landlords')
+          .doc(widget.uid)
+          .get()
+          .then((value) {
+        if (value.exists) {
+          if (value.data()!['isNewVouchers'] == true) {
+            setState(() {
+              isNewVoucher = true;
+            });
+          } else {
+            setState(() {
+              isNewVoucher = false;
+            });
+          }
         }
-      }
-    });
+      });
+    } on Exception catch (e) {
+      print('Error is $e');
+    }
   }
 
   void _toggleSidebar() {
@@ -181,9 +187,13 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
                               // isWithdraw: _isWithdraw,
                             );
                           case 3:
-                            return LandlordRentHistoryPage(uid: widget.uid);
+                            return TenantRentHistoryPage(
+                                uid: widget.uid, callerType: 'Landlords');
                           case 4:
-                            return LandlordProfilePage(uid: widget.uid);
+                            return LandlordProfilePage(
+                              uid: widget.uid,
+                              callerType: 'Landlords',
+                            );
                           default:
                             return Container();
                         }
@@ -457,7 +467,7 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const VouchersPage(),
+                            builder: (context) => const NewVouchersPage(),
                           ),
                         );
                         // _closeSidebar();
@@ -660,20 +670,18 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
 
                     return Stack(
                       children: <Widget>[
-                        Positioned.fill(
-                          child: Container(
-                            decoration: BoxDecoration(
-                              gradient: const LinearGradient(
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                                colors: [
-                                  Color(0xFF0FA697),
-                                  Color(0xFF45BF7A),
-                                  Color(0xFF0DF205),
-                                ],
-                              ),
-                              borderRadius: BorderRadius.circular(25.0),
+                        Container(
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                Color(0xFF0FA697),
+                                Color(0xFF45BF7A),
+                                Color(0xFF0DF205),
+                              ],
                             ),
+                            borderRadius: BorderRadius.circular(25.0),
                           ),
                         ),
                         Column(

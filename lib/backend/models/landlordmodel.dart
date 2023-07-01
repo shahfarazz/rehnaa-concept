@@ -24,6 +24,7 @@ class Landlord {
   String? iban;
   String? emailOrPhone;
   Timestamp? dateJoined;
+  String? address;
 
   Landlord({
     required this.firstName,
@@ -45,6 +46,7 @@ class Landlord {
     this.iban,
     this.emailOrPhone,
     this.dateJoined,
+    this.address,
   });
 
   static Landlord fromJson(Map<String, dynamic>? json) {
@@ -71,6 +73,7 @@ class Landlord {
       pathToImage: json['pathToImage'] ?? 'assets/defaulticon.png',
       emailOrPhone: json['emailOrPhone'] ?? '',
       dateJoined: json['dateJoined'],
+      address: json['address'] ?? '',
     );
 
     // await landlord.fetchData();

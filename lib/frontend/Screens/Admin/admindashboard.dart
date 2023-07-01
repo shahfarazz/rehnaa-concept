@@ -4,6 +4,7 @@ import 'package:flutter/rendering.dart';
 import 'package:rehnaa/frontend/helper/Admindashboard_pages/admin_requests.dart';
 import 'package:rehnaa/frontend/helper/Admindashboard_pages/admin_tenantinput.dart';
 
+import '../../../backend/services/helperfunctions.dart';
 import '../../helper/Admindashboard_pages/admin_analytics.dart';
 import '../../helper/Admindashboard_pages/admin_landlord_tenant_info.dart';
 import '../../helper/Admindashboard_pages/admin_landlordinput.dart';
@@ -36,34 +37,38 @@ class _AdminDashboardState extends State<AdminDashboard> {
             .orderBy('timestamp', descending: true)
             .get();
 
-    print('propertiesSnapshot is ${propertiesSnapshot.size}');
-
     if (propertiesSnapshot.size > 0) {
       List<Map<String, String>> tempNotifications = [];
       propertiesSnapshot.docs.forEach((propertysnapshot) {
         propertysnapshot.data().forEach((key, value) {
           if (key == 'withdrawRequest' || key == 'paymentRequest') {
             value.forEach((item) {
-              Map<String, String> notification = {
-                'title': key,
-                'amount': item['amount'].toString(),
-                'fullname': item['fullname'],
-                'paymentMethod': item['paymentMethod'],
-              };
-              tempNotifications.add(notification);
+              if (!item.containsKey('read') || !item['read']) {
+                Map<String, String> notification = {
+                  'title': key,
+                  'amount': item['amount'].toString(),
+                  'fullname': item['fullname'],
+                  'paymentMethod': item['paymentMethod'],
+                  'senderid': propertysnapshot.id,
+                };
+                tempNotifications.add(notification);
+              }
             });
           } else if (key == 'rentalRequest') {
             value.forEach((item) {
-              Map<String, String> notification = {
-                'title': key,
-                'fullname': item['fullname'],
-                'uid': item['uid'],
-                'property name': item['property']['title'],
-              };
-              tempNotifications.add(notification);
+              if (!item.containsKey('read') || !item['read']) {
+                Map<String, String> notification = {
+                  'title': key,
+                  'fullname': item['fullname'],
+                  'uid': item['uid'],
+                  'property name': item['property']['title'],
+                  'senderid': propertysnapshot.id,
+                };
+                tempNotifications.add(notification);
+              }
             });
           } else if (key == 'timestamp') {
-            //do nothing
+            // Do nothing
           } else {
             // Leave other cases blank for now
             Map<String, String> notification = {
@@ -84,7 +89,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
 
   @override
   Widget build(BuildContext context) {
-    void _showNotificationsDialog() {
+    void showNotificationsDialog() {
       showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -111,6 +116,40 @@ class _AdminDashboardState extends State<AdminDashboard> {
                         onDismissed: (direction) {
                           setState(() {
                             notifications.removeAt(index);
+                          });
+
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content:
+                                  Text('${notification['title']} dismissed'),
+                            ),
+                          );
+
+                          String notificationTitle =
+                              notification['title'] ?? '';
+                          FirebaseFirestore.instance
+                              .collection('AdminRequests')
+                              .doc(notification['senderid'])
+                              .get()
+                              .then((docSnapshot) {
+                            if (docSnapshot.exists) {
+                              Map<String, dynamic>? data = docSnapshot.data();
+                              if (data!.containsKey(notificationTitle) &&
+                                  data[notificationTitle] is List) {
+                                List<dynamic> notificationList =
+                                    List.from(data[notificationTitle]);
+                                if (index >= 0 &&
+                                    index < notificationList.length) {
+                                  notificationList[index]['read'] = true;
+                                  FirebaseFirestore.instance
+                                      .collection('AdminRequests')
+                                      .doc(notification['senderid'])
+                                      .update({
+                                    notificationTitle: notificationList,
+                                  });
+                                }
+                              }
+                            }
                           });
                         },
                         background: Container(
@@ -200,139 +239,132 @@ class _AdminDashboardState extends State<AdminDashboard> {
 
     Size size = MediaQuery.of(context).size;
     return Scaffold(
-      appBar: AppBar(
-        toolbarHeight: 70,
-        title: Container(
-          alignment: Alignment.topLeft,
-          child: Padding(
-              padding: EdgeInsets.only(
-                  left: 0.0), // Adjust the left padding as needed
-              child: Column(
-                children: [
-                  Text(
-                    'Rehnaa ',
-                    style: TextStyle(
-                      fontSize: 30,
-                      fontFamily: 'Montserrat',
-                      // fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                      // letterSpacing: 3.0, // Adjust the value as needed
+        appBar: AppBar(
+          toolbarHeight: 70,
+          title: Container(
+            alignment: Alignment.topLeft,
+            child: Padding(
+                padding: EdgeInsets.only(
+                    left: 0.0), // Adjust the left padding as needed
+                child: Column(
+                  children: [
+                    Text(
+                      'Rehnaa ',
+                      style: TextStyle(
+                        fontSize: 30,
+                        fontFamily: 'Montserrat',
+                        // fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        // letterSpacing: 3.0, // Adjust the value as needed
+                      ),
                     ),
-                  ),
-                  Row(
-                    children: [
-                      IconButton(
-                        icon: Stack(
-                          children: [
-                            Icon(Icons.notifications_active),
-                            if (notifications.length > 0)
-                              Positioned(
-                                right: 0,
-                                child: Container(
-                                  padding: EdgeInsets.all(0),
-                                  decoration: BoxDecoration(
-                                    color: Colors.red,
-                                    shape: BoxShape.circle,
-                                  ),
-                                  constraints: BoxConstraints(
-                                    minWidth: 16,
-                                    minHeight: 16,
-                                  ),
-                                  child: Text(
-                                    notifications.length.toString(),
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 12,
+                    Row(
+                      children: [
+                        IconButton(
+                          icon: Stack(
+                            children: [
+                              Icon(Icons.notifications_active),
+                              if (notifications.length > 0)
+                                Positioned(
+                                  right: 0,
+                                  child: Container(
+                                    padding: EdgeInsets.all(0),
+                                    decoration: BoxDecoration(
+                                      color: Colors.red,
+                                      shape: BoxShape.circle,
                                     ),
-                                    textAlign: TextAlign.center,
+                                    constraints: BoxConstraints(
+                                      minWidth: 16,
+                                      minHeight: 16,
+                                    ),
+                                    child: Text(
+                                      notifications.length.toString(),
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 12,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
                                   ),
                                 ),
-                              ),
-                          ],
+                            ],
+                          ),
+                          onPressed: showNotificationsDialog,
                         ),
-                        onPressed: _showNotificationsDialog,
-                      ),
-                      IconButton(
-                        icon: Icon(Icons.refresh),
-                        onPressed: () {
-                          setState(() {
-                            _getNotifs();
-                          });
-                        },
-                      ),
-                    ],
-                  )
+                        IconButton(
+                          icon: Icon(Icons.refresh),
+                          onPressed: () {
+                            setState(() {
+                              _getNotifs();
+                            });
+                          },
+                        ),
+                      ],
+                    )
+                  ],
+                )),
+          ),
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          flexibleSpace: Container(
+            decoration: const BoxDecoration(
+              // borderRadius: BorderRadius.circular(24),
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Color(0xff0FA697),
+                  Color(0xff45BF7A),
+                  Color(0xff0DF205),
                 ],
-              )),
-        ),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            // borderRadius: BorderRadius.circular(24),
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Color(0xff0FA697),
-                Color(0xff45BF7A),
-                Color(0xff0DF205),
-              ],
+              ),
             ),
           ),
         ),
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            SizedBox(height: size.height * 0.03),
-            Padding(
-              padding: const EdgeInsets.only(
-                top: 2.0,
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Stack(
-                    children: [
-                      ClipPath(
-                        clipper: HexagonClipper(),
-                        child: Transform.scale(
-                          scale: 0.96,
-                          child: Container(
-                            color: Colors.white,
-                            width: 120,
-                            height: 120,
+        body: SingleChildScrollView(
+          child: Column(
+            children: [
+              SizedBox(height: size.height * 0.03),
+              Padding(
+                padding: const EdgeInsets.only(top: 2.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Stack(
+                      children: [
+                        ClipPath(
+                          clipper: HexagonClipper(),
+                          child: Transform.scale(
+                            scale: 0.96,
+                            child: Container(
+                              color: Colors.white,
+                              width: 120,
+                              height: 120,
+                            ),
                           ),
                         ),
-                      ),
-                      ClipPath(
-                        clipper: HexagonClipper(),
-                        child: Image.asset(
-                          'assets/mainlogo.png',
-                          width: 120,
-                          height: 120,
-                          fit: BoxFit.cover,
+                        ClipPath(
+                          clipper: HexagonClipper(),
+                          child: Image.asset(
+                            'assets/mainlogo.png',
+                            width: 120,
+                            height: 120,
+                            fit: BoxFit.cover,
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                  // const SizedBox(width:),
-                ],
+                      ],
+                    ),
+                  ],
+                ),
               ),
-            ),
-            SizedBox(height: size.height * 0.05),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  width: size.width * 0.4,
-                  height: size.height * 0.2,
-                  decoration: BoxDecoration(
+              SizedBox(height: size.height * 0.05),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CustomButton(
                     color: Colors.orange,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: ElevatedButton(
+                    icon: Icons.admin_panel_settings_rounded,
+                    text: 'Admin Requests',
                     onPressed: () {
                       Navigator.push(
                         context,
@@ -341,42 +373,13 @@ class _AdminDashboardState extends State<AdminDashboard> {
                         ),
                       );
                     },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.transparent,
-                      elevation: 0,
-                    ),
-                    child: const Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.admin_panel_settings_rounded,
-                          size: 60,
-                          color: Colors.white,
-                        ),
-                        SizedBox(height: 10),
-                        Text(
-                          'Admin Requests',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 14,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    ),
                   ),
-                ),
-                const SizedBox(width: 20),
-                Container(
-                  width: size.width * 0.4,
-                  height: size.height * 0.2,
-                  decoration: BoxDecoration(
+                  const SizedBox(width: 20),
+                  CustomButton(
                     color: Colors.purple,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: ElevatedButton(
+                    icon: Icons.apartment,
+                    text: 'Property Input',
                     onPressed: () {
-                      // Handle Property pictures button press
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -384,46 +387,18 @@ class _AdminDashboardState extends State<AdminDashboard> {
                         ),
                       );
                     },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.transparent,
-                      elevation: 0,
-                    ),
-                    child: const Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.apartment,
-                          size: 60,
-                          color: Colors.white,
-                        ),
-                        SizedBox(height: 10),
-                        Text(
-                          'Property Input',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
-                          ),
-                        ),
-                      ],
-                    ),
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  width: size.width * 0.4,
-                  height: size.height * 0.2,
-                  decoration: BoxDecoration(
+                ],
+              ),
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CustomButton(
                     color: Colors.red,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: ElevatedButton(
+                    icon: Icons.info,
+                    text: 'Information about\nLandlord and Tenant',
                     onPressed: () {
-                      // Handle Information about landlord and tenant button press
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -431,42 +406,13 @@ class _AdminDashboardState extends State<AdminDashboard> {
                         ),
                       );
                     },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.transparent,
-                      elevation: 0,
-                    ),
-                    child: const Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.info,
-                          size: 60,
-                          color: Colors.white,
-                        ),
-                        SizedBox(height: 10),
-                        Text(
-                          'Information about\nLandlord and Tenant',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 14,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    ),
                   ),
-                ),
-                const SizedBox(width: 20),
-                Container(
-                  width: size.width * 0.4,
-                  height: size.height * 0.2,
-                  decoration: BoxDecoration(
+                  const SizedBox(width: 20),
+                  CustomButton(
                     color: Colors.teal,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: ElevatedButton(
+                    icon: Icons.input,
+                    text: 'Landlord Input\nin Dealers Dashboard',
                     onPressed: () {
-                      // Handle Landlord input in Dealers dashboard button press
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -474,47 +420,18 @@ class _AdminDashboardState extends State<AdminDashboard> {
                         ),
                       );
                     },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.transparent,
-                      elevation: 0,
-                    ),
-                    child: const Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.input,
-                          size: 60,
-                          color: Colors.white,
-                        ),
-                        SizedBox(height: 10),
-                        Text(
-                          'Landlord Input\nin Dealers Dashboard',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 14,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    ),
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  width: size.width * 0.4,
-                  height: size.height * 0.2,
-                  decoration: BoxDecoration(
+                ],
+              ),
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CustomButton(
                     color: Colors.indigo,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: ElevatedButton(
+                    icon: Icons.local_offer,
+                    text: 'Add and Delete\nVouchers',
                     onPressed: () {
-                      // Handle Add and Delete Vouchers button press
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -522,42 +439,13 @@ class _AdminDashboardState extends State<AdminDashboard> {
                         ),
                       );
                     },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.transparent,
-                      elevation: 0,
-                    ),
-                    child: const Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.local_offer,
-                          size: 60,
-                          color: Colors.white,
-                        ),
-                        SizedBox(height: 10),
-                        Text(
-                          'Add and Delete\nVouchers',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 14,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    ),
                   ),
-                ),
-                const SizedBox(width: 20),
-                Container(
-                  width: size.width * 0.4,
-                  height: size.height * 0.2,
-                  decoration: BoxDecoration(
+                  const SizedBox(width: 20),
+                  CustomButton(
                     color: Colors.yellow,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: ElevatedButton(
+                    icon: Icons.person_add,
+                    text: 'More\nTenant Profiles',
                     onPressed: () {
-                      // Handle Create more unlimited user profiles button press
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -565,47 +453,18 @@ class _AdminDashboardState extends State<AdminDashboard> {
                         ),
                       );
                     },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.transparent,
-                      elevation: 0,
-                    ),
-                    child: const Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.person_add,
-                          size: 60,
-                          color: Colors.white,
-                        ),
-                        SizedBox(height: 10),
-                        Text(
-                          'More\nTenant Profiles',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 14,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    ),
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  width: size.width * 0.4,
-                  height: size.height * 0.2,
-                  decoration: BoxDecoration(
+                ],
+              ),
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CustomButton(
                     color: Colors.cyan,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: ElevatedButton(
+                    icon: Icons.analytics,
+                    text: 'Data Analytics',
                     onPressed: () {
-                      // Handle Data storage of everything for trend and analytics button press
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -613,42 +472,13 @@ class _AdminDashboardState extends State<AdminDashboard> {
                         ),
                       );
                     },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.transparent,
-                      elevation: 0,
-                    ),
-                    child: const Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.analytics,
-                          size: 60,
-                          color: Colors.white,
-                        ),
-                        SizedBox(height: 10),
-                        Text(
-                          'Data Analytics',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 14,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    ),
                   ),
-                ),
-                const SizedBox(width: 20),
-                Container(
-                  width: size.width * 0.4,
-                  height: size.height * 0.2,
-                  decoration: BoxDecoration(
+                  const SizedBox(width: 20),
+                  CustomButton(
                     color: Colors.grey,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: ElevatedButton(
+                    icon: Icons.visibility_off,
+                    text: 'Hide Profiles\nfrom Each Other',
                     onPressed: () {
-                      // Handle Hide profiles from each other button press
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -659,45 +489,17 @@ class _AdminDashboardState extends State<AdminDashboard> {
                         ),
                       );
                     },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.transparent,
-                      elevation: 0,
-                    ),
-                    child: const Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.visibility_off,
-                          size: 60,
-                          color: Colors.white,
-                        ),
-                        SizedBox(height: 10),
-                        Text(
-                          'Hide Profiles\nfrom Each Other',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 14,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    ),
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  width: size.width * 0.4,
-                  height: size.height * 0.2,
-                  decoration: BoxDecoration(
+                ],
+              ),
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CustomButton(
                     color: const Color.fromARGB(255, 197, 79, 177),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: ElevatedButton(
+                    icon: Icons.person,
+                    text: 'Monthly rent off winner\nDiscount',
                     onPressed: () {
                       Navigator.push(
                         context,
@@ -705,44 +507,14 @@ class _AdminDashboardState extends State<AdminDashboard> {
                           builder: (context) => AdminRentOffWinnerPage(),
                         ),
                       );
-                      // Handle Add and Delete Vouchers button press
                     },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.transparent,
-                      elevation: 0,
-                    ),
-                    child: const Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.person,
-                          size: 60,
-                          color: Colors.white,
-                        ),
-                        SizedBox(height: 10),
-                        Text(
-                          'Monthly rent off winner\nDiscount',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 14,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    ),
                   ),
-                ),
-                const SizedBox(width: 20),
-                Container(
-                  width: size.width * 0.4,
-                  height: size.height * 0.2,
-                  decoration: BoxDecoration(
+                  const SizedBox(width: 20),
+                  CustomButton(
                     color: Colors.deepOrange,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: ElevatedButton(
+                    icon: Icons.star,
+                    text: 'Add Reviews\nand Testimonials',
                     onPressed: () {
-                      // Handle Add reviews and testimonials button press
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -750,37 +522,12 @@ class _AdminDashboardState extends State<AdminDashboard> {
                         ),
                       );
                     },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.transparent,
-                      elevation: 0,
-                    ),
-                    child: const Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.star,
-                          size: 60,
-                          color: Colors.white,
-                        ),
-                        SizedBox(height: 10),
-                        Text(
-                          'Add Reviews\nand Testimonials',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 14,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    ),
                   ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
+                ],
+              ),
+            ],
+          ),
+        ));
   }
 }
 

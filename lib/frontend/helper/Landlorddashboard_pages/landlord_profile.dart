@@ -12,11 +12,17 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
 import '../../Screens/splash.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:geocoding/geocoding.dart';
 
 class LandlordProfilePage extends StatefulWidget {
   final String uid;
+  final String callerType;
 
-  const LandlordProfilePage({Key? key, required this.uid}) : super(key: key);
+  const LandlordProfilePage(
+      {Key? key, required this.uid, required this.callerType})
+      : super(key: key);
 
   @override
   _LandlordProfilePageState createState() => _LandlordProfilePageState();
@@ -26,8 +32,8 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
   bool showAdditionalSettings = false;
   bool showChangePassword = false;
   bool _obscurePassword = true; // Track whether the password is obscured or not
-  bool _obscurePassword2 =
-      true; // Track whether the password is obscured or not
+  bool _obscurePassword2 = true;
+
   //define two new controllers for the password fields
   final TextEditingController _oldPasswordController = TextEditingController();
   final TextEditingController _newPasswordController = TextEditingController();
@@ -183,7 +189,7 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
 
       // Update the 'pathToImage' property in the 'Dealers' collection
       await FirebaseFirestore.instance
-          .collection('Landlords')
+          .collection(widget.callerType)
           .doc(widget.uid)
           .update({'pathToImage': downloadURL});
 
@@ -234,7 +240,7 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
 
       // Update the 'pathToImage' property in the 'Tenants' collection
       await FirebaseFirestore.instance
-          .collection('Landlords')
+          .collection(widget.callerType)
           .doc(widget.uid)
           .update({'pathToImage': downloadURL});
 
@@ -280,8 +286,37 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               GestureDetector(
-                onTap: () {
-                  _uploadImageToFirebase();
+                onTap: () async {
+                  showDialog(
+                    context: context,
+                    barrierDismissible: false,
+                    builder: (BuildContext context) {
+                      return WillPopScope(
+                        onWillPop: () async => Future.value(
+                            false), // Disable back button during upload
+                        child: AlertDialog(
+                          title: Text(
+                            'Uploading Image',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: Colors.green,
+                              fontSize: 20,
+                              fontFamily: GoogleFonts.montserrat().fontFamily,
+                            ),
+                          ),
+                          content: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: <Widget>[
+                              CircularProgressIndicator(color: Colors.green),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  );
+
+                  await _uploadImageToFirebase();
+                  Navigator.of(context).pop();
                   Navigator.of(context).pop();
                 },
                 child: Container(
@@ -290,7 +325,7 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
                   width: size.width,
                   child: Row(
                     mainAxisSize: MainAxisSize.max,
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.start,
                     children: <Widget>[
                       Icon(
                         Icons.photo_library,
@@ -409,13 +444,39 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
     );
   }
 
+  Future<String> _getLocation() async {
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        return "";
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      // Permissions are denied forever, handle appropriately.
+      return "";
+    }
+
+    // When we reach here, permissions are granted and we can get the location
+    Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+
+    // Geocoding
+    List<Placemark> placemarks =
+        await placemarkFromCoordinates(position.latitude, position.longitude);
+    Placemark place = placemarks[0];
+
+    return '${place.locality}, ${place.administrativeArea}';
+  }
+
   @override
   Widget build(BuildContext context) {
     final authService = AuthenticationService();
     return Scaffold(
       body: FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
         future: FirebaseFirestore.instance
-            .collection('Landlords')
+            .collection(widget.callerType)
             .doc(widget.uid)
             .get(),
         builder: (context, snapshot) {
@@ -561,10 +622,24 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
                         title: isEmail ? 'Email' : 'Contact',
                         subtitle: contactInfo,
                       ),
-                      const ProfileInfoItem(
-                        icon: Icons.location_on,
-                        title: 'Location',
-                        subtitle: 'Lahore, Punjab',
+                      FutureBuilder<String>(
+                        future: _getLocation(),
+                        builder: (BuildContext context,
+                            AsyncSnapshot<String> snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return CircularProgressIndicator();
+                          } else if (snapshot.hasError ||
+                              snapshot.data == null) {
+                            return Container(); // Empty container, the item will not be shown
+                          } else {
+                            return ProfileInfoItem(
+                              icon: Icons.location_on,
+                              title: 'Location',
+                              subtitle: snapshot.data ?? '', // The location
+                            );
+                          }
+                        },
                       ),
                       StatefulBuilder(
                         builder: (BuildContext context, StateSetter setState) {

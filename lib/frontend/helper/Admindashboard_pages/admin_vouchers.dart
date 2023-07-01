@@ -76,6 +76,16 @@ class _AdminVouchersPageState extends State<AdminVouchersPage> {
         await uploadTask;
         String imageUrl = await storageReference.getDownloadURL();
 
+        //create or update a new collection called Vouchers and add the imageurl to firestore
+
+        await FirebaseFirestore.instance
+            .collection('Vouchers')
+            .doc('voucherkey')
+            .set({
+          //add the url to a list of urls
+          'urls': FieldValue.arrayUnion([imageUrl])
+        }, SetOptions(merge: true));
+
         setState(() {
           isLoading = false;
           Navigator.pushReplacement(
@@ -114,7 +124,7 @@ class _AdminVouchersPageState extends State<AdminVouchersPage> {
     }
   }
 
-  Future<void> fetchVouchers() async {
+  Future<List<Voucher>>? fetchVouchers() async {
     try {
       firebase_storage.ListResult listResult = await firebase_storage
           .FirebaseStorage.instance
@@ -125,11 +135,10 @@ class _AdminVouchersPageState extends State<AdminVouchersPage> {
         String url = await ref.getDownloadURL();
         vouchersList.add(Voucher(url, ref));
       }
-      setState(() {
-        vouchers = vouchersList;
-      });
+      return vouchersList;
     } catch (error) {
       print('Error fetching vouchers: $error');
+      return [];
     }
   }
 
@@ -140,6 +149,12 @@ class _AdminVouchersPageState extends State<AdminVouchersPage> {
           .delete();
       setState(() {
         vouchers.removeAt(index);
+      });
+      FirebaseFirestore.instance
+          .collection('Vouchers')
+          .doc('voucherkey')
+          .update({
+        'urls': FieldValue.arrayRemove([vouchers[index].url])
       });
     } catch (error) {
       print('Error deleting voucher: $error');
@@ -218,17 +233,40 @@ class _AdminVouchersPageState extends State<AdminVouchersPage> {
               ],
             ),
             Expanded(
-              child: ListView.builder(
-                itemCount: vouchers.length,
-                itemBuilder: (context, index) {
-                  return ListTile(
-                    title: Text('Voucher ${index + 1}'),
-                    leading: Image.network(vouchers[index].url),
-                    trailing: IconButton(
-                      onPressed: () => deleteVoucher(index),
-                      icon: const Icon(Icons.delete),
-                    ),
-                  );
+              child: FutureBuilder<List<Voucher>>(
+                future:
+                    fetchVouchers(), // replace with your method to get vouchers
+                builder: (BuildContext context,
+                    AsyncSnapshot<List<Voucher>> snapshot) {
+                  print('data is ${snapshot.connectionState}');
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    // If the future is loading, show a loading spinner
+                    return Center(
+                        child: CircularProgressIndicator(
+                      color: Colors.green,
+                    ));
+                  } else if (snapshot.hasError) {
+                    // If the future completed with an error, show an error message
+                    return Center(child: Text('Error: ${snapshot.error}'));
+                  } else {
+                    // If the future completed with a value, show the ListView
+                    // var data = snapshot.data!;
+                    print('now data is ${snapshot.data}');
+                    return ListView.builder(
+                      itemCount: snapshot.data?.length,
+                      addAutomaticKeepAlives: true,
+                      itemBuilder: (context, index) {
+                        return ListTile(
+                          title: Text('Voucher ${index + 1}'),
+                          leading: Image.network(snapshot.data![index].url),
+                          trailing: IconButton(
+                            onPressed: () => deleteVoucher(index),
+                            icon: const Icon(Icons.delete),
+                          ),
+                        );
+                      },
+                    );
+                  }
                 },
               ),
             ),

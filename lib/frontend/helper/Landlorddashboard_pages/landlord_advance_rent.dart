@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
-
 import '../../../backend/models/landlordmodel.dart';
 import '../../Screens/Landlord/landlord_dashboard.dart';
 
@@ -221,14 +220,17 @@ class _LandlordAdvanceRentPageState extends State<LandlordAdvanceRentPage> {
                           .center, // Align contents vertically in the center
                       children: [
                         Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Padding(
-                                padding:
-                                    EdgeInsets.only(left: size.width * 0.27)),
+                            // Padding(
+                            //     padding:
+                            //         EdgeInsets.only(left: size.width * 0.27)),
                             Text(
-                              DateFormat('dd MMMM yyyy').format(landlord?.dateJoined?.toDate() ?? DateTime.now()),
+                              DateFormat('dd MMMM yyyy').format(
+                                  landlord?.dateJoined?.toDate() ??
+                                      DateTime.now()),
 
-                                  // 'Date Joined',
+                              // 'Date Joined',
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
@@ -240,10 +242,11 @@ class _LandlordAdvanceRentPageState extends State<LandlordAdvanceRentPage> {
                         ),
                         SizedBox(height: 10),
                         Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Padding(
-                                padding:
-                                    EdgeInsets.only(left: size.width * 0.27)),
+                            // Padding(
+                            //     padding:
+                            //         EdgeInsets.only(left: size.width * 0.27)),
                             Text(
                               'Date Joined',
                               style: TextStyle(

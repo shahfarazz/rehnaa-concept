@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:rehnaa/frontend/Screens/contract.dart';
 import 'package:rehnaa/frontend/Screens/faq.dart';
 import 'package:rehnaa/frontend/Screens/vouchers.dart';
+import 'package:rehnaa/frontend/helper/Landlorddashboard_pages/landlord_profile.dart';
 import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenant_profile.dart';
 import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenant_properties.dart';
 import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenant_rentaccrual.dart';
@@ -15,6 +16,8 @@ import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenant_dashboard_co
 import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenantmonthlyrentoff.dart';
 
 import '../../helper/Tenantdashboard_pages/tenant_rented_property.dart';
+import '../../helper/Tenantdashboard_pages/tenant_security_deposit.dart';
+import '../new_vouchers.dart';
 import '../privacypolicy.dart';
 import '../login_page.dart';
 
@@ -89,23 +92,27 @@ class _DashboardPageState extends State<TenantDashboardPage>
     // also after setting isNewVoucher to true or false, update the isNew variable in the user document
     // which should now be false
 
-    FirebaseFirestore.instance
-        .collection('Tenants')
-        .doc(widget.uid)
-        .get()
-        .then((value) {
-      if (value.exists) {
-        if (value.data()!['isNewVouchers'] == true) {
-          setState(() {
-            isNewVoucher = true;
-          });
-        } else {
-          setState(() {
-            isNewVoucher = false;
-          });
+    try {
+      FirebaseFirestore.instance
+          .collection('Tenants')
+          .doc(widget.uid)
+          .get()
+          .then((value) {
+        if (value.exists) {
+          if (value.data()!['isNewVouchers'] == true) {
+            setState(() {
+              isNewVoucher = true;
+            });
+          } else {
+            setState(() {
+              isNewVoucher = false;
+            });
+          }
         }
-      }
-    });
+      });
+    } catch (e) {
+      print('error is $e');
+    }
   }
 
   Future<void> _markNotificationsAsRead() async {
@@ -225,9 +232,14 @@ class _DashboardPageState extends State<TenantDashboardPage>
                                     );
                                   case 3:
                                     return TenantRentHistoryPage(
-                                        uid: widget.uid);
+                                      uid: widget.uid,
+                                      callerType: 'Tenants',
+                                    );
                                   case 4:
-                                    return TenantProfilePage(uid: widget.uid);
+                                    return LandlordProfilePage(
+                                      uid: widget.uid,
+                                      callerType: 'Tenants',
+                                    );
                                   default:
                                     return Container();
                                 }
@@ -503,6 +515,21 @@ class _DashboardPageState extends State<TenantDashboardPage>
                       },
                     ),
                     _buildSidebarItem(
+                      icon: Icons.security,
+                      label: 'Security Deposit',
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => TenantSecurityDepositPage(
+                              uid: widget.uid,
+                            ),
+                          ),
+                        );
+                        // _closeSidebar();
+                      },
+                    ),
+                    _buildSidebarItem(
                       icon: Icons.discount,
                       label: 'Rent Off Winners',
                       onTap: () {
@@ -521,19 +548,21 @@ class _DashboardPageState extends State<TenantDashboardPage>
                       onTap: () {
                         //firebase call set users isNewVouchers to false
                         FirebaseFirestore.instance
-                            .collection('Landlords')
+                            .collection('Tenants')
                             .doc(widget.uid)
-                            .update({'isNewVouchers': false});
+                            .set({
+                          'isNewVouchers': false,
+                        }, SetOptions(merge: true));
+
                         setState(() {
                           isNewVoucher = false;
                         });
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const VouchersPage(),
+                            builder: (context) => const NewVouchersPage(),
                           ),
                         );
-                        // _closeSidebar();
                       },
                       showBadge: isNewVoucher,
                     ),

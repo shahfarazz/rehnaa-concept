@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -12,11 +14,13 @@ import '../Landlorddashboard_pages/skeleton.dart';
 
 class TenantRentHistoryPage extends StatefulWidget {
   final String uid; // UID of the landlord
+  final String callerType;
 
-  const TenantRentHistoryPage({Key? key, required this.uid}) : super(key: key);
+  const TenantRentHistoryPage(
+      {Key? key, required this.uid, required this.callerType})
+      : super(key: key);
 
   @override
-  // ignore: library_private_types_in_public_api
   _TenantRentHistoryPageState createState() => _TenantRentHistoryPageState();
 }
 
@@ -27,7 +31,9 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
   String lastName = '';
   bool shouldDisplay = false;
   String searchText = ''; // Variable to store the search query
+  String invoiceNumber = '';
   String pdfUrl = '';
+  Timer? _timer;
 
   @override
   bool get wantKeepAlive => true;
@@ -36,6 +42,25 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
   void initState() {
     super.initState();
     _tenantRentPayments(); // Call method to load rent payments when the state is initialized
+    _startPeriodicFetch(); // Start periodic fetching of new data
+  }
+
+  @override
+  void dispose() {
+    _stopPeriodicFetch(); // Stop periodic fetching when the widget is disposed
+    super.dispose();
+  }
+
+  // Periodically fetch new data every 5 seconds
+  void _startPeriodicFetch() {
+    Timer.periodic(const Duration(seconds: 5), (_) {
+      _tenantRentPayments();
+    });
+  }
+
+  // Stop periodic fetching
+  void _stopPeriodicFetch() {
+    _timer?.cancel();
   }
 
   Future<void> _tenantRentPayments() async {
@@ -43,24 +68,20 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
       // Fetch landlord data from Firestore
       DocumentSnapshot<Map<String, dynamic>> landlordSnapshot =
           await FirebaseFirestore.instance
-              .collection('Tenants')
+              .collection(widget.callerType)
               .doc(widget.uid)
               .get();
 
       Map<String, dynamic>? data = landlordSnapshot.data();
-      List<dynamic> rentPaymentRefs = data!['rentPaymentRef'] ?? [];
+      List<dynamic> rentPaymentRefs = data!['rentpaymentRef'] ?? [];
       firstName = data['firstName'];
       lastName = data['lastName'];
-
-      try {
-        pdfUrl = data['pdfUrl'];
-      } catch (e) {
-        pdfUrl = '';
-      }
 
       setState(() {
         shouldDisplay = true;
       });
+
+      List<RentPayment> newRentPayments = []; // Store the new rent payments
 
       // Fetch each rent payment document using the document references
       for (DocumentReference<Map<String, dynamic>> rentPaymentRef
@@ -71,8 +92,20 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
         Map<String, dynamic>? data = rentPaymentSnapshot.data();
         if (data != null) {
           RentPayment rentPayment = await RentPayment.fromJson(data);
-          _rentPayments.add(rentPayment);
+          rentPayment.pdfUrl = await FirebaseFirestore.instance
+              .collection('invoices')
+              .doc(rentPayment.invoiceNumber)
+              .get()
+              .then((value) => value.data()!['url']);
+          newRentPayments.add(rentPayment); // Add the new rent payment
         }
+      }
+
+      // Check for changes in rent payments
+      if (!listEquals(_rentPayments, newRentPayments)) {
+        setState(() {
+          _rentPayments = newRentPayments; // Update the rent payments list
+        });
       }
 
       if (kDebugMode) {
@@ -83,11 +116,6 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
         print('Error fetching rent payments: $e');
       }
     }
-
-    setState(() {
-      // Update the state to trigger a rebuild with the fetched rent payments
-      _rentPayments = _rentPayments;
-    });
   }
 
   final PageController _pageController = PageController(initialPage: 0);
@@ -132,7 +160,7 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
                 rentPayment: rentPayment,
                 firstName: firstName,
                 lastName: lastName,
-                receiptUrl: pdfUrl,
+                receiptUrl: rentPayment.pdfUrl!,
               ),
             ),
           );
@@ -175,7 +203,7 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
                           ),
                           SizedBox(height: size.height * 0.01),
                           Text(
-                            rentPayment.property!.location,
+                            rentPayment.property?.location ?? '',
                             style: GoogleFonts.montserrat(
                               fontSize: size.width * 0.03,
                               color: const Color(0xff33907c),
@@ -282,6 +310,8 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
     final Size size = MediaQuery.of(context).size;
 
     if (_rentPayments.isEmpty && shouldDisplay) {
+      // print('here because rent payments empty is ${_rentPayments.isEmpty}');
+      // print('here because should display is $shouldDisplay');
       return Center(
         child: Card(
           elevation: 4.0,
@@ -317,47 +347,10 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
         ),
       );
     } else if (_rentPayments.isEmpty && !shouldDisplay) {
-      return const Expanded(
-        child: TenantRentSkeleton(),
-      );
+      return const TenantRentSkeleton();
     } else {
       return SizedBox(height: size.height * 0.02);
     }
-  }
-
-  Widget _buildRefreshButton() {
-    final Size size = MediaQuery.of(context).size;
-
-    return InkWell(
-      borderRadius: BorderRadius.circular(20),
-      onTap: () {
-        setState(() {
-          _rentPayments.clear();
-          _tenantRentPayments();
-          shouldDisplay = false;
-        });
-      },
-      child: Center(
-        child: ShaderMask(
-          shaderCallback: (Rect bounds) {
-            return const LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Color(0xff0FA697),
-                Color(0xff45BF7A),
-                Color(0xff0DF205),
-              ],
-            ).createShader(bounds);
-          },
-          child: Icon(
-            Icons.refresh,
-            color: Colors.white,
-            size: size.width * 0.08,
-          ),
-        ),
-      ),
-    );
   }
 
   @override
@@ -370,103 +363,116 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
     return ResponsiveScaledBox(
       width: size.width,
       child: Scaffold(
-          body: ListView(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // Padding(padding: EdgeInsets.fromLTRB(size.width * 0.2, 20, 0, 0)),
-              Text(
-                'Payment History',
-                style: GoogleFonts.montserrat(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 24.0,
-                  color: const Color(0xff33907c),
-                ),
-              ),
-              SizedBox(width: size.width * 0.04),
-              _buildRefreshButton(),
-            ],
-          ),
-          SizedBox(height: size.height * 0.03),
-          Text(
-            'All Tenant Rentals',
-            style: GoogleFonts.montserrat(
-              fontWeight: FontWeight.bold,
-              // fontStyle: FontStyle.italic,
-              fontSize: size.width * 0.045,
-              color: const Color(0xff33907c),
-            ),
-            textAlign: TextAlign.center,
-          ),
-          SizedBox(height: size.height * 0.01),
-          Center(
-            child: Column(
+        body: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                SizedBox(height: size.height * 0.02),
-                Container(
-                  width: 300,
-                  height: 50,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    border:
-                        Border.all(width: 1, color: const Color(0xff33907c)),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: TextFormField(
-                    decoration: const InputDecoration(
-                      labelText: "Search",
-                      suffixIcon: Icon(Icons.search),
-                      border: InputBorder.none,
-                      contentPadding: EdgeInsets.all(10),
-                    ),
-                    onChanged: (value) {
-                      setState(() {
-                        searchText = value; // Update the search query
-                      });
-                    },
+                Text(
+                  'Payment History',
+                  style: GoogleFonts.montserrat(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 24.0,
+                    color: const Color(0xff33907c),
                   ),
                 ),
-                SizedBox(height: size.height * 0.02),
-                _buildLatestMonthWidget(),
+                SizedBox(width: size.width * 0.04),
+                // _buildRefreshButton(),
               ],
             ),
-          ),
-          _rentPaymentSelectorWidget(context),
-          Expanded(
-            child: SingleChildScrollView(
+            SizedBox(height: size.height * 0.03),
+            Text(
+              'All ${widget.callerType} Rentals',
+              style: GoogleFonts.montserrat(
+                fontWeight: FontWeight.bold,
+                // fontStyle: FontStyle.italic,
+                fontSize: size.width * 0.045,
+                color: const Color(0xff33907c),
+              ),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: size.height * 0.01),
+            Center(
               child: Column(
-                children: _buildRentPaymentCards(0),
+                children: [
+                  SizedBox(height: size.height * 0.02),
+                  Container(
+                    width: 300,
+                    height: 50,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        width: 1,
+                        color: const Color(0xff33907c),
+                      ),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: TextFormField(
+                      decoration: const InputDecoration(
+                        labelText: "Search",
+                        suffixIcon: Icon(Icons.search),
+                        border: InputBorder.none,
+                        contentPadding: EdgeInsets.all(10),
+                      ),
+                      onChanged: (value) {
+                        setState(() {
+                          searchText = value; // Update the search query
+                        });
+                      },
+                    ),
+                  ),
+                  SizedBox(height: size.height * 0.02),
+                  _buildLatestMonthWidget(),
+                ],
               ),
             ),
-          ),
-          SizedBox(height: size.height * 0.01),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              SmoothPageIndicator(
-                controller: _pageController,
-                count: pageCount,
-                effect: const WormEffect(
-                  dotColor: Colors.grey,
-                  activeDotColor: Color(0xff33907c),
-                  dotHeight: 10.0,
-                  dotWidth: 10.0,
-                  spacing: 8.0,
+            _rentPaymentSelectorWidget(context),
+            Expanded(
+              // Wrap the Column with Expanded
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.max,
+                  children: [
+                    Container(
+                      height: size.height * 0.5, // Replace with desired height
+                      child: PageView.builder(
+                        itemCount: pageCount,
+                        controller: _pageController,
+                        itemBuilder: (context, index) {
+                          return SingleChildScrollView(
+                            child: Column(
+                              children: _buildRentPaymentCards(index),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    SizedBox(height: size.height * 0.01),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SmoothPageIndicator(
+                          controller: _pageController,
+                          count: pageCount,
+                          effect: const WormEffect(
+                            dotColor: Colors.grey,
+                            activeDotColor: Color(0xff33907c),
+                            dotHeight: 10.0,
+                            dotWidth: 10.0,
+                            spacing: 8.0,
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: size.height * 0.03),
+                  ],
                 ),
               ),
-            ],
-          ),
-          SizedBox(height: size.height * 0.03),
-        ],
-      )),
+            ),
+          ],
+        ),
+      ),
     );
-  }
-
-  @override
-  void dispose() {
-    _pageController.dispose();
-    super.dispose();
   }
 }
 
@@ -477,84 +483,69 @@ class TenantRentSkeleton extends StatelessWidget {
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
 
-    return Expanded(
-      child: Column(
-        children: <Widget>[
-          SizedBox(height: size.height * 0.03),
-          Container(
-            padding: const EdgeInsets.symmetric(vertical: 16.0),
-            alignment: Alignment.center,
-            child: Skeleton(
-              width: size.width * 0.5,
-              height: 30,
-            ),
+    return Column(
+      children: <Widget>[
+        SizedBox(height: size.height * 0.03),
+        Container(
+          padding: const EdgeInsets.symmetric(vertical: 16.0),
+          alignment: Alignment.center,
+          child: Skeleton(
+            width: size.width * 0.5,
+            height: 30,
           ),
-          SizedBox(height: size.height * 0.02),
-          ListView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: 4,
-            itemBuilder: (context, index) {
-              return Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8.0),
-                child: Card(
-                  elevation: 4.0,
-                  shape: RoundedRectangleBorder(
+        ),
+        SizedBox(height: size.height * 0.02),
+        ListView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: 4,
+          itemBuilder: (context, index) {
+            return Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              child: Card(
+                elevation: 4.0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20.0),
+                ),
+                child: Container(
+                  decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(20.0),
+                    color: Colors.white,
                   ),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20.0),
-                      color: Colors.white,
-                    ),
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Skeleton(
-                          width: size.width * 0.4,
-                          height: 20.0,
-                        ),
-                        const SizedBox(height: 8.0),
-                        Skeleton(
-                          width: size.width * 0.7,
-                          height: 16.0,
-                        ),
-                        const SizedBox(height: 16.0),
-                        Row(
-                          children: [
-                            Skeleton(
-                              width: size.width * 0.12,
-                              height: 20.0,
-                            ),
-                            SizedBox(width: size.width * 0.04),
-                            Skeleton(
-                              width: size.width * 0.6,
-                              height: 20.0,
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: size.height * 0.05),
-                        Padding(
-                          padding: EdgeInsets.only(bottom: size.height * 0.02),
-                          child: Row(
-                            children: [
-                              Skeleton(
-                                width: size.width * 0.04,
-                                height: 20.0,
-                              ),
-                              SizedBox(width: size.width * 0.02),
-                              Skeleton(
-                                width: size.width * 0.2,
-                                height: 20.0,
-                              ),
-                            ],
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Skeleton(
+                        width: size.width * 0.4,
+                        height: 20.0,
+                      ),
+                      const SizedBox(height: 8.0),
+                      Skeleton(
+                        width: size.width * 0.7,
+                        height: 16.0,
+                      ),
+                      const SizedBox(height: 16.0),
+                      Row(
+                        children: [
+                          Skeleton(
+                            width: size.width * 0.12,
+                            height: 20.0,
                           ),
-                        ),
-                        Row(
+                          SizedBox(width: size.width * 0.04),
+                          Skeleton(
+                            width: size.width * 0.6,
+                            height: 20.0,
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: size.height * 0.05),
+                      Padding(
+                        padding: EdgeInsets.only(bottom: size.height * 0.02),
+                        child: Row(
                           children: [
                             Skeleton(
-                              width: size.width * 0.06,
+                              width: size.width * 0.04,
                               height: 20.0,
                             ),
                             SizedBox(width: size.width * 0.02),
@@ -564,15 +555,28 @@ class TenantRentSkeleton extends StatelessWidget {
                             ),
                           ],
                         ),
-                      ],
-                    ),
+                      ),
+                      Row(
+                        children: [
+                          Skeleton(
+                            width: size.width * 0.06,
+                            height: 20.0,
+                          ),
+                          SizedBox(width: size.width * 0.02),
+                          Skeleton(
+                            width: size.width * 0.2,
+                            height: 20.0,
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
-              );
-            },
-          ),
-        ],
-      ),
+              ),
+            );
+          },
+        ),
+      ],
     );
   }
 }

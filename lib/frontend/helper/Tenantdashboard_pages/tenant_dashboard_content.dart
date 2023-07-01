@@ -1,7 +1,9 @@
+import 'dart:math';
 import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
@@ -11,6 +13,8 @@ import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenantinvoice.dart'
 
 import 'package:responsive_framework/responsive_framework.dart';
 import '../../../backend/models/landlordmodel.dart';
+import '../../Screens/pdf_landlord.dart';
+import '../../Screens/pdf_tenant.dart';
 import '../Landlorddashboard_pages/landlord_dashboard_content.dart';
 
 class TenantDashboardContent extends StatefulWidget {
@@ -46,6 +50,16 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
         .collection('Tenants')
         .doc(widget.uid)
         .snapshots();
+  }
+
+  String generateInvoiceNumber() {
+    var rng = Random();
+    // Generate a random number between 10000 and 99999.
+    int randomNumber = rng.nextInt(90000) + 10000;
+    // Combine the prefix and the random number to form the invoice number.
+    String invoiceNumber =
+        'INV' + DateTime.now().year.toString() + randomNumber.toString();
+    return invoiceNumber;
   }
 
   void showOptionDialog(Function callback, Tenant tenant) {
@@ -162,7 +176,15 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                           double amount = 0.0;
 
                           return AlertDialog(
-                            title: Text('Enter Payment Amount'),
+                            title: Text(
+                              'Enter Payment Amount',
+                              style: TextStyle(
+                                fontSize: 20.0,
+                                fontWeight: FontWeight.normal,
+                                fontFamily: GoogleFonts.montserrat().fontFamily,
+                                color: Colors.green,
+                              ),
+                            ),
                             content: TextField(
                               keyboardType: TextInputType.number,
                               onChanged: (value) {
@@ -171,13 +193,27 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                             ),
                             actions: <Widget>[
                               TextButton(
-                                child: Text('Cancel'),
+                                child: Text(
+                                  'Cancel',
+                                  style: TextStyle(
+                                    color: Colors.green,
+                                    fontFamily:
+                                        GoogleFonts.montserrat().fontFamily,
+                                  ),
+                                ),
                                 onPressed: () {
                                   Navigator.of(context).pop();
                                 },
                               ),
                               TextButton(
-                                child: Text('Submit'),
+                                child: Text(
+                                  'Submit',
+                                  style: TextStyle(
+                                    color: Colors.green,
+                                    fontFamily:
+                                        GoogleFonts.montserrat().fontFamily,
+                                  ),
+                                ),
                                 onPressed: () {
                                   if (amount > 0 && amount <= tenant.rent) {
                                     Fluttertoast.showToast(
@@ -206,6 +242,10 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                                         .set({
                                       'isWithdraw': true,
                                     }, SetOptions(merge: true));
+
+                                    String invoiceNumber =
+                                        generateInvoiceNumber();
+
                                     FirebaseFirestore.instance
                                         .collection('AdminRequests')
                                         .doc(widget.uid)
@@ -217,6 +257,7 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                                           'amount': amount,
                                           'paymentMethod': selectedOption,
                                           'uid': widget.uid,
+                                          'invoiceNumber': invoiceNumber,
                                         }
                                       ]),
                                       'timestamp': Timestamp.now()
@@ -236,22 +277,31 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                                             as Map<String, dynamic>;
                                         Landlord landlord =
                                             Landlord.fromJson(landlordJson);
-                                        print(
-                                            'reached here landlord is ${landlord.firstName} ${landlord.lastName}}');
+                                        // print(
+                                        // 'reached here landlord is ${landlord.firstName} ${landlord.lastName}}');
+
                                         Navigator.push(
                                           context,
                                           MaterialPageRoute(
                                               builder: (context) =>
-                                                  TenantInvoicePage(
+                                                  PDFEditorTenantPage(
                                                     tenantName:
                                                         '${tenant.firstName} ${tenant.lastName}',
-                                                    // paymentDateTime: DateTime.now(),
-                                                    rent: tenant.rent,
+                                                    landlordName:
+                                                        '${landlord.firstName} ${landlord.lastName}',
                                                     amount: amount,
-                                                    selectedOption:
-                                                        selectedOption,
-                                                    id: widget.uid,
-                                                    landlord: landlord,
+                                                    invoiceNumber:
+                                                        invoiceNumber,
+                                                    balance:
+                                                        tenant.rent.toDouble(),
+                                                    paymentMode: selectedOption,
+                                                    uid: widget.uid,
+                                                    landlordAddress:
+                                                        landlord.address,
+                                                    tenantAddress:
+                                                        tenant.address,
+                                                    cnic: landlord.cnic ??
+                                                        'No cnic provided',
                                                   )),
                                         );
                                       }
@@ -289,7 +339,7 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
   void someFunction(Tenant tenant) {
     showOptionDialog(() {
       // setState(() {
-      //   isWithdraw = true;
+      isWithdraw = true;
       // });
       widget.onUpdateWithdrawState(false);
     }, tenant);
@@ -328,9 +378,9 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
     super.build(context); // Ensure the state is kept alive
     final Size size = MediaQuery.of(context).size;
 
-    if (kDebugMode) {
-      print('UID: ${widget.uid}');
-    }
+    // if (kDebugMode) {
+    //   print('UID: ${widget.uid}');
+    // }
 
     return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
       stream: _tenantStream,
@@ -343,9 +393,26 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
           return Text('Error: ${snapshot.error}');
         } else if (snapshot.hasData) {
           Map<String, dynamic> json =
-              snapshot.data!.data() as Map<String, dynamic>;
+              snapshot.data?.data() as Map<String, dynamic>;
           // Fetch tenant
           Tenant tenant = Tenant.fromJson(json);
+          if (json['isWithdraw'] != null && json['isWithdraw'] == true) {
+            SchedulerBinding.instance!.addPostFrameCallback((_) {
+              if (mounted) {
+                setState(() {
+                  isWithdraw = true;
+                });
+              }
+            });
+          } else {
+            SchedulerBinding.instance!.addPostFrameCallback((_) {
+              if (mounted) {
+                setState(() {
+                  isWithdraw = false;
+                });
+              }
+            });
+          }
           // Format the rent for display
           String formattedRent = NumberFormat('#,##0').format(tenant.rent);
 

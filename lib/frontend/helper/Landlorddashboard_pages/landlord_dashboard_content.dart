@@ -1,6 +1,6 @@
+import 'dart:math';
 import 'dart:ui';
 
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -9,9 +9,10 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:rehnaa/backend/models/landlordmodel.dart';
-import 'package:rehnaa/frontend/Screens/faq.dart';
 import 'package:rehnaa/frontend/helper/Landlorddashboard_pages/landlordinvoice.dart';
 import 'package:responsive_framework/responsive_scaled_box.dart';
+import '../../../backend/models/tenantsmodel.dart';
+import '../../Screens/pdf_landlord.dart';
 import 'skeleton.dart';
 
 class LandlordDashboardContent extends StatefulWidget {
@@ -34,7 +35,7 @@ class LandlordDashboardContent extends StatefulWidget {
 
 class _LandlordDashboardContentState extends State<LandlordDashboardContent>
     with AutomaticKeepAliveClientMixin<LandlordDashboardContent> {
-  late Future<Landlord> _landlordFuture;
+  // late Future<Landlord> _landlordFuture;
   late Stream<DocumentSnapshot<Map<String, dynamic>>> _landlordStream;
 
   @override
@@ -90,15 +91,26 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
     // }
   }
 
+  String generateInvoiceNumber() {
+    var rng = Random();
+    // Generate a random number between 10000 and 99999.
+    int randomNumber = rng.nextInt(90000) + 10000;
+    // Combine the prefix and the random number to form the invoice number.
+    String invoiceNumber =
+        'INV' + DateTime.now().year.toString() + randomNumber.toString();
+    return invoiceNumber;
+  }
+
   void showOptionDialog(Function callback, Landlord landlord) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        print('Firebase auth id is: ${FirebaseAuth.instance.currentUser!.uid}');
+        // print('Firebase auth id is: ${FirebaseAuth.instance.currentUser!.uid}');
         String selectedOption = '';
 
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setState) {
+            Size size = MediaQuery.of(context).size;
             // Your AlertDialog code goes here...
             return AlertDialog(
               title: Padding(
@@ -113,9 +125,9 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
                 ),
               ),
 
-              titlePadding: const EdgeInsets.fromLTRB(
-                  20.0, 16.0, 16.0, 0.0), // padding above title
-              contentPadding: const EdgeInsets.fromLTRB(16.0, 20.0, 16.0, 8.0),
+              // titlePadding: const EdgeInsets.fromLTRB(
+              //     20.0, 16.0, 16.0, 0.0), // padding above title
+              // contentPadding: const EdgeInsets.fromLTRB(.0, 20.0, 16.0, 8.0),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
@@ -205,7 +217,15 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
                           double withdrawalAmount = 0.0;
 
                           return AlertDialog(
-                            title: Text('Enter Withdrawal Amount'),
+                            title: Text(
+                              'Enter Withdrawal Amount',
+                              style: TextStyle(
+                                fontSize: 20.0,
+                                fontWeight: FontWeight.normal,
+                                fontFamily: GoogleFonts.montserrat().fontFamily,
+                                color: Colors.green,
+                              ),
+                            ),
                             content: TextField(
                               keyboardType: TextInputType.number,
                               onChanged: (value) {
@@ -215,14 +235,30 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
                             ),
                             actions: <Widget>[
                               TextButton(
-                                child: Text('Cancel'),
+                                child: Text(
+                                  'Cancel',
+                                  style: TextStyle(
+                                    color: Colors.green,
+                                    fontFamily:
+                                        GoogleFonts.montserrat().fontFamily,
+                                  ),
+                                ),
                                 onPressed: () {
                                   Navigator.of(context).pop();
                                 },
                               ),
                               TextButton(
-                                child: Text('Submit'),
+                                child: Text(
+                                  'Submit',
+                                  style: TextStyle(
+                                    color: Colors.green,
+                                    fontFamily:
+                                        GoogleFonts.montserrat().fontFamily,
+                                  ),
+                                ),
                                 onPressed: () {
+                                  String invoiceNumber =
+                                      generateInvoiceNumber();
                                   if (withdrawalAmount > 0 &&
                                       withdrawalAmount <= landlord.balance) {
                                     Fluttertoast.showToast(
@@ -262,7 +298,8 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
                                               '${landlord.firstName} ${landlord.lastName}',
                                           'amount': withdrawalAmount,
                                           'paymentMethod': selectedOption,
-                                          'uid': widget.uid
+                                          'uid': widget.uid,
+                                          'invoiceNumber': invoiceNumber,
                                           // Convert to desired format
                                         }
                                       ]),
@@ -273,20 +310,100 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
                                       isWithdraw = true;
                                     });
 
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              LandlordInvoicePage(
-                                                landlordName:
-                                                    '${landlord.firstName} ${landlord.lastName}',
-                                                // paymentDateTime: DateTime.now(),
-                                                balance: landlord.balance,
-                                                amount: withdrawalAmount,
-                                                transactionMode: selectedOption,
-                                                id: widget.uid,
-                                              )),
-                                    );
+                                    //showdialog box let user select particular tenant and then show pdf editor page
+                                    // because we have to use landlord.tenantref.get() and then use that snapshot to get tenant data
+                                    // first listview of tenantref list then futurebuilder to get each tenantref.get() and then use that snapshot to get tenant data
+
+                                    showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return AlertDialog(
+                                            title: Text('Select Tenant'),
+                                            content: Container(
+                                              height: 300,
+                                              width: 300,
+                                              child: ListView.builder(
+                                                itemCount:
+                                                    landlord.tenantRef?.length,
+                                                itemBuilder: (context, index) {
+                                                  return FutureBuilder(
+                                                    future: landlord
+                                                        .tenantRef?[index]
+                                                        .get(),
+                                                    builder:
+                                                        (context, snapshot) {
+                                                      if (snapshot.hasData) {
+                                                        Tenant tenant = Tenant
+                                                            .fromJson(snapshot
+                                                                    .data
+                                                                    ?.data()
+                                                                as Map<String,
+                                                                    dynamic>);
+                                                        return ListTile(
+                                                          title: Text(
+                                                              '${tenant.firstName} ${tenant.lastName}'),
+                                                          onTap: () {
+                                                            Navigator.pop(
+                                                                context);
+                                                            Navigator.push(
+                                                              context,
+                                                              MaterialPageRoute(
+                                                                  builder:
+                                                                      (context) =>
+                                                                          PDFEditorPage(
+                                                                            tenantName:
+                                                                                '${tenant.firstName} ${tenant.lastName}',
+                                                                            balance:
+                                                                                tenant.rent.toDouble(),
+                                                                            landlordName:
+                                                                                '${landlord.firstName} ${landlord.lastName}',
+                                                                            amount:
+                                                                                withdrawalAmount,
+                                                                            paymentMode:
+                                                                                selectedOption,
+                                                                            uid:
+                                                                                widget.uid,
+                                                                            landlordAddress:
+                                                                                landlord.address,
+                                                                            tenantAddress:
+                                                                                tenant.address,
+                                                                            invoiceNumber:
+                                                                                invoiceNumber,
+                                                                          )),
+                                                            );
+                                                          },
+                                                        );
+                                                      } else {
+                                                        return Center(
+                                                            child:
+                                                                CircularProgressIndicator());
+                                                      }
+                                                    },
+                                                  );
+                                                },
+                                              ),
+                                            ),
+                                          );
+                                        });
+
+                                    // Navigator.push(
+                                    //   context,
+                                    //   MaterialPageRoute(
+                                    //       builder: (context) => PDFEditorPage(
+                                    //             tenantName:
+                                    //                 '${tenant.firstName} ${tenant.lastName}',
+                                    //             balance: tenant.rent.toDouble(),
+                                    //             landlordName:
+                                    //                 '${landlord.firstName} ${landlord.lastName}',
+                                    //             amount: withdrawalAmount,
+                                    //             paymentMode: selectedOption,
+                                    //             uid: widget.uid,
+                                    //             landlordAddress:
+                                    //                 landlord.address,
+                                    //             tenantAddress: tenant.address,
+                                    //             invoiceNumber: invoiceNumber,
+                                    //           )),
+                                    // );
                                   } else {
                                     Fluttertoast.showToast(
                                       msg: 'Invalid withdrawal amount',
@@ -331,6 +448,7 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
     String optionImage = "",
     String optionName = "",
     VoidCallback? onTap,
+    Size? size,
   }) {
     return ListTile(
       leading: selectedOption == optionName
@@ -346,8 +464,13 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
             width: 50,
             height: 30,
           ),
-          const SizedBox(width: 20),
-          Text(optionName),
+          const SizedBox(width: 8.0), // Add some spacing
+          Expanded(
+            child: Text(
+              optionName,
+              style: TextStyle(fontFamily: GoogleFonts.montserrat().fontFamily),
+            ),
+          ),
         ],
       ),
       onTap: onTap,
@@ -390,6 +513,14 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
                 });
               }
             });
+          } else {
+            SchedulerBinding.instance!.addPostFrameCallback((_) {
+              if (mounted) {
+                setState(() {
+                  isWithdraw = false;
+                });
+              }
+            });
           }
 
           // Format the balance for display
@@ -425,6 +556,7 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
                         padding: const EdgeInsets.only(bottom: 8.0),
                         child: CircleAvatar(
                           radius: 75,
+                          backgroundColor: Colors.transparent,
                           child: ClipOval(
                             child: landlord.pathToImage != null &&
                                     landlord.pathToImage!.isNotEmpty
@@ -543,7 +675,12 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
                                         borderRadius: BorderRadius.circular(20),
                                         onTap: () {
                                           isWithdraw
-                                              ? someFunction(landlord)
+                                              ? null
+                                              // Navigator.push(
+                                              //     context,
+                                              //     MaterialPageRoute(
+                                              //         builder: (context) =>
+                                              //             PDFEditorPage()))
                                               : someFunction(
                                                   landlord); // Show the option dialog
                                         },
