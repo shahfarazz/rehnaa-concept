@@ -91,7 +91,7 @@ class FAQPage extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: 24,
                                 color: Color(0xff33907c),
-                                fontWeight: FontWeight.bold,
+                                // fontWeight: FontWeight.bold,
                                 fontFamily: GoogleFonts.montserrat().fontFamily,
                               ),
                             ),

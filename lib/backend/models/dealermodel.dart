@@ -1,11 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:rehnaa/backend/models/landlordmodel.dart';
 
 class Dealer {
-  final String firstName;
-  final String lastName;
-  final double balance;
+  String firstName;
+  String lastName;
+  double balance;
   String? pathToImage;
+  String? tempID;
 
   final List<DocumentReference<Map<String, dynamic>>>? landlordRef;
 
@@ -15,6 +15,7 @@ class Dealer {
     required this.balance,
     this.landlordRef,
     this.pathToImage,
+    this.tempID,
   });
 
   factory Dealer.fromJson(Map<String, dynamic> json) {
@@ -22,7 +23,6 @@ class Dealer {
       firstName: json['firstName'],
       lastName: json['lastName'],
       balance: json['balance'] != null ? json['balance'].toDouble() : 0.0,
-
       pathToImage: json['pathToImage'] ?? 'assets/defaulticon.png',
       landlordRef: json['landlordRef'] != null
           ? List<DocumentReference<Map<String, dynamic>>>.from(

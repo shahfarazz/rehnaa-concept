@@ -318,6 +318,7 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
                   await _uploadImageToFirebase();
                   Navigator.of(context).pop();
                   Navigator.of(context).pop();
+                  setState(() {});
                 },
                 child: Container(
                   // padding: EdgeInsets.symmetric(vertical: 16),

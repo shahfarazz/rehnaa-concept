@@ -115,7 +115,9 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
                     ListTile(
                       leading: const Icon(Icons.person_2),
                       title: Text(
-                        'Tenant Ref: ${landlord.tenantRef?.toString() ?? ''}',
+                        // if tenant ref exists show yes otherwise no
+                        'TenantRef: ${landlord.tenantRef != null ? 'Yes' : 'No'}',
+
                         style: const TextStyle(
                           fontSize: 16,
                         ),

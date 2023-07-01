@@ -22,8 +22,17 @@ class _AdminRequestsPageState extends State<AdminRequestsPage> {
         try {
           if (doc["withdrawRequest"] != null) {
             // if yes, then loop through the array
+            print('withdraw request found doc is ${doc["withdrawRequest"]}');
             for (var i = 0; i < doc["withdrawRequest"].length; i++) {
               // add each request to the adminRequests list
+              // var withdrawRequest = doc["withdrawRequest"][i];
+              // print('data of this is ${withdrawRequest}');
+              // print('data of this is ${withdrawRequest["fullname"]}');
+              // print('data of this is ${withdrawRequest["amount"].toString()}');
+              // print('data of this is ${withdrawRequest["uid"]}');
+              // print('data of this is ${withdrawRequest["paymentMethod"]}');
+              // print('data of this is ${withdrawRequest["invoiceNumber"]}');
+              // print('data of this is  ${doc["withdrawRequest"][i]["requestID"]}');
 
               adminRequests.add(
                 AdminRequestData(
@@ -35,7 +44,7 @@ class _AdminRequestsPageState extends State<AdminRequestsPage> {
                       ["paymentMethod"],
                   requestID: doc.id,
                   requestType: 'Landlord Withdraw Request',
-                  invoiceNumber: doc["paymentRequest"][i]["invoiceNumber"],
+                  invoiceNumber: doc["withdrawRequest"][i]["invoiceNumber"],
                 ),
               );
             }
