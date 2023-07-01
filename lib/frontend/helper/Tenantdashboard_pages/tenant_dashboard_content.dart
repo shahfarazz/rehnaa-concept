@@ -1,17 +1,19 @@
+import 'dart:math';
 import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:rehnaa/backend/models/tenantsmodel.dart';
-// import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenantinvoice.dart';
+import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenantinvoice.dart';
 
 import 'package:responsive_framework/responsive_framework.dart';
 import '../../../backend/models/landlordmodel.dart';
-import '../../Screens/pdfediter.dart';
+import '../../Screens/pdfeditor.dart';
 import '../Landlorddashboard_pages/landlord_dashboard_content.dart';
 
 class TenantDashboardContent extends StatefulWidget {
@@ -38,9 +40,6 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
   @override
   bool get wantKeepAlive => true;
   bool isWithdraw = false;
-  double? temp_amount;
-  String? temp_option;
-  Landlord? temp_landlord;
 
   @override
   void initState() {
@@ -50,6 +49,16 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
         .collection('Tenants')
         .doc(widget.uid)
         .snapshots();
+  }
+
+  String generateInvoiceNumber() {
+    var rng = Random();
+    // Generate a random number between 10000 and 99999.
+    int randomNumber = rng.nextInt(90000) + 10000;
+    // Combine the prefix and the random number to form the invoice number.
+    String invoiceNumber =
+        'INV' + DateTime.now().year.toString() + randomNumber.toString();
+    return invoiceNumber;
   }
 
   void showOptionDialog(Function callback, Tenant tenant) {
@@ -232,6 +241,10 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                                         .set({
                                       'isWithdraw': true,
                                     }, SetOptions(merge: true));
+
+                                    String invoiceNumber =
+                                        generateInvoiceNumber();
+
                                     FirebaseFirestore.instance
                                         .collection('AdminRequests')
                                         .doc(widget.uid)
@@ -243,6 +256,7 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                                           'amount': amount,
                                           'paymentMethod': selectedOption,
                                           'uid': widget.uid,
+                                          'invoiceNumber': invoiceNumber,
                                         }
                                       ]),
                                       'timestamp': Timestamp.now()
@@ -262,23 +276,13 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                                             as Map<String, dynamic>;
                                         Landlord landlord =
                                             Landlord.fromJson(landlordJson);
-                                        print(
-                                            'reached here landlord is ${landlord.firstName} ${landlord.lastName}}');
+                                        // print(
+                                        // 'reached here landlord is ${landlord.firstName} ${landlord.lastName}}');
+
                                         Navigator.push(
                                           context,
                                           MaterialPageRoute(
                                               builder: (context) =>
-                                                  // TenantInvoicePage(
-                                                  //   tenantName:
-                                                  //       '${tenant.firstName} ${tenant.lastName}',
-                                                  //   // paymentDateTime: DateTime.now(),
-                                                  //   rent: tenant.rent,
-                                                  //   amount: amount,
-                                                  //   selectedOption:
-                                                  //       selectedOption,
-                                                  //   id: widget.uid,
-                                                  //   landlord: landlord,
-                                                  // )
                                                   PDFEditorPage(
                                                     tenantName:
                                                         '${tenant.firstName} ${tenant.lastName}',
@@ -293,6 +297,8 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                                                         landlord.address,
                                                     tenantAddress:
                                                         tenant.address,
+                                                    invoiceNumber:
+                                                        invoiceNumber,
                                                   )),
                                         );
                                       }
@@ -369,9 +375,9 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
     super.build(context); // Ensure the state is kept alive
     final Size size = MediaQuery.of(context).size;
 
-    if (kDebugMode) {
-      print('UID: ${widget.uid}');
-    }
+    // if (kDebugMode) {
+    //   print('UID: ${widget.uid}');
+    // }
 
     return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
       stream: _tenantStream,
@@ -387,6 +393,23 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
               snapshot.data!.data() as Map<String, dynamic>;
           // Fetch tenant
           Tenant tenant = Tenant.fromJson(json);
+          if (json['isWithdraw'] != null && json['isWithdraw'] == true) {
+            SchedulerBinding.instance!.addPostFrameCallback((_) {
+              if (mounted) {
+                setState(() {
+                  isWithdraw = true;
+                });
+              }
+            });
+          } else {
+            SchedulerBinding.instance!.addPostFrameCallback((_) {
+              if (mounted) {
+                setState(() {
+                  isWithdraw = false;
+                });
+              }
+            });
+          }
           // Format the rent for display
           String formattedRent = NumberFormat('#,##0').format(tenant.rent);
 
@@ -537,33 +560,7 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                                               BorderRadius.circular(20),
                                           onTap: () {
                                             isWithdraw
-                                                ?
-                                                // temp_option.isEmpty?
-                                                Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            PDFEditorPage(
-                                                              tenantName:
-                                                                  '${tenant.firstName} ${tenant.lastName}',
-                                                              balance: tenant
-                                                                  .rent
-                                                                  .toDouble(),
-                                                              landlordName:
-                                                                  '${temp_landlord?.firstName} ${temp_landlord?.lastName}',
-                                                              amount:
-                                                                  temp_amount!,
-                                                              paymentMode:
-                                                                  temp_option!,
-                                                              uid: widget.uid,
-                                                              landlordAddress:
-                                                                  temp_landlord
-                                                                      ?.address,
-                                                              tenantAddress:
-                                                                  tenant
-                                                                      .address,
-                                                            )),
-                                                  )
+                                                ? null
                                                 : someFunction(tenant);
                                             // Show the option dialog
                                           },

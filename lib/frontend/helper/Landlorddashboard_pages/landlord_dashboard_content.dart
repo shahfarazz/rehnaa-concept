@@ -10,7 +10,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:rehnaa/backend/models/landlordmodel.dart';
 import 'package:rehnaa/frontend/helper/Landlorddashboard_pages/landlordinvoice.dart';
 import 'package:responsive_framework/responsive_scaled_box.dart';
-import '../../Screens/pdfediter.dart';
+import '../../Screens/pdfeditor.dart';
 import 'skeleton.dart';
 
 class LandlordDashboardContent extends StatefulWidget {
@@ -415,6 +415,15 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
               if (mounted) {
                 setState(() {
                   isWithdraw = true;
+                });
+              }
+            });
+          }
+          else{
+            SchedulerBinding.instance!.addPostFrameCallback((_) {
+              if (mounted) {
+                setState(() {
+                  isWithdraw = false;
                 });
               }
             });

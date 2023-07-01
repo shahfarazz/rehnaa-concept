@@ -59,6 +59,7 @@ class _AdminRequestsPageState extends State<AdminRequestsPage> {
                   cashOrBankTransfer: doc["paymentRequest"][i]["paymentMethod"],
                   requestID: doc.id,
                   requestType: 'Tenant Payment Request',
+                  invoiceNumber: doc["paymentRequest"][i]["invoiceNumber"],
                 ),
               );
             }
@@ -320,6 +321,7 @@ class AdminRequestData {
   final String requestID;
   DocumentReference<Map<String, dynamic>>? propertyLandlordRef;
   String? propertyID;
+  String? invoiceNumber;
 
   AdminRequestData({
     required this.name,
@@ -332,6 +334,7 @@ class AdminRequestData {
     required this.requestID,
     this.propertyLandlordRef,
     this.propertyID,
+    this.invoiceNumber,
   });
 }
 
@@ -533,7 +536,7 @@ class LandlordWithdrawalCard extends StatelessWidget {
                           .doc(data.uid)
                           .update({
                         'balance': FieldValue.increment(
-                            int.parse(data.requestedAmount!)),
+                            -int.parse(data.requestedAmount!)),
                       });
                       //remove the payment request
                       FirebaseFirestore.instance
@@ -585,6 +588,7 @@ class LandlordWithdrawalCard extends StatelessWidget {
                             .collection('Tenants')
                             .doc(data.uid),
                         'landlordRef': null,
+                        'invoiceNumber': data.invoiceNumber
                       });
 
                       // set the tenant's rentPaymentRef to tenant's own id reference which is data.requestID
@@ -596,6 +600,14 @@ class LandlordWithdrawalCard extends StatelessWidget {
                           rentPaymentRef,
                         ])
                       });
+
+                      //reset the state of the page
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const AdminRequestsPage(),
+                        ),
+                      );
                     }
                   } else if (data.requestType == 'Tenant Rental Request') {
                     //rental request

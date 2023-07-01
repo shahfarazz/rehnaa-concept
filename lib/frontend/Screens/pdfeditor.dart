@@ -1,18 +1,18 @@
 import 'dart:math';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-// import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pdfWidget;
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:open_file/open_file.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
-
-import '../helper/Landlorddashboard_pages/landlord_advance_rent.dart';
+import 'Tenant/tenant_dashboard.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 class PDFEditorPage extends StatefulWidget {
   final String tenantName;
@@ -23,6 +23,7 @@ class PDFEditorPage extends StatefulWidget {
   final double amount;
   final String paymentMode;
   final String uid;
+  final String invoiceNumber;
 
   PDFEditorPage(
       {Key? key,
@@ -33,7 +34,8 @@ class PDFEditorPage extends StatefulWidget {
       this.tenantAddress,
       required this.amount,
       required this.paymentMode,
-      required this.uid})
+      required this.uid,
+      required this.invoiceNumber})
       : super(key: key);
   @override
   _PDFEditorPageState createState() => _PDFEditorPageState();
@@ -81,16 +83,6 @@ class _PDFEditorPageState extends State<PDFEditorPage> {
     }
   }
 
-  String generateInvoiceNumber() {
-    var rng = Random();
-    // Generate a random number between 10000 and 99999.
-    int randomNumber = rng.nextInt(90000) + 10000;
-    // Combine the prefix and the random number to form the invoice number.
-    String invoiceNumber =
-        'INV' + DateTime.now().year.toString() + randomNumber.toString();
-    return invoiceNumber;
-  }
-
   Future<File> createPdf() async {
     //Load the existing document.
     final File file = await getFileFromAssets('assets/template.pdf');
@@ -134,10 +126,8 @@ class _PDFEditorPageState extends State<PDFEditorPage> {
 
     //write a function which generates a random invoice number
 
-    var invoiceNumber = generateInvoiceNumber();
-
     //Invoice number
-    graphics.drawString(invoiceNumber, font,
+    graphics.drawString(widget.invoiceNumber, font,
         brush: PdfBrushes.black,
         bounds: Rect.fromLTWH(
             452, 162, page.getClientSize().width, page.getClientSize().height),
@@ -229,6 +219,56 @@ class _PDFEditorPageState extends State<PDFEditorPage> {
 
     //Open the PDF document in mobile
     OpenFile.open('$path/Output.pdf');
+
+    // upload the pdf to firebase storage
+    FirebaseStorage storage = FirebaseStorage.instance;
+    Reference ref = storage.ref().child("invoice_${widget.invoiceNumber}.pdf");
+    UploadTask uploadTask = ref.putFile(outputFile);
+    uploadTask.then((res) {
+      res.ref.getDownloadURL().then((value) {
+        print("Uploaded File URL: $value");
+        FirebaseFirestore.instance
+            .collection('invoices')
+            .doc(widget.invoiceNumber)
+            .set({
+          // 'invoiceNumber': widget.invoiceNumber,
+          // 'landlordName': widget.landlordName,
+          // 'landlordAddress': widget.landlordAddress,
+          // 'tenantName': widget.tenantName,
+          // 'tenantAddress': widget.tenantAddress,
+          // 'amount': widget.amount,
+          // 'paymentMode': widget.paymentMode,
+          // 'date': formatted,
+          'url': value,
+        });
+      });
+    });
+
+    return outputFile;
+  }
+
+  //funcion which takes the created pdf as input and saves it to the device
+  Future<File> savePdf(File file) async {
+    print("savePdf called");
+
+    //Get the external storage directory
+    final Directory directory = await getApplicationDocumentsDirectory();
+    print("Directory obtained: $directory");
+
+    //Get the directory path
+    final String path = directory.path;
+    print("Path: $path");
+
+    //Create an empty file to write PDF data.
+    final File outputFile = File('$path/Output.pdf');
+    print("Output file: $outputFile");
+
+    //Write PDF data.
+    await outputFile.writeAsBytes(file.readAsBytesSync(), flush: true);
+    print("PDF data written to output file");
+
+    //Open the PDF document in mobile
+    // OpenFile.open('$path/Output.pdf');
     return outputFile;
   }
 
@@ -322,6 +362,17 @@ class _PDFEditorPageState extends State<PDFEditorPage> {
   PreferredSizeWidget _buildAppBar(Size size, context) {
     return AppBar(
       toolbarHeight: 70,
+      leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => TenantDashboardPage(
+                        uid: widget.uid,
+                      )),
+            );
+          }),
       title: Padding(
         padding: EdgeInsets.only(
           right:

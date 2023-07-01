@@ -31,6 +31,7 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
   String lastName = '';
   bool shouldDisplay = false;
   String searchText = ''; // Variable to store the search query
+  String invoiceNumber = '';
   String pdfUrl = '';
   Timer? _timer;
 
@@ -50,7 +51,7 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
     super.dispose();
   }
 
-  // Periodically fetch new data every 30 seconds
+  // Periodically fetch new data every 5 seconds
   void _startPeriodicFetch() {
     Timer.periodic(const Duration(seconds: 5), (_) {
       _tenantRentPayments();
@@ -76,12 +77,6 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
       firstName = data['firstName'];
       lastName = data['lastName'];
 
-      try {
-        pdfUrl = data['pdfUrl'];
-      } catch (e) {
-        pdfUrl = '';
-      }
-
       setState(() {
         shouldDisplay = true;
       });
@@ -97,6 +92,11 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
         Map<String, dynamic>? data = rentPaymentSnapshot.data();
         if (data != null) {
           RentPayment rentPayment = await RentPayment.fromJson(data);
+          rentPayment.pdfUrl = await FirebaseFirestore.instance
+              .collection('invoices')
+              .doc(rentPayment.invoiceNumber)
+              .get()
+              .then((value) => value.data()!['url']);
           newRentPayments.add(rentPayment); // Add the new rent payment
         }
       }
@@ -160,7 +160,7 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
                 rentPayment: rentPayment,
                 firstName: firstName,
                 lastName: lastName,
-                receiptUrl: pdfUrl,
+                receiptUrl: rentPayment.pdfUrl!,
               ),
             ),
           );
