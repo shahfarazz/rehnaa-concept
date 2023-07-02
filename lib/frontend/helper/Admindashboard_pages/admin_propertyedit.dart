@@ -14,18 +14,17 @@ class PropertyEditPage extends StatefulWidget {
 }
 
 class _PropertyEditPageState extends State<PropertyEditPage> {
-  late TextEditingController titleController;
-  late TextEditingController locationController;
-  late TextEditingController typeController;
-  late TextEditingController bedsController;
-  late TextEditingController bathsController;
-  late TextEditingController descriptionController;
+  TextEditingController titleController = TextEditingController();
+  TextEditingController locationController = TextEditingController();
+  TextEditingController typeController = TextEditingController();
+  TextEditingController bedsController = TextEditingController();
+  TextEditingController bathsController = TextEditingController();
+  TextEditingController descriptionController = TextEditingController();
 
   bool isLoading = false;
 
   @override
   void initState() {
-    super.initState();
     titleController = TextEditingController(text: widget.property.title);
     locationController = TextEditingController(text: widget.property.location);
     typeController = TextEditingController(text: widget.property.type);
@@ -35,18 +34,23 @@ class _PropertyEditPageState extends State<PropertyEditPage> {
         TextEditingController(text: widget.property.baths.toString());
     descriptionController =
         TextEditingController(text: widget.property.description);
+
+    setState(() {
+      isLoading = false;
+    });
+    super.initState();
   }
 
-  @override
-  void dispose() {
-    titleController.dispose();
-    locationController.dispose();
-    typeController.dispose();
-    bedsController.dispose();
-    bathsController.dispose();
-    descriptionController.dispose();
-    super.dispose();
-  }
+  // @override
+  // void dispose() {
+  //   titleController.dispose();
+  //   locationController.dispose();
+  //   typeController.dispose();
+  //   bedsController.dispose();
+  //   bathsController.dispose();
+  //   descriptionController.dispose();
+  //   super.dispose();
+  // }
 
   Future<void> saveChanges() async {
     setState(() {
@@ -99,6 +103,14 @@ class _PropertyEditPageState extends State<PropertyEditPage> {
 
   @override
   Widget build(BuildContext context) {
+    // print('titleController text: ${titleController.text}');
+    // print('locationController text: ${locationController.text}');
+    // print('typeController text: ${typeController.text}');
+    // print('bedsController text: ${bedsController.text}');
+    // print('bathsController text: ${bathsController.text}');
+    // print('descriptionController text: ${descriptionController.text}');
+    setState(() {});
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Edit Property'),
@@ -124,8 +136,9 @@ class _PropertyEditPageState extends State<PropertyEditPage> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
+        child: ListView(
           children: [
+            Text('Hello world'),
             TextField(
               controller: titleController,
               decoration: InputDecoration(labelText: 'Title'),
@@ -153,18 +166,24 @@ class _PropertyEditPageState extends State<PropertyEditPage> {
               maxLines: 3,
               decoration: InputDecoration(labelText: 'Description'),
             ),
+            isLoading
+                ? LinearProgressIndicator(
+                    backgroundColor: Colors.grey[200],
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
+                  )
+                : SizedBox(height: 0),
           ],
         ),
       ),
-      bottomNavigationBar: Container(
-        padding: EdgeInsets.all(16.0),
-        child: isLoading
-            ? LinearProgressIndicator(
-                backgroundColor: Colors.grey[200],
-                valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
-              )
-            : null,
-      ),
+      // bottomNavigationBar: Container(
+      //   padding: EdgeInsets.all(16.0),
+      //   child: isLoading
+      //       ? LinearProgressIndicator(
+      //           backgroundColor: Colors.grey[200],
+      //           valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
+      //         )
+      //       : null,
+      // ),
     );
   }
 }

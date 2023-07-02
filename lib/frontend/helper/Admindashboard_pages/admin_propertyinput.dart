@@ -95,6 +95,8 @@ class _AdminPropertyInputPageState extends State<AdminPropertyInputPage> {
   Future<void> openPropertyDetailsPage(Property property) async {
     String landlordName = await getLandlordName(property.landlordRef);
 
+    print('Property id is ${property.propertyID}');
+
     Navigator.push(
       context,
       MaterialPageRoute(
