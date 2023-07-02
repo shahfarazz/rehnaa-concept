@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -93,7 +94,25 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
               email: user.email!,
               password: oldPassword,
             );
-            await user.reauthenticateWithCredential(credential);
+            try {
+              await user.reauthenticateWithCredential(credential);
+            } catch (e) {
+              if (kDebugMode) {
+                print('Error reauthenticating user: $e');
+              }
+              //show toast
+              Fluttertoast.showToast(
+                  msg: 'Wrong old password entered',
+                  toastLength: Toast.LENGTH_LONG,
+                  gravity: ToastGravity.BOTTOM,
+                  timeInSecForIosWeb: 1,
+                  backgroundColor: Colors.red,
+                  textColor: Colors.white,
+                  fontSize: 16.0);
+              Navigator.of(context).pop();
+              Navigator.of(context).pop();
+              return;
+            }
 
             // Change the user's password
             await user.updatePassword(newPassword);

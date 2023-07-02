@@ -221,28 +221,60 @@ class _PDFEditorPageState extends State<PDFEditorPage> {
     OpenFile.open('$path/Output.pdf');
 
     // upload the pdf to firebase storage
-    FirebaseStorage storage = FirebaseStorage.instance;
-    Reference ref = storage.ref().child("invoice_${widget.invoiceNumber}.pdf");
-    UploadTask uploadTask = ref.putFile(outputFile);
-    uploadTask.then((res) {
-      res.ref.getDownloadURL().then((value) {
-        print("Uploaded File URL: $value");
-        FirebaseFirestore.instance
-            .collection('invoices')
-            .doc(widget.invoiceNumber)
-            .set({
-          // 'invoiceNumber': widget.invoiceNumber,
-          // 'landlordName': widget.landlordName,
-          // 'landlordAddress': widget.landlordAddress,
-          // 'tenantName': widget.tenantName,
-          // 'tenantAddress': widget.tenantAddress,
-          // 'amount': widget.amount,
-          // 'paymentMode': widget.paymentMode,
-          // 'date': formatted,
-          'url': value,
+    try {
+      FirebaseStorage storage = FirebaseStorage.instance;
+      Reference ref =
+          storage.ref().child("invoice_${widget.invoiceNumber}.pdf");
+      UploadTask uploadTask = ref.putFile(outputFile);
+      uploadTask.then((res) {
+        res.ref.getDownloadURL().then((value) {
+          print("Uploaded File URL: $value");
+          FirebaseFirestore.instance
+              .collection('invoices')
+              .doc(widget.invoiceNumber)
+              .set({
+            // 'invoiceNumber': widget.invoiceNumber,
+            // 'landlordName': widget.landlordName,
+            // 'landlordAddress': widget.landlordAddress,
+            // 'tenantName': widget.tenantName,
+            // 'tenantAddress': widget.tenantAddress,
+            // 'amount': widget.amount,
+            // 'paymentMode': widget.paymentMode,
+            // 'date': formatted,
+            'url': value,
+          });
         });
       });
-    });
+    } catch (e) {
+      try {
+        FirebaseStorage storage = FirebaseStorage.instance;
+        Reference ref =
+            storage.ref().child("invoice_${widget.invoiceNumber}.pdf");
+        UploadTask uploadTask = ref.putFile(outputFile);
+        uploadTask.then((res) {
+          res.ref.getDownloadURL().then((value) {
+            print("Uploaded File URL: $value");
+            FirebaseFirestore.instance
+                .collection('invoices')
+                .doc(widget.invoiceNumber)
+                .set({
+              // 'invoiceNumber': widget.invoiceNumber,
+              // 'landlordName': widget.landlordName,
+              // 'landlordAddress': widget.landlordAddress,
+              // 'tenantName': widget.tenantName,
+              // 'tenantAddress': widget.tenantAddress,
+              // 'amount': widget.amount,
+              // 'paymentMode': widget.paymentMode,
+              // 'date': formatted,
+              'url': value,
+            });
+          });
+        });
+      } catch (e) {
+        print('tried two times error is $e');
+      }
+      // TODO
+    }
 
     return outputFile;
   }
