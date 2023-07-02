@@ -1066,7 +1066,12 @@ class _TenantProfilePageState extends State<TenantProfilePage> {
                                                             Navigator.of(
                                                                     context)
                                                                 .pop(null),
-                                                        child: Text('Cancel'),
+                                                        child: Text(
+                                                          'Cancel',
+                                                          style: TextStyle(
+                                                            color: Colors.green,
+                                                          ),
+                                                        ),
                                                       ),
                                                       TextButton(
                                                         onPressed: () async {
