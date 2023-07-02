@@ -129,7 +129,7 @@ class _SignUpPageState extends State<SignUpPage> {
       });
     } catch (e) {
       setState(() => isLoading = false);
-      _showToast('Sign up failed: $e', Colors.red);
+      _showToast('Sign up failed, please try again', Colors.red);
     }
   }
 
