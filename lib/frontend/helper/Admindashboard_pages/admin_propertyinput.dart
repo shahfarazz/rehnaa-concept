@@ -11,6 +11,7 @@ import 'dart:io';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter/services.dart';
+import 'package:rehnaa/frontend/Screens/Admin/admindashboard.dart';
 import 'dart:html' as html;
 
 import '../../../backend/models/propertymodel.dart';
@@ -107,110 +108,140 @@ class _AdminPropertyInputPageState extends State<AdminPropertyInputPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Property Images'),
-        flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Color(0xff0FA697),
-                Color(0xff45BF7A),
-                Color(0xff0DF205),
-              ],
-            ),
+  return Scaffold(
+    appBar: AppBar(
+      title: const Text('Property Images'),
+      flexibleSpace: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Color(0xff0FA697),
+              Color(0xff45BF7A),
+              Color(0xff0DF205),
+            ],
           ),
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.only(top: 16.0),
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: TextField(
-                controller: searchController,
-                onChanged: (value) {
-                  filterProperties(value);
-                },
-                decoration: const InputDecoration(
-                  labelText: 'Search',
-                  prefixIcon: Icon(Icons.search),
-                  border: OutlineInputBorder(),
-                ),
-              ),
-            ),
-            Expanded(
-              child: ListView.builder(
-                itemCount: getPaginatedProperties().length,
-                itemBuilder: (context, index) {
-                  Property property = getPaginatedProperties()[index];
-
-                  return ListTile(
-                    title: Text(property.title),
-                    subtitle: Text(property.location),
-                    leading: const Icon(Icons.home),
-                    onTap: () => openPropertyDetailsPage(property),
-                  );
-                },
-              ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.arrow_back),
-                  onPressed: () {
-                    setState(() {
-                      if (currentPage > 1) {
-                        currentPage--;
-                      }
-                    });
-                  },
-                ),
-                Text(
-                  'Page $currentPage',
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.arrow_forward),
-                  onPressed: () {
-                    setState(() {
-                      final maxPage =
-                          (filteredProperties.length / itemsPerPage).ceil();
-                      if (currentPage < maxPage) {
-                        currentPage++;
-                      }
-                    });
-                  },
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
+      leading: IconButton(
+        icon: Icon(Icons.arrow_back),
         onPressed: () {
-          showDialog(
-            context: context,
-            builder: (context) {
-              return Dialog(
-                child: PropertyCardWidget(),
-              );
-            },
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => AdminDashboard()),
           );
-          // Add functionality for the + floating action button here
         },
-        backgroundColor: const Color(0xff0FA697),
-        child: const Icon(Icons.add),
       ),
-    );
-  }
+    ),
+    body: Padding(
+      padding: const EdgeInsets.only(top: 16.0),
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: TextField(
+              controller: searchController,
+              onChanged: (value) {
+                filterProperties(value);
+              },
+              decoration: const InputDecoration(
+                labelText: 'Search',
+                prefixIcon: Icon(Icons.search),
+                border: OutlineInputBorder(),
+              ),
+            ),
+          ),
+          Expanded(
+            child: ListView.builder(
+              itemCount: getPaginatedProperties().length,
+              itemBuilder: (context, index) {
+                Property property = getPaginatedProperties()[index];
+
+                return ListTile(
+                  title: Text(property.title),
+                  subtitle: Text(property.location),
+                  leading: const Icon(Icons.home),
+                  onTap: () => openPropertyDetailsPage(property),
+                );
+              },
+            ),
+          ),
+          Row(
+  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  children: [
+    Expanded(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () {
+              setState(() {
+                if (currentPage > 1) {
+                  currentPage--;
+                }
+              });
+            },
+          ),
+          Text(
+            'Page $currentPage',
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          IconButton(
+            icon: const Icon(Icons.arrow_forward),
+            onPressed: () {
+              setState(() {
+                final maxPage = (filteredProperties.length / itemsPerPage).ceil();
+                if (currentPage < maxPage) {
+                  currentPage++;
+                }
+              });
+            },
+          ),
+        ],
+      ),
+    ),
+    Align(
+      alignment: Alignment.bottomRight,
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: buildFloatingActionButton(context),
+      ),
+    ),
+  ],
+),
+
+       
+
+        ],
+        
+      ),
+    ),
+    
+  );
+}
+}
+
+Widget buildFloatingActionButton(BuildContext context) {
+  return FloatingActionButton(
+    onPressed: () {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return Dialog(
+            child: PropertyCardWidget(),
+          );
+        },
+      );
+      // Add functionality for the + floating action button here
+    },
+    backgroundColor: const Color(0xff0FA697),
+    child: const Icon(Icons.add),
+  );
 }
 
 class PropertyCardWidget extends StatefulWidget {
@@ -687,7 +718,10 @@ class _PropertyCardWidgetState extends State<PropertyCardWidget> {
                           ),
                       child: const Text('Submit'),
                     ),
-                    if (uploading) const CircularProgressIndicator(),
+                    if (uploading) Container(
+                    padding: EdgeInsets.only(left: 150.0),
+                    child: CircularProgressIndicator(),
+                  ),
                   ],
                 ),
               ),

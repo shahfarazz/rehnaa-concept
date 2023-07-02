@@ -105,15 +105,15 @@ class _LandlordTenantsPageState extends State<LandlordTenantsPage>
     return GestureDetector(
       onTap: () {
         // Navigate to tenant info page
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => LandlordTenantInfoPage(
-              tenant: tenant,
-              uid: widget.uid,
-            ),
-          ),
-        );
+        // Navigator.push(
+        //   context,
+        //   MaterialPageRoute(
+        //     builder: (context) => LandlordTenantInfoPage(
+        //       tenant: tenant,
+        //       uid: widget.uid,
+        //     ),
+        //   ),
+        // );
       },
       child: Card(
         elevation: 4.0,
