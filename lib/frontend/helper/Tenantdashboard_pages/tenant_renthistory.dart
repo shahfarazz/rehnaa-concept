@@ -34,6 +34,7 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
   String invoiceNumber = '';
   String pdfUrl = '';
   Timer? _timer;
+  bool isWithdrawType = false;
 
   @override
   bool get wantKeepAlive => true;
@@ -99,6 +100,7 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
               .doc(rentPayment.invoiceNumber)
               .get()
               .then((value) => value.data()!['url']);
+          isWithdrawType = data['landlordRef'] != null;
 
           print('rentpayment found and is ${rentPayment}');
           newRentPayments.add(rentPayment); // Add the new rent payment
@@ -242,7 +244,7 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Text(
-                              firstName == 'Withdraw' ? '-' : '+',
+                              isWithdrawType ? '-' : '+',
                               style: GoogleFonts.montserrat(
                                 fontSize: size.width * 0.04,
                                 fontWeight: FontWeight.bold,
