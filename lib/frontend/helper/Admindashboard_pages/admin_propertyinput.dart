@@ -166,57 +166,42 @@ class _AdminPropertyInputPageState extends State<AdminPropertyInputPage> {
             ),
           ),
           Row(
-  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  children: [
-    Expanded(
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: () {
-              setState(() {
-                if (currentPage > 1) {
-                  currentPage--;
-                }
-              });
-            },
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.arrow_back),
+                onPressed: () {
+                  setState(() {
+                    if (currentPage > 1) {
+                      currentPage--;
+                    }
+                  });
+                },
+              ),
+              Text(
+                'Page $currentPage',
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.arrow_forward),
+                onPressed: () {
+                  setState(() {
+                    final maxPage =
+                        (filteredProperties.length / itemsPerPage).ceil();
+                    if (currentPage < maxPage) {
+                      currentPage++;
+                    }
+                  });
+                },
+              ),
+            ],
           ),
-          Text(
-            'Page $currentPage',
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          IconButton(
-            icon: const Icon(Icons.arrow_forward),
-            onPressed: () {
-              setState(() {
-                final maxPage = (filteredProperties.length / itemsPerPage).ceil();
-                if (currentPage < maxPage) {
-                  currentPage++;
-                }
-              });
-            },
-          ),
-        ],
-      ),
-    ),
-    Align(
-      alignment: Alignment.bottomRight,
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: buildFloatingActionButton(context),
-      ),
-    ),
-  ],
-),
-
-       
+        buildFloatingActionButton(context),
 
         ],
-        
       ),
     ),
     

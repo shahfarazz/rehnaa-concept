@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'dart:html' as html;
 
 import '../../../backend/models/dealermodel.dart';
+import '../../Screens/Admin/admindashboard.dart';
 
 class AdminDealerInputPage extends StatefulWidget {
   const AdminDealerInputPage({super.key});
@@ -435,6 +436,15 @@ class _AdminDealerInputPageState extends State<AdminDealerInputPage> {
             ),
           ),
         ),
+        leading: IconButton(
+        icon: Icon(Icons.arrow_back),
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => AdminDashboard()),
+          );
+        },
+      ),
       ),
       body: Padding(
         padding: const EdgeInsets.only(top: 16.0),
@@ -515,6 +525,10 @@ class _AdminDealerInputPageState extends State<AdminDealerInputPage> {
         backgroundColor: const Color(0xff0FA697),
         child: const Icon(Icons.add),
       ),
+      
     );
   }
 }
+
+
+

@@ -12,6 +12,7 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:rehnaa/frontend/Screens/Admin/admindashboard.dart';
 
 import '../../../backend/models/landlordmodel.dart';
 import '../../../backend/models/propertymodel.dart';
@@ -426,6 +427,15 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
             ),
           ),
         ),
+        leading: IconButton(
+        icon: Icon(Icons.arrow_back),
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => AdminDashboard()),
+          );
+        },
+      ),
       ),
       body: Padding(
         padding: const EdgeInsets.only(top: 16.0),
@@ -496,23 +506,29 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
                 ),
               ],
             ),
+      buildFloatingActionButton(context),
+
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          showDialog(
-            context: context,
-            builder: (context) {
-              return Dialog(
-                child: TenantCardWidget(),
-              );
-            },
-          );
-        },
-        backgroundColor: const Color(0xff0FA697),
-        child: const Icon(Icons.add),
-      ),
     );
   }
+}
+
+Widget buildFloatingActionButton(BuildContext context) {
+  return FloatingActionButton(
+    onPressed: () {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return Dialog(
+            child: TenantCardWidget(),
+          );
+        },
+      );
+      // Add functionality for the + floating action button here
+    },
+    backgroundColor: const Color(0xff0FA697),
+    child: const Icon(Icons.add),
+  );
 }

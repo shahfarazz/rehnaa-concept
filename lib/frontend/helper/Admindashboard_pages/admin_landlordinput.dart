@@ -18,6 +18,7 @@ import 'package:flutter/services.dart' show rootBundle;
 
 import '../../../backend/models/landlordmodel.dart';
 // import '../../../backend/models/propertymodel.dart';
+import '../../Screens/Admin/admindashboard.dart';
 import 'admin_landlordinputhelper.dart';
 
 class AdminLandlordInputPage extends StatefulWidget {
@@ -174,9 +175,9 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
                         },
                         progressIndicatorBuilder:
                             (context, url, downloadProgress) {
-                          return CircularProgressIndicator(
-                            value: downloadProgress.progress,
-                          );
+                          return Container(
+                    padding: EdgeInsets.only(left: 150.0),
+                    child: CircularProgressIndicator(value: downloadProgress.progress,),);
                         },
                       ),
                     ),
@@ -464,7 +465,9 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
                         }).toList(),
                       );
                     } else {
-                      return const CircularProgressIndicator();
+                      return Container(
+                    padding: EdgeInsets.only(left: 150.0),
+                    child: CircularProgressIndicator());
                     }
                   },
                 ),
@@ -537,7 +540,11 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
                         }).toList(),
                       );
                     } else {
-                      return const CircularProgressIndicator();
+                      return Container(
+                    padding: EdgeInsets.only(left: 150.0),
+                    child: CircularProgressIndicator(),
+                  );
+                      // CircularProgressIndicator();
                     }
                   },
                 ),
@@ -612,7 +619,9 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
                         }).toList(),
                       );
                     } else {
-                      return const CircularProgressIndicator();
+                      return Container(
+                    padding: EdgeInsets.only(left: 150.0),
+                    child: CircularProgressIndicator());
                     }
                   },
                 ),
@@ -661,7 +670,17 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
             ),
           ),
         ),
+        leading: IconButton(
+        icon: Icon(Icons.arrow_back),
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => AdminDashboard()),
+          );
+        },
       ),
+      ),
+      
       body: Padding(
         padding: const EdgeInsets.only(top: 16.0),
         child: Column(
@@ -729,24 +748,29 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
                 ),
               ],
             ),
+            buildFloatingActionButton(context),
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          showDialog(
-            context: context,
-            builder: (context) {
-              return Dialog(
-                child: LandlordCardWidget(),
-              );
-            },
-          );
-          // Add functionality for the + floating action button here
-        },
-        backgroundColor: const Color(0xff0FA697),
-        child: const Icon(Icons.add),
-      ),
+      
     );
   }
+}
+
+Widget buildFloatingActionButton(BuildContext context) {
+  return FloatingActionButton(
+    onPressed: () {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return Dialog(
+            child: LandlordCardWidget(),
+          );
+        },
+      );
+      // Add functionality for the + floating action button here
+    },
+    backgroundColor: const Color(0xff0FA697),
+    child: const Icon(Icons.add),
+  );
 }
