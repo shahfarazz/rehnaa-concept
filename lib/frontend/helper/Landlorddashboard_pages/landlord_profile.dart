@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:rehnaa/backend/services/authentication_service.dart';
@@ -193,14 +194,29 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
       return false;
     }
 
-    final File imageFile = File(pickedImage.path);
+    // Compress the image
+    final Uint8List? compressedImage =
+        await FlutterImageCompress.compressWithFile(
+      pickedImage.path,
+      minWidth: 1000, // Adjust parameters as needed
+      minHeight: 1000, // Adjust parameters as needed
+      quality: 88, // Adjust parameters as needed
+    );
+
+    final Directory tempDir = Directory.systemTemp;
+    final String tempPath =
+        '${tempDir.path}/${DateTime.now().millisecondsSinceEpoch}.jpg';
+    final File compressedImageFile =
+        await File(tempPath).writeAsBytes(compressedImage!);
+
     final String fileName = 'users/${widget.uid}/profile_image.jpg';
 
     try {
       // Upload the image to Firebase Storage
       final Reference storageReference =
           FirebaseStorage.instance.ref().child(fileName);
-      final UploadTask uploadTask = storageReference.putFile(imageFile);
+      final UploadTask uploadTask =
+          storageReference.putFile(compressedImageFile);
       final TaskSnapshot taskSnapshot = await uploadTask.whenComplete(() {});
 
       // Get the download URL of the uploaded image
@@ -222,6 +238,10 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
         textColor: Colors.white,
         fontSize: 16.0,
       );
+
+      // Delete the temporary image file
+      await compressedImageFile.delete();
+
       return true;
     } catch (e) {
       // Show an error toast
@@ -273,6 +293,7 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
         textColor: Colors.white,
         fontSize: 16.0,
       );
+      return;
     } catch (e) {
       // Show an error toast
       Fluttertoast.showToast(
@@ -285,6 +306,7 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
         fontSize: 16.0,
       );
       print('Error uploading image: $e');
+      return;
     }
   }
 
