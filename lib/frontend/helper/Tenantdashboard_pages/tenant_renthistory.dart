@@ -54,7 +54,7 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
 
   // Periodically fetch new data every 5 seconds
   void _startPeriodicFetch() {
-    Timer.periodic(const Duration(seconds: 5), (_) {
+    _timer = Timer.periodic(const Duration(seconds: 5), (_) {
       _tenantRentPayments();
     });
   }
@@ -78,10 +78,6 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
       firstName = data['firstName'];
       lastName = data['lastName'];
 
-      setState(() {
-        shouldDisplay = true;
-      });
-
       // print('reached here with landlord data as $data');
 
       List<RentPayment> newRentPayments = []; // Store the new rent payments
@@ -102,7 +98,10 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
               .then((value) => value.data()!['url']);
           isWithdrawType = data['landlordRef'] != null;
 
-          print('rentpayment found and is ${rentPayment}');
+          // print('rentpayment found and is ${rentPayment}');
+          setState(() {
+            shouldDisplay = true;
+          });
           newRentPayments.add(rentPayment); // Add the new rent payment
         }
       }
@@ -115,9 +114,12 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
       }
 
       if (kDebugMode) {
-        print('Rent payments: $_rentPayments');
+        // print('Rent payments: $_rentPayments');
       }
     } catch (e) {
+      setState(() {
+        shouldDisplay = false;
+      });
       if (kDebugMode) {
         print('Error fetching rent payments: $e');
       }

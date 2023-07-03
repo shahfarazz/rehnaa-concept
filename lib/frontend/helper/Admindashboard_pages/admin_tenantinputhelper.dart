@@ -241,7 +241,10 @@ class _TenantCardWidgetState extends State<TenantCardWidget> {
                           onPressed: validateInputs,
                           child: const Text('Submit'),
                         ),
-                        if (uploading) const CircularProgressIndicator(),
+                        if (uploading)  Container(
+                    padding: EdgeInsets.only(left: 150.0),
+                    child: CircularProgressIndicator(),
+                  ),
                       ],
                     ),
                   ),

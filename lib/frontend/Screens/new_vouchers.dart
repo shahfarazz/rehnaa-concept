@@ -71,54 +71,57 @@ class _NewVouchersPageState extends State<NewVouchersPage> {
                 )
               ],
             )
-          : ListView.builder(
-              addAutomaticKeepAlives: true,
-              itemCount: images.length,
-              itemBuilder: (context, index) {
-                return Column(
-                  children: [
-                    SizedBox(height: size.height * 0.02),
-                    Text(
-                      'Voucher ${index + 1}',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.green,
-                        fontFamily: GoogleFonts.montserrat().fontFamily,
-                      ),
-                    ),
-                    Card(
-                      child: GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => ExpandedImageDialog(
-                                imagePath: images[index],
-                              ),
-                            ),
-                          );
-                        },
-                        child: SizedBox(
-                          width: 200,
-                          height: 200,
-                          child: Image.network(images[index],
-                              fit: BoxFit.cover,
-                              loadingBuilder:
-                                  (context, child, loadingProgress) => Center(
-                                        child: loadingProgress == null
-                                            ? child
-                                            : CircularProgressIndicator(
-                                                color: Colors.green,
-                                              ),
-                                      )),
+          : images.length == 0
+              ? Center(child: Text('No Vouchers Available Yet'))
+              : ListView.builder(
+                  addAutomaticKeepAlives: true,
+                  itemCount: images.length,
+                  itemBuilder: (context, index) {
+                    return Column(
+                      children: [
+                        SizedBox(height: size.height * 0.02),
+                        Text(
+                          'Voucher ${index + 1}',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.green,
+                            fontFamily: GoogleFonts.montserrat().fontFamily,
+                          ),
                         ),
-                      ),
-                    )
-                  ],
-                );
-              },
-            ),
+                        Card(
+                          child: GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ExpandedImageDialog(
+                                    imagePath: images[index],
+                                  ),
+                                ),
+                              );
+                            },
+                            child: SizedBox(
+                              width: 200,
+                              height: 200,
+                              child: Image.network(images[index],
+                                  fit: BoxFit.cover,
+                                  loadingBuilder:
+                                      (context, child, loadingProgress) =>
+                                          Center(
+                                            child: loadingProgress == null
+                                                ? child
+                                                : CircularProgressIndicator(
+                                                    color: Colors.green,
+                                                  ),
+                                          )),
+                            ),
+                          ),
+                        )
+                      ],
+                    );
+                  },
+                ),
     );
   }
 }

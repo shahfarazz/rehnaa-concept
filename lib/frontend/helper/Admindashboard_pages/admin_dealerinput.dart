@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'dart:html' as html;
 
 import '../../../backend/models/dealermodel.dart';
+import '../../Screens/Admin/admindashboard.dart';
 
 class AdminDealerInputPage extends StatefulWidget {
   const AdminDealerInputPage({super.key});
@@ -435,86 +436,105 @@ class _AdminDealerInputPageState extends State<AdminDealerInputPage> {
             ),
           ),
         ),
+        leading: IconButton(
+        icon: Icon(Icons.arrow_back),
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => AdminDashboard()),
+          );
+        },
+      ),
       ),
       body: Padding(
-        padding: const EdgeInsets.only(top: 16.0),
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: TextField(
-                controller: searchController,
-                onChanged: (value) {
-                  filterDealers(value);
-                },
-                decoration: const InputDecoration(
-                  labelText: 'Search',
-                  prefixIcon: Icon(Icons.search),
-                  border: OutlineInputBorder(),
-                ),
-              ),
-            ),
-            Expanded(
-              child: ListView.builder(
-                itemCount: getPaginatedDealers().length,
-                itemBuilder: (context, index) {
-                  Dealer dealer = getPaginatedDealers()[index];
-
-                  return ListTile(
-                    title: Text('${dealer.firstName} ${dealer.lastName}'),
-                    subtitle: Text(dealer.balance.toString()),
-                    leading: const Icon(Icons.person),
-                    onTap: () {
-                      _showEditDialog(dealer);
-                    },
-                  );
-                },
-              ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.arrow_back),
-                  onPressed: () {
-                    setState(() {
-                      if (currentPage > 1) {
-                        currentPage--;
-                      }
-                    });
-                  },
-                ),
-                Text(
-                  'Page $currentPage',
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.arrow_forward),
-                  onPressed: () {
-                    setState(() {
-                      final maxPage =
-                          (filteredDealers.length / itemsPerPage).ceil();
-                      if (currentPage < maxPage) {
-                        currentPage++;
-                      }
-                    });
-                  },
-                ),
-              ],
-            ),
-          ],
+  padding: const EdgeInsets.only(top: 16.0),
+  child: Column(
+    children: [
+      Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: TextField(
+          controller: searchController,
+          onChanged: (value) {
+            filterDealers(value);
+          },
+          decoration: const InputDecoration(
+            labelText: 'Search',
+            prefixIcon: Icon(Icons.search),
+            border: OutlineInputBorder(),
+          ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          _addNewDealerDialog();
-        },
-        backgroundColor: const Color(0xff0FA697),
-        child: const Icon(Icons.add),
+      Expanded(
+        child: ListView.builder(
+          itemCount: getPaginatedDealers().length,
+          itemBuilder: (context, index) {
+            Dealer dealer = getPaginatedDealers()[index];
+
+            return ListTile(
+              title: Text('${dealer.firstName} ${dealer.lastName}'),
+              subtitle: Text(dealer.balance.toString()),
+              leading: const Icon(Icons.person),
+              onTap: () {
+                _showEditDialog(dealer);
+              },
+            );
+          },
+        ),
       ),
+      Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.arrow_back),
+                onPressed: () {
+                  setState(() {
+                    if (currentPage > 1) {
+                      currentPage--;
+                    }
+                  });
+                },
+              ),
+              Text(
+                'Page $currentPage',
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.arrow_forward),
+                onPressed: () {
+                  setState(() {
+                    final maxPage =
+                        (filteredDealers.length / itemsPerPage).ceil();
+                    if (currentPage < maxPage) {
+                      currentPage++;
+                    }
+                  });
+                },
+              ),
+            ],
+          ),
+          SizedBox(height: 5.0), // Add some spacing between the arrows and the FloatingActionButton
+          FloatingActionButton(
+            onPressed: () {
+              _addNewDealerDialog();
+            },
+            backgroundColor: const Color(0xff0FA697),
+            child: const Icon(Icons.add),
+          ),
+        ],
+      ),
+    ],
+  ),
+),
+
+      
     );
   }
 }
+
+
+
