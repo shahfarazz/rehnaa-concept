@@ -444,7 +444,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                   const SizedBox(width: 20),
                   CustomButton(
                     color: Colors.deepPurpleAccent,
-                    icon: Icons.person_add,
+                    icon: Icons.person_add_alt_1,
                     text: 'Tenant Input',
                     onPressed: () {
                       Navigator.push(

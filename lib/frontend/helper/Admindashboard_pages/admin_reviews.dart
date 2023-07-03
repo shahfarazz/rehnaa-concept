@@ -64,29 +64,42 @@ class _AdminReviewsTestimonialsPageState
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Reviews and Testimonials'),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.of(context).pushReplacement(
-              MaterialPageRoute(
-                builder: (context) => AdminDashboard(),
-              ),
-            );
-          },
+Widget build(BuildContext context) {
+  return Scaffold(
+    appBar: AppBar(
+      title: Text('Reviews and Testimonials'),
+      flexibleSpace: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Color(0xff0FA697),
+              Color(0xff45BF7A),
+              Color(0xff0DF205),
+            ],
+          ),
         ),
       ),
-      body: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-        stream: _propertiesStream,
-        builder: (BuildContext context,
-            AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
-          if (snapshot.hasError) {
-            return Container(
-              color: Colors.red,
-              padding: const EdgeInsets.all(8.0),
+      leading: IconButton(
+        icon: Icon(Icons.arrow_back),
+        onPressed: () {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (context) => AdminDashboard(),
+            ),
+          );
+        },
+      ),
+    ),
+    body: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+      stream: _propertiesStream,
+      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
+        if (snapshot.hasError) {
+          return Container(
+            color: Colors.red,
+            padding: const EdgeInsets.all(8.0),
+            child: Center(
               child: Text(
                 'Something went wrong',
                 style: TextStyle(
@@ -94,43 +107,40 @@ class _AdminReviewsTestimonialsPageState
                   fontSize: 16.0,
                 ),
               ),
-            );
-          } else if (snapshot.connectionState == ConnectionState.waiting) {
-            return Stack(
-              children: [
-                ListView(), // Empty ListView as a placeholder
-                Positioned.fill(
-                  child: Container(
-                    color: Colors.black.withOpacity(0.5), // Background color
-                    child: Center(
-                      child: CircularProgressIndicator(
-                        valueColor: AlwaysStoppedAnimation<Color>(
-                            Colors.green), // Set the color of the indicator
-                      ),
+            ),
+          );
+        } else if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(
+            child: CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
+            ),
+          );
+        } else {
+          final properties = snapshot.data?.docs;
+
+          if (properties == null || properties.isEmpty) {
+            return Center(child: Text('No properties found'));
+          }
+
+          return ListView.builder(
+            itemCount: properties.length,
+            itemBuilder: (context, index) {
+              DocumentSnapshot<Map<String, dynamic>> property = properties[index];
+              final propertyData = property.data();
+              String title = propertyData?['title'] ?? 'No title';
+              String address = propertyData?['address'] ?? 'No address';
+              String tenantReview = propertyData?['tenantReview'] ?? '';
+
+              return Card(
+                child: ListTile(
+                  leading: Icon(Icons.house),
+                  title: Text(
+                    title,
+                    style: TextStyle(
+                      // fontWeight: FontWeight.bold,
+                      fontSize: 16.0,
                     ),
                   ),
-                ),
-              ],
-            );
-          } else {
-            final properties = snapshot.data?.docs;
-
-            if (properties == null || properties.isEmpty) {
-              return Text('No properties found');
-            }
-
-            return ListView.builder(
-              itemCount: properties.length,
-              itemBuilder: (context, index) {
-                DocumentSnapshot<Map<String, dynamic>> property =
-                    properties[index];
-                final propertyData = property.data();
-                String title = propertyData?['title'] ?? 'No title';
-                String address = propertyData?['address'] ?? 'No address';
-                String tenantReview = propertyData?['tenantReview'] ?? '';
-
-                return ListTile(
-                  title: Text(title),
                   subtitle: Text(address),
                   onTap: () {
                     showDialog(
@@ -151,10 +161,8 @@ class _AdminReviewsTestimonialsPageState
                               },
                               child: Text('Cancel'),
                             ),
-                            TextButton(
-                              onPressed: _addingReview
-                                  ? null
-                                  : () => _addReview(property.id),
+                            ElevatedButton(
+                              onPressed: _addingReview ? null : () => _addReview(property.id),
                               child: Text('Add'),
                             ),
                           ],
@@ -162,12 +170,15 @@ class _AdminReviewsTestimonialsPageState
                       },
                     );
                   },
-                );
-              },
-            );
-          }
-        },
-      ),
-    );
-  }
+                ),
+              );
+            },
+          );
+        }
+      },
+    ),
+  );
+}
+
+
 }
