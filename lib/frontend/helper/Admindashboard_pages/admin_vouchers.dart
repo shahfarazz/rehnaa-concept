@@ -33,6 +33,7 @@ class _AdminVouchersPageState extends State<AdminVouchersPage> {
   void initState() {
     super.initState();
     fetchVouchers();
+    reloadVouchers();
   }
 
   Future<void> addVoucher() async {
@@ -51,7 +52,6 @@ class _AdminVouchersPageState extends State<AdminVouchersPage> {
     if (input.files != null) {
       setState(() {
         pickedFile = input.files;
-        // buttonLabel = 'Images Selected (${selectedImages!.length})';
       });
     }
 
@@ -144,17 +144,18 @@ class _AdminVouchersPageState extends State<AdminVouchersPage> {
 
   Future<void> deleteVoucher(int index) async {
     try {
-      await firebase_storage.FirebaseStorage.instance
-          .ref(vouchers[index].ref.fullPath)
-          .delete();
-      setState(() {
-        vouchers.removeAt(index);
-      });
       FirebaseFirestore.instance
           .collection('Vouchers')
           .doc('voucherkey')
           .update({
         'urls': FieldValue.arrayRemove([vouchers[index].url])
+      });
+      // print('current voucher: ${vouchers}');
+      await firebase_storage.FirebaseStorage.instance
+          .ref(vouchers[index].ref.fullPath)
+          .delete();
+      setState(() {
+        vouchers.removeAt(index);
       });
     } catch (error) {
       print('Error deleting voucher: $error');
@@ -211,69 +212,70 @@ class _AdminVouchersPageState extends State<AdminVouchersPage> {
         ),
       ),
       body: Stack(
-  children: [
-    Column(
-      children: [
-        Expanded(
-          child: FutureBuilder<List<Voucher>>(
-            future: fetchVouchers(),
-            builder: (BuildContext context, AsyncSnapshot<List<Voucher>> snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return Center(
-                  child: CircularProgressIndicator(color: Colors.green),
-                );
-              } else if (snapshot.hasError) {
-                return Center(child: Text('Error: ${snapshot.error}'));
-              } else {
-                return ListView.builder(
-                  itemCount: snapshot.data?.length,
-                  addAutomaticKeepAlives: true,
-                  itemBuilder: (context, index) {
-                    return ListTile(
-                      title: Text('Voucher ${index + 1}'),
-                      leading: Image.network(snapshot.data![index].url),
-                      trailing: IconButton(
-                        onPressed: () => deleteVoucher(index),
-                        icon: const Icon(Icons.delete),
-                      ),
-                    );
-                  },
-                );
-              }
-            },
-          ),
-        ),
-      ],
-    ),
-    Positioned(
-      left: 0,
-      right: 0,
-      bottom: 20,
-      child: Column(
         children: [
-          Text(
-            'Add Voucher',
-            style: TextStyle(
-              fontSize: 16, // Adjust the font size as desired
-              fontWeight: FontWeight.bold, // Make the text bold
+          Column(
+            children: [
+              Expanded(
+                child: FutureBuilder<List<Voucher>>(
+                  future: fetchVouchers(),
+                  builder: (BuildContext context,
+                      AsyncSnapshot<List<Voucher>> snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Center(
+                        child: CircularProgressIndicator(color: Colors.green),
+                      );
+                    } else if (snapshot.hasError) {
+                      return Center(child: Text('Error: ${snapshot.error}'));
+                    } else {
+                      return ListView.builder(
+                        itemCount: snapshot.data?.length,
+                        addAutomaticKeepAlives: true,
+                        itemBuilder: (context, index) {
+                          return ListTile(
+                            title: Text('Voucher ${index + 1}'),
+                            leading: Image.network(snapshot.data![index].url),
+                            trailing: IconButton(
+                              onPressed: () {
+                                deleteVoucher(index);
+                                // setState(() {});
+                              },
+                              icon: const Icon(Icons.delete),
+                            ),
+                          );
+                        },
+                      );
+                    }
+                  },
+                ),
+              ),
+            ],
+          ),
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 20,
+            child: Column(
+              children: [
+                Text(
+                  'Add Voucher',
+                  style: TextStyle(
+                    fontSize: 16, // Adjust the font size as desired
+                    fontWeight: FontWeight.bold, // Make the text bold
+                  ),
+                ),
+                const SizedBox(height: 8),
+                FloatingActionButton(
+                  onPressed: () {
+                    addVoucher();
+                  },
+                  backgroundColor: const Color(0xff0FA697),
+                  child: const Icon(Icons.add),
+                ),
+              ],
             ),
           ),
-          const SizedBox(height: 8),
-
-          FloatingActionButton(
-            onPressed: () {
-              addVoucher();
-            },
-            backgroundColor: const Color(0xff0FA697),
-            child: const Icon(Icons.add),
-          ),
-          
         ],
       ),
-    ),
-  ],
-),
-
     );
   }
 }
