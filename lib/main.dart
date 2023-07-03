@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
-import 'package:rehnaa/frontend/Screens/Admin/admindashboard.dart';
+// import 'package:rehnaa/frontend/Screens/Admin/admindashboard.dart';
 import 'package:rehnaa/frontend/Screens/Landlord/landlord_dashboard.dart';
 import 'package:rehnaa/frontend/Screens/login_page.dart';
 import 'package:rehnaa/frontend/Screens/signup_page.dart';
@@ -62,10 +62,10 @@ class MyApp extends StatelessWidget {
                 bodyMedium: TextStyle(fontSize: 14),
                 bodySmall: TextStyle(fontSize: 12),
               )),
-          // home: LandlordDashboardPage(
-          //   uid: '9l1ZrmtJ0lRSSIazEpFf7xWau952',
-          // ),
-          home: AdminDashboard(),
+          home: LandlordDashboardPage(
+            uid: '9l1ZrmtJ0lRSSIazEpFf7xWau952',
+          ),
+          // home: AdminDashboard(),
           // home: const SplashScreen(),
           // home: DealerDashboardPage(uid: 'fUuFmW7bNaweyP5xkc4c'),
           // home: TenantDashboardPage(

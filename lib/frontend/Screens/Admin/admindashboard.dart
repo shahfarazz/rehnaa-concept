@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -23,10 +25,31 @@ class AdminDashboard extends StatefulWidget {
 }
 
 class _AdminDashboardState extends State<AdminDashboard> {
+  Timer? _timer;
+
   @override
   void initState() {
     super.initState();
     _getNotifs();
+    _startPeriodicFetch();
+  }
+
+  // Periodically fetch new data every 5 seconds
+  void _startPeriodicFetch() {
+    _timer = Timer.periodic(const Duration(seconds: 5), (_) {
+      _getNotifs();
+    });
+  }
+
+  // Stop periodic fetching
+  void _stopPeriodicFetch() {
+    _timer?.cancel();
+  }
+
+  @override
+  void dispose() {
+    _stopPeriodicFetch();
+    super.dispose();
   }
 
   List<Map<String, String>> notifications = [];
@@ -72,13 +95,25 @@ class _AdminDashboardState extends State<AdminDashboard> {
             // Do nothing
           } else {
             // Leave other cases blank for now
-            Map<String, String> notification = {
-              'title': key,
-              'amount': '',
-              'fullname': '',
-              'paymentMethod': '',
-            };
-            tempNotifications.add(notification);
+            value.forEach((item) {
+              if (!item.containsKey('read') || !item['read']) {
+                Map<String, String> notification = {
+                  'title': key,
+                  'fullname': '',
+                  // 'uid': item['uid'],
+                  'senderid': propertysnapshot.id,
+                };
+                tempNotifications.add(notification);
+              }
+            });
+            // Map<String, String> notification = {
+            //   'title': key,
+            //   'amount': '',
+            //   'fullname': '',
+            //   'paymentMethod': '',
+            //   'senderid': propertysnapshot.id,
+            // };
+            // tempNotifications.add(notification);
           }
         });
       });
@@ -115,19 +150,14 @@ class _AdminDashboardState extends State<AdminDashboard> {
                       return Dismissible(
                         key: Key(notification.toString()),
                         onDismissed: (direction) {
+                          // print('registered dimsiss at index ');
                           setState(() {
                             notifications.removeAt(index);
                           });
-
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content:
-                                  Text('${notification['title']} dismissed'),
-                            ),
-                          );
-
                           String notificationTitle =
                               notification['title'] ?? '';
+                          // print(
+                          //     'notification senderId is ${notification['senderid']}');
                           FirebaseFirestore.instance
                               .collection('AdminRequests')
                               .doc(notification['senderid'])
@@ -135,6 +165,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
                               .then((docSnapshot) {
                             if (docSnapshot.exists) {
                               Map<String, dynamic>? data = docSnapshot.data();
+                              // print(
+                              //     'docsnapshot exists and notificationtitle is $notificationTitle and data is ${data?['notificationTitle']}');
                               if (data!.containsKey(notificationTitle) &&
                                   data[notificationTitle] is List) {
                                 List<dynamic> notificationList =
@@ -152,6 +184,13 @@ class _AdminDashboardState extends State<AdminDashboard> {
                               }
                             }
                           });
+
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content:
+                                  Text('${notification['title']} dismissed'),
+                            ),
+                          );
                         },
                         background: Container(
                           color: Colors.red,
@@ -395,19 +434,19 @@ class _AdminDashboardState extends State<AdminDashboard> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  CustomButton(
-                    color: Colors.red,
-                    icon: Icons.info,
-                    text: 'Information about\nLandlord and Tenant',
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => AdminLandlordTenantInfoPage(),
-                        ),
-                      );
-                    },
-                  ),
+                  // CustomButton(
+                  //   color: Colors.red,
+                  //   icon: Icons.info,
+                  //   text: 'Information about\nLandlord and Tenant',
+                  //   onPressed: () {
+                  //     Navigator.push(
+                  //       context,
+                  //       MaterialPageRoute(
+                  //         builder: (context) => AdminLandlordTenantInfoPage(),
+                  //       ),
+                  //     );
+                  //   },
+                  // ),
                   const SizedBox(width: 20),
                   CustomButton(
                     color: Colors.teal,

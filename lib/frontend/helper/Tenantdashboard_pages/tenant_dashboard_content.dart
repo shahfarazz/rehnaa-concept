@@ -392,6 +392,7 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
           // Handle any error that occurred while fetching the data
           return Text('Error: ${snapshot.error}');
         } else if (snapshot.hasData) {
+          print('snapshot: ${snapshot.data?.data()}');
           Map<String, dynamic> json =
               snapshot.data?.data() as Map<String, dynamic>;
           // Fetch tenant

@@ -496,7 +496,7 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
           return Text('Error: ${snapshot.error}');
         } else if (snapshot.hasData) {
           // Convert the snapshot to JSON
-          print('Snapshot: ${snapshot.data!.data()}');
+          // print('Snapshot: ${snapshot.data!.data()}');
           Map<String, dynamic> json =
               snapshot.data!.data() as Map<String, dynamic>;
           if (kDebugMode) {

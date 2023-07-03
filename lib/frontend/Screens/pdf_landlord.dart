@@ -9,9 +9,9 @@ import 'package:pdf/widgets.dart' as pdfWidget;
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:open_file/open_file.dart';
+import 'package:rehnaa/frontend/Screens/Landlord/landlord_dashboard.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
-import 'Tenant/tenant_dashboard.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
 class PDFEditorPage extends StatefulWidget {
@@ -400,7 +400,7 @@ class _PDFEditorPageState extends State<PDFEditorPage> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) => TenantDashboardPage(
+                  builder: (context) => LandlordDashboardPage(
                         uid: widget.uid,
                       )),
             );
