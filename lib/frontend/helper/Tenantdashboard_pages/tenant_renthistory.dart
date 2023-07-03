@@ -78,10 +78,6 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
       firstName = data['firstName'];
       lastName = data['lastName'];
 
-      setState(() {
-        shouldDisplay = true;
-      });
-
       // print('reached here with landlord data as $data');
 
       List<RentPayment> newRentPayments = []; // Store the new rent payments
@@ -103,6 +99,9 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
           isWithdrawType = data['landlordRef'] != null;
 
           // print('rentpayment found and is ${rentPayment}');
+          setState(() {
+            shouldDisplay = true;
+          });
           newRentPayments.add(rentPayment); // Add the new rent payment
         }
       }
@@ -118,6 +117,9 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
         // print('Rent payments: $_rentPayments');
       }
     } catch (e) {
+      setState(() {
+        shouldDisplay = false;
+      });
       if (kDebugMode) {
         print('Error fetching rent payments: $e');
       }

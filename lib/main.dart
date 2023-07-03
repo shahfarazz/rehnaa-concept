@@ -2,17 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
 // import 'package:rehnaa/frontend/Screens/Admin/admindashboard.dart';
-import 'package:rehnaa/frontend/Screens/Landlord/landlord_dashboard.dart';
-import 'package:rehnaa/frontend/Screens/login_page.dart';
-import 'package:rehnaa/frontend/Screens/signup_page.dart';
-import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenant_rented_property.dart';
+// import 'package:rehnaa/frontend/Screens/Landlord/landlord_dashboard.dart';
+// import 'package:rehnaa/frontend/Screens/login_page.dart';
+// import 'package:rehnaa/frontend/Screens/signup_page.dart';
+// import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenant_rented_property.dart';
 import 'backend/services/authentication_service.dart';
-import 'frontend/Screens/Dealer/dealer_dashboard.dart';
-import 'frontend/Screens/Tenant/tenant_dashboard.dart';
-import 'frontend/Screens/Tenant/tenantsignupdetails.dart';
+// import 'frontend/Screens/Dealer/dealer_dashboard.dart';
+// import 'frontend/Screens/Tenant/tenant_dashboard.dart';
+// import 'frontend/Screens/Tenant/tenantsignupdetails.dart';
 import 'frontend/Screens/splash.dart';
 import 'firebase_options.dart';
-import 'frontend/helper/Tenantdashboard_pages/tenant_profile.dart';
+// import 'frontend/helper/Tenantdashboard_pages/tenant_profile.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 
 void main() async {
@@ -62,11 +62,11 @@ class MyApp extends StatelessWidget {
                 bodyMedium: TextStyle(fontSize: 14),
                 bodySmall: TextStyle(fontSize: 12),
               )),
-          home: LandlordDashboardPage(
-            uid: '9l1ZrmtJ0lRSSIazEpFf7xWau952',
-          ),
+          // home: LandlordDashboardPage(
+          //   uid: '9l1ZrmtJ0lRSSIazEpFf7xWau952',
+          // ),
           // home: AdminDashboard(),
-          // home: const SplashScreen(),
+          home: const SplashScreen(),
           // home: DealerDashboardPage(uid: 'fUuFmW7bNaweyP5xkc4c'),
           // home: TenantDashboardPage(
           //   uid: 'b8F8kl7Hf2h4dOii1jzUFHsNvzw2',
