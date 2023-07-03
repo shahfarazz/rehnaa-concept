@@ -210,69 +210,70 @@ class _AdminVouchersPageState extends State<AdminVouchersPage> {
           ),
         ),
       ),
-      body: Center(
-        child: Column(
-          children: [
-            Stack(
-              children: [
-                ElevatedButton(
-                  onPressed: () {
-                    addVoucher();
-                  },
-                  child: const Text('Add Voucher'),
-                ),
-                if (isLoading)
-                  Positioned.fill(
-                    child: Container(
-                      color: Colors.black54,
-                      child: const Center(
-                        child: CircularProgressIndicator(),
+      body: Stack(
+  children: [
+    Column(
+      children: [
+        Expanded(
+          child: FutureBuilder<List<Voucher>>(
+            future: fetchVouchers(),
+            builder: (BuildContext context, AsyncSnapshot<List<Voucher>> snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Center(
+                  child: CircularProgressIndicator(color: Colors.green),
+                );
+              } else if (snapshot.hasError) {
+                return Center(child: Text('Error: ${snapshot.error}'));
+              } else {
+                return ListView.builder(
+                  itemCount: snapshot.data?.length,
+                  addAutomaticKeepAlives: true,
+                  itemBuilder: (context, index) {
+                    return ListTile(
+                      title: Text('Voucher ${index + 1}'),
+                      leading: Image.network(snapshot.data![index].url),
+                      trailing: IconButton(
+                        onPressed: () => deleteVoucher(index),
+                        icon: const Icon(Icons.delete),
                       ),
-                    ),
-                  ),
-              ],
-            ),
-            Expanded(
-              child: FutureBuilder<List<Voucher>>(
-                future:
-                    fetchVouchers(), // replace with your method to get vouchers
-                builder: (BuildContext context,
-                    AsyncSnapshot<List<Voucher>> snapshot) {
-                  print('data is ${snapshot.connectionState}');
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    // If the future is loading, show a loading spinner
-                    return Center(
-                        child: CircularProgressIndicator(
-                      color: Colors.green,
-                    ));
-                  } else if (snapshot.hasError) {
-                    // If the future completed with an error, show an error message
-                    return Center(child: Text('Error: ${snapshot.error}'));
-                  } else {
-                    // If the future completed with a value, show the ListView
-                    // var data = snapshot.data!;
-                    print('now data is ${snapshot.data}');
-                    return ListView.builder(
-                      itemCount: snapshot.data?.length,
-                      addAutomaticKeepAlives: true,
-                      itemBuilder: (context, index) {
-                        return ListTile(
-                          title: Text('Voucher ${index + 1}'),
-                          leading: Image.network(snapshot.data![index].url),
-                          trailing: IconButton(
-                            onPressed: () => deleteVoucher(index),
-                            icon: const Icon(Icons.delete),
-                          ),
-                        );
-                      },
                     );
-                  }
-                },
-              ),
-            ),
-          ],
+                  },
+                );
+              }
+            },
+          ),
         ),
+      ],
+    ),
+    Positioned(
+      left: 0,
+      right: 0,
+      bottom: 20,
+      child: Column(
+        children: [
+          Text(
+            'Add Voucher',
+            style: TextStyle(
+              fontSize: 16, // Adjust the font size as desired
+              fontWeight: FontWeight.bold, // Make the text bold
+            ),
+          ),
+          const SizedBox(height: 8),
+
+          FloatingActionButton(
+            onPressed: () {
+              addVoucher();
+            },
+            backgroundColor: const Color(0xff0FA697),
+            child: const Icon(Icons.add),
+          ),
+          
+        ],
       ),
+    ),
+  ],
+),
+
     );
   }
 }
