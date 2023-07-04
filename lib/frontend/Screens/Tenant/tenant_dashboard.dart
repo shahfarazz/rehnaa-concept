@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -45,6 +47,7 @@ class _DashboardPageState extends State<TenantDashboardPage>
   bool isNewVoucher = false;
 
   bool _isWithdraw = false;
+  Timer? _timer;
 
   @override
   void initState() {
@@ -63,6 +66,20 @@ class _DashboardPageState extends State<TenantDashboardPage>
         .doc(widget.uid)
         .snapshots();
     isNewVouchers();
+    _startPeriodicFetch();
+  }
+
+  // Periodically fetch new data every 16 seconds
+  void _startPeriodicFetch() {
+    // print('start periodic fetch');
+    _timer = Timer.periodic(const Duration(seconds: 15), (_) {
+      isNewVouchers();
+    });
+  }
+
+  // Stop periodic fetching
+  void _stopPeriodicFetch() {
+    _timer?.cancel();
   }
 
   @override
@@ -71,6 +88,7 @@ class _DashboardPageState extends State<TenantDashboardPage>
     _sidebarController.dispose(); // Dispose the AnimationController
     super.dispose();
     // _getNotifs();
+    _stopPeriodicFetch();
     _notificationStream.drain();
     _notificationStream2.drain();
   }
@@ -110,6 +128,7 @@ class _DashboardPageState extends State<TenantDashboardPage>
           }
         }
       });
+      // print('isNewVoucher is $isNewVoucher');
     } catch (e) {
       print('error is $e');
     }
@@ -542,29 +561,33 @@ class _DashboardPageState extends State<TenantDashboardPage>
                         // _closeSidebar();
                       },
                     ),
-                    _buildSidebarItem(
-                      icon: Icons.receipt,
-                      label: 'Vouchers',
-                      onTap: () {
-                        //firebase call set users isNewVouchers to false
-                        FirebaseFirestore.instance
-                            .collection('Tenants')
-                            .doc(widget.uid)
-                            .set({
-                          'isNewVouchers': false,
-                        }, SetOptions(merge: true));
+                    StatefulBuilder(
+                      builder: (BuildContext context, setState) {
+                        return _buildSidebarItem(
+                          icon: Icons.receipt,
+                          label: 'Vouchers',
+                          onTap: () {
+                            //firebase call set users isNewVouchers to false
+                            FirebaseFirestore.instance
+                                .collection('Tenants')
+                                .doc(widget.uid)
+                                .set({
+                              'isNewVouchers': false,
+                            }, SetOptions(merge: true));
 
-                        setState(() {
-                          isNewVoucher = false;
-                        });
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const NewVouchersPage(),
-                          ),
+                            setState(() {
+                              isNewVoucher = false;
+                            });
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const NewVouchersPage(),
+                              ),
+                            );
+                          },
+                          showBadge: isNewVoucher,
                         );
                       },
-                      showBadge: isNewVoucher,
                     ),
                     _buildSidebarItem(
                       icon: Icons.lock,

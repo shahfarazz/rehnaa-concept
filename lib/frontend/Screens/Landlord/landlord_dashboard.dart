@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -40,6 +42,7 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
   late Stream<DocumentSnapshot<Map<String, dynamic>>> _notificationStream;
   late Stream<DocumentSnapshot<Map<String, dynamic>>> _notificationStream2;
   bool isNewVoucher = false;
+  Timer? _timer;
 
   @override
   void initState() {
@@ -57,6 +60,19 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
         .doc(widget.uid)
         .snapshots();
     isNewVouchers();
+    _startPeriodicFetch();
+  }
+
+  // Periodically fetch new data every 15 seconds
+  void _startPeriodicFetch() {
+    _timer = Timer.periodic(const Duration(seconds: 15), (_) {
+      isNewVouchers();
+    });
+  }
+
+  // Stop periodic fetching
+  void _stopPeriodicFetch() {
+    _timer?.cancel();
   }
 
   @override
@@ -65,6 +81,7 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
     _sidebarController.dispose();
     _notificationStream.drain();
     _notificationStream2.drain();
+    _stopPeriodicFetch();
     super.dispose();
   }
 
@@ -450,29 +467,33 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
                         // _closeSidebar();
                       },
                     ),
-                    _buildSidebarItem(
-                      icon: Icons.receipt,
-                      label: 'Vouchers',
-                      onTap: () {
-                        //firebase call set users isNewVouchers to false
-                        FirebaseFirestore.instance
-                            .collection('Landlords')
-                            .doc(widget.uid)
-                            .update({'isNewVouchers': false});
+                    StatefulBuilder(
+                      builder: (BuildContext context, setState) {
+                        return _buildSidebarItem(
+                          icon: Icons.receipt,
+                          label: 'Vouchers',
+                          onTap: () {
+                            //firebase call set users isNewVouchers to false
+                            FirebaseFirestore.instance
+                                .collection('Tenants')
+                                .doc(widget.uid)
+                                .set({
+                              'isNewVouchers': false,
+                            }, SetOptions(merge: true));
 
-                        setState(() {
-                          isNewVoucher = false;
-                        });
-
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const NewVouchersPage(),
-                          ),
+                            setState(() {
+                              isNewVoucher = false;
+                            });
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const NewVouchersPage(),
+                              ),
+                            );
+                          },
+                          showBadge: isNewVoucher,
                         );
-                        // _closeSidebar();
                       },
-                      showBadge: isNewVoucher,
                     ),
                     _buildSidebarItem(
                       icon: Icons.receipt_long,

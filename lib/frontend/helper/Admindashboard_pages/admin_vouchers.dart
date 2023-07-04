@@ -101,6 +101,25 @@ class _AdminVouchersPageState extends State<AdminVouchersPage> {
         // Update documents in the Tenants collection
         QuerySnapshot tenantsQuerySnapshot =
             await FirebaseFirestore.instance.collection('Tenants').get();
+        QuerySnapshot notifsQuerySnapshot =
+            await FirebaseFirestore.instance.collection('Notifications').get();
+
+        //in all notification documents append to the notifications array
+        // with a title:"New Voucher has been added".
+
+        notifsQuerySnapshot.docs.forEach((notifDoc) {
+          batch.set(
+              notifDoc.reference,
+              {
+                'notifications': FieldValue.arrayUnion([
+                  {
+                    'title': 'New Voucher has been added',
+                  }
+                ])
+              },
+              SetOptions(merge: true));
+        });
+
         tenantsQuerySnapshot.docs.forEach((tenantDoc) {
           batch.set(tenantDoc.reference, {'isNewVouchers': true},
               SetOptions(merge: true));

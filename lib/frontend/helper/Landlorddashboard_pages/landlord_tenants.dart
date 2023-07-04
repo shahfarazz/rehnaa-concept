@@ -234,7 +234,7 @@ class _LandlordTenantsPageState extends State<LandlordTenantsPage>
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     const Icon(
-                      Icons.sentiment_dissatisfied,
+                      Icons.error_outline_rounded,
                       size: 48.0,
                       color: Color(0xff33907c),
                     ),

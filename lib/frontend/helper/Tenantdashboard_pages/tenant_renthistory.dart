@@ -418,7 +418,8 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
                     child: TextFormField(
                       decoration: const InputDecoration(
                         labelText: "Search",
-                        suffixIcon: Icon(Icons.search),
+                        labelStyle: TextStyle(color: Colors.green),
+                        suffixIcon: Icon(Icons.search, color: Colors.green),
                         border: InputBorder.none,
                         contentPadding: EdgeInsets.all(10),
                       ),

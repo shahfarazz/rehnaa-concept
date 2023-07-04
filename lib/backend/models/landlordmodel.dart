@@ -7,7 +7,7 @@ import 'tenantsmodel.dart';
 class Landlord {
   final String firstName;
   final String lastName;
-  final double balance;
+  final num balance;
   final String? pathToImage;
   final List<DocumentReference<Map<String, dynamic>>>? tenantRef;
   final List<DocumentReference<Map<String, dynamic>>> propertyRef;
@@ -53,7 +53,7 @@ class Landlord {
     Landlord landlord = Landlord(
       firstName: json!['firstName'],
       lastName: json['lastName'],
-      balance: json['balance'] != null ? json['balance'].toDouble() : 0.0,
+      balance: json['balance'] ?? 0.0,
       tenantRef: json['tenantRef'] != null
           ? List<DocumentReference<Map<String, dynamic>>>.from(
               json['tenantRef'].map((ref) => ref as DocumentReference))
