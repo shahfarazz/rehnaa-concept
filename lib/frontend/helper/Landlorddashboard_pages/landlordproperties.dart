@@ -98,6 +98,7 @@ class _LandlordPropertiesPageState extends State<LandlordPropertiesPage>
           setState(() {
             _propertyStream = combinedStream;
             propertyDataList = propertyDataList2;
+            isEmptyList = false;
           });
         }
       }
@@ -250,6 +251,7 @@ class _LandlordPropertiesPageState extends State<LandlordPropertiesPage>
                   location: property.location,
                   address: property.address,
                   type: property.type,
+                  area: property.area ?? 0,
                   onTap: () {
                     Navigator.push(
                       context,
@@ -287,6 +289,7 @@ class PropertyCard extends StatelessWidget {
   final String location;
   final String address;
   final String type;
+  final num area;
 
   const PropertyCard({
     super.key,
@@ -298,6 +301,7 @@ class PropertyCard extends StatelessWidget {
     required this.location,
     required this.address,
     required this.type,
+    required this.area,
   });
 
   @override
@@ -355,6 +359,13 @@ class PropertyCard extends StatelessWidget {
                     SizedBox(height: screenHeight * 0.01),
                     Row(
                       children: [
+                        Icon(Icons.area_chart, size: screenWidth * 0.035),
+                        SizedBox(width: screenWidth * 0.01),
+                        Text(
+                          '${property.area?.round()} Marlas / ${(property.area! * 272).round()} Sqft',
+                          style: TextStyle(fontSize: screenWidth * 0.035),
+                        ),
+                        SizedBox(width: screenWidth * 0.01),
                         Icon(Icons.king_bed_outlined,
                             size: screenWidth * 0.035),
                         SizedBox(width: screenWidth * 0.01),

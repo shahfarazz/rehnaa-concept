@@ -20,6 +20,7 @@ class _PropertyEditPageState extends State<PropertyEditPage> {
   TextEditingController bedsController = TextEditingController();
   TextEditingController bathsController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
+  TextEditingController areaController = TextEditingController();
 
   bool isLoading = false;
 
@@ -34,6 +35,9 @@ class _PropertyEditPageState extends State<PropertyEditPage> {
         TextEditingController(text: widget.property.baths.toString());
     descriptionController =
         TextEditingController(text: widget.property.description);
+
+    areaController =
+        TextEditingController(text: widget.property.area.toString());
 
     setState(() {
       isLoading = false;
@@ -62,14 +66,15 @@ class _PropertyEditPageState extends State<PropertyEditPage> {
       await FirebaseFirestore.instance
           .collection('Properties')
           .doc(widget.property.propertyID)
-          .update({
+          .set({
         'title': titleController.text,
         'location': locationController.text,
         'type': typeController.text,
         'beds': int.tryParse(bedsController.text) ?? 0,
         'baths': int.tryParse(bathsController.text) ?? 0,
         'description': descriptionController.text,
-      });
+        'area': int.tryParse(areaController.text) ?? 0,
+      }, SetOptions(merge: true));
 
       // Update property object with edited values
       widget.property.title = titleController.text;
@@ -78,6 +83,7 @@ class _PropertyEditPageState extends State<PropertyEditPage> {
       widget.property.beds = int.tryParse(bedsController.text) ?? 0;
       widget.property.baths = int.tryParse(bathsController.text) ?? 0;
       widget.property.description = descriptionController.text;
+      widget.property.area = int.tryParse(areaController.text) ?? 0;
 
       Fluttertoast.showToast(
         msg: 'Changes saved successfully',
@@ -160,6 +166,11 @@ class _PropertyEditPageState extends State<PropertyEditPage> {
               controller: bathsController,
               keyboardType: TextInputType.number,
               decoration: InputDecoration(labelText: 'Baths'),
+            ),
+            TextField(
+              controller: areaController,
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(labelText: 'Area in Marlas'),
             ),
             TextField(
               controller: descriptionController,

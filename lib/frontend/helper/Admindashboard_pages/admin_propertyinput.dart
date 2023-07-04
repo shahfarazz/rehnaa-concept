@@ -108,107 +108,105 @@ class _AdminPropertyInputPageState extends State<AdminPropertyInputPage> {
 
   @override
   Widget build(BuildContext context) {
-  return Scaffold(
-    appBar: AppBar(
-      title: const Text('Property Images'),
-      flexibleSpace: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Color(0xff0FA697),
-              Color(0xff45BF7A),
-              Color(0xff0DF205),
-            ],
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Property Images'),
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Color(0xff0FA697),
+                Color(0xff45BF7A),
+                Color(0xff0DF205),
+              ],
+            ),
           ),
         ),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => AdminDashboard()),
+            );
+          },
+        ),
       ),
-      leading: IconButton(
-        icon: Icon(Icons.arrow_back),
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => AdminDashboard()),
-          );
-        },
-      ),
-    ),
-    body: Padding(
-      padding: const EdgeInsets.only(top: 16.0),
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: TextField(
-              controller: searchController,
-              onChanged: (value) {
-                filterProperties(value);
-              },
-              decoration: const InputDecoration(
-                labelText: 'Search',
-                prefixIcon: Icon(Icons.search),
-                border: OutlineInputBorder(),
-              ),
-            ),
-          ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: getPaginatedProperties().length,
-              itemBuilder: (context, index) {
-                Property property = getPaginatedProperties()[index];
-
-                return ListTile(
-                  title: Text(property.title),
-                  subtitle: Text(property.location),
-                  leading: const Icon(Icons.home),
-                  onTap: () => openPropertyDetailsPage(property),
-                );
-              },
-            ),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              IconButton(
-                icon: const Icon(Icons.arrow_back),
-                onPressed: () {
-                  setState(() {
-                    if (currentPage > 1) {
-                      currentPage--;
-                    }
-                  });
+      body: Padding(
+        padding: const EdgeInsets.only(top: 16.0),
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: TextField(
+                controller: searchController,
+                onChanged: (value) {
+                  filterProperties(value);
                 },
-              ),
-              Text(
-                'Page $currentPage',
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
+                decoration: const InputDecoration(
+                  labelText: 'Search',
+                  prefixIcon: Icon(Icons.search),
+                  border: OutlineInputBorder(),
                 ),
               ),
-              IconButton(
-                icon: const Icon(Icons.arrow_forward),
-                onPressed: () {
-                  setState(() {
-                    final maxPage =
-                        (filteredProperties.length / itemsPerPage).ceil();
-                    if (currentPage < maxPage) {
-                      currentPage++;
-                    }
-                  });
+            ),
+            Expanded(
+              child: ListView.builder(
+                itemCount: getPaginatedProperties().length,
+                itemBuilder: (context, index) {
+                  Property property = getPaginatedProperties()[index];
+
+                  return ListTile(
+                    title: Text(property.title),
+                    subtitle: Text(property.location),
+                    leading: const Icon(Icons.home),
+                    onTap: () => openPropertyDetailsPage(property),
+                  );
                 },
               ),
-            ],
-          ),
-        buildFloatingActionButton(context),
-
-        ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.arrow_back),
+                  onPressed: () {
+                    setState(() {
+                      if (currentPage > 1) {
+                        currentPage--;
+                      }
+                    });
+                  },
+                ),
+                Text(
+                  'Page $currentPage',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.arrow_forward),
+                  onPressed: () {
+                    setState(() {
+                      final maxPage =
+                          (filteredProperties.length / itemsPerPage).ceil();
+                      if (currentPage < maxPage) {
+                        currentPage++;
+                      }
+                    });
+                  },
+                ),
+              ],
+            ),
+            buildFloatingActionButton(context),
+          ],
+        ),
       ),
-    ),
-    
-  );
-}
+    );
+  }
 }
 
 Widget buildFloatingActionButton(BuildContext context) {
@@ -253,6 +251,7 @@ class _PropertyCardWidgetState extends State<PropertyCardWidget> {
   String tenantReview = '';
   List<String> imagePath = [];
   String? typeError;
+  String? areaError;
   String? bedsError;
   String? bathsError;
   String? livingError;
@@ -274,6 +273,7 @@ class _PropertyCardWidgetState extends State<PropertyCardWidget> {
   String? addressError;
   String buttonLabel = 'Select Images';
   bool uploading = false; // Track the uploading state
+  num? area;
 
   List<DocumentSnapshot<Map<String, dynamic>>> landlordList = [];
   List<html.File>? selectedImages = [];
@@ -378,6 +378,19 @@ class _PropertyCardWidgetState extends State<PropertyCardWidget> {
                 onChanged: (value) {
                   setState(() {
                     title = value;
+                  });
+                },
+              ),
+              if (areaError != null)
+                Text(
+                  areaError!,
+                  style: const TextStyle(color: Colors.red),
+                ),
+              TextField(
+                decoration: const InputDecoration(labelText: 'Area in Marlas'),
+                onChanged: (value) {
+                  setState(() {
+                    area = value.isEmpty ? null : num.parse(value);
                   });
                 },
               ),
@@ -666,6 +679,7 @@ class _PropertyCardWidgetState extends State<PropertyCardWidget> {
                             'rehnaaRating': rehnaaRating,
                             'tenantRating': tenantRating,
                             'tenantReview': tenantReview,
+                            'area': area,
                           }, SetOptions(merge: true));
 
                           // set landlord's property ref to the new property ref above
@@ -703,10 +717,11 @@ class _PropertyCardWidgetState extends State<PropertyCardWidget> {
                           ),
                       child: const Text('Submit'),
                     ),
-                    if (uploading) Container(
-                    padding: EdgeInsets.only(left: 150.0),
-                    child: CircularProgressIndicator(),
-                  ),
+                    if (uploading)
+                      Container(
+                        padding: EdgeInsets.only(left: 150.0),
+                        child: CircularProgressIndicator(),
+                      ),
                   ],
                 ),
               ),
@@ -728,6 +743,16 @@ class _PropertyCardWidgetState extends State<PropertyCardWidget> {
     } else {
       setState(() {
         typeError = null;
+      });
+    }
+    if ((area ?? 0) <= 0) {
+      setState(() {
+        areaError = 'Area is less than 0 or empty.';
+        isValid = false;
+      });
+    } else {
+      setState(() {
+        areaError = null;
       });
     }
 

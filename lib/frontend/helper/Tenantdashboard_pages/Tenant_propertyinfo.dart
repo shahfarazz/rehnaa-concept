@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 // ignore: depend_on_referenced_packages
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:rehnaa/frontend/Screens/Tenant/tenant_dashboard.dart';
-import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenant_dashboard_content.dart';
+// import 'package:rehnaa/frontend/Screens/Tenant/tenant_dashboard.dart';
+// import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenant_dashboard_content.dart';
 import 'package:photo_view/photo_view.dart';
 
 import '../../../backend/models/propertymodel.dart';
@@ -365,6 +365,12 @@ class PropertyDetails extends StatelessWidget {
                                 physics: const AlwaysScrollableScrollPhysics(),
                                 child: Row(
                                   children: [
+                                    SizedBox(width: screenWidth * 0.02),
+                                    PropertySpecs(
+                                      icon: Icons.area_chart_outlined,
+                                      text:
+                                          '${property.area?.round()} Marlas/ ${(property.area! * 272).round()} Sqft',
+                                    ),
                                     SizedBox(width: screenWidth * 0.035),
                                     if (property.beds > 0)
                                       PropertySpecs(
@@ -423,11 +429,12 @@ class PropertyDetails extends StatelessWidget {
                     ),
                     const SizedBox(height: 12),
                     Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         // const SizedBox(width: 8),
                         // const Spacer(),
-                        Padding(
-                            padding: EdgeInsets.only(left: screenWidth * 0.3)),
+                        // Padding(
+                        //     padding: EdgeInsets.only(left: screenWidth * 0.3)),
                         Center(
                           child: isRequested
                               ? GradientButton(
@@ -694,19 +701,20 @@ class GradientButton extends StatelessWidget {
           onTap: onPressed,
           child: Padding(
             padding: const EdgeInsets.symmetric(
-              horizontal: 5,
+              horizontal: 12,
               vertical: 12,
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(
-                  Icons.arrow_forward,
-                  color: Colors.white,
-                ),
+                // const Icon(
+                //   Icons.arrow_forward,
+                //   color: Colors.white,
+                // ),
                 const SizedBox(width: 8),
                 Text(
                   text,
+                  textAlign: TextAlign.center,
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 16,

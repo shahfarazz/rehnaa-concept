@@ -22,6 +22,7 @@ class Property {
   double tenantRating;
   String tenantReview;
   String? propertyID;
+  num? area;
 
   Property({
     required this.imagePath,
@@ -44,6 +45,7 @@ class Property {
     required this.tenantReview,
     this.propertyID,
     this.tenantRef,
+    this.area,
   });
 
   static Property fromJson(Map<String, dynamic> json) {
@@ -67,6 +69,7 @@ class Property {
       tenantReview: json['tenantReview'],
       address: json['address'] ?? 'No address provided',
       tenantRef: json['tenantRef'],
+      area: json['area'] ?? 0.0,
       // landlord: Landlord.fromJson(json['landlord']),
     );
 

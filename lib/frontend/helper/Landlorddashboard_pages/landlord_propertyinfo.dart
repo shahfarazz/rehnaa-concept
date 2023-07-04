@@ -323,6 +323,12 @@ class PropertyDetails extends StatelessWidget {
                           child: Row(
                             children: [
                               SizedBox(width: screenWidth * 0.025),
+                              PropertySpecs(
+                                icon: Icons.area_chart_outlined,
+                                text:
+                                    '${property.area?.round()} Marlas/ ${(property.area! * 272).round()} Sqft',
+                              ),
+                              SizedBox(width: screenWidth * 0.02),
                               if (property.beds > 0)
                                 PropertySpecs(
                                   icon: Icons.king_bed_outlined,
