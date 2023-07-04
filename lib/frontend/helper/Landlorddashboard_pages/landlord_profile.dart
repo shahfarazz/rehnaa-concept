@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
@@ -186,7 +188,7 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
     });
   }
 
-  Future<bool> openCamera() async {
+  Future<bool> openCamera(BuildContext context) async {
     final picker = ImagePicker();
     final pickedImage = await picker.pickImage(source: ImageSource.camera);
 
@@ -217,7 +219,88 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
           FirebaseStorage.instance.ref().child(fileName);
       final UploadTask uploadTask =
           storageReference.putFile(compressedImageFile);
+
+      // Show a dialog indicating the upload is in progress
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text(
+              'Uploading Image',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.green,
+                fontSize: 20,
+                fontFamily: GoogleFonts.montserrat().fontFamily,
+              ),
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                CircularProgressIndicator(color: Colors.green),
+                SizedBox(height: 16),
+                Text(
+                  'Uploading...',
+                  style: TextStyle(fontSize: 16),
+                ),
+              ],
+            ),
+          );
+        },
+      );
+
+      // Add a showDialog statement to display a message during the upload
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text(
+              'Upload Progress',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.green,
+                fontSize: 20,
+                fontFamily: GoogleFonts.montserrat().fontFamily,
+              ),
+            ),
+            content: StreamBuilder<TaskSnapshot>(
+              stream: uploadTask.snapshotEvents,
+              builder:
+                  (BuildContext context, AsyncSnapshot<TaskSnapshot> snapshot) {
+                try {
+                  double progress = snapshot.data!.bytesTransferred /
+                      snapshot.data!.totalBytes;
+                  String progressText = progress != null
+                      ? (progress * 100).toStringAsFixed(2) + '%'
+                      : '0%';
+                  return Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      CircularProgressIndicator(
+                          color: Colors.green, value: progress),
+                      SizedBox(height: 16),
+                      Text(
+                        'Upload progress: $progressText',
+                        style: TextStyle(fontSize: 16),
+                      ),
+                    ],
+                  );
+                } catch (e) {
+                  // TODO
+                  return Container();
+                }
+              },
+            ),
+          );
+        },
+      );
+
       final TaskSnapshot taskSnapshot = await uploadTask.whenComplete(() {});
+
+      // Dismiss the upload progress dialog
+      Navigator.of(context, rootNavigator: true).pop();
 
       // Get the download URL of the uploaded image
       final String downloadURL = await taskSnapshot.ref.getDownloadURL();
@@ -254,7 +337,30 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
         textColor: Colors.white,
         fontSize: 16.0,
       );
+
+      // Print the error
       print('Error uploading image: $e');
+
+      // Show the error message on the screen
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text(
+              'Error',
+              style: TextStyle(color: Colors.red),
+            ),
+            content: Text('Failed to upload image: $e'),
+            actions: [
+              ElevatedButton(
+                child: Text('OK'),
+                onPressed: () => Navigator.pop(context),
+              ),
+            ],
+          );
+        },
+      );
+
       return false;
     }
   }
@@ -417,7 +523,7 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
                     },
                   );
 
-                  bool isUploadSuccess = await openCamera();
+                  bool isUploadSuccess = await openCamera(context);
 
                   setState(() {});
 

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
@@ -22,17 +24,26 @@ class LandlordPropertiesPage extends StatefulWidget {
 class _LandlordPropertiesPageState extends State<LandlordPropertiesPage>
     with AutomaticKeepAliveClientMixin<LandlordPropertiesPage> {
   List<Property> properties = [];
-  late Stream<List<DocumentSnapshot<Map<String, dynamic>>>> _propertyStream;
+  // late Stream<List<DocumentSnapshot<Map<String, dynamic>>>> _propertyStream;
   String firstName = '';
   String lastName = '';
 
   bool shouldDisplay = false;
+  bool isEmptyList = false;
   @override
+  Stream<List<DocumentSnapshot<Map<String, dynamic>>>> _propertyStream =
+      const Stream.empty();
+  Timer? _propertyStreamTimer;
+  List<DocumentReference<Map<String, dynamic>>> propertyDataList = [];
+
   void initState() {
     super.initState();
-    // _loadProperties();
-    _propertyStream = const Stream.empty();
     _loadProperties(); // Initialize the stream for the properties
+  }
+
+  void dispose() {
+    _cancelPropertyStreamTimer();
+    super.dispose();
   }
 
   void _loadProperties() {
@@ -40,7 +51,76 @@ class _LandlordPropertiesPageState extends State<LandlordPropertiesPage>
       setState(() {
         _propertyStream = stream;
       });
+      _startPropertyStreamTimer(); // Start the timer to periodically update the property stream
     });
+  }
+
+  Future<void> _updatePropertyStream() async {
+    _cancelPropertyStreamTimer(); // Cancel the timer before updating the stream
+
+    // Fetch the latest property references from the Landlords collection
+    final landlordSnapshot = await FirebaseFirestore.instance
+        .collection('Landlords')
+        .doc(widget.uid)
+        .get();
+
+    if (landlordSnapshot.exists) {
+      print('nahi yahan');
+      Map<String, dynamic> data = landlordSnapshot.data()!;
+      List<DocumentReference<Map<String, dynamic>>> propertyDataList2 =
+          (data['propertyRef'] as List<dynamic>)
+              .cast<DocumentReference<Map<String, dynamic>>>();
+
+      if (propertyDataList.map((ref) => ref.path).toList().toString() !=
+          propertyDataList2.map((ref) => ref.path).toList().toString()) {
+        print('propertyDataList is $propertyDataList');
+        print('propertyDataList2 is ${propertyDataList2.length}');
+
+        Iterable<Stream<DocumentSnapshot<Map<String, dynamic>>>>
+            propertySnapshotsStreams =
+            propertyDataList2.map((ref) => ref.snapshots());
+
+        properties = []; // Clear the properties list
+        // Combine the property snapshot streams into a single stream
+        if (propertyDataList2.isEmpty) {
+          // print('reached here and doing this');
+          // Set the propertyDataList to null if propertyDataList2 is null
+          setState(() {
+            // _propertyStream.drain();
+            _propertyStream = const Stream.empty();
+            propertyDataList = [];
+            isEmptyList = true;
+          });
+        } else {
+          Stream<List<DocumentSnapshot<Map<String, dynamic>>>> combinedStream =
+              CombineLatestStream.list(propertySnapshotsStreams);
+
+          setState(() {
+            _propertyStream = combinedStream;
+            propertyDataList = propertyDataList2;
+          });
+        }
+      }
+    } else {
+      print('yahan reach horha hai');
+      setState(() {
+        properties =
+            []; // Handle the case where the landlord document doesn't exist
+        _propertyStream = Stream.empty();
+      });
+    }
+
+    _startPropertyStreamTimer(); // Restart the timer for periodic updates
+  }
+
+  void _startPropertyStreamTimer() {
+    _propertyStreamTimer = Timer.periodic(const Duration(seconds: 5), (_) {
+      _updatePropertyStream();
+    });
+  }
+
+  void _cancelPropertyStreamTimer() {
+    _propertyStreamTimer?.cancel();
   }
 
   Future<Stream<List<DocumentSnapshot<Map<String, dynamic>>>>>
@@ -62,9 +142,8 @@ class _LandlordPropertiesPageState extends State<LandlordPropertiesPage>
         firstName = landlord.firstName;
         lastName = landlord.lastName;
 
-        List<DocumentReference<Map<String, dynamic>>> propertyDataList =
-            (data['propertyRef'] as List<dynamic>)
-                .cast<DocumentReference<Map<String, dynamic>>>();
+        propertyDataList = (data['propertyRef'] as List<dynamic>)
+            .cast<DocumentReference<Map<String, dynamic>>>();
 
         Iterable<Stream<DocumentSnapshot<Map<String, dynamic>>>>
             propertySnapshotsStreams =
@@ -101,9 +180,10 @@ class _LandlordPropertiesPageState extends State<LandlordPropertiesPage>
       stream: _propertyStream,
       builder: (context, snapshot) {
         Size size = MediaQuery.of(context).size;
+        // print('data is ${snapshot.data?.map((e) => e.data())}');
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const LandlordPropertiesSkeleton();
-        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+        } else if (isEmptyList || !snapshot.hasData || snapshot.data!.isEmpty) {
           return Column(
             children: [
               SizedBox(height: size.height * 0.03),
@@ -226,7 +306,7 @@ class PropertyCard extends StatelessWidget {
     final screenWidth = mediaQuery.size.width;
     final screenHeight = mediaQuery.size.height;
 
-    print('property.imagepath is ${property.imagePath}');
+    // print('property.imagepath is ${property.imagePath}');
 
     return GestureDetector(
       onTap: onTap,
