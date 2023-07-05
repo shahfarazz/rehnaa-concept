@@ -717,39 +717,35 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
                         ),
                         Column(
                           children: <Widget>[
-                            Padding(
-                              padding: const EdgeInsets.only(
-                                top: 0.0,
-                                left: 20.0,
-                                right: 20.0,
-                                bottom: 0.0,
-                              ),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: <Widget>[
-                                  Hero(
-                                    tag: 'notificationTitle',
-                                    child: Text(
-                                      'Notifications',
-                                      style: TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                        fontFamily:
-                                            GoogleFonts.montserrat().fontFamily,
-                                      ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                SizedBox(width: size.width * 0.15),
+                                Hero(
+                                  tag: 'notificationTitle',
+                                  child: Text(
+                                    'Notifications',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                      fontFamily:
+                                          GoogleFonts.montserrat().fontFamily,
                                     ),
                                   ),
-                                  IconButton(
-                                    icon: const Icon(Icons.close),
-                                    onPressed: () {
-                                      Navigator.pop(context);
-                                    },
-                                    color: Colors.white,
-                                  ),
-                                ],
-                              ),
+                                ),
+                                IconButton(
+                                  padding:
+                                      EdgeInsets.only(left: size.width * 0.1),
+                                  alignment: Alignment.centerRight,
+                                  icon: const Icon(Icons.close),
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                  color: Colors.white,
+                                ),
+                              ],
                             ),
                             const Divider(
                               height: 0,

@@ -281,6 +281,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
     return Scaffold(
         appBar: AppBar(
           toolbarHeight: 70,
+          leading: Container(),
           title: Container(
             alignment: Alignment.topLeft,
             child: Padding(

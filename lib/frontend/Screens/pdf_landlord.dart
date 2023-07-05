@@ -403,7 +403,7 @@ class _PDFEditorPageState extends State<PDFEditorPage> {
   // PreferredSizeWidget _buildAppBar(Size size, context) {
   //   return AppBar(
   //     toolbarHeight: 70,
-  //     leading: IconButton(
+  // leading: IconButton(
   //         icon: Icon(Icons.arrow_back),
   //         onPressed: () {
   //           Navigator.push(

@@ -20,9 +20,11 @@ class _NewVouchersPageState extends State<NewVouchersPage> {
   // I want to load the images as fast as possible
 
   var images = [];
+  var imageNames = [];
   double loadingProgress = 0.0;
   bool isLoading = true;
   Timer? loadingTimer;
+  String? searchQuery = '';
 
   void _loadImages() {
     FirebaseFirestore.instance
@@ -32,6 +34,7 @@ class _NewVouchersPageState extends State<NewVouchersPage> {
         .then((value) {
       setState(() {
         images = value.data()?['urls'];
+        imageNames = value.data()?['names'];
         isLoading = false;
       });
     });
@@ -59,6 +62,7 @@ class _NewVouchersPageState extends State<NewVouchersPage> {
 
   @override
   //return a list of images fetched using the url in images, wrapped in a card with a listview
+  @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
@@ -75,59 +79,90 @@ class _NewVouchersPageState extends State<NewVouchersPage> {
             )
           : images.length == 0
               ? Center(child: Text('No Vouchers Available Yet'))
-              : ListView.builder(
-                  addAutomaticKeepAlives: true,
-                  itemCount: images.length,
-                  itemBuilder: (context, index) {
-                    return Column(
-                      children: [
-                        SizedBox(height: size.height * 0.02),
-                        Text(
-                          'Voucher ${index + 1}',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
+              : Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: TextField(
+                        onChanged: (value) {
+                          setState(() {
+                            searchQuery = value.toLowerCase();
+                          });
+                        },
+                        decoration: InputDecoration(
+                          focusedBorder: UnderlineInputBorder(
+                            borderSide: BorderSide(color: Colors.green),
+                          ),
+                          hintText: 'Search',
+                          hintStyle: TextStyle(
                             color: Colors.green,
                             fontFamily: GoogleFonts.montserrat().fontFamily,
                           ),
+                          prefixIcon: Icon(Icons.search, color: Colors.green),
                         ),
-                        Card(
-                          child: GestureDetector(
-                            onTap: () async {
-                              final imageProvider =
-                                  CachedNetworkImageProvider(images[index]);
+                      ),
+                    ),
+                    Expanded(
+                      child: ListView.builder(
+                        addAutomaticKeepAlives: true,
+                        itemCount: images.length,
+                        itemBuilder: (context, index) {
+                          int reversedIndex = images.length - 1 - index;
+                          String imageName = imageNames[reversedIndex];
 
-                              await showImageViewer(context, imageProvider);
-                              // Navigator.push(
-                              //   context,
-                              //   MaterialPageRoute(
-                              //     builder: (context) => ExpandedImageDialog(
-                              //       imagePath: images[index],
-                              //     ),
-                              //   ),
-                              // );
-                            },
-                            child: SizedBox(
-                              width: 200,
-                              height: 200,
-                              child: Image.network(images[index],
-                                  fit: BoxFit.cover,
-                                  loadingBuilder:
-                                      (context, child, loadingProgress) =>
-                                          Center(
-                                            child: loadingProgress == null
-                                                ? child
-                                                : const SpinKitFadingCube(
-                                                    color: Color.fromARGB(
-                                                        255, 30, 197, 83),
-                                                  ),
-                                          )),
-                            ),
-                          ),
-                        )
-                      ],
-                    );
-                  },
+                          if (searchQuery != null &&
+                              imageName.toLowerCase().contains(searchQuery!)) {
+                            return Column(
+                              children: [
+                                SizedBox(height: size.height * 0.02),
+                                Text(
+                                  '$imageName',
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.green,
+                                    fontFamily:
+                                        GoogleFonts.montserrat().fontFamily,
+                                  ),
+                                ),
+                                Card(
+                                  child: GestureDetector(
+                                    onTap: () async {
+                                      final imageProvider =
+                                          CachedNetworkImageProvider(
+                                              images[reversedIndex]);
+
+                                      await showImageViewer(
+                                          context, imageProvider);
+                                    },
+                                    child: SizedBox(
+                                      width: 200,
+                                      height: 200,
+                                      child: Image.network(
+                                          images[reversedIndex],
+                                          fit: BoxFit.cover,
+                                          loadingBuilder: (context, child,
+                                                  loadingProgress) =>
+                                              Center(
+                                                child: loadingProgress == null
+                                                    ? child
+                                                    : const SpinKitFadingCube(
+                                                        color: Color.fromARGB(
+                                                            255, 30, 197, 83),
+                                                      ),
+                                              )),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            );
+                          } else {
+                            return Container();
+                          }
+                        },
+                      ),
+                    ),
+                  ],
                 ),
     );
   }
