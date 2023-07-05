@@ -8,6 +8,7 @@ import 'package:rehnaa/frontend/helper/Admindashboard_pages/admin_tenantinput.da
 
 import '../../../backend/services/helperfunctions.dart';
 import '../../helper/Admindashboard_pages/admin_analytics.dart';
+import '../../helper/Admindashboard_pages/admin_contracts.dart';
 import '../../helper/Admindashboard_pages/admin_dealerinput.dart';
 import '../../helper/Admindashboard_pages/admin_landlord_tenant_info.dart';
 import '../../helper/Admindashboard_pages/admin_landlordinput.dart';
@@ -435,19 +436,19 @@ class _AdminDashboardState extends State<AdminDashboard> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // CustomButton(
-                  //   color: Colors.red,
-                  //   icon: Icons.info,
-                  //   text: 'Information about\nLandlord and Tenant',
-                  //   onPressed: () {
-                  //     Navigator.push(
-                  //       context,
-                  //       MaterialPageRoute(
-                  //         builder: (context) => AdminLandlordTenantInfoPage(),
-                  //       ),
-                  //     );
-                  //   },
-                  // ),
+                  CustomButton(
+                    color: Colors.red,
+                    icon: Icons.edit,
+                    text: 'Contracts Edit',
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => AdminContractsViewPage(),
+                        ),
+                      );
+                    },
+                  ),
                   const SizedBox(width: 20),
                   CustomButton(
                     color: Colors.teal,

@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:rehnaa/backend/services/helperfunctions.dart';
 
 class AdminPropertyContractsPage extends StatefulWidget {
   final String tenantID;
@@ -95,14 +96,14 @@ class _AdminPropertyContractsPageState
         .set({
       //add all the fields to the document
       'landlordName': landlordName,
-      'landlordCnic': landlordCnic,
+      'landlordCnic': encryptString(landlordCnic),
       'tenantName': tenantName,
-      'tenantCnic': tenantCnic,
+      'tenantCnic': encryptString(tenantCnic),
       'firstWitnessName': firstWitnessName,
-      'firstWitnessCnic': firstWitnessCnic,
+      'firstWitnessCnic': encryptString(firstWitnessCnic),
       'firstWitnessContact': firstWitnessContact,
       'secondWitnessName': secondWitnessName,
-      'secondWitnessCnic': secondWitnessCnic,
+      'secondWitnessCnic': encryptString(secondWitnessCnic),
       'secondWitnessContact': secondWitnessContact,
       'propertyAddress': propertyAddress,
       'monthlyRent': monthlyRent,

@@ -3,6 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:rehnaa/backend/services/helperfunctions.dart';
+import 'package:rehnaa/frontend/Screens/rentpayment_info.dart';
 
 import '../../backend/models/tenantsmodel.dart';
 
@@ -70,7 +72,8 @@ class MyScreen extends StatelessWidget {
         } else if (snapshot.hasData) {
           DocumentSnapshot<Map<String, dynamic>> data = snapshot.data!;
           Map<String, dynamic>? contractFields = data.data();
-          print('contractFields: $contractFields');
+          // print('contractFields: $contractFields');
+          String? pdfUrl = contractFields?['pdfUrl'];
 
           if (contractFields == null) {
             final Size size = MediaQuery.of(context).size;
@@ -124,199 +127,161 @@ class MyScreen extends StatelessWidget {
             );
           }
 
-          return Column(
-            children: [
-              SizedBox(height: 30),
-              Stack(
-                alignment: Alignment.topLeft,
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.push(context, MaterialPageRoute(builder: (_) {
-                        return const ZoomedScreen();
-                      }));
-                    },
-                    child: Hero(
-                      tag: 'imageTag',
-                      child: SizedBox(
-                        height: MediaQuery.of(context).size.height * 0.3,
-                        width: MediaQuery.of(context).size.width,
-                        child: Image.asset(
-                          'assets/image1.jpg',
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    ),
-                  ),
-                  Stack(
-                    children: [
-                      SafeArea(
-                        child: Container(
-                          alignment: Alignment.topLeft,
-                          padding: const EdgeInsets.all(20.0),
-                          // child: Text('Your Content'),
-                        ),
-                      ),
-                      Positioned(
-                        top: 30.0,
-                        left: 10.0,
-                        child: GestureDetector(
-                          onTap: () {
-                            Navigator.pop(context);
-                          },
-                          child: Container(
-                            width: 40,
-                            height: 40,
-                            decoration: const BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Color(0xFF33907C),
-                              gradient: LinearGradient(
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                                colors: [
-                                  Color(0xff0FA697),
-                                  Color(0xff45BF7A),
-                                  Color(0xff0DF205),
-                                ],
-                              ),
-                            ),
-                            child: const Icon(
-                              Icons.arrow_back,
-                              size: 20,
-                              color: Colors.white,
-                            ),
+          Size size = MediaQuery.of(context).size;
+          // PDFScreen pdfScreen
+          // print('pdfUrl: $pdfUrl');
+          PDFScreen pdfScreen = PDFScreen(
+            displayAppBar: false,
+          );
+          if (pdfUrl != null) {
+            pdfScreen = PDFScreen(
+              path: pdfUrl,
+              displayAppBar: false,
+            );
+          }
+
+          return Scaffold(
+            appBar: _buildAppBar(MediaQuery.of(context).size, context),
+            body: Column(
+              children: [
+                (pdfUrl != null)
+                    ? Expanded(
+                        child: pdfScreen,
+                      )
+                    : Container(),
+                SizedBox(height: size.height * 0.05),
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(20.0),
+                        child: Card(
+                          color: Colors.grey[200],
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20.0),
                           ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              SizedBox(height: 20),
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Center(
-                    child: Padding(
-                      padding: const EdgeInsets.all(20.0),
-                      child: Card(
-                        color: Colors.grey[200],
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20.0),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Center(
-                                child: Text(
-                                  "Contract",
-                                  style: GoogleFonts.montserrat(
-                                    fontSize: 24,
-                                    color: const Color(0xff33907c),
-                                    fontWeight: FontWeight.bold,
+                          child: Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Center(
+                                  child: Text(
+                                    "Contract",
+                                    style: GoogleFonts.montserrat(
+                                      fontSize: 24,
+                                      color: const Color(0xff33907c),
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
                                 ),
-                              ),
-                              SizedBox(height: 24),
-                              ContractCard(
-                                icon: Icons.person,
-                                label: 'Landlord Name:',
-                                data: contractFields?['landlordName'] ?? '',
-                              ),
-                              SizedBox(height: 16),
-                              ContractCard(
-                                icon: Icons.credit_card,
-                                label: 'Landlord CNIC:',
-                                data: contractFields?['landlordCnic'] ?? '',
-                              ),
-                              SizedBox(height: 16),
-                              ContractCard(
-                                icon: Icons.person,
-                                label: 'Tenant Name:',
-                                data: contractFields?['tenantName'] ?? '',
-                              ),
-                              SizedBox(height: 16),
-                              ContractCard(
-                                icon: Icons.credit_card,
-                                label: 'Tenant CNIC:',
-                                data: contractFields?['tenantCnic'] ?? '',
-                              ),
-                              SizedBox(height: 16),
-                              ContractCard(
-                                icon: Icons.person,
-                                label: 'First Witness Name:',
-                                data: contractFields?['firstWitnessName'] ?? '',
-                              ),
-                              SizedBox(height: 16),
-                              ContractCard(
-                                icon: Icons.credit_card,
-                                label: 'First Witness CNIC:',
-                                data: contractFields?['firstWitnessCnic'] ?? '',
-                              ),
-                              SizedBox(height: 16),
-                              ContractCard(
-                                icon: Icons.phone,
-                                label: 'First Witness Contact Number:',
-                                data: contractFields?['firstWitnessContact'] ??
-                                    '',
-                              ),
-                              SizedBox(height: 16),
-                              ContractCard(
-                                icon: Icons.person,
-                                label: 'Second Witness Name:',
-                                data:
-                                    contractFields?['secondWitnessName'] ?? '',
-                              ),
-                              SizedBox(height: 16),
-                              ContractCard(
-                                icon: Icons.credit_card,
-                                label: 'Second Witness CNIC:',
-                                data:
-                                    contractFields?['secondWitnessCnic'] ?? '',
-                              ),
-                              SizedBox(height: 16),
-                              ContractCard(
-                                icon: Icons.phone,
-                                label: 'Second Witness Contact Number:',
-                                data: contractFields?['secondWitnessContact'] ??
-                                    '',
-                              ),
-                              SizedBox(height: 16),
-                              ContractCard(
-                                icon: Icons.home,
-                                label: 'Property:',
-                                data: contractFields?['propertyAddress'] ?? '',
-                              ),
-                              SizedBox(height: 16),
-                              ContractCard(
-                                icon: Icons.monetization_on,
-                                label: 'Monthly Rent:',
-                                data: contractFields?['monthlyRent'] ?? '',
-                              ),
-                              SizedBox(height: 16),
-                              ContractCard(
-                                icon: Icons.calendar_today,
-                                label: 'Contract Start Date:',
-                                data:
-                                    contractFields?['contractStartDate'] ?? '',
-                              ),
-                              SizedBox(height: 16),
-                              ContractCard(
-                                icon: Icons.calendar_today,
-                                label: 'Contract End Date:',
-                                data: contractFields?['contractEndDate'] ?? '',
-                              ),
-                              // Rest of the ContractCard widgets...
-                            ],
+                                SizedBox(height: 24),
+                                ContractCard(
+                                  icon: Icons.person,
+                                  label: 'Landlord Name:',
+                                  data: contractFields?['landlordName'] ?? '',
+                                ),
+                                SizedBox(height: 16),
+                                ContractCard(
+                                  icon: Icons.credit_card,
+                                  label: 'Landlord CNIC:',
+                                  data: decryptString(
+                                      contractFields['landlordCnic']),
+                                ),
+                                SizedBox(height: 16),
+                                ContractCard(
+                                  icon: Icons.person,
+                                  label: 'Tenant Name:',
+                                  data: contractFields?['tenantName'] ?? '',
+                                ),
+                                SizedBox(height: 16),
+                                ContractCard(
+                                  icon: Icons.credit_card,
+                                  label: 'Tenant CNIC:',
+                                  data: decryptString(
+                                      contractFields['tenantCnic']),
+                                ),
+                                SizedBox(height: 16),
+                                ContractCard(
+                                  icon: Icons.person,
+                                  label: 'First Witness Name:',
+                                  data:
+                                      contractFields?['firstWitnessName'] ?? '',
+                                ),
+                                SizedBox(height: 16),
+                                ContractCard(
+                                  icon: Icons.credit_card,
+                                  label: 'First Witness CNIC:',
+                                  data: decryptString(
+                                      contractFields['firstWitnessCnic']),
+                                ),
+                                SizedBox(height: 16),
+                                ContractCard(
+                                  icon: Icons.phone,
+                                  label: 'First Witness Contact Number:',
+                                  data:
+                                      contractFields?['firstWitnessContact'] ??
+                                          '',
+                                ),
+                                SizedBox(height: 16),
+                                ContractCard(
+                                  icon: Icons.person,
+                                  label: 'Second Witness Name:',
+                                  data: contractFields?['secondWitnessName'] ??
+                                      '',
+                                ),
+                                SizedBox(height: 16),
+                                ContractCard(
+                                  icon: Icons.credit_card,
+                                  label: 'Second Witness CNIC:',
+                                  data: contractFields?['secondWitnessCnic'] ??
+                                      '',
+                                ),
+                                SizedBox(height: 16),
+                                ContractCard(
+                                  icon: Icons.phone,
+                                  label: 'Second Witness Contact Number:',
+                                  data: decryptString(
+                                      contractFields['secondWitnessContact']),
+                                ),
+                                SizedBox(height: 16),
+                                ContractCard(
+                                  icon: Icons.home,
+                                  label: 'Property:',
+                                  data:
+                                      contractFields?['propertyAddress'] ?? '',
+                                ),
+                                SizedBox(height: 16),
+                                ContractCard(
+                                  icon: Icons.monetization_on,
+                                  label: 'Monthly Rent:',
+                                  data: contractFields?['monthlyRent'] ?? '',
+                                ),
+                                SizedBox(height: 16),
+                                ContractCard(
+                                  icon: Icons.calendar_today,
+                                  label: 'Contract Start Date:',
+                                  data: contractFields?['contractStartDate'] ??
+                                      '',
+                                ),
+                                SizedBox(height: 16),
+                                ContractCard(
+                                  icon: Icons.calendar_today,
+                                  label: 'Contract End Date:',
+                                  data:
+                                      contractFields?['contractEndDate'] ?? '',
+                                ),
+                                // Rest of the ContractCard widgets...
+                              ],
+                            ),
                           ),
                         ),
                       ),
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           );
         } else if (snapshot.hasError) {
           // Handle error case

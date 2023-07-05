@@ -698,6 +698,12 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
                         },
                         child: Stack(
                           children: [
+                            //add a testing crash button that rethrows the error
+                            // ElevatedButton(
+                            //     onPressed: () {
+                            //       throw Exception('Test Crash');
+                            //     },
+                            //     child: Text('Throw error')),
                             CircleAvatar(
                               radius: 75,
                               backgroundColor: Colors.transparent,

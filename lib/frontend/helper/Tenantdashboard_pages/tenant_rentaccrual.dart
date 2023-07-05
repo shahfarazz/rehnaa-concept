@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../backend/models/tenantsmodel.dart';
@@ -110,7 +111,33 @@ class _TenantRentAccrualPageState extends State<TenantRentAccrualPage> {
                             color: Colors.transparent,
                             child: InkWell(
                               borderRadius: BorderRadius.circular(30.0),
-                              onTap: () {
+                              onTap: () async {
+                                Timestamp? joinDate = await FirebaseFirestore
+                                    .instance
+                                    .collection('Tenants')
+                                    .doc(widget.uid)
+                                    .get()
+                                    .then((value) {
+                                  return value.data()!['dateJoined'];
+                                });
+
+                                DateTime? joinDateTime = joinDate?.toDate();
+                                DateTime? now = DateTime.now();
+
+                                if (now.difference(joinDateTime!).inDays <
+                                    180) {
+                                  Fluttertoast.showToast(
+                                    msg:
+                                        'You must be a member for 6 months to apply for Rent Accrual.',
+                                    toastLength: Toast.LENGTH_LONG,
+                                    gravity: ToastGravity.BOTTOM,
+                                    timeInSecForIosWeb: 1,
+                                    backgroundColor: Colors.green,
+                                    textColor: Colors.white,
+                                    fontSize: 16.0,
+                                  );
+                                  return;
+                                }
                                 if (isApplied) {
                                   return;
                                 }
@@ -174,7 +201,7 @@ class _TenantRentAccrualPageState extends State<TenantRentAccrualPage> {
                                 ),
                                 child: Center(
                                   child: Text(
-                                    isApplied ? 'Applied' : 'Apply',
+                                    isApplied! ? 'Applied' : 'Apply',
                                     style: TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.bold,

@@ -519,7 +519,10 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
                           children: [
                             SmoothPageIndicator(
                               controller: _pageController,
-                              count: pageCount,
+                              count: _filteredRentPayments().isEmpty
+                                  ? 1
+                                  : (_filteredRentPayments().length / _pageSize)
+                                      .ceil(),
                               effect: const WormEffect(
                                 dotColor: Colors.grey,
                                 activeDotColor: Color(0xff33907c),

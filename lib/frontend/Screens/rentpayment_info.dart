@@ -161,6 +161,7 @@ class RentPaymentInfoPage extends StatelessWidget {
                               MaterialPageRoute(
                                 builder: (context) => PDFScreen(
                                   path: receiptUrl,
+                                  displayAppBar: true,
                                 ),
                               ),
                             );
@@ -202,8 +203,10 @@ class RentPaymentInfoPage extends StatelessWidget {
 
 class PDFScreen extends StatefulWidget {
   final String? path;
+  bool displayAppBar;
 
-  PDFScreen({Key? key, this.path}) : super(key: key);
+  PDFScreen({Key? key, this.path, required this.displayAppBar})
+      : super(key: key);
 
   @override
   _PDFScreenState createState() => _PDFScreenState();
@@ -234,15 +237,19 @@ class _PDFScreenState extends State<PDFScreen> {
     }
 
     // Update the local path state
-    setState(() {
-      localPath = file.path;
-    });
+    if (mounted) {
+      setState(() {
+        localPath = file.path;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: _buildAppBar(MediaQuery.of(context).size, context),
+      appBar: widget.displayAppBar
+          ? _buildAppBar(MediaQuery.of(context).size, context)
+          : null,
       body: localPath.isEmpty
           ? Center(
               child: const SpinKitFadingCube(
@@ -251,8 +258,11 @@ class _PDFScreenState extends State<PDFScreen> {
             )
           : SfPdfViewer.file(
               File(localPath),
+              scrollDirection: PdfScrollDirection.vertical,
               canShowScrollHead: false,
               canShowScrollStatus: false,
+              enableTextSelection: false,
+              pageLayoutMode: PdfPageLayoutMode.single,
             ),
     );
   }
