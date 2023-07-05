@@ -190,6 +190,15 @@ class PropertyCard extends StatelessWidget {
     required this.type,
     required this.area,
   });
+  String capitalizeFirstLetter(String text) {
+    if (text.isEmpty) return '';
+    return text
+        .split(' ')
+        .map((word) =>
+            word.substring(0, 1).toUpperCase() +
+            word.substring(1).toLowerCase())
+        .join(' ');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -230,7 +239,7 @@ class PropertyCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      property.title,
+                      capitalizeFirstLetter(property.title),
                       style: GoogleFonts.montserrat(
                         fontSize: screenWidth * 0.04,
                         fontWeight: FontWeight.bold,
@@ -240,21 +249,16 @@ class PropertyCard extends StatelessWidget {
                     SizedBox(height: screenHeight * 0.005),
                     Text(
                       '$location\n$address',
-                      style: TextStyle(
-                          fontSize: screenWidth * 0.035,
-                          fontFamily: GoogleFonts.montserrat().fontFamily),
+                      style: TextStyle(fontSize: screenWidth * 0.035),
                     ),
                     SizedBox(height: screenHeight * 0.01),
                     Row(
                       children: [
-                        Icon(Icons.area_chart_outlined,
-                            size: screenWidth * 0.035),
+                        Icon(Icons.area_chart, size: screenWidth * 0.035),
                         SizedBox(width: screenWidth * 0.01),
                         Text(
                           '${property.area?.round()} Marlas / ${(property.area! * 272).round()} Sqft',
-                          style: TextStyle(
-                              fontSize: screenWidth * 0.035,
-                              fontFamily: GoogleFonts.montserrat().fontFamily),
+                          style: TextStyle(fontSize: screenWidth * 0.035),
                         ),
                         SizedBox(width: screenWidth * 0.01),
                         Icon(Icons.king_bed_outlined,
@@ -262,47 +266,42 @@ class PropertyCard extends StatelessWidget {
                         SizedBox(width: screenWidth * 0.01),
                         Text(
                           '${property.beds} Bed',
-                          style: TextStyle(
-                              fontSize: screenWidth * 0.035,
-                              fontFamily: GoogleFonts.montserrat().fontFamily),
+                          style: TextStyle(fontSize: screenWidth * 0.035),
                         ),
                         SizedBox(width: screenWidth * 0.02),
                         Icon(Icons.bathtub_outlined, size: screenWidth * 0.035),
                         SizedBox(width: screenWidth * 0.01),
                         Text(
                           '${property.baths} Bath',
-                          style: TextStyle(
-                              fontSize: screenWidth * 0.035,
-                              fontFamily: GoogleFonts.montserrat().fontFamily),
+                          style: TextStyle(fontSize: screenWidth * 0.035),
                         ),
                       ],
                     ),
-                    // SizedBox(height: screenHeight * 0.01),
-                    // Row(
-                    //   children: [
-                    //     // CircleAvatar(
-                    //     //   backgroundImage: Image.network(
-                    //     //     pathToImage ?? 'assets/userimage.png',
-                    //     //   ).image,
-                    //     //   radius: screenWidth * 0.025,
-                    //     // ),
-                    //     SizedBox(width: screenWidth * 0.01),
-                    //     // Text(
-                    //     //   '$firstName $lastName',
-                    //     //   style: TextStyle(
-                    //     //       fontSize: screenWidth * 0.035,
-                    //     //       fontFamily: GoogleFonts.montserrat().fontFamily),
-                    //     // ),
-                    //     // SizedBox(width: screenWidth * 0.01),
-                    //     // Text(
-                    //     //   '($type)',
-                    //     //   style: TextStyle(
-                    //     //     fontSize: screenWidth * 0.035,
-                    //     //     fontFamily: GoogleFonts.montserrat().fontFamily,
-                    //     //   ),
-                    //     // ),
-                    //   ],
-                    // ),
+                    SizedBox(height: screenHeight * 0.01),
+                    Row(
+                      children: [
+                        CircleAvatar(
+                          // minRadius: screenWidth * 0.025,
+                          backgroundColor: Colors.transparent,
+                          child: ClipOval(
+                            child: pathToImage!.startsWith('https')
+                                ? CachedNetworkImage(imageUrl: pathToImage!)
+                                : Image.asset(pathToImage!),
+                          ),
+                          radius: screenWidth * 0.025,
+                        ),
+                        SizedBox(width: screenWidth * 0.01),
+                        Text(
+                          '$firstName $lastName',
+                          style: TextStyle(fontSize: screenWidth * 0.035),
+                        ),
+                        SizedBox(width: screenWidth * 0.01),
+                        Text(
+                          '($type)',
+                          style: TextStyle(fontSize: screenWidth * 0.035),
+                        ),
+                      ],
+                    ),
                   ],
                 ),
               ),

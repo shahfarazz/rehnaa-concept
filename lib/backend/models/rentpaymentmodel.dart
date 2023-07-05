@@ -16,6 +16,7 @@ class RentPayment {
   Landlord? landlord;
   String? pdfUrl;
   String? invoiceNumber;
+  String? tenantname;
 
   RentPayment({
     required this.amount,
@@ -29,6 +30,7 @@ class RentPayment {
     this.landlord,
     this.pdfUrl,
     this.invoiceNumber,
+    this.tenantname,
   });
 
   static Future<RentPayment> fromJson(Map<String, dynamic> json) async {
@@ -48,6 +50,7 @@ class RentPayment {
         tenantRef: tenantRef,
         landlordRef: landlordRef,
         invoiceNumber: json['invoiceNumber'],
+        tenantname: json['tenantname'] ?? 'Old document',
       );
 
       if (propertyRef != null) {

@@ -6,6 +6,7 @@ import 'package:rehnaa/frontend/Screens/signup_page.dart';
 import 'package:rehnaa/frontend/Screens/forget_password.dart';
 import 'package:provider/provider.dart';
 import 'package:rehnaa/backend/services/authentication_service.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -164,6 +165,27 @@ class _LoginPageState extends State<LoginPage> {
                         child: InkWell(
                           borderRadius: BorderRadius.circular(24),
                           onTap: () {
+                            showDialog(
+                              context: context,
+                              barrierDismissible:
+                                  true, // Prevents dismissing the dialog by tapping outside
+                              builder: (context) =>
+                                  //   WillPopScope(
+                                  // onWillPop: () async =>
+                                  //     false, // Prevents dismissing the dialog with the back button
+
+                                  // title: Text('Processing',
+                                  // style: TextStyle(
+                                  //     color: Colors.green,
+                                  //     fontFamily: GoogleFonts.montserrat()
+                                  //         .fontFamily),
+                                  // textAlign: TextAlign.center),
+                                  const SpinKitFadingCube(
+                                color: Color.fromARGB(255, 30, 197, 83),
+                              ),
+
+                              // ),
+                            );
                             String emailOrPhone =
                                 _emailOrPhoneController.text.trim();
 

@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:rehnaa/backend/services/authentication_service.dart';
@@ -37,6 +38,7 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
   bool showChangePassword = false;
   bool _obscurePassword = true; // Track whether the password is obscured or not
   bool _obscurePassword2 = true;
+  bool deleteCall = false;
 
   //define two new controllers for the password fields
   final TextEditingController _oldPasswordController = TextEditingController();
@@ -238,7 +240,9 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                CircularProgressIndicator(color: Colors.green),
+                const SpinKitFadingCube(
+                  color: Color.fromARGB(255, 30, 197, 83),
+                ),
                 SizedBox(height: 16),
                 Text(
                   'Uploading...',
@@ -278,8 +282,9 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
                   return Column(
                     mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
-                      CircularProgressIndicator(
-                          color: Colors.green, value: progress),
+                      const SpinKitFadingCube(
+                        color: Color.fromARGB(255, 30, 197, 83),
+                      ),
                       SizedBox(height: 16),
                       Text(
                         'Upload progress: $progressText',
@@ -454,7 +459,9 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
                           content: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: <Widget>[
-                              CircularProgressIndicator(color: Colors.green),
+                              const SpinKitFadingCube(
+                                color: Color.fromARGB(255, 30, 197, 83),
+                              ),
                             ],
                           ),
                         ),
@@ -515,7 +522,9 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
                           content: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: <Widget>[
-                              CircularProgressIndicator(color: Colors.green),
+                              const SpinKitFadingCube(
+                                color: Color.fromARGB(255, 30, 197, 83),
+                              ),
                             ],
                           ),
                         ),
@@ -631,7 +640,11 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
           Size size = MediaQuery.of(context).size;
           if (snapshot.connectionState == ConnectionState.waiting) {
             // While data is being fetched, show a loading indicator
-            return const Center(child: CircularProgressIndicator());
+            return const Center(
+              child: const SpinKitFadingCube(
+                color: Color.fromARGB(255, 30, 197, 83),
+              ),
+            );
           }
 
           if (snapshot.hasError) {
@@ -707,17 +720,9 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
                                               if (loadingProgress == null)
                                                 return child;
                                               return Center(
-                                                child:
-                                                    CircularProgressIndicator(
-                                                  color: Colors.green,
-                                                  value: loadingProgress
-                                                              .expectedTotalBytes !=
-                                                          null
-                                                      ? loadingProgress
-                                                              .cumulativeBytesLoaded /
-                                                          loadingProgress
-                                                              .expectedTotalBytes!
-                                                      : null,
+                                                child: const SpinKitFadingCube(
+                                                  color: Color.fromARGB(
+                                                      255, 30, 197, 83),
                                                 ),
                                               );
                                             },
@@ -776,7 +781,9 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
                             AsyncSnapshot<String> snapshot) {
                           if (snapshot.connectionState ==
                               ConnectionState.waiting) {
-                            return CircularProgressIndicator();
+                            return const SpinKitFadingCube(
+                              color: Color.fromARGB(255, 30, 197, 83),
+                            );
                           } else if (snapshot.hasError ||
                               snapshot.data == null) {
                             return Container(); // Empty container, the item will not be shown
@@ -1024,6 +1031,30 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
                                             subtitle:
                                                 'Click to delete your account',
                                             onTap: () async {
+                                              //block the user's screen using a loading screen
+                                              showDialog(
+                                                context: context,
+                                                barrierDismissible:
+                                                    true, // Prevents dismissing the dialog by tapping outside
+                                                builder: (context) =>
+                                                    //   WillPopScope(
+                                                    // onWillPop: () async =>
+                                                    //     false, // Prevents dismissing the dialog with the back button
+                                                    AlertDialog(
+                                                  title: Text('Processing',
+                                                      style: TextStyle(
+                                                          color: Colors.green,
+                                                          fontFamily: GoogleFonts
+                                                                  .montserrat()
+                                                              .fontFamily),
+                                                      textAlign:
+                                                          TextAlign.center),
+                                                  // content:
+                                                  // CircularProgressIndicator(),
+                                                ),
+                                                // ),
+                                              );
+
                                               User? currentUser = FirebaseAuth
                                                   .instance.currentUser;
                                               String? phoneNumber =
@@ -1124,12 +1155,23 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
                                                         ),
                                                         actions: [
                                                           TextButton(
-                                                            onPressed: () =>
-                                                                Navigator.of(
-                                                                        context)
-                                                                    .pop(null),
-                                                            child:
-                                                                Text('Cancel'),
+                                                            onPressed: () {
+                                                              Navigator.of(
+                                                                      context)
+                                                                  .pop(null);
+                                                              Navigator.pop(
+                                                                  context);
+                                                            },
+                                                            child: Text(
+                                                              'Cancel',
+                                                              style: TextStyle(
+                                                                color: Colors
+                                                                    .green,
+                                                                fontFamily: GoogleFonts
+                                                                        .montserrat()
+                                                                    .fontFamily,
+                                                              ),
+                                                            ),
                                                           ),
                                                           TextButton(
                                                             onPressed:
@@ -1212,8 +1254,16 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
                                                                 }
                                                               }
                                                             },
-                                                            child:
-                                                                Text('Verify'),
+                                                            child: Text(
+                                                              'Verify',
+                                                              style: TextStyle(
+                                                                color: Colors
+                                                                    .green,
+                                                                fontFamily: GoogleFonts
+                                                                        .montserrat()
+                                                                    .fontFamily,
+                                                              ),
+                                                            ),
                                                           ),
                                                         ],
                                                       ),

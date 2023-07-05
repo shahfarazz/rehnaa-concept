@@ -6,10 +6,11 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:google_fonts/google_fonts.dart';
 // import 'package:rehnaa/frontend/Screens/Tenant/tenant_dashboard.dart';
 // import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenant_dashboard_content.dart';
-import 'package:photo_view/photo_view.dart';
+// import 'package:photo_view/photo_view.dart';
 
 import '../../../backend/models/propertymodel.dart';
 import '../../../backend/models/tenantsmodel.dart';
+import 'package:easy_image_viewer/easy_image_viewer.dart';
 
 class TenantPropertyPage extends StatefulWidget {
   final Property property;
@@ -120,14 +121,10 @@ class PropertyCarousel extends StatelessWidget {
             return Builder(
               builder: (BuildContext context) {
                 return GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) =>
-                            ExpandedImageDialog(imageProvider: imagePath),
-                      ),
-                    );
+                  onTap: () async {
+                    final imageProvider = CachedNetworkImageProvider(imagePath);
+
+                    await showImageViewer(context, imageProvider);
                   },
                   child: Hero(
                     tag: imagePath,
@@ -724,70 +721,6 @@ class GradientButton extends StatelessWidget {
             ),
           ),
         ),
-      ),
-    );
-  }
-}
-
-class ExpandedImageDialog extends StatelessWidget {
-  final String imageProvider;
-
-  const ExpandedImageDialog({Key? key, required this.imageProvider})
-      : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Dialog(
-      insetPadding: EdgeInsets.zero,
-      child: Stack(
-        children: [
-          Container(
-            constraints: const BoxConstraints.expand(),
-            child: PhotoView(
-              imageProvider: CachedNetworkImageProvider(imageProvider),
-              backgroundDecoration: BoxDecoration(
-                color: Colors.transparent,
-              ),
-              minScale: PhotoViewComputedScale.contained * 1.0,
-              maxScale: PhotoViewComputedScale.covered * 2.0,
-              initialScale: PhotoViewComputedScale.contained,
-              basePosition: Alignment.center,
-              heroAttributes: const PhotoViewHeroAttributes(tag: "someTag"),
-              customSize: MediaQuery.of(context).size,
-            ),
-          ),
-          Positioned(
-            top: 65.0,
-            left: 10.0,
-            child: GestureDetector(
-              onTap: () {
-                Navigator.pop(context);
-              },
-              child: Container(
-                width: 40,
-                height: 40,
-                decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Color(0xFF33907C),
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      Color(0xff0FA697),
-                      Color(0xff45BF7A),
-                      Color(0xff0DF205),
-                    ],
-                  ),
-                ),
-                child: const Icon(
-                  Icons.arrow_back,
-                  size: 20,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }

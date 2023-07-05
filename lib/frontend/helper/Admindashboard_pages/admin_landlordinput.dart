@@ -18,6 +18,7 @@ import 'package:flutter/services.dart' show rootBundle;
 
 import '../../../backend/models/landlordmodel.dart';
 // import '../../../backend/models/propertymodel.dart';
+import '../../../backend/services/helperfunctions.dart';
 import '../../Screens/Admin/admindashboard.dart';
 import 'admin_landlordinputhelper.dart';
 
@@ -176,8 +177,11 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
                         progressIndicatorBuilder:
                             (context, url, downloadProgress) {
                           return Container(
-                    padding: EdgeInsets.only(left: 150.0),
-                    child: CircularProgressIndicator(value: downloadProgress.progress,),);
+                            padding: EdgeInsets.only(left: 150.0),
+                            child: CircularProgressIndicator(
+                              value: downloadProgress.progress,
+                            ),
+                          );
                         },
                       ),
                     ),
@@ -226,11 +230,11 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
     final TextEditingController addressController =
         TextEditingController(text: landlord.address ?? '');
 
-    final hashedCnic = hashString(cnicController.text);
-    final hashedBankName = hashString(bankNameController.text);
-    final hashedRaastId = hashString(raastIdController.text);
-    final hashedAccountNumber = hashString(accountNumberController.text);
-    final hashedIban = hashString(ibanController.text);
+    final hashedCnic = encryptString(cnicController.text);
+    final hashedBankName = encryptString(bankNameController.text);
+    final hashedRaastId = encryptString(raastIdController.text);
+    final hashedAccountNumber = encryptString(accountNumberController.text);
+    final hashedIban = encryptString(ibanController.text);
 
     showDialog(
       context: context,
@@ -373,22 +377,22 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
                           ? dealerRefController.text
                           : FieldValue.delete(),
                       'cnic': cnicController.text.isNotEmpty
-                          ? hashedCnic
+                          ? encryptString(cnicController.text)
                           : FieldValue.delete(),
                       'bankName': bankNameController.text.isNotEmpty
-                          ? hashedBankName
+                          ? encryptString(bankNameController.text)
                           : FieldValue.delete(),
                       'raastId': raastIdController.text.isNotEmpty
-                          ? hashedRaastId
+                          ? encryptString(raastIdController.text)
                           : FieldValue.delete(),
                       'accountNumber': accountNumberController.text.isNotEmpty
-                          ? hashedAccountNumber
+                          ? encryptString(accountNumberController.text)
                           : FieldValue.delete(),
                       'iban': ibanController.text.isNotEmpty
-                          ? hashedIban
+                          ? encryptString(ibanController.text)
                           : FieldValue.delete(),
                       'address': addressController.text.isNotEmpty
-                          ? addressController.text
+                          ? encryptString(addressController.text)
                           : FieldValue.delete(),
                     }, SetOptions(merge: true)).then((_) {
                       Fluttertoast.showToast(
@@ -466,8 +470,8 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
                       );
                     } else {
                       return Container(
-                    padding: EdgeInsets.only(left: 150.0),
-                    child: CircularProgressIndicator());
+                          padding: EdgeInsets.only(left: 150.0),
+                          child: CircularProgressIndicator());
                     }
                   },
                 ),
@@ -541,9 +545,9 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
                       );
                     } else {
                       return Container(
-                    padding: EdgeInsets.only(left: 150.0),
-                    child: CircularProgressIndicator(),
-                  );
+                        padding: EdgeInsets.only(left: 150.0),
+                        child: CircularProgressIndicator(),
+                      );
                       // CircularProgressIndicator();
                     }
                   },
@@ -620,8 +624,8 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
                       );
                     } else {
                       return Container(
-                    padding: EdgeInsets.only(left: 150.0),
-                    child: CircularProgressIndicator());
+                          padding: EdgeInsets.only(left: 150.0),
+                          child: CircularProgressIndicator());
                     }
                   },
                 ),
@@ -671,16 +675,15 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
           ),
         ),
         leading: IconButton(
-        icon: Icon(Icons.arrow_back),
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => AdminDashboard()),
-          );
-        },
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => AdminDashboard()),
+            );
+          },
+        ),
       ),
-      ),
-      
       body: Padding(
         padding: const EdgeInsets.only(top: 16.0),
         child: Column(
@@ -752,7 +755,6 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
           ],
         ),
       ),
-      
     );
   }
 }

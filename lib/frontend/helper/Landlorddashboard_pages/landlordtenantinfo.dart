@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:rehnaa/backend/models/tenantsmodel.dart';
+import 'package:rehnaa/backend/services/helperfunctions.dart';
 
 class LandlordTenantInfoPage extends StatelessWidget {
   final Tenant tenant;
@@ -174,7 +175,7 @@ class LandlordTenantInfoPage extends StatelessWidget {
                               icon: Icons.numbers,
                               iconColor: const Color(0xff33907c),
                               label: 'CNIC Number',
-                              value: tenant.cnicNumber,
+                              value: decryptString(tenant.cnicNumber),
                             ),
                           ),
                           const SizedBox(height: 10.0),
@@ -218,6 +219,14 @@ class LandlordTenantInfoPage extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(height: 10.0),
+                          Center(
+                            child: WhiteBox(
+                              icon: Icons.info,
+                              iconColor: const Color(0xff33907c),
+                              label: 'Other Information',
+                              value: 'N/A',
+                            ),
+                          ),
                         ],
                       ),
                     ),

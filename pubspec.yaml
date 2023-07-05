@@ -64,6 +64,11 @@ dependencies:
     syncfusion_flutter_pdf:
     open_file: ^3.2.1
     syncfusion_flutter_pdfviewer:
+    easy_image_viewer: ^1.2.1
+    insta_image_viewer: ^1.0.2
+    flutter_spinkit: ^5.2.0
+    easy_debounce: ^2.0.3
+    encrypt: ^5.0.1
 
     # open_file: ^3.2.1
     # flutter_pdfview: ^1.2.7

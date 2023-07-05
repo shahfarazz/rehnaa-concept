@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:easy_debounce/easy_debounce.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -77,6 +78,11 @@ class _DashboardPageState extends State<TenantDashboardPage>
     });
   }
 
+  void _handleNotificationsButtonPress() async {
+    await _markNotificationsAsRead();
+    _showNotificationsDialog();
+  }
+
   // Stop periodic fetching
   void _stopPeriodicFetch() {
     _timer?.cancel();
@@ -117,11 +123,12 @@ class _DashboardPageState extends State<TenantDashboardPage>
           .get()
           .then((value) {
         if (value.exists) {
-          if (value.data()!['isNewVouchers'] == true) {
+          if (value.data()!['isNewVouchers'] == true && isNewVoucher == false) {
             setState(() {
               isNewVoucher = true;
             });
-          } else {
+          } else if (value.data()!['isNewVouchers'] == false &&
+              isNewVoucher == true) {
             setState(() {
               isNewVoucher = false;
             });
@@ -342,9 +349,12 @@ class _DashboardPageState extends State<TenantDashboardPage>
             children: [
               IconButton(
                 icon: const Icon(Icons.notifications_active),
-                onPressed: () async {
-                  await _markNotificationsAsRead();
-                  _showNotificationsDialog();
+                onPressed: () {
+                  EasyDebounce.debounce(
+                    'notifications-debouncer', // Debouncer ID
+                    Duration(milliseconds: 500), // Debounce duration
+                    _handleNotificationsButtonPress, // Wrapped function
+                  );
                 },
               ),
               Positioned(

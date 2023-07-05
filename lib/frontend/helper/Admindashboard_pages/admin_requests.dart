@@ -45,6 +45,7 @@ class _AdminRequestsPageState extends State<AdminRequestsPage> {
                   requestID: doc.id,
                   requestType: 'Landlord Withdraw Request',
                   invoiceNumber: doc["withdrawRequest"][i]["invoiceNumber"],
+                  altTenantName: doc["withdrawRequest"][i]["tenantname"],
                 ),
               );
             }
@@ -332,6 +333,7 @@ class AdminRequestData {
   DocumentReference<Map<String, dynamic>>? propertyLandlordRef;
   String? propertyID;
   String? invoiceNumber;
+  String? altTenantName;
 
   AdminRequestData({
     required this.name,
@@ -345,6 +347,7 @@ class AdminRequestData {
     this.propertyLandlordRef,
     this.propertyID,
     this.invoiceNumber,
+    this.altTenantName,
   });
 }
 
@@ -518,7 +521,8 @@ class LandlordWithdrawalCard extends StatelessWidget {
                         'landlordRef': FirebaseFirestore.instance
                             .collection('Landlords')
                             .doc(data.uid),
-                        'invoiceNumber': data.invoiceNumber
+                        'invoiceNumber': data.invoiceNumber,
+                        'tenantname': data.altTenantName
                       });
 
                       //reset the state of the page

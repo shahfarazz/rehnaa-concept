@@ -15,30 +15,30 @@ import 'Tenant/tenant_dashboard.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
 class PDFEditorTenantPage extends StatefulWidget {
-  final String tenantName;
-  final String landlordName;
-  String? landlordAddress;
-  String? tenantAddress;
-  final double balance;
-  final double amount;
-  final String paymentMode;
-  final String uid;
-  final String invoiceNumber;
-  final String cnic;
+  // final String tenantName;
+  // final String landlordName;
+  // String? landlordAddress;
+  // String? tenantAddress;
+  // final double balance;
+  // final double amount;
+  // final String paymentMode;
+  // final String uid;
+  // final String invoiceNumber;
+  // final String cnic;
 
-  PDFEditorTenantPage({
-    Key? key,
-    required this.tenantName,
-    required this.balance,
-    required this.landlordName,
-    this.landlordAddress,
-    this.tenantAddress,
-    required this.amount,
-    required this.paymentMode,
-    required this.uid,
-    required this.invoiceNumber,
-    required this.cnic,
-  }) : super(key: key);
+  // PDFEditorTenantPage({
+  //   Key? key,
+  //   // required this.tenantName,
+  //   // required this.balance,
+  //   // required this.landlordName,
+  //   // this.landlordAddress,
+  //   // this.tenantAddress,
+  //   // required this.amount,
+  //   // required this.paymentMode,
+  //   // required this.uid,
+  //   // required this.invoiceNumber,
+  //   // required this.cnic,
+  // }) : super(key: key);
   @override
   _PDFEditorTenantPageState createState() => _PDFEditorTenantPageState();
 }
@@ -85,7 +85,18 @@ class _PDFEditorTenantPageState extends State<PDFEditorTenantPage> {
     }
   }
 
-  Future<File> createPdf() async {
+  Future<File> createPdf(
+    String tenantName,
+    String landlordName,
+    String? landlordAddress,
+    String? tenantAddress,
+    double balance,
+    double amount,
+    String paymentMode,
+    String uid,
+    String invoiceNumber,
+    String cnic,
+  ) async {
     //Load the existing document.
     final File file = await getFileFromAssets('assets/template2.pdf');
     final document = PdfDocument(inputBytes: file.readAsBytesSync());
@@ -112,7 +123,7 @@ class _PDFEditorTenantPageState extends State<PDFEditorTenantPage> {
         PdfTrueTypeFont(fontData.buffer.asByteData().buffer.asUint8List(), 18);
 
     //Billing To
-    graphics.drawString(widget.landlordName, font_main,
+    graphics.drawString(landlordName, font_main,
         brush: PdfBrushes.black,
         pen: PdfPen(PdfColor(0, 0, 0), width: 0.5),
         bounds: Rect.fromLTWH(
@@ -120,21 +131,21 @@ class _PDFEditorTenantPageState extends State<PDFEditorTenantPage> {
         format: PdfStringFormat(alignment: PdfTextAlignment.left));
 
     //CNIC number
-    graphics.drawString(widget.cnic, font_small,
+    graphics.drawString(cnic, font_small,
         brush: PdfBrushes.black,
         bounds: Rect.fromLTWH(100, 205.5, page.getClientSize().width,
             page.getClientSize().height),
         format: PdfStringFormat(alignment: PdfTextAlignment.left));
 
     //Address
-    graphics.drawString(widget.landlordAddress ?? '', font_small,
+    graphics.drawString(landlordAddress ?? '', font_small,
         brush: PdfBrushes.black,
         bounds: Rect.fromLTWH(
             60, 220, page.getClientSize().width, page.getClientSize().height),
         format: PdfStringFormat(alignment: PdfTextAlignment.left));
 
     //Invoice number
-    graphics.drawString(widget.invoiceNumber, font,
+    graphics.drawString(invoiceNumber, font,
         brush: PdfBrushes.black,
         bounds: Rect.fromLTWH(
             442, 162, page.getClientSize().width, page.getClientSize().height),
@@ -167,21 +178,21 @@ class _PDFEditorTenantPageState extends State<PDFEditorTenantPage> {
         format: PdfStringFormat(alignment: PdfTextAlignment.left));
 
     //Property Rented Address
-    graphics.drawString(widget.tenantAddress ?? '', font_small,
+    graphics.drawString(tenantAddress ?? '', font_small,
         brush: PdfBrushes.black,
         bounds: Rect.fromLTWH(
             250, 295, page.getClientSize().width, page.getClientSize().height),
         format: PdfStringFormat(alignment: PdfTextAlignment.left));
 
     //Mode of payment
-    graphics.drawString(widget.paymentMode, font_small,
+    graphics.drawString(paymentMode, font_small,
         brush: PdfBrushes.black,
         bounds: Rect.fromLTWH(
             200, 315, page.getClientSize().width, page.getClientSize().height),
         format: PdfStringFormat(alignment: PdfTextAlignment.left));
 
     //Tenant Name
-    graphics.drawString(widget.tenantName, font_medium,
+    graphics.drawString(tenantName, font_medium,
         brush: PdfBrushes.black,
         // pen: PdfPen(PdfColor(0, 0, 0), width: 0.5),
         bounds: Rect.fromLTWH(
@@ -206,7 +217,7 @@ class _PDFEditorTenantPageState extends State<PDFEditorTenantPage> {
         format: PdfStringFormat(alignment: PdfTextAlignment.left));
 
     //Tenant Amount
-    graphics.drawString("PKR ${widget.amount}", font_medium,
+    graphics.drawString("PKR ${amount}", font_medium,
         brush: PdfBrushes.black,
         // pen: PdfPen(PdfColor(0, 0, 0), width: 0.5),
         bounds: Rect.fromLTWH(
@@ -232,26 +243,26 @@ class _PDFEditorTenantPageState extends State<PDFEditorTenantPage> {
     await outputFile.writeAsBytes(bytes, flush: true);
 
     //Open the PDF document in mobile
-    OpenFile.open('$path/Output.pdf');
+    // OpenFile.open('$path/Output.pdf');
 
     // upload the pdf to firebase storage
     FirebaseStorage storage = FirebaseStorage.instance;
-    Reference ref = storage.ref().child("invoice_${widget.invoiceNumber}.pdf");
+    Reference ref = storage.ref().child("invoice_${invoiceNumber}.pdf");
     UploadTask uploadTask = ref.putFile(outputFile);
     uploadTask.then((res) {
       res.ref.getDownloadURL().then((value) {
         print("Uploaded File URL: $value");
         FirebaseFirestore.instance
             .collection('invoices')
-            .doc(widget.invoiceNumber)
+            .doc(invoiceNumber)
             .set({
-          // 'invoiceNumber': widget.invoiceNumber,
-          // 'landlordName': widget.landlordName,
-          // 'landlordAddress': widget.landlordAddress,
-          // 'tenantName': widget.tenantName,
-          // 'tenantAddress': widget.tenantAddress,
-          // 'amount': widget.amount,
-          // 'paymentMode': widget.paymentMode,
+          // 'invoiceNumber': invoiceNumber,
+          // 'landlordName': landlordName,
+          // 'landlordAddress': landlordAddress,
+          // 'tenantName': tenantName,
+          // 'tenantAddress': tenantAddress,
+          // 'amount': amount,
+          // 'paymentMode': paymentMode,
           // 'date': formatted,
           'url': value,
         });
@@ -289,161 +300,162 @@ class _PDFEditorTenantPageState extends State<PDFEditorTenantPage> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    return Scaffold(
-      appBar: _buildAppBar(size, context),
-      body: Center(
-        child: FutureBuilder<File>(
-          future: (path == null) ? createPdf() : Future.value(File(path!)),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.done &&
-                snapshot.hasData) {
-              final file = snapshot.data!;
-              return Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'Generated Invoice:',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.green,
-                      fontFamily: GoogleFonts.montserrat().fontFamily,
-                    ),
-                  ),
-                  SizedBox(height: size.height * 0.03),
-                  Container(
-                    height: 300, // Adjust the height and width as needed
-                    width: 300,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(20.0),
-                      child: ColorFiltered(
-                        colorFilter: ColorFilter.mode(
-                          Colors.black.withOpacity(
-                              0.7), // Adjust the color and opacity as needed
-                          BlendMode.srcOver,
-                        ),
-                        child: SfPdfViewer.file(
-                          file,
-                          canShowScrollHead: false,
-                          canShowScrollStatus: false,
-                        ),
-                      ),
-                    ),
-                  ),
-                  Align(
-                    alignment: Alignment.bottomCenter,
-                    child: Padding(
-                      padding: EdgeInsets.all(16.0),
-                      child: Ink(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              const Color(0xff0FA697),
-                              const Color(0xff45BF7A),
-                              const Color(0xff0DF205),
-                            ],
-                          ),
-                          borderRadius: BorderRadius.circular(30.0),
-                        ),
-                        child: InkWell(
-                          borderRadius: BorderRadius.circular(30.0),
-                          onTap: () {
-                            OpenFile.open(file.path);
-                          },
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(
-                                vertical: 10.0, horizontal: 20.0),
-                            child: Text('View PDF',
-                                style: TextStyle(color: Colors.white)),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              );
-            } else if (snapshot.connectionState == ConnectionState.waiting) {
-              return CircularProgressIndicator();
-            } else {
-              return Text('Error: ${snapshot.error}');
-            }
-          },
-        ),
-      ),
-    );
+    // return Scaffold(
+    //   appBar: _buildAppBar(size, context),
+    //   body: Center(
+    //     child: FutureBuilder<File>(
+    //       future: (path == null) ? createPdf() : Future.value(File(path!)),
+    //       builder: (context, snapshot) {
+    //         if (snapshot.connectionState == ConnectionState.done &&
+    //             snapshot.hasData) {
+    //           final file = snapshot.data!;
+    //           return Column(
+    //             mainAxisAlignment: MainAxisAlignment.center,
+    //             children: [
+    //               Text(
+    //                 'Generated Invoice:',
+    //                 style: TextStyle(
+    //                   fontSize: 20,
+    //                   fontWeight: FontWeight.bold,
+    //                   color: Colors.green,
+    //                   fontFamily: GoogleFonts.montserrat().fontFamily,
+    //                 ),
+    //               ),
+    //               SizedBox(height: size.height * 0.03),
+    //               Container(
+    //                 height: 300, // Adjust the height and width as needed
+    //                 width: 300,
+    //                 child: ClipRRect(
+    //                   borderRadius: BorderRadius.circular(20.0),
+    //                   child: ColorFiltered(
+    //                     colorFilter: ColorFilter.mode(
+    //                       Colors.black.withOpacity(
+    //                           0.7), // Adjust the color and opacity as needed
+    //                       BlendMode.srcOver,
+    //                     ),
+    //                     child: SfPdfViewer.file(
+    //                       file,
+    //                       canShowScrollHead: false,
+    //                       canShowScrollStatus: false,
+    //                     ),
+    //                   ),
+    //                 ),
+    //               ),
+    //               Align(
+    //                 alignment: Alignment.bottomCenter,
+    //                 child: Padding(
+    //                   padding: EdgeInsets.all(16.0),
+    //                   child: Ink(
+    //                     decoration: BoxDecoration(
+    //                       gradient: LinearGradient(
+    //                         colors: [
+    //                           const Color(0xff0FA697),
+    //                           const Color(0xff45BF7A),
+    //                           const Color(0xff0DF205),
+    //                         ],
+    //                       ),
+    //                       borderRadius: BorderRadius.circular(30.0),
+    //                     ),
+    //                     child: InkWell(
+    //                       borderRadius: BorderRadius.circular(30.0),
+    //                       onTap: () {
+    //                         OpenFile.open(file.path);
+    //                       },
+    //                       child: Padding(
+    //                         padding: EdgeInsets.symmetric(
+    //                             vertical: 10.0, horizontal: 20.0),
+    //                         child: Text('View PDF',
+    //                             style: TextStyle(color: Colors.white)),
+    //                       ),
+    //                     ),
+    //                   ),
+    //                 ),
+    //               ),
+    //             ],
+    //           );
+    //         } else if (snapshot.connectionState == ConnectionState.waiting) {
+    //           return CircularProgressIndicator();
+    //         } else {
+    //           return Text('Error: ${snapshot.error}');
+    //         }
+    //       },
+    //     ),
+    //   ),
+    // );
+    return Container();
   }
 
-  PreferredSizeWidget _buildAppBar(Size size, context) {
-    return AppBar(
-      toolbarHeight: 70,
-      leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => TenantDashboardPage(
-                        uid: widget.uid,
-                      )),
-            );
-          }),
-      title: Padding(
-        padding: EdgeInsets.only(
-          right:
-              MediaQuery.of(context).size.width * 0.14, // 55% of the page width
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Stack(
-              children: [
-                ClipPath(
-                  clipper: HexagonClipper(),
-                  child: Transform.scale(
-                    scale: 0.87,
-                    child: Container(
-                      color: Colors.white,
-                      width: 60,
-                      height: 60,
-                    ),
-                  ),
-                ),
-                ClipPath(
-                  clipper: HexagonClipper(),
-                  child: Image.asset(
-                    'assets/mainlogo.png',
-                    width: 60,
-                    height: 60,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              ],
-            ),
-            // const SizedBox(width: 8),
-          ],
-        ),
-      ),
-      actions: <Widget>[
-        Padding(
-          padding: const EdgeInsets.only(top: 15.0),
-          child: Stack(
-            children: [],
-          ),
-        ),
-      ],
-      flexibleSpace: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Color(0xff0FA697),
-              Color(0xff45BF7A),
-              Color(0xff0DF205),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
+//   PreferredSizeWidget _buildAppBar(Size size, context) {
+//     return AppBar(
+//       toolbarHeight: 70,
+//       leading: IconButton(
+//           icon: Icon(Icons.arrow_back),
+//           onPressed: () {
+//             Navigator.push(
+//               context,
+//               MaterialPageRoute(
+//                   builder: (context) => TenantDashboardPage(
+//                         uid: uid,
+//                       )),
+//             );
+//           }),
+//       title: Padding(
+//         padding: EdgeInsets.only(
+//           right:
+//               MediaQuery.of(context).size.width * 0.14, // 55% of the page width
+//         ),
+//         child: Row(
+//           mainAxisAlignment: MainAxisAlignment.center,
+//           children: <Widget>[
+//             Stack(
+//               children: [
+//                 ClipPath(
+//                   clipper: HexagonClipper(),
+//                   child: Transform.scale(
+//                     scale: 0.87,
+//                     child: Container(
+//                       color: Colors.white,
+//                       width: 60,
+//                       height: 60,
+//                     ),
+//                   ),
+//                 ),
+//                 ClipPath(
+//                   clipper: HexagonClipper(),
+//                   child: Image.asset(
+//                     'assets/mainlogo.png',
+//                     width: 60,
+//                     height: 60,
+//                     fit: BoxFit.cover,
+//                   ),
+//                 ),
+//               ],
+//             ),
+//             // const SizedBox(width: 8),
+//           ],
+//         ),
+//       ),
+//       actions: <Widget>[
+//         Padding(
+//           padding: const EdgeInsets.only(top: 15.0),
+//           child: Stack(
+//             children: [],
+//           ),
+//         ),
+//       ],
+//       flexibleSpace: Container(
+//         decoration: const BoxDecoration(
+//           gradient: LinearGradient(
+//             begin: Alignment.topLeft,
+//             end: Alignment.bottomRight,
+//             colors: [
+//               Color(0xff0FA697),
+//               Color(0xff45BF7A),
+//               Color(0xff0DF205),
+//             ],
+//           ),
+//         ),
+//       ),
+//     );
+//   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:encrypt/encrypt.dart' as encrypt;
 
 String formatNumber(double num) {
   if (num >= 1000000000000) {
@@ -67,4 +68,37 @@ class CustomButton extends StatelessWidget {
       ),
     );
   }
+}
+
+String encryptString(String input) {
+  try {
+    final key = encrypt.Key.fromUtf8("aixgru@@djnjd#%d");
+    final iv = encrypt.IV.fromLength(16);
+
+    final encrypter = encrypt.Encrypter(encrypt.AES(key));
+
+    final encrypted = encrypter.encrypt(input, iv: iv);
+
+    return encrypted.base64;
+  } catch (e) {
+    return 'error';
+    // TODO
+  }
+}
+
+String decryptString(String input) {
+  //TODO fix this bad practice of hardcoding the key
+  String decrypted = "";
+  try {
+    final key = encrypt.Key.fromUtf8("aixgru@@djnjd#%d");
+    final iv = encrypt.IV.fromLength(16);
+
+    final encrypter = encrypt.Encrypter(encrypt.AES(key));
+
+    decrypted = encrypter.decrypt64(input, iv: iv);
+  } catch (e) {
+    decrypted = "Error with encryption or decryption";
+  }
+
+  return decrypted;
 }

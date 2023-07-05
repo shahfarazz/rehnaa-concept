@@ -1,8 +1,11 @@
 import 'dart:async';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:easy_image_viewer/easy_image_viewer.dart';
 
 class NewVouchersPage extends StatefulWidget {
   const NewVouchersPage({super.key});
@@ -65,10 +68,9 @@ class _NewVouchersPageState extends State<NewVouchersPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Padding(padding: EdgeInsets.only(top: size.height * 0.3)),
-                CircularProgressIndicator(
-                  color: Colors.green,
-                  value: loadingProgress,
-                )
+                const SpinKitFadingCube(
+                  color: Color.fromARGB(255, 30, 197, 83),
+                ),
               ],
             )
           : images.length == 0
@@ -91,15 +93,19 @@ class _NewVouchersPageState extends State<NewVouchersPage> {
                         ),
                         Card(
                           child: GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => ExpandedImageDialog(
-                                    imagePath: images[index],
-                                  ),
-                                ),
-                              );
+                            onTap: () async {
+                              final imageProvider =
+                                  CachedNetworkImageProvider(images[index]);
+
+                              await showImageViewer(context, imageProvider);
+                              // Navigator.push(
+                              //   context,
+                              //   MaterialPageRoute(
+                              //     builder: (context) => ExpandedImageDialog(
+                              //       imagePath: images[index],
+                              //     ),
+                              //   ),
+                              // );
                             },
                             child: SizedBox(
                               width: 200,
@@ -111,8 +117,9 @@ class _NewVouchersPageState extends State<NewVouchersPage> {
                                           Center(
                                             child: loadingProgress == null
                                                 ? child
-                                                : CircularProgressIndicator(
-                                                    color: Colors.green,
+                                                : const SpinKitFadingCube(
+                                                    color: Color.fromARGB(
+                                                        255, 30, 197, 83),
                                                   ),
                                           )),
                             ),
@@ -206,66 +213,5 @@ class HexagonClipper extends CustomClipper<Path> {
   @override
   bool shouldReclip(CustomClipper<Path> oldClipper) {
     return false;
-  }
-}
-
-class ExpandedImageDialog extends StatelessWidget {
-  final String imagePath;
-
-  const ExpandedImageDialog({Key? key, required this.imagePath})
-      : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Dialog(
-      insetPadding: EdgeInsets.zero,
-      child: Stack(
-        children: [
-          Container(
-            constraints: const BoxConstraints.expand(),
-            child: InteractiveViewer(
-              boundaryMargin: const EdgeInsets.all(20),
-              minScale: 0.5,
-              maxScale: 5.0,
-              child: Image.network(
-                imagePath,
-                fit: BoxFit.contain,
-              ),
-            ),
-          ),
-          Positioned(
-            top: 65.0,
-            left: 10.0,
-            child: GestureDetector(
-              onTap: () {
-                Navigator.pop(context);
-              },
-              child: Container(
-                width: 40,
-                height: 40,
-                decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Color(0xFF33907C),
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      Color(0xff0FA697),
-                      Color(0xff45BF7A),
-                      Color(0xff0DF205),
-                    ],
-                  ),
-                ),
-                child: const Icon(
-                  Icons.arrow_back,
-                  size: 20,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
   }
 }

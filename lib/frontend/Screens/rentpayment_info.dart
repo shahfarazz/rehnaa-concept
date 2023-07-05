@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:rehnaa/backend/models/rentpaymentmodel.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -243,7 +244,11 @@ class _PDFScreenState extends State<PDFScreen> {
     return Scaffold(
       appBar: _buildAppBar(MediaQuery.of(context).size, context),
       body: localPath.isEmpty
-          ? Center(child: CircularProgressIndicator())
+          ? Center(
+              child: const SpinKitFadingCube(
+                color: Color.fromARGB(255, 30, 197, 83),
+              ),
+            )
           : SfPdfViewer.file(
               File(localPath),
               canShowScrollHead: false,

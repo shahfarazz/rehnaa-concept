@@ -65,7 +65,7 @@ class _LandlordPropertiesPageState extends State<LandlordPropertiesPage>
         .get();
 
     if (landlordSnapshot.exists) {
-      print('nahi yahan');
+      // print('nahi yahan');
       Map<String, dynamic> data = landlordSnapshot.data()!;
       List<DocumentReference<Map<String, dynamic>>> propertyDataList2 =
           (data['propertyRef'] as List<dynamic>)
@@ -73,8 +73,8 @@ class _LandlordPropertiesPageState extends State<LandlordPropertiesPage>
 
       if (propertyDataList.map((ref) => ref.path).toList().toString() !=
           propertyDataList2.map((ref) => ref.path).toList().toString()) {
-        print('propertyDataList is $propertyDataList');
-        print('propertyDataList2 is ${propertyDataList2.length}');
+        // print('propertyDataList is $propertyDataList');
+        // print('propertyDataList2 is ${propertyDataList2.length}');
 
         Iterable<Stream<DocumentSnapshot<Map<String, dynamic>>>>
             propertySnapshotsStreams =
@@ -304,6 +304,16 @@ class PropertyCard extends StatelessWidget {
     required this.area,
   });
 
+  String capitalizeFirstLetter(String text) {
+    if (text.isEmpty) return '';
+    return text
+        .split(' ')
+        .map((word) =>
+            word.substring(0, 1).toUpperCase() +
+            word.substring(1).toLowerCase())
+        .join(' ');
+  }
+
   @override
   Widget build(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
@@ -343,7 +353,7 @@ class PropertyCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      property.title,
+                      capitalizeFirstLetter(property.title),
                       style: GoogleFonts.montserrat(
                         fontSize: screenWidth * 0.04,
                         fontWeight: FontWeight.bold,
@@ -351,7 +361,6 @@ class PropertyCard extends StatelessWidget {
                       ),
                     ),
                     SizedBox(height: screenHeight * 0.005),
-
                     Text(
                       '$location\n$address',
                       style: TextStyle(fontSize: screenWidth * 0.035),
@@ -386,8 +395,10 @@ class PropertyCard extends StatelessWidget {
                     Row(
                       children: [
                         CircleAvatar(
-                          backgroundImage: AssetImage(
-                            pathToImage ?? 'assets/userimage.png',
+                          child: ClipOval(
+                            child: pathToImage!.startsWith('https')
+                                ? CachedNetworkImage(imageUrl: pathToImage!)
+                                : Image.asset(pathToImage!),
                           ),
                           radius: screenWidth * 0.025,
                         ),
@@ -403,7 +414,6 @@ class PropertyCard extends StatelessWidget {
                         ),
                       ],
                     ),
-                    // SizedBox(height: 10),
                   ],
                 ),
               ),

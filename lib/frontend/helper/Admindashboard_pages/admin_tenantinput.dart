@@ -12,6 +12,7 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:rehnaa/backend/services/helperfunctions.dart';
 import 'package:rehnaa/frontend/Screens/Admin/admindashboard.dart';
 
 import '../../../backend/models/landlordmodel.dart';
@@ -177,7 +178,7 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
     final TextEditingController ratingController =
         TextEditingController(text: tenant.rating.toString());
 
-    final hashedCnic = hashString(cnicNumberController.text);
+    final hashedCnic = encryptString(cnicNumberController.text);
 
     showDialog(
       context: context,
@@ -269,11 +270,11 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
                       'firstName': firstNameController.text,
                       'lastName': lastNameController.text,
                       'description': descriptionController.text,
-                      'rent': double.tryParse(rentController.text) ?? 0.0,
+                      'balance': double.tryParse(rentController.text) ?? 0.0,
                       'creditPoints':
                           int.tryParse(creditPointsController.text) ?? 0,
                       'cnicNumber': cnicNumberController.text.isNotEmpty
-                          ? hashedCnic
+                          ? encryptString(cnicNumberController.text)
                           : '',
                       'emailOrPhone': emailOrPhoneController.text,
                       'familyMembers':
@@ -428,14 +429,14 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
           ),
         ),
         leading: IconButton(
-        icon: Icon(Icons.arrow_back),
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => AdminDashboard()),
-          );
-        },
-      ),
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => AdminDashboard()),
+            );
+          },
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.only(top: 16.0),
@@ -506,8 +507,7 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
                 ),
               ],
             ),
-      buildFloatingActionButton(context),
-
+            buildFloatingActionButton(context),
           ],
         ),
       ),

@@ -13,7 +13,7 @@ import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenantinvoice.dart'
 
 import 'package:responsive_framework/responsive_framework.dart';
 import '../../../backend/models/landlordmodel.dart';
-import '../../Screens/pdf_landlord.dart';
+// import '../../Screens/pdf_landlord.dart';
 import '../../Screens/pdf_tenant.dart';
 import '../Landlorddashboard_pages/landlord_dashboard_content.dart';
 
@@ -84,9 +84,9 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                 ),
               ),
 
-              titlePadding: const EdgeInsets.fromLTRB(
-                  20.0, 16.0, 16.0, 0.0), // padding above title
-              contentPadding: const EdgeInsets.fromLTRB(16.0, 20.0, 16.0, 8.0),
+              // titlePadding: const EdgeInsets.fromLTRB(
+              //     20.0, 16.0, 16.0, 0.0), // padding above title
+              // contentPadding: const EdgeInsets.fromLTRB(16.0, 20.0, 16.0, 8.0),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
@@ -144,10 +144,11 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                       borderRadius: BorderRadius.circular(20.0),
                     ),
                   ),
-                  child: const Text(
+                  child: Text(
                     'Cancel',
                     style: TextStyle(
                       color: Colors.white,
+                      fontFamily: GoogleFonts.montserrat().fontFamily,
                     ),
                   ),
                   onPressed: () {
@@ -162,10 +163,11 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                       borderRadius: BorderRadius.circular(20.0),
                     ),
                   ),
-                  child: const Text(
+                  child: Text(
                     'Next',
                     style: TextStyle(
                       color: Colors.white,
+                      fontFamily: GoogleFonts.montserrat().fontFamily,
                     ),
                   ),
                   onPressed: () {
@@ -190,6 +192,11 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                               onChanged: (value) {
                                 amount = double.tryParse(value) ?? 0.0;
                               },
+                              decoration: InputDecoration(
+                                focusedBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.green),
+                                ),
+                              ),
                             ),
                             actions: <Widget>[
                               TextButton(
@@ -280,30 +287,48 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                                         // print(
                                         // 'reached here landlord is ${landlord.firstName} ${landlord.lastName}}');
 
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  PDFEditorTenantPage(
-                                                    tenantName:
-                                                        '${tenant.firstName} ${tenant.lastName}',
-                                                    landlordName:
-                                                        '${landlord.firstName} ${landlord.lastName}',
-                                                    amount: amount,
-                                                    invoiceNumber:
-                                                        invoiceNumber,
-                                                    balance:
-                                                        tenant.rent.toDouble(),
-                                                    paymentMode: selectedOption,
-                                                    uid: widget.uid,
-                                                    landlordAddress:
-                                                        landlord.address,
-                                                    tenantAddress:
-                                                        tenant.address,
-                                                    cnic: landlord.cnic ??
-                                                        'No cnic provided',
-                                                  )),
-                                        );
+                                        Navigator.pop(context);
+                                        Navigator.pop(context);
+                                        PDFEditorTenantPage pdfinstance =
+                                            PDFEditorTenantPage();
+
+                                        pdfinstance.createState().createPdf(
+                                            '${tenant.firstName} ${tenant.lastName}',
+                                            '${landlord.firstName} ${landlord.lastName}',
+                                            landlord.address,
+                                            tenant.address,
+                                            tenant.rent.toDouble(),
+                                            amount,
+                                            selectedOption,
+                                            widget.uid,
+                                            invoiceNumber,
+                                            landlord.cnic ??
+                                                'No cnic provided');
+
+                                        // Navigator.push(
+                                        //   context,
+                                        //   MaterialPageRoute(
+                                        //       builder: (context) =>
+                                        //           PDFEditorTenantPage(
+                                        //             tenantName:
+                                        //                 '${tenant.firstName} ${tenant.lastName}',
+                                        //             landlordName:
+                                        //                 '${landlord.firstName} ${landlord.lastName}',
+                                        //             amount: amount,
+                                        //             invoiceNumber:
+                                        //                 invoiceNumber,
+                                        //             balance:
+                                        //                 tenant.rent.toDouble(),
+                                        //             paymentMode: selectedOption,
+                                        //             uid: widget.uid,
+                                        //             landlordAddress:
+                                        //                 landlord.address,
+                                        //             tenantAddress:
+                                        //                 tenant.address,
+                                        //             cnic: landlord.cnic ??
+                                        //                 'No cnic provided',
+                                        //           )),
+                                        // );
                                       }
                                     });
                                   } else {
@@ -365,8 +390,13 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
             width: 50,
             height: 30,
           ),
-          const SizedBox(width: 20),
-          Text(optionName),
+          const SizedBox(width: 8.0), // Add some spacing
+          Expanded(
+            child: Text(
+              optionName,
+              style: TextStyle(fontFamily: GoogleFonts.montserrat().fontFamily),
+            ),
+          ),
         ],
       ),
       onTap: onTap,

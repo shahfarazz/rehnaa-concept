@@ -18,6 +18,7 @@ import '../../helper/Landlorddashboard_pages/landlord_interestfreeloan.dart';
 // import '../../helper/Landlorddashboard_pages/landlord_renthistory.dart';
 import '../../helper/Landlorddashboard_pages/landlord_tenants.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:easy_debounce/easy_debounce.dart';
 
 import '../../helper/Landlorddashboard_pages/landlordproperties.dart';
 
@@ -109,11 +110,12 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
           .get()
           .then((value) {
         if (value.exists) {
-          if (value.data()!['isNewVouchers'] == true) {
+          if (value.data()!['isNewVouchers'] == true && isNewVoucher == false) {
             setState(() {
               isNewVoucher = true;
             });
-          } else {
+          } else if (value.data()!['isNewVouchers'] == false &&
+              isNewVoucher == true) {
             setState(() {
               isNewVoucher = false;
             });
@@ -152,6 +154,11 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
 // Method to check if the keyboard is visible
   bool isKeyboardVisible(BuildContext context) {
     return MediaQuery.of(context).viewInsets.bottom > 0;
+  }
+
+  void _handleNotificationsButtonPress() async {
+    await _markNotificationsAsRead();
+    _showNotificationsDialog();
   }
 
   @override
@@ -290,9 +297,12 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
             children: [
               IconButton(
                 icon: const Icon(Icons.notifications_active),
-                onPressed: () async {
-                  await _markNotificationsAsRead();
-                  _showNotificationsDialog();
+                onPressed: () {
+                  EasyDebounce.debounce(
+                    'notifications-debouncer', // Debouncer ID
+                    Duration(milliseconds: 500), // Debounce duration
+                    _handleNotificationsButtonPress, // Wrapped function
+                  );
                 },
               ),
               Positioned(
@@ -475,7 +485,7 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
                           onTap: () {
                             //firebase call set users isNewVouchers to false
                             FirebaseFirestore.instance
-                                .collection('Tenants')
+                                .collection('Landlords')
                                 .doc(widget.uid)
                                 .set({
                               'isNewVouchers': false,
