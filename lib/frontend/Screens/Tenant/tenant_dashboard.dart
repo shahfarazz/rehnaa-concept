@@ -18,6 +18,7 @@ import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenant_renthistory.
 import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenant_dashboard_content.dart';
 import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenantmonthlyrentoff.dart';
 
+import '../../helper/Tenantdashboard_pages/tenant_landlords.dart';
 import '../../helper/Tenantdashboard_pages/tenant_rented_property.dart';
 import '../../helper/Tenantdashboard_pages/tenant_security_deposit.dart';
 import '../new_vouchers.dart';
@@ -248,7 +249,7 @@ class _DashboardPageState extends State<TenantDashboardPage>
                                           updateWithdrawState,
                                     );
                                   case 1:
-                                    return TenantRentAccrualPage(
+                                    return TenantLandlordsPage(
                                       uid: widget.uid,
                                     );
                                   case 2:
@@ -620,6 +621,21 @@ class _DashboardPageState extends State<TenantDashboardPage>
                           context,
                           MaterialPageRoute(
                             builder: (context) => const FAQPage(),
+                          ),
+                        );
+                        // _closeSidebar();
+                      },
+                    ),
+                    _buildSidebarItem(
+                      icon: Icons.real_estate_agent,
+                      label: 'Rent Accrual',
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => TenantRentAccrualPage(
+                              uid: widget.uid,
+                            ),
                           ),
                         );
                         // _closeSidebar();
@@ -1071,8 +1087,7 @@ class _DashboardPageState extends State<TenantDashboardPage>
         currentIndex: _currentIndex,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.real_estate_agent), label: 'Accrual'),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Landlord'),
           BottomNavigationBarItem(
               icon: Icon(Icons.home_work), label: 'Property'),
           BottomNavigationBarItem(icon: Icon(Icons.history), label: 'History'),

@@ -120,6 +120,25 @@ class _AdminPropertyContractsPageState
       'totalSecurity': totalSecurity,
       'rehnaaSecurity': rehnaaSecurity,
       'additionalInformation': additionalInformation,
+      'landlordID': widget.landlordID,
+      'tenantID': widget.tenantID,
+    });
+
+    FirebaseFirestore.instance.collection('Tenants').doc(widget.tenantID).set({
+      'contractStartDate': contractStartDate,
+      'contractEndDate': contractEndDate,
+      'propertyAddress': propertyAddress,
+      'monthlyRent': monthlyRent,
+    });
+
+    FirebaseFirestore.instance
+        .collection('Landlords')
+        .doc(widget.landlordID)
+        .set({
+      'contractStartDate': contractStartDate,
+      'contractEndDate': contractEndDate,
+      'propertyAddress': propertyAddress,
+      'monthlyRent': monthlyRent,
     });
 
     //Navigate to the home page

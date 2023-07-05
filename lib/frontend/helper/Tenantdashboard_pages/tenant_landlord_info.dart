@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:rehnaa/backend/models/tenantsmodel.dart';
-import 'package:rehnaa/backend/services/helperfunctions.dart';
+// import 'package:rehnaa/backend/services/helperfunctions.dart';
+// import '../../../backend/models/landlordmodel.dart';
+import '../../../backend/models/tenantsmodel.dart';
 
-class LandlordTenantInfoPage extends StatelessWidget {
+class TenantLandlordInfoPage extends StatelessWidget {
   final Tenant tenant;
   final String uid;
 
-  const LandlordTenantInfoPage(
+  const TenantLandlordInfoPage(
       {Key? key, required this.tenant, required this.uid})
       : super(key: key);
 
@@ -76,33 +78,25 @@ class LandlordTenantInfoPage extends StatelessWidget {
                     backgroundColor: Colors.white,
                     radius: 75,
                     child: ClipOval(
-                      child: tenant.pathToImage != null &&
-                              tenant.pathToImage!.isNotEmpty
-                          ? (tenant.pathToImage!.startsWith('assets')
+                      child: tenant.landlord?.pathToImage != null &&
+                              tenant.landlord!.pathToImage!.isNotEmpty
+                          ? (tenant.landlord!.pathToImage!.startsWith('assets')
                               ? Image.asset(
-                                  tenant.pathToImage!,
+                                  tenant.landlord!.pathToImage!,
                                   width: 150,
                                   height: 150,
                                 )
                               : Image.network(
                                   fit: BoxFit.fill,
-                                  tenant.pathToImage!,
+                                  tenant.landlord!.pathToImage!,
                                   width: 150,
                                   height: 150,
                                   loadingBuilder:
                                       (context, child, loadingProgress) {
                                     if (loadingProgress == null) return child;
-                                    return Center(
-                                      child: CircularProgressIndicator(
-                                        color: Colors.green,
-                                        value: loadingProgress
-                                                    .expectedTotalBytes !=
-                                                null
-                                            ? loadingProgress
-                                                    .cumulativeBytesLoaded /
-                                                loadingProgress
-                                                    .expectedTotalBytes!
-                                            : null,
+                                    return const Center(
+                                      child: SpinKitFadingCube(
+                                        color: Color.fromARGB(255, 30, 197, 83),
                                       ),
                                     );
                                   },
@@ -116,7 +110,7 @@ class LandlordTenantInfoPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 20.0),
                   Text(
-                    '${tenant.firstName} ${tenant.lastName}',
+                    '${tenant.landlord?.firstName} ${tenant.landlord?.lastName}',
                     style: GoogleFonts.montserrat(
                       fontSize: 20.0,
                       fontWeight: FontWeight.bold,
@@ -126,7 +120,7 @@ class LandlordTenantInfoPage extends StatelessWidget {
                   const SizedBox(height: 10.0),
                   Center(
                     child: Text(
-                      tenant.description,
+                      "Landlord",
                       textAlign: TextAlign.center,
                       style: GoogleFonts.montserrat(
                         fontSize: 16.0,
@@ -162,70 +156,76 @@ class LandlordTenantInfoPage extends StatelessWidget {
                             child: WhiteBox(
                               icon: Icons.star,
                               iconColor: const Color(0xff33907c),
-                              label: 'Rating',
-                              value: '${tenant.rating}',
-                              points: '${tenant.creditPoints}',
+                              label: 'Tenant Name',
+                              value: '${tenant.firstName} ${tenant.lastName}',
+                              // points: '${tenant.landlord.creditPoints}',
                             ),
                           ),
 
                           const SizedBox(height: 10.0),
-                          Center(
-                            child: WhiteBox(
-                              icon: Icons.numbers,
-                              iconColor: const Color(0xff33907c),
-                              label: 'CNIC Number',
-                              value: decryptString(tenant.cnicNumber),
-                            ),
-                          ),
+                          tenant.contractStartDate != ''
+                              ? Center(
+                                  child: WhiteBox(
+                                    icon: Icons.numbers,
+                                    iconColor: const Color(0xff33907c),
+                                    label: 'Contract Start Date',
+                                    value: tenant.contractStartDate!,
+                                  ),
+                                )
+                              : const SizedBox.shrink(),
                           const SizedBox(height: 10.0),
-                          Center(
-                            child: WhiteBox(
-                              icon: Icons.email,
-                              iconColor: const Color(0xff33907c),
-                              label: 'Contact Number',
-                              value: tenant.emailOrPhone,
-                            ),
-                          ),
+                          tenant.contractEndDate != ''
+                              ? Center(
+                                  child: WhiteBox(
+                                    icon: Icons.numbers,
+                                    iconColor: const Color(0xff33907c),
+                                    label: 'Contract End Date',
+                                    value: tenant.contractEndDate!,
+                                  ),
+                                )
+                              : const SizedBox.shrink(),
                           const SizedBox(height: 10.0),
-                          Center(
-                            child: WhiteBox(
-                              icon: Icons.verified_user,
-                              label: 'Tasdeeq Verification',
-                              iconColor: const Color(0xff33907c),
-                              value: tenant.tasdeeqVerification
-                                  ? 'Verified'
-                                  : 'Not Verified',
-                            ),
-                          ),
+                          tenant.propertyAddress != ''
+                              ? Center(
+                                  child: WhiteBox(
+                                    icon: Icons.home,
+                                    iconColor: const Color(0xff33907c),
+                                    label: 'Property Address',
+                                    value: tenant.propertyAddress!,
+                                  ),
+                                )
+                              : const SizedBox.shrink(),
                           const SizedBox(height: 10.0),
-                          Center(
-                            child: WhiteBox(
-                              icon: Icons.family_restroom,
-                              iconColor: const Color(0xff33907c),
-                              label: 'Family Members',
-                              value: tenant.familyMembers.toString(),
-                            ),
-                          ),
+                          tenant.upfrontBonus != ''
+                              ? Center(
+                                  child: WhiteBox(
+                                    icon: Icons.money,
+                                    iconColor: const Color(0xff33907c),
+                                    label: 'Upfront Bonus',
+                                    value: tenant.upfrontBonus!,
+                                  ),
+                                )
+                              : const SizedBox.shrink(),
                           const SizedBox(height: 10.0),
-                          Center(
-                            child: WhiteBox(
-                              icon: Icons.local_police,
-                              iconColor: const Color(0xff33907c),
-                              label: 'Police Verification',
-                              value: tenant.policeVerification
-                                  ? 'Verified'
-                                  : 'Not Verified',
-                            ),
-                          ),
+                          tenant.monthlyProfit != ''
+                              ? Center(
+                                  child: WhiteBox(
+                                    icon: Icons.money,
+                                    iconColor: const Color(0xff33907c),
+                                    label: 'Monthly Profit',
+                                    value: tenant.monthlyProfit!,
+                                  ),
+                                )
+                              : const SizedBox.shrink(),
                           const SizedBox(height: 10.0),
-                          Center(
-                            child: WhiteBox(
-                              icon: Icons.info,
-                              iconColor: const Color(0xff33907c),
-                              label: 'Other Information',
-                              value: 'N/A',
-                            ),
-                          ),
+                          // Center(
+                          //   child: WhiteBox(
+                          //     icon: Icons.info,
+                          //     iconColor: const Color(0xff33907c),
+                          //     label: 'Other Information',
+                          //     value: 'N/A',
+                          //   ),
+                          // ),
                         ],
                       ),
                     ),

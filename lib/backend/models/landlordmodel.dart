@@ -25,6 +25,10 @@ class Landlord {
   String? emailOrPhone;
   Timestamp? dateJoined;
   String? address;
+  String? rating;
+  String? contractStartDate;
+  String? contractEndDate;
+  String? monthlyRent;
 
   Landlord({
     required this.firstName,
@@ -47,6 +51,10 @@ class Landlord {
     this.emailOrPhone,
     this.dateJoined,
     this.address,
+    this.rating,
+    this.contractStartDate,
+    this.contractEndDate,
+    this.monthlyRent,
   });
 
   static Landlord fromJson(Map<String, dynamic>? json) {
@@ -74,6 +82,10 @@ class Landlord {
       emailOrPhone: json['emailOrPhone'] ?? '',
       dateJoined: json['dateJoined'],
       address: json['address'] ?? '',
+      rating: json['rating'] ?? '0.0',
+      contractStartDate: json['contractStartDate'] ?? '',
+      contractEndDate: json['contractEndDate'] ?? '',
+      monthlyRent: json['monthlyRent'] ?? '',
     );
 
     // await landlord.fetchData();
@@ -104,12 +116,18 @@ class Landlord {
     }
   }
 
-  Future<void> getProperty() async {
-    property = [];
+  Future<List<Property>?> getProperty() async {
+    List<Property>? propertiesList = [];
 
-    for (DocumentReference<Map<String, dynamic>> ref in propertyRef) {
-      DocumentSnapshot<Map<String, dynamic>> snapshot = await ref.get();
-      property.add(await Property.fromJson(snapshot.data()!));
+    try {
+      for (DocumentReference<Map<String, dynamic>> ref in propertyRef) {
+        DocumentSnapshot<Map<String, dynamic>> snapshot = await ref.get();
+        propertiesList.add(Property.fromJson(snapshot.data()!));
+      }
+      return propertiesList;
+    } catch (e) {
+      // TODO
+      return propertiesList;
     }
   }
 

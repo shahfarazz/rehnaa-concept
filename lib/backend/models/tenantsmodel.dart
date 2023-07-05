@@ -22,28 +22,43 @@ class Tenant {
   String? tempID;
   Timestamp? dateJoined;
   String? address;
+  String? contractStartDate;
+  String? contractEndDate;
+  String? propertyAddress;
+  String? monthlyRent;
+  // ignore: prefer_typing_uninitialized_variables
+  var upfrontBonus;
+  // ignore: prefer_typing_uninitialized_variables
+  var monthlyProfit;
 
-  Tenant(
-      {required this.firstName,
-      required this.lastName,
-      required this.description,
-      required this.rating,
-      required this.rent,
-      required this.creditPoints,
-      // required this.propertyDetails,
-      required this.cnicNumber,
-      required this.emailOrPhone,
-      required this.tasdeeqVerification,
-      required this.familyMembers,
-      required this.policeVerification,
-      this.landlordRef,
-      this.landlord,
-      this.pathToImage,
-      this.tempID,
-      this.propertyRef,
-      this.dateJoined,
-      this.rentpaymentRef,
-      this.address});
+  Tenant({
+    required this.firstName,
+    required this.lastName,
+    required this.description,
+    required this.rating,
+    required this.rent,
+    required this.creditPoints,
+    // required this.propertyDetails,
+    required this.cnicNumber,
+    required this.emailOrPhone,
+    required this.tasdeeqVerification,
+    required this.familyMembers,
+    required this.policeVerification,
+    this.landlordRef,
+    this.landlord,
+    this.pathToImage,
+    this.tempID,
+    this.propertyRef,
+    this.dateJoined,
+    this.rentpaymentRef,
+    this.address,
+    this.contractStartDate,
+    this.contractEndDate,
+    this.propertyAddress,
+    this.monthlyRent,
+    this.upfrontBonus,
+    this.monthlyProfit,
+  });
 
   factory Tenant.fromJson(Map<String, dynamic> json) {
     return Tenant(
@@ -67,6 +82,12 @@ class Tenant {
               json['rentpaymentRef'].map((ref) => ref as DocumentReference))
           : null,
       address: json['address'] ?? '',
+      contractStartDate: json['contractStartDate'] ?? '',
+      contractEndDate: json['contractEndDate'] ?? '',
+      propertyAddress: json['propertyAddress'] ?? '',
+      monthlyRent: json['monthlyRent'] ?? '',
+      upfrontBonus: json['upfrontBonus'] ?? '',
+      monthlyProfit: json['monthlyProfit'] ?? '',
     );
   }
 
@@ -89,12 +110,14 @@ class Tenant {
     };
   }
 
-  Future<void> getLandlord() async {
+  Future<Landlord?> getLandlord() async {
     if (landlordRef != null) {
       DocumentSnapshot<Map<String, dynamic>> snapshot =
           await landlordRef!.get();
-      landlord = await Landlord.fromJson(snapshot.data());
+      landlord = Landlord.fromJson(snapshot.data());
+      return landlord;
     }
+    return null;
   }
 
   static void addDummyTenant() async {
