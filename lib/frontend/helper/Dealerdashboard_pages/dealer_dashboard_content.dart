@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'dart:ui';
 
 import 'package:firebase_auth/firebase_auth.dart';
@@ -276,6 +277,12 @@ class _DealerDashboardContentState extends State<DealerDashboardContent>
                                         .set({
                                       'isWithdraw': true,
                                     }, SetOptions(merge: true));
+                                    // Generate a random ID
+                                    final Random random = Random();
+                                    final String randomID = random
+                                        .nextInt(999999)
+                                        .toString()
+                                        .padLeft(6, '0');
 
                                     FirebaseFirestore.instance
                                         .collection('AdminRequests')
@@ -287,7 +294,8 @@ class _DealerDashboardContentState extends State<DealerDashboardContent>
                                               '${dealer.firstName} ${dealer.lastName}',
                                           'amount': withdrawalAmount,
                                           'paymentMethod': selectedOption,
-                                          'uid': widget.uid
+                                          'uid': widget.uid,
+                                          'requestID': randomID,
                                           // Convert to desired format
                                         }
                                       ]),

@@ -75,6 +75,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                   'fullname': item['fullname'],
                   'paymentMethod': item['paymentMethod'],
                   'senderid': propertysnapshot.id,
+                  'requestID': item['requestID'],
                 };
                 tempNotifications.add(notification);
               }
@@ -88,6 +89,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                   'uid': item['uid'],
                   'property name': item['property']['title'],
                   'senderid': propertysnapshot.id,
+                  'requestID': item['requestID'],
                 };
                 tempNotifications.add(notification);
               }
@@ -103,6 +105,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                   'fullname': '',
                   // 'uid': item['uid'],
                   'senderid': propertysnapshot.id,
+                  'requestID': item['requestID'],
                 };
                 tempNotifications.add(notification);
               }

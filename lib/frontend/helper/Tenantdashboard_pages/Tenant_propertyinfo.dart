@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -449,6 +451,13 @@ class PropertyDetails extends StatelessWidget {
                                     Map<String, dynamic> propertyMap =
                                         property.toMap();
 
+                                    // Generate a random ID
+                                    final Random random = Random();
+                                    final String randomID = random
+                                        .nextInt(999999)
+                                        .toString()
+                                        .padLeft(6, '0');
+
                                     // Send request to admin
                                     FirebaseFirestore.instance
                                         .collection('AdminRequests')
@@ -461,6 +470,7 @@ class PropertyDetails extends StatelessWidget {
                                           'uid': uid,
                                           'property': propertyMap,
                                           'propertyID': propertyID,
+                                          'requestID': randomID,
                                         }
                                       ]),
                                       'timestamp': Timestamp.now(),

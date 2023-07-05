@@ -23,6 +23,7 @@ class Property {
   String tenantReview;
   String? propertyID;
   num? area;
+  bool? shouldShow;
 
   Property({
     required this.imagePath,
@@ -46,6 +47,7 @@ class Property {
     this.propertyID,
     this.tenantRef,
     this.area,
+    this.shouldShow,
   });
 
   static Property fromJson(Map<String, dynamic> json) {

@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../Screens/Admin/admindashboard.dart';
 import 'admin_contractsedit.dart';
 
 class AdminContractsViewPage extends StatefulWidget {
@@ -22,8 +23,28 @@ class _AdminContractsEditPageState extends State<AdminContractsViewPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Admin Contracts'),
-        backgroundColor: Colors.green,
+        title: const Text('Admin Contracts'),
+        leading: IconButton(
+            icon: Icon(Icons.arrow_back),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => AdminDashboard()),
+              );
+            }),
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Color(0xff0FA697),
+                Color(0xff45BF7A),
+                Color(0xff0DF205),
+              ],
+            ),
+          ),
+        ),
       ),
       body: FutureBuilder<List<DocumentSnapshot<Map<String, dynamic>>>>(
         future: fetchContracts(),

@@ -144,7 +144,7 @@ class _PropertyEditPageState extends State<PropertyEditPage> {
         padding: const EdgeInsets.all(16.0),
         child: ListView(
           children: [
-            Text('Hello world'),
+            // Text('Hello world'),
             TextField(
               controller: titleController,
               decoration: InputDecoration(labelText: 'Title'),

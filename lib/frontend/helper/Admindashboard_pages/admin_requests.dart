@@ -46,6 +46,7 @@ class _AdminRequestsPageState extends State<AdminRequestsPage> {
                   requestType: 'Landlord Withdraw Request',
                   invoiceNumber: doc["withdrawRequest"][i]["invoiceNumber"],
                   altTenantName: doc["withdrawRequest"][i]["tenantname"],
+                  withinArrayID: doc["withdrawRequest"][i]["requestID"],
                 ),
               );
             }
@@ -71,13 +72,14 @@ class _AdminRequestsPageState extends State<AdminRequestsPage> {
                   requestID: doc.id,
                   requestType: 'Tenant Payment Request',
                   invoiceNumber: doc["paymentRequest"][i]["invoiceNumber"],
+                  withinArrayID: doc["paymentRequest"][i]["requestID"],
                 ),
               );
             }
           }
         } catch (e) {
           if (kDebugMode) {
-            print('Error: $e');
+            print('Error222: $e');
           }
         }
 
@@ -100,6 +102,7 @@ class _AdminRequestsPageState extends State<AdminRequestsPage> {
                     requestType: 'Tenant Rental Request',
                     propertyLandlordRef: doc["rentalRequest"][i]["property"]
                         ["landlordRef"],
+                    withinArrayID: doc["rentalRequest"][i]["requestID"],
                     propertyID: doc["rentalRequest"][i]["propertyID"]),
               );
             }
@@ -334,6 +337,7 @@ class AdminRequestData {
   String? propertyID;
   String? invoiceNumber;
   String? altTenantName;
+  String? withinArrayID;
 
   AdminRequestData({
     required this.name,
@@ -348,6 +352,7 @@ class AdminRequestData {
     this.propertyID,
     this.invoiceNumber,
     this.altTenantName,
+    this.withinArrayID,
   });
 }
 
@@ -471,10 +476,26 @@ class LandlordWithdrawalCard extends StatelessWidget {
                             -int.parse(data.requestedAmount!)),
                       });
                       //remove the withdrawal request
+
                       FirebaseFirestore.instance
                           .collection('AdminRequests')
                           .doc(data.requestID)
-                          .delete();
+                          .get()
+                          .then((snapshot) {
+                        if (snapshot.exists) {
+                          final List<dynamic> withdrawRequestArray =
+                              snapshot.get('withdrawalRequest') ?? [];
+
+                          final updatedArray = List.from(withdrawRequestArray)
+                            ..removeWhere((element) =>
+                                element['requestID'] == data.withinArrayID);
+
+                          FirebaseFirestore.instance
+                              .collection('AdminRequests')
+                              .doc(data.requestID)
+                              .update({'withdrawalRequest': updatedArray});
+                        }
+                      });
                       //send a notification to the landlord by accessing the landlord's uid on Collection 'Notifications'
                       // and appending to the array called 'notifications' which has fields amount and title
                       FirebaseFirestore.instance
@@ -553,11 +574,28 @@ class LandlordWithdrawalCard extends StatelessWidget {
                         'balance': FieldValue.increment(
                             -int.parse(data.requestedAmount!)),
                       });
+
                       //remove the payment request
                       FirebaseFirestore.instance
                           .collection('AdminRequests')
                           .doc(data.requestID)
-                          .delete();
+                          .get()
+                          .then((snapshot) {
+                        if (snapshot.exists) {
+                          final List<dynamic> withdrawRequestArray =
+                              snapshot.get('paymentRequest') ?? [];
+
+                          final updatedArray = List.from(withdrawRequestArray)
+                            ..removeWhere((element) =>
+                                element['requestID'] == data.withinArrayID);
+
+                          FirebaseFirestore.instance
+                              .collection('AdminRequests')
+                              .doc(data.requestID)
+                              .update({'paymentRequest': updatedArray});
+                        }
+                      });
+
                       //send a notification to the tenant by accessing the tenant's uid on Collection 'Notifications'
                       // and appending to the array called 'notifications' which has fields amount and title
                       FirebaseFirestore.instance
@@ -671,7 +709,7 @@ class LandlordWithdrawalCard extends StatelessWidget {
                           .collection('Tenants')
                           .doc(data.uid)
                           .update({
-                        'rent':
+                        'balance':
                             FieldValue.increment(int.parse(newRentalAmount)),
                       });
                     } else {
@@ -679,7 +717,7 @@ class LandlordWithdrawalCard extends StatelessWidget {
                           .collection('Tenants')
                           .doc(data.uid)
                           .update({
-                        'rent': FieldValue.increment(
+                        'balance': FieldValue.increment(
                             int.parse(data.requestedAmount!)),
                       });
                     }
@@ -688,7 +726,22 @@ class LandlordWithdrawalCard extends StatelessWidget {
                     FirebaseFirestore.instance
                         .collection('AdminRequests')
                         .doc(data.requestID)
-                        .delete();
+                        .get()
+                        .then((snapshot) {
+                      if (snapshot.exists) {
+                        final List<dynamic> withdrawRequestArray =
+                            snapshot.get('rentalRequest') ?? [];
+
+                        final updatedArray = List.from(withdrawRequestArray)
+                          ..removeWhere((element) =>
+                              element['requestID'] == data.withinArrayID);
+
+                        FirebaseFirestore.instance
+                            .collection('AdminRequests')
+                            .doc(data.requestID)
+                            .update({'rentalRequest': updatedArray});
+                      }
+                    });
                     //send a notification to the tenant by accessing the tenant's uid on Collection 'Notifications'
                     // and appending to the array called 'notifications' which has fields amount and title
                     FirebaseFirestore.instance
@@ -762,6 +815,14 @@ class LandlordWithdrawalCard extends StatelessWidget {
                       ])
                     });
 
+                    // Update Properties's isRequestedbyTenants field
+                    FirebaseFirestore.instance
+                        .collection('Properties')
+                        .doc(data.propertyID)
+                        .update({
+                      'isRequestedByTenants': FieldValue.arrayRemove([data.uid])
+                    });
+
                     //a new page should be called for setting the contract
 
                     // make a navigation to that page
@@ -772,6 +833,46 @@ class LandlordWithdrawalCard extends StatelessWidget {
                           landlordID: landlordRef.id,
                           tenantID: data.uid,
                         ),
+                      ),
+                    );
+                  } else if (data.requestType == 'Rent Accrual Request') {
+                    FirebaseFirestore.instance
+                        .collection('Notifications')
+                        .doc(data.uid)
+                        .update({
+                      'notifications': FieldValue.arrayUnion([
+                        {
+                          // 'amount': data.requestedAmount,
+                          'title':
+                              'Your Rent Accrual request has been accepted, somebody from the Rehnaa team will contact you shortly',
+                        }
+                      ])
+                    });
+
+                    FirebaseFirestore.instance
+                        .collection('AdminRequests')
+                        .doc(data.requestID)
+                        .get()
+                        .then((snapshot) {
+                      if (snapshot.exists) {
+                        final List<dynamic> withdrawRequestArray =
+                            snapshot.get('rentAccrualRequest') ?? [];
+
+                        final updatedArray = List.from(withdrawRequestArray)
+                          ..removeWhere((element) =>
+                              element['requestID'] == data.withinArrayID);
+
+                        FirebaseFirestore.instance
+                            .collection('AdminRequests')
+                            .doc(data.requestID)
+                            .update({'rentAccrualRequest': updatedArray});
+                      }
+                    });
+                    //reset the state of the page
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const AdminRequestsPage(),
                       ),
                     );
                   }
@@ -791,8 +892,134 @@ class LandlordWithdrawalCard extends StatelessWidget {
               ),
               const SizedBox(width: 10),
               ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
+                  print('data.uid: ${data.uid}');
+                  print('data.requestType: ${data.requestType}');
                   // Handle deny button press
+                  // remove the request from the admin request collection
+                  await FirebaseFirestore.instance
+                      .collection('Notifications')
+                      .doc(data.uid)
+                      .update({
+                    'notifications': FieldValue.arrayUnion([
+                      {
+                        'title': 'Your request has been denied',
+                      }
+                    ])
+                  });
+
+                  if (data.requestType == 'Landlord Withdraw Request') {
+                    await FirebaseFirestore.instance
+                        .collection('AdminRequests')
+                        .doc(data.requestID)
+                        .get()
+                        .then((snapshot) {
+                      if (snapshot.exists) {
+                        final List<dynamic> withdrawRequestArray =
+                            snapshot.get('withdrawalRequest') ?? [];
+
+                        final updatedArray = List.from(withdrawRequestArray)
+                          ..removeWhere((element) =>
+                              element['requestID'] == data.withinArrayID);
+
+                        FirebaseFirestore.instance
+                            .collection('AdminRequests')
+                            .doc(data.requestID)
+                            .update({'withdrawalRequest': updatedArray});
+
+                        FirebaseFirestore.instance
+                            .collection('Landlords')
+                            .doc(data.uid)
+                            .update({
+                          'isWithdraw': false,
+                        });
+                      }
+                    });
+                  } else if (data.requestType == 'Tenant Payment Request') {
+                    await FirebaseFirestore.instance
+                        .collection('AdminRequests')
+                        .doc(data.requestID)
+                        .get()
+                        .then((snapshot) {
+                      if (snapshot.exists) {
+                        final List<dynamic> withdrawRequestArray =
+                            snapshot.get('paymentRequest') ?? [];
+
+                        final updatedArray = List.from(withdrawRequestArray)
+                          ..removeWhere((element) =>
+                              element['requestID'] == data.withinArrayID);
+
+                        FirebaseFirestore.instance
+                            .collection('AdminRequests')
+                            .doc(data.requestID)
+                            .update({'paymentRequest': updatedArray});
+                      }
+
+                      FirebaseFirestore.instance
+                          .collection('Tenants')
+                          .doc(data.uid)
+                          .update({
+                        'isWithdraw': false,
+                      });
+                    });
+                  } else if (data.requestType == 'Tenant Rental Request') {
+                    //remove the rental request
+                    await FirebaseFirestore.instance
+                        .collection('AdminRequests')
+                        .doc(data.requestID)
+                        .get()
+                        .then((snapshot) {
+                      if (snapshot.exists) {
+                        final List<dynamic> withdrawRequestArray =
+                            snapshot.get('rentalRequest') ?? [];
+
+                        print('prev array: $withdrawRequestArray');
+
+                        final updatedArray = List.from(withdrawRequestArray)
+                          ..removeWhere((element) =>
+                              element['requestID'] == data.withinArrayID);
+
+                        print('new array: $updatedArray');
+
+                        FirebaseFirestore.instance
+                            .collection('AdminRequests')
+                            .doc(data.requestID)
+                            .update({'rentalRequest': updatedArray});
+                      }
+                    });
+                    // Update Properties's isRequestedbyTenants field
+                    FirebaseFirestore.instance
+                        .collection('Properties')
+                        .doc(data.propertyID)
+                        .update({
+                      'isRequestedByTenants': FieldValue.arrayRemove([data.uid])
+                    });
+                  } else if (data.requestType == 'Rent Accrual Request') {
+                    await FirebaseFirestore.instance
+                        .collection('AdminRequests')
+                        .doc(data.requestID)
+                        .get()
+                        .then((snapshot) {
+                      if (snapshot.exists) {
+                        final List<dynamic> withdrawRequestArray =
+                            snapshot.get('rentAccrualRequest') ?? [];
+
+                        final updatedArray = List.from(withdrawRequestArray)
+                          ..removeWhere((element) =>
+                              element['requestID'] == data.withinArrayID);
+
+                        FirebaseFirestore.instance
+                            .collection('AdminRequests')
+                            .doc(data.requestID)
+                            .update({'rentAccrualRequest': updatedArray});
+                      }
+                    });
+                  }
+
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => AdminRequestsPage()));
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.red,

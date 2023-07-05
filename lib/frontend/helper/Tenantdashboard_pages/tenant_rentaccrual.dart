@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -152,6 +154,13 @@ class _TenantRentAccrualPageState extends State<TenantRentAccrualPage> {
                                   'isApplied': true,
                                 }, SetOptions(merge: true));
 
+                                // Generate a random ID
+                                final Random random = Random();
+                                final String randomID = random
+                                    .nextInt(999999)
+                                    .toString()
+                                    .padLeft(6, '0');
+
                                 //send an AdminRequest for the tenant
                                 FirebaseFirestore.instance
                                     .collection('AdminRequests')
@@ -162,6 +171,7 @@ class _TenantRentAccrualPageState extends State<TenantRentAccrualPage> {
                                       'fullname':
                                           '${tenant?.firstName} ${tenant?.lastName}',
                                       'uid': widget.uid,
+                                      'requestID': randomID,
                                     }
                                   ]),
                                   'timestamp': Timestamp.now()

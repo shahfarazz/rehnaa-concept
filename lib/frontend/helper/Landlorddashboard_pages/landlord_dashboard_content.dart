@@ -354,6 +354,19 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
                                                                         merge:
                                                                             true));
 
+                                                            // Generate a random ID
+                                                            final Random
+                                                                random =
+                                                                Random();
+                                                            final String
+                                                                randomID =
+                                                                random
+                                                                    .nextInt(
+                                                                        999999)
+                                                                    .toString()
+                                                                    .padLeft(
+                                                                        6, '0');
+
                                                             FirebaseFirestore
                                                                 .instance
                                                                 .collection(
@@ -377,6 +390,8 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
                                                                           invoiceNumber,
                                                                       'tenantname':
                                                                           '${tenant.firstName} ${tenant.lastName}',
+                                                                      'requestID':
+                                                                          randomID,
                                                                     }
                                                                   ]),
                                                                   'timestamp':

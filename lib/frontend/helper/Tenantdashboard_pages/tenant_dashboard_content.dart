@@ -253,6 +253,13 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                                     String invoiceNumber =
                                         generateInvoiceNumber();
 
+                                    // Generate a random ID
+                                    final Random random = Random();
+                                    final String randomID = random
+                                        .nextInt(999999)
+                                        .toString()
+                                        .padLeft(6, '0');
+
                                     FirebaseFirestore.instance
                                         .collection('AdminRequests')
                                         .doc(widget.uid)
@@ -265,6 +272,7 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                                           'paymentMethod': selectedOption,
                                           'uid': widget.uid,
                                           'invoiceNumber': invoiceNumber,
+                                          'requestID': randomID,
                                         }
                                       ]),
                                       'timestamp': Timestamp.now()

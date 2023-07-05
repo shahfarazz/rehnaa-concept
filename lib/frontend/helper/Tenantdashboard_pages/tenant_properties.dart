@@ -27,8 +27,9 @@ class TenantPropertiesPage extends StatefulWidget {
 class _TenantPropertiesPageState extends State<TenantPropertiesPage>
     with AutomaticKeepAliveClientMixin<TenantPropertiesPage> {
   late Future<List<Property>> _propertiesFuture;
-  bool shouldDisplay = false;
+  // bool shouldDisplay = false;
   String? emailOrPhone;
+  bool shouldShow = true;
 
   @override
   void initState() {
@@ -46,6 +47,19 @@ class _TenantPropertiesPageState extends State<TenantPropertiesPage>
       Property property =
           Property.fromJson(documentSnapshot.data() as Map<String, dynamic>);
       property.propertyID = documentSnapshot.id;
+
+      // print('reached here property.tenantref is ${property.tenantRef}');
+
+      if (property.tenantRef != null) {
+        // print('reached here property.tenantref is not null: ${property.tenantRef}')
+        if (property.tenantRef!.id == widget.uid) {
+          property.shouldShow = false;
+        } else {
+          property.shouldShow = false;
+        }
+      } else {
+        property.shouldShow = true;
+      }
 
       DocumentSnapshot<Map<String, dynamic>> landlordSnapshot =
           await property.landlordRef!.get();
@@ -127,6 +141,9 @@ class _TenantPropertiesPageState extends State<TenantPropertiesPage>
               itemCount: properties.length,
               itemBuilder: (context, index) {
                 Property property = properties[index];
+                if (property.shouldShow == false) {
+                  return Container();
+                }
                 return PropertyCard(
                   property: property,
                   firstName: property.landlord?.firstName ?? '',
