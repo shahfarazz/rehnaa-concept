@@ -24,6 +24,7 @@ class _LandlordTenantsPageState extends State<LandlordTenantsPage>
     with AutomaticKeepAliveClientMixin<LandlordTenantsPage> {
   final PageController _pageController = PageController(initialPage: 0);
   List<Tenant> _tenants = [];
+  List<dynamic>? refs = [];
   bool shouldDisplayContent = false;
 
   // int _currentPage = 0;
@@ -34,10 +35,25 @@ class _LandlordTenantsPageState extends State<LandlordTenantsPage>
   @override
   bool get wantKeepAlive => true;
 
+  Timer? _timer;
+  bool firstCall = true;
+
   @override
   void initState() {
     super.initState();
     _loadTenants();
+    _startPeriodicFetching();
+  }
+
+  void _startPeriodicFetching() {
+    _timer = Timer.periodic(
+      const Duration(seconds: 30),
+      (_) => _loadTenants(),
+    );
+  }
+
+  void _stopPeriodicFetching() {
+    _timer?.cancel();
   }
 
   @override
@@ -46,10 +62,12 @@ class _LandlordTenantsPageState extends State<LandlordTenantsPage>
         .complete(); // Complete the Completer to cancel the Future.delayed() call
     _pageController.dispose(); // Dispose the PageController
     super.dispose();
+    _stopPeriodicFetching();
   }
 
   // Fetch tenant data from Firestore
   Future<void> _loadTenants() async {
+    // print('called');
     DocumentSnapshot<Map<String, dynamic>> landlordSnapshot =
         await FirebaseFirestore.instance
             .collection('Landlords')
@@ -67,6 +85,22 @@ class _LandlordTenantsPageState extends State<LandlordTenantsPage>
         List<DocumentReference<Map<String, dynamic>>> tenantRefs =
             (landlordData['tenantRef'] as List<dynamic>)
                 .cast<DocumentReference<Map<String, dynamic>>>();
+
+        if (refs!.isEmpty) {
+          // print('refs was empty');
+          refs = tenantRefs;
+        }
+
+        //check if refs and tenantRefs are equal by mapping each element
+        // and also checking if each elements data is the same as well
+        // if (refs!.every((element) => tenantRefs.contains(element)) &&
+        //     !firstCall) {
+        //   print('refs was equal');
+        //   // refs = tenantRefs;
+        //   return;
+        // }
+
+        // firstCall = false;
 
         // Fetch tenant documents from Firestore
         List<Future<DocumentSnapshot<Map<String, dynamic>>>> tenantSnapshots =
@@ -105,15 +139,15 @@ class _LandlordTenantsPageState extends State<LandlordTenantsPage>
     return GestureDetector(
       onTap: () {
         // Navigate to tenant info page
-        // Navigator.push(
-        //   context,
-        //   MaterialPageRoute(
-        //     builder: (context) => LandlordTenantInfoPage(
-        //       tenant: tenant,
-        //       uid: widget.uid,
-        //     ),
-        //   ),
-        // );
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => LandlordTenantInfoPage(
+              tenant: tenant,
+              uid: widget.uid,
+            ),
+          ),
+        );
       },
       child: Card(
         elevation: 4.0,
@@ -283,8 +317,12 @@ class _LandlordTenantsPageState extends State<LandlordTenantsPage>
               ),
             ),
           ),
-          Expanded(
-            child: buildTenantsList(),
+          StatefulBuilder(
+            builder: (context, setState) {
+              return Expanded(
+                child: buildTenantsList(),
+              );
+            },
           ),
           SmoothPageIndicator(
             controller: _pageController,
