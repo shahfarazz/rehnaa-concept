@@ -511,6 +511,7 @@ class AuthenticationService extends ChangeNotifier {
     } catch (e) {
       print('Error signing in with Email and Password: $e');
       showToast('Failed to sign in with email and password.', Colors.red);
+      Navigator.pop(context);
     }
   }
 }

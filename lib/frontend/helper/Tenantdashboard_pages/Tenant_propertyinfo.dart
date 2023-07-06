@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 // ignore: depend_on_referenced_packages
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 // import 'package:rehnaa/frontend/Screens/Tenant/tenant_dashboard.dart';
 // import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenant_dashboard_content.dart';
@@ -134,8 +135,11 @@ class PropertyCarousel extends StatelessWidget {
                       imageUrl:
                           imagePath, // TODO define a new property.iconimagepath
 
-                      placeholder: (context, url) =>
-                          const CircularProgressIndicator(),
+                      placeholder: (context, url) => const Center(
+                        child: SpinKitFadingCube(
+                          color: Color.fromARGB(255, 30, 197, 83),
+                        ),
+                      ),
                       errorWidget: (context, url, error) =>
                           const Icon(Icons.error),
                       fit: BoxFit.cover,
@@ -618,7 +622,11 @@ class PropertyDetails extends StatelessWidget {
         } else if (snapshot.hasError) {
           return Text('Error: ${snapshot.error}');
         } else {
-          return const CircularProgressIndicator();
+          return const Center(
+            child: SpinKitFadingCube(
+              color: Color.fromARGB(255, 30, 197, 83),
+            ),
+          );
         }
       },
     );

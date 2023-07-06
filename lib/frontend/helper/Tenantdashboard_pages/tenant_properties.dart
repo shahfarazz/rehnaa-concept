@@ -1,13 +1,13 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenant_propertyinfo.dart';
-import '../../../backend/models/landlordmodel.dart';
+// import '../../../backend/models/landlordmodel.dart';
 import '../../../backend/models/propertymodel.dart';
-import '../Landlorddashboard_pages/landlord_propertyinfo.dart';
-import '../Landlorddashboard_pages/landlordproperties.dart';
+// import '../Landlorddashboard_pages/landlord_propertyinfo.dart';
+// import '../Landlorddashboard_pages/landlordproperties.dart';
 
 class TenantPropertiesPage extends StatefulWidget {
   final String uid; // UID of the landlord
@@ -27,19 +27,48 @@ class TenantPropertiesPage extends StatefulWidget {
 class _TenantPropertiesPageState extends State<TenantPropertiesPage>
     with AutomaticKeepAliveClientMixin<TenantPropertiesPage> {
   late Future<List<Property>> _propertiesFuture;
-  // bool shouldDisplay = false;
-  String? emailOrPhone;
-  bool shouldShow = true;
+  bool _isLoading = false;
+  List<Property> _properties = [];
+  DocumentSnapshot? _lastDocument;
+  ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
     _propertiesFuture = _fetchProperties();
+
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels ==
+          _scrollController.position.maxScrollExtent) {
+        _loadMoreProperties();
+      }
+    });
+  }
+
+  Future<void> _refreshProperties() async {
+    setState(() {
+      _isLoading = true;
+      _properties = [];
+      _lastDocument = null;
+    });
+
+    List<Property> refreshedProperties = await _fetchProperties();
+
+    setState(() {
+      _properties = refreshedProperties;
+      _isLoading = false;
+    });
   }
 
   Future<List<Property>> _fetchProperties() async {
-    QuerySnapshot<Map<String, dynamic>> snapshot =
-        await FirebaseFirestore.instance.collection('Properties').get();
+    Query<Map<String, dynamic>> query =
+        FirebaseFirestore.instance.collection('Properties').limit(5);
+
+    if (_lastDocument != null) {
+      query = query.startAfterDocument(_lastDocument!);
+    }
+
+    QuerySnapshot<Map<String, dynamic>> snapshot = await query.get();
 
     List<Property> properties = [];
     for (DocumentSnapshot<Map<String, dynamic>> documentSnapshot
@@ -47,37 +76,30 @@ class _TenantPropertiesPageState extends State<TenantPropertiesPage>
       Property property =
           Property.fromJson(documentSnapshot.data() as Map<String, dynamic>);
       property.propertyID = documentSnapshot.id;
-
-      // print('reached here property.tenantref is ${property.tenantRef}');
-
-      if (property.tenantRef != null) {
-        // print('reached here property.tenantref is not null: ${property.tenantRef}')
-        if (property.tenantRef!.id == widget.uid) {
-          property.shouldShow = false;
-        } else {
-          property.shouldShow = false;
-        }
-      } else {
-        property.shouldShow = true;
-      }
-
-      DocumentSnapshot<Map<String, dynamic>> landlordSnapshot =
-          await property.landlordRef!.get();
-      if (landlordSnapshot.exists) {
-        Landlord landlord =
-            Landlord.fromJson(landlordSnapshot.data() as Map<String, dynamic>);
-        property.landlord = landlord;
-      }
-
       properties.add(property);
+    }
+
+    if (snapshot.docs.isNotEmpty) {
+      _lastDocument = snapshot.docs.last;
     }
 
     return properties;
   }
 
-  Future<void> _refreshProperties() async {
+  Future<void> _loadMoreProperties() async {
+    if (_isLoading) return;
+
     setState(() {
-      _propertiesFuture = _fetchProperties();
+      _isLoading = true;
+    });
+
+    await Future.delayed(Duration(seconds: 2));
+
+    List<Property> newProperties = await _fetchProperties();
+
+    setState(() {
+      _properties.addAll(newProperties);
+      _isLoading = false;
     });
   }
 
@@ -85,102 +107,122 @@ class _TenantPropertiesPageState extends State<TenantPropertiesPage>
   bool get wantKeepAlive => true;
 
   @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    _scrollController.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     super.build(context); // Necessary for AutomaticKeepAliveClientMixin
 
     return FutureBuilder<List<Property>>(
-      future: _propertiesFuture,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(
-              child: CircularProgressIndicator(
-            color: Colors.green,
-          ));
-        } else if (snapshot.hasError) {
-          return const Center(child: Text('Error retrieving data'));
-        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          return Center(
-            child: Card(
-              elevation: 4.0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20.0),
+        future: _propertiesFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+                child: Center(
+              child: SpinKitFadingCube(
+                color: Color.fromARGB(255, 30, 197, 83),
               ),
-              child: Container(
-                decoration: BoxDecoration(
+            ));
+          } else if (snapshot.hasError) {
+            return const Center(child: Text('Error retrieving data'));
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return Center(
+              child: Card(
+                elevation: 4.0,
+                shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20.0),
-                  color: Colors.white,
                 ),
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(
-                      Icons.house,
-                      size: 48.0,
-                      color: Color(0xff33907c),
-                    ),
-                    const SizedBox(height: 16.0),
-                    Text(
-                      'No Properties to show',
-                      style: GoogleFonts.montserrat(
-                        fontSize: 20.0,
-                        color: const Color(0xff33907c),
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20.0),
+                    color: Colors.white,
+                  ),
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(
+                        Icons.house,
+                        size: 48.0,
+                        color: Color(0xff33907c),
                       ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          );
-        } else {
-          List<Property> properties = snapshot.data!;
-
-          return RefreshIndicator(
-            onRefresh: _refreshProperties,
-            child: ListView.builder(
-              itemCount: properties.length,
-              itemBuilder: (context, index) {
-                Property property = properties[index];
-                if (property.shouldShow == false) {
-                  return Container();
-                }
-                return PropertyCard(
-                  property: property,
-                  firstName: property.landlord?.firstName ?? '',
-                  lastName: property.landlord?.lastName ?? '',
-                  location: property.location,
-                  address: property.address,
-                  type: property.type,
-                  area: property.area ?? 0.0,
-                  pathToImage:
-                      property.landlord?.pathToImage ?? 'assets/userimage.png',
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => TenantPropertyPage(
-                          property: property,
-                          firstName: property.landlord?.firstName ?? '',
-                          lastName: property.landlord?.lastName ?? '',
-                          pathToImage: property.landlord?.pathToImage ??
-                              'assets/userimage.png',
-                          location: property.location,
-                          address: property.address,
-                          propertyID: property.propertyID ?? '',
-                          uid: widget.uid,
-                          isWithdraw: widget.isWithdraw,
-                          emailOrPhone: property.landlord?.emailOrPhone ?? '',
+                      const SizedBox(height: 16.0),
+                      Text(
+                        'No Properties to show',
+                        style: GoogleFonts.montserrat(
+                          fontSize: 20.0,
+                          color: const Color(0xff33907c),
                         ),
                       ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          } else {
+            _properties = snapshot.data!;
+
+            return RefreshIndicator(
+              onRefresh: _refreshProperties,
+              child: ListView.builder(
+                itemCount: _properties.length + (_isLoading ? 1 : 0),
+                controller: _scrollController,
+                itemBuilder: (context, index) {
+                  if (index < _properties.length) {
+                    Property property = _properties[index];
+                    if (property.shouldShow == false) {
+                      return Container();
+                    }
+                    return PropertyCard(
+                      property: property,
+                      firstName: property.landlord?.firstName ?? '',
+                      lastName: property.landlord?.lastName ?? '',
+                      location: property.location,
+                      address: property.address,
+                      type: property.type,
+                      area: property.area ?? 0.0,
+                      pathToImage: property.landlord?.pathToImage ??
+                          'assets/userimage.png',
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => TenantPropertyPage(
+                              property: property,
+                              firstName: property.landlord?.firstName ?? '',
+                              lastName: property.landlord?.lastName ?? '',
+                              pathToImage: property.landlord?.pathToImage ??
+                                  'assets/userimage.png',
+                              location: property.location,
+                              address: property.address,
+                              propertyID: property.propertyID ?? '',
+                              uid: widget.uid,
+                              isWithdraw: widget.isWithdraw,
+                              emailOrPhone:
+                                  property.landlord?.emailOrPhone ?? '',
+                            ),
+                          ),
+                        );
+                      },
                     );
-                  },
-                );
-              },
-            ),
-          );
-        }
-      },
-    );
+                  } else {
+                    return _isLoading
+                        ? const Center(
+                            child: SpinKitFadingCube(
+                              color: Color.fromARGB(255, 30, 197, 83),
+                            ),
+                          )
+                        : const SizedBox.shrink();
+                  }
+                },
+              ),
+            );
+          }
+        });
   }
 }
 
@@ -242,9 +284,10 @@ class PropertyCard extends StatelessWidget {
                   imageUrl: property
                       .imagePath[0], // TODO define a new property.iconimagepath
 
-                  placeholder: (context, url) =>
-                      const CircularProgressIndicator(
-                    color: Color(0xFF33907C),
+                  placeholder: (context, url) => const Center(
+                    child: SpinKitFadingCube(
+                      color: Color.fromARGB(255, 30, 197, 83),
+                    ),
                   ),
                   errorWidget: (context, url, error) => const Icon(Icons.error),
                   fit: BoxFit.cover,
