@@ -6,6 +6,8 @@ class Dealer {
   double balance;
   String? pathToImage;
   String? tempID;
+  String? agencyName;
+  String? agencyAddress;
 
   final List<DocumentReference<Map<String, dynamic>>>? landlordRef;
 
@@ -16,6 +18,8 @@ class Dealer {
     this.landlordRef,
     this.pathToImage,
     this.tempID,
+    this.agencyName,
+    this.agencyAddress,
   });
 
   factory Dealer.fromJson(Map<String, dynamic> json) {
@@ -28,6 +32,9 @@ class Dealer {
           ? List<DocumentReference<Map<String, dynamic>>>.from(
               json['landlordRef'].map((ref) => ref as DocumentReference))
           : null,
+      tempID: json['tempID'],
+      agencyName: json['agencyName'] ?? '',
+      agencyAddress: json['agencyAddress'] ?? '',
     );
   }
 

@@ -118,7 +118,8 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
               .doc(rentPayment.invoiceNumber)
               .get()
               .then((value) => value.data()!['url']);
-          isWithdrawType = data['landlordRef'] != null;
+          isWithdrawType =
+              data['landlordRef'] != null || data['dealerRef'] != null;
 
           // if (widget.callerType == 'Landlords') {
           //   // firstName = data['tenantname'] ?? 'Old doc no tenantname';
@@ -243,9 +244,9 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            widget.callerType == 'Landlords'
-                                ? rentPayment.tenantname!
-                                : '$firstName $lastName',
+                            widget.callerType == 'Tenants'
+                                ? '$firstName $lastName'
+                                : rentPayment.tenantname!,
                             style: GoogleFonts.montserrat(
                               fontSize: size.width * 0.04,
                               fontWeight: FontWeight.bold,
@@ -343,25 +344,25 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
         .toList();
   }
 
-  Widget _buildLatestMonthWidget() {
-    final Size size = MediaQuery.of(context).size;
+  // Widget _buildLatestMonthWidget() {
+  //   final Size size = MediaQuery.of(context).size;
 
-    if (latestMonth != null) {
-      return Padding(
-        padding: EdgeInsets.only(bottom: size.height * 0.02),
-        child: Text(
-          latestMonth!,
-          style: GoogleFonts.montserrat(
-            fontSize: size.width * 0.04,
-            fontWeight: FontWeight.bold,
-            color: const Color(0xff33907c),
-          ),
-        ),
-      );
-    } else {
-      return Container();
-    }
-  }
+  //   if (latestMonth != null) {
+  //     return Padding(
+  //       padding: EdgeInsets.only(bottom: size.height * 0.02),
+  //       child: Text(
+  //         latestMonth!,
+  //         style: GoogleFonts.montserrat(
+  //           fontSize: size.width * 0.04,
+  //           fontWeight: FontWeight.bold,
+  //           color: const Color(0xff33907c),
+  //         ),
+  //       ),
+  //     );
+  //   } else {
+  //     return Container();
+  //   }
+  // }
 
   Widget _rentPaymentSelectorWidget(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
@@ -481,7 +482,7 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
                     ),
                   ),
                   SizedBox(height: size.height * 0.02),
-                  _buildLatestMonthWidget(),
+                  // _buildLatestMonthWidget(),
                 ],
               ),
             ),

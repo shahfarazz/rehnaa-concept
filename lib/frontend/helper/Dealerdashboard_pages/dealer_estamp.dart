@@ -1,69 +1,27 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:rehnaa/frontend/helper/Dealerdashboard_pages/landlordonboardedinfo.dart';
 
 import '../../../backend/models/landlordmodel.dart';
+import '../../Screens/contract.dart';
+import 'dealer_estamp_info.dart';
 
-class DealerLandlordOnboardedPage extends StatefulWidget {
+class DealerEstampPage extends StatefulWidget {
   final String uid;
 
-  const DealerLandlordOnboardedPage({Key? key, required this.uid})
-      : super(key: key);
+  const DealerEstampPage({super.key, required this.uid});
+
   @override
-  _DealerLandlordOnboardedPageState createState() =>
-      _DealerLandlordOnboardedPageState();
+  State<DealerEstampPage> createState() => _DealerEstampPageState();
 }
 
-class _DealerLandlordOnboardedPageState
-    extends State<DealerLandlordOnboardedPage> {
-  List<Landlord> landlords = [];
-
-  bool isLoading = true;
-
-  Future<List<Landlord>> fetchLandlords() async {
-    try {
-      DocumentSnapshot<Map<String, dynamic>> documentSnapshot =
-          await FirebaseFirestore.instance
-              .collection('Dealers')
-              .doc(widget.uid)
-              .get();
-
-      Map<String, dynamic>? data = documentSnapshot.data()!;
-      // print('data: ${data['landlordRef'][0].id}');
-      List<dynamic> landlordRef = data['landlordRef'];
-
-      List<Landlord> landlordList = [];
-
-      for (var landlordID in landlordRef!) {
-        print('landlordID: ${landlordID.id}');
-        DocumentSnapshot<Map<String, dynamic>> documentSnapshot =
-            await landlordID.get();
-        Landlord landlord = Landlord.fromJson(documentSnapshot.data());
-        landlordList.add(landlord);
-      }
-
-      setState(() {
-        landlords = landlordList;
-        filteredLandlords = List.from(landlords);
-        isLoading = false;
-      });
-      return landlords;
-    } catch (e) {
-      print(e);
-      // setState(() {
-      isLoading = false;
-      // });
-
-      return [];
-    }
-  }
-
-  List<Landlord> filteredLandlords = [];
+class _DealerEstampPageState extends State<DealerEstampPage> {
   late FocusNode searchFocusNode;
   final searchController = TextEditingController();
   bool isTyping = false;
-
+  List<Landlord> filteredLandlords = [];
+  List<Landlord> landlords = [];
+  bool isLoading = true;
   @override
   void initState() {
     super.initState();
@@ -103,10 +61,49 @@ class _DealerLandlordOnboardedPageState
     super.dispose();
   }
 
+  Future<List<Landlord>> fetchLandlords() async {
+    try {
+      DocumentSnapshot<Map<String, dynamic>> documentSnapshot =
+          await FirebaseFirestore.instance
+              .collection('Dealers')
+              .doc(widget.uid)
+              .get();
+
+      Map<String, dynamic>? data = documentSnapshot.data()!;
+      // print('data: ${data['landlordRef'][0].id}');
+      List<dynamic> landlordRef = data['landlordRef'];
+
+      List<Landlord> landlordList = [];
+
+      for (var landlordID in landlordRef!) {
+        print('landlordID: ${landlordID.id}');
+        DocumentSnapshot<Map<String, dynamic>> documentSnapshot =
+            await landlordID.get();
+        Landlord landlord = Landlord.fromJson(documentSnapshot.data());
+        landlordList.add(landlord);
+      }
+
+      setState(() {
+        landlords = landlordList;
+        filteredLandlords = List.from(landlords);
+        isLoading = false;
+      });
+      return landlords;
+    } catch (e) {
+      print(e);
+      // setState(() {
+      isLoading = false;
+      // });
+
+      return [];
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
+      appBar: _buildAppBar(size, context),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
@@ -115,7 +112,7 @@ class _DealerLandlordOnboardedPageState
               SizedBox(height: size.height * 0.05),
               Container(
                 child: Text(
-                  "Landlords Onboarded",
+                  "E-Stamp Papers Services",
                   textAlign: TextAlign.center,
                   style: GoogleFonts.montserrat(
                     fontSize: 24,
@@ -186,7 +183,7 @@ class _DealerLandlordOnboardedPageState
                                         ),
                                         const SizedBox(height: 16.0),
                                         Text(
-                                          'No Landlords onboarded yet',
+                                          'No E-Stamp Papers Found.',
                                           textAlign: TextAlign.center,
                                           style: GoogleFonts.montserrat(
                                             fontSize: 20.0,
@@ -211,8 +208,7 @@ class _DealerLandlordOnboardedPageState
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) =>
-                                        LandlordsOnboardedInfoPage(
+                                    builder: (context) => DealerEstampInfoPage(
                                       landlord: landlord,
                                     ),
                                   ),
@@ -236,14 +232,27 @@ class _DealerLandlordOnboardedPageState
                                             GoogleFonts.montserrat().fontFamily,
                                         fontWeight: FontWeight.bold),
                                   ),
+                                  subtitle: Text(
+                                    landlord.property.isEmpty
+                                        ? 'No Property/Address not added'
+                                        : landlord.property[0].address,
+                                    style: TextStyle(
+                                        color: Colors.green,
+                                        fontFamily:
+                                            GoogleFonts.montserrat().fontFamily,
+                                        fontWeight: FontWeight.bold),
+                                  ),
                                   trailing: Text(
-                                    landlord.balance.toString(),
+                                    landlord.contractStartDate == ''
+                                        ? 'No Contract\n\n${landlord.monthlyRent == "" ? "No Rent" : landlord.monthlyRent}'
+                                        : '${landlord.contractStartDate!}\n ${landlord.monthlyRent == "" ? "No Rent" : landlord.monthlyRent}',
                                     style: TextStyle(
                                       color: Colors.black,
                                       fontFamily:
                                           GoogleFonts.montserrat().fontFamily,
                                     ),
                                   ),
+
                                   // subtitle: Text('dummy'),
                                 ),
                               ),
@@ -258,4 +267,68 @@ class _DealerLandlordOnboardedPageState
       ),
     );
   }
+}
+
+PreferredSizeWidget _buildAppBar(Size size, context) {
+  return AppBar(
+    toolbarHeight: 70,
+    title: Padding(
+      padding: EdgeInsets.only(
+        // top: MediaQuery.of(context).size.height * 0.02, // 2% of the page height
+        right:
+            MediaQuery.of(context).size.width * 0.14, // 55% of the page width
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Stack(
+            children: [
+              ClipPath(
+                clipper: HexagonClipper(),
+                child: Transform.scale(
+                  scale: 0.87,
+                  child: Container(
+                    color: Colors.white,
+                    width: 60,
+                    height: 60,
+                  ),
+                ),
+              ),
+              ClipPath(
+                clipper: HexagonClipper(),
+                child: Image.asset(
+                  'assets/mainlogo.png',
+                  width: 60,
+                  height: 60,
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ],
+          ),
+          // const SizedBox(width: 8),
+        ],
+      ),
+    ),
+    actions: <Widget>[
+      Padding(
+        padding: const EdgeInsets.only(top: 15.0),
+        child: Stack(
+          children: [],
+        ),
+      ),
+    ],
+    flexibleSpace: Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Color(0xff0FA697),
+            Color(0xff45BF7A),
+            Color(0xff0DF205),
+          ],
+        ),
+      ),
+    ),
+  );
 }

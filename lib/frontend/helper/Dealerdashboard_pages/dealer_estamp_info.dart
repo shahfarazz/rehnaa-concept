@@ -60,9 +60,9 @@ class ContractCard extends StatelessWidget {
   }
 }
 
-class LandlordsOnboardedInfoPage extends StatelessWidget {
+class DealerEstampInfoPage extends StatelessWidget {
   final Landlord landlord;
-  const LandlordsOnboardedInfoPage({super.key, required this.landlord});
+  const DealerEstampInfoPage({super.key, required this.landlord});
 
   @override
   Widget build(BuildContext context) {
@@ -161,14 +161,14 @@ class LandlordsOnboardedInfoPage extends StatelessWidget {
                               SizedBox(height: 16),
                               ContractCard(
                                 icon: Icons.calendar_today,
-                                label: 'Contract Start Date:',
+                                label: 'Request Date:',
                                 data: landlord.contractStartDate ?? '',
                               ),
                               SizedBox(height: 16),
                               ContractCard(
                                 icon: Icons.calendar_today,
-                                label: 'Contract End Date:',
-                                data: landlord.contractEndDate ?? '',
+                                label: 'E-stamp Value:',
+                                data: 'Rs. 1000',
                               ),
                               SizedBox(height: 16),
                               ContractCard(
@@ -181,22 +181,26 @@ class LandlordsOnboardedInfoPage extends StatelessWidget {
                               SizedBox(height: 16),
                               ContractCard(
                                   icon: Icons.money_rounded,
-                                  label: 'Property rent amount:',
+                                  label: 'Charges:',
                                   data: landlord.property.isEmpty
                                       ? ''
                                       : landlord.property[0].price.toString()),
                               SizedBox(height: 16),
                               ContractCard(
                                 icon: Icons.request_page,
-                                label: 'Upfront Bonus:',
-                                data: '',
+                                label: 'Police Verification:',
+                                data: landlord.tenant == null ||
+                                        landlord.tenant!.isEmpty
+                                    ? 'No tenant yet'
+                                    : landlord.tenant![0].policeVerification
+                                        .toString(),
                               ),
-                              SizedBox(height: 16),
-                              ContractCard(
-                                icon: Icons.request_page,
-                                label: 'Monthly Profit:',
-                                data: landlord.monthlyRent ?? '',
-                              ),
+                              // SizedBox(height: 16),
+                              // ContractCard(
+                              //   icon: Icons.request_page,
+                              //   label: 'Monthly Profit:',
+                              //   data: landlord.monthlyRent ?? '',
+                              // ),
                               SizedBox(height: 24),
                             ],
                           ),

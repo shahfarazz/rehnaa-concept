@@ -70,7 +70,6 @@ dependencies:
     easy_debounce: ^2.0.3
     encrypt: ^5.0.1
     firebase_crashlytics: ^3.3.3
-
     # open_file: ^3.2.1
     # flutter_pdfview: ^1.2.7
     # path_provider: ^2.0.8

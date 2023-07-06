@@ -14,7 +14,7 @@ class Property {
   String title;
   String location;
   String address;
-  double price;
+  double? price;
   DocumentReference<Map<String, dynamic>>? landlordRef;
   DocumentReference<Map<String, dynamic>>? tenantRef;
   Landlord? landlord;
@@ -64,7 +64,7 @@ class Property {
       description: json['description'],
       title: json['title'],
       location: json['location'],
-      price: json['price'].toDouble(),
+      price: json['price'].toDouble() ?? 0.0,
       landlordRef: json['landlordRef'],
       rehnaaRating: json['rehnaaRating'].toDouble(),
       tenantRating: json['tenantRating'].toDouble(),

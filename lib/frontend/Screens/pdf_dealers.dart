@@ -14,10 +14,10 @@ import 'package:syncfusion_flutter_pdf/pdf.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
-class PDFEditorPage extends StatefulWidget {
-  // final String tenantName;
+class PDFDealerPage extends StatefulWidget {
+  // final String dealerName;
   // final String landlordName;
-  // String? landlordAddress;
+  // String? dealerAgencyAddress;
   // String? tenantAddress;
   // final double balance;
   // final double amount;
@@ -25,12 +25,12 @@ class PDFEditorPage extends StatefulWidget {
   // final String uid;
   // final String invoiceNumber;
 
-  // PDFEditorPage(
+  // PDFDealerPage(
   //     {Key? key,
-  //     required this.tenantName,
+  //     required this.dealerName,
   //     required this.balance,
   //     required this.landlordName,
-  //     this.landlordAddress,
+  //     this.dealerAgencyAddress,
   //     this.tenantAddress,
   //     required this.amount,
   //     required this.paymentMode,
@@ -38,10 +38,10 @@ class PDFEditorPage extends StatefulWidget {
   //     required this.invoiceNumber})
   //     : super(key: key);
   @override
-  _PDFEditorPageState createState() => _PDFEditorPageState();
+  _PDFDealerPageState createState() => _PDFDealerPageState();
 }
 
-class _PDFEditorPageState extends State<PDFEditorPage> {
+class _PDFDealerPageState extends State<PDFDealerPage> {
   String? path;
 
   @override
@@ -84,18 +84,19 @@ class _PDFEditorPageState extends State<PDFEditorPage> {
   }
 
   Future<File> createPdf(
-    String tenantName,
-    String landlordName,
-    String? landlordAddress,
-    String? tenantAddress,
-    double balance,
+    String dealerName,
+    // String landlordName,
+    String? dealerAgencyAddress,
+    String? agencyName,
+    // String? tenantAddress,
+    // double balance,
     double amount,
     String paymentMode,
-    String uid,
+    // String uid,
     String invoiceNumber,
   ) async {
     //Load the existing document.
-    final File file = await getFileFromAssets('assets/template.pdf');
+    final File file = await getFileFromAssets('assets/template3.pdf');
     final document = PdfDocument(inputBytes: file.readAsBytesSync());
 
     //Get the first page.
@@ -120,19 +121,19 @@ class _PDFEditorPageState extends State<PDFEditorPage> {
         PdfTrueTypeFont(fontData.buffer.asByteData().buffer.asUint8List(), 18);
 
     //Rent Paid To
-    graphics.drawString(landlordName, font_main,
+    graphics.drawString(agencyName ?? '', font_main,
         brush: PdfBrushes.black,
         pen: PdfPen(PdfColor(0, 0, 0), width: 0.5),
         bounds: Rect.fromLTWH(
             60, 182, page.getClientSize().width, page.getClientSize().height),
         format: PdfStringFormat(alignment: PdfTextAlignment.left));
 
-    //Address of paid to
-    graphics.drawString(landlordAddress ?? '', font_small,
-        brush: PdfBrushes.black,
-        bounds: Rect.fromLTWH(
-            60, 215, page.getClientSize().width, page.getClientSize().height),
-        format: PdfStringFormat(alignment: PdfTextAlignment.left));
+    // //Address of paid to
+    // graphics.drawString(dealerAgencyAddress ?? '', font_small,
+    //     brush: PdfBrushes.black,
+    //     bounds: Rect.fromLTWH(
+    //         60, 215, page.getClientSize().width, page.getClientSize().height),
+    //     format: PdfStringFormat(alignment: PdfTextAlignment.left));
 
     //write a function which generates a random invoice number
 
@@ -156,7 +157,7 @@ class _PDFEditorPageState extends State<PDFEditorPage> {
         format: PdfStringFormat(alignment: PdfTextAlignment.left));
 
     //Property Rented Address
-    graphics.drawString(tenantAddress ?? '', font_small,
+    graphics.drawString(dealerAgencyAddress ?? '', font_small,
         brush: PdfBrushes.black,
         bounds: Rect.fromLTWH(
             248, 255, page.getClientSize().width, page.getClientSize().height),
@@ -170,14 +171,14 @@ class _PDFEditorPageState extends State<PDFEditorPage> {
         format: PdfStringFormat(alignment: PdfTextAlignment.left));
 
     //cash received by
-    graphics.drawString(landlordName, font,
+    graphics.drawString(dealerName, font,
         brush: PdfBrushes.black,
         bounds: Rect.fromLTWH(
             200, 295, page.getClientSize().width, page.getClientSize().height),
         format: PdfStringFormat(alignment: PdfTextAlignment.left));
 
     //Tenant Name
-    graphics.drawString(tenantName, font_medium,
+    graphics.drawString(dealerName, font_medium,
         brush: PdfBrushes.black,
         // pen: PdfPen(PdfColor(0, 0, 0), width: 0.5),
         bounds: Rect.fromLTWH(
@@ -244,8 +245,8 @@ class _PDFEditorPageState extends State<PDFEditorPage> {
               .set({
             // 'invoiceNumber': invoiceNumber,
             // 'landlordName': landlordName,
-            // 'landlordAddress': landlordAddress,
-            // 'tenantName': tenantName,
+            // 'dealerAgencyAddress': dealerAgencyAddress,
+            // 'dealerName': dealerName,
             // 'tenantAddress': tenantAddress,
             // 'amount': amount,
             // 'paymentMode': paymentMode,
@@ -268,8 +269,8 @@ class _PDFEditorPageState extends State<PDFEditorPage> {
                 .set({
               // 'invoiceNumber': widget.invoiceNumber,
               // 'landlordName': widget.landlordName,
-              // 'landlordAddress': widget.landlordAddress,
-              // 'tenantName': widget.tenantName,
+              // 'dealerAgencyAddress': widget.dealerAgencyAddress,
+              // 'dealerName': widget.dealerName,
               // 'tenantAddress': widget.tenantAddress,
               // 'amount': widget.amount,
               // 'paymentMode': widget.paymentMode,

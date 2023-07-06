@@ -1,23 +1,26 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_debounce/easy_debounce.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import 'package:rehnaa/frontend/Screens/contract.dart';
+// import 'package:rehnaa/frontend/Screens/contract.dart';
 import 'package:rehnaa/frontend/Screens/new_vouchers.dart';
 import 'package:rehnaa/frontend/Screens/privacypolicy.dart';
 import 'package:rehnaa/frontend/Screens/faq.dart';
 import 'package:rehnaa/frontend/Screens/login_page.dart';
-import 'package:rehnaa/frontend/Screens/vouchers.dart';
+// import 'package:rehnaa/frontend/Screens/vouchers.dart';
 import 'package:rehnaa/frontend/helper/Dealerdashboard_pages/dealer_dashboard_content.dart';
-import 'package:rehnaa/frontend/helper/Dealerdashboard_pages/dealer_renthistory.dart';
-import 'package:rehnaa/frontend/helper/Landlorddashboard_pages/landlord_dashboard_content.dart';
+// import 'package:rehnaa/frontend/helper/Dealerdashboard_pages/dealer_renthistory.dart';
+// import 'package:rehnaa/frontend/helper/Landlorddashboard_pages/landlord_dashboard_content.dart';
 import 'package:rehnaa/frontend/helper/Landlorddashboard_pages/landlord_profile.dart';
 import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenant_renthistory.dart';
-import '../../helper/Dealerdashboard_pages/dealer_profile.dart';
+// import '../../helper/Dealerdashboard_pages/dealer_profile.dart';
+import '../../helper/Dealerdashboard_pages/dealer_estamp.dart';
 import '../../helper/Dealerdashboard_pages/dealerlandlordonboarded.dart';
-import '../../helper/Landlorddashboard_pages/landlord_renthistory.dart';
-import '../../helper/Landlorddashboard_pages/landlord_tenants.dart';
+// import '../../helper/Landlorddashboard_pages/landlord_renthistory.dart';
+// import '../../helper/Landlorddashboard_pages/landlord_tenants.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import '../../helper/Landlorddashboard_pages/landlordproperties.dart';
@@ -42,6 +45,8 @@ class _DealerDashboardPageState extends State<DealerDashboardPage>
   bool _isWithdraw = false;
   late Stream<DocumentSnapshot<Map<String, dynamic>>> _notificationStream;
   late Stream<DocumentSnapshot<Map<String, dynamic>>> _notificationStream2;
+  bool isNewVoucher = false;
+  Timer? _timer;
 
   @override
   void initState() {
@@ -58,6 +63,8 @@ class _DealerDashboardPageState extends State<DealerDashboardPage>
         .collection('Notifications')
         .doc(widget.uid)
         .snapshots();
+    isNewVouchers();
+    _startPeriodicFetch();
   }
 
   @override
@@ -66,7 +73,25 @@ class _DealerDashboardPageState extends State<DealerDashboardPage>
     _sidebarController.dispose();
     _notificationStream.drain();
     _notificationStream2.drain();
+    _stopPeriodicFetch();
     super.dispose();
+  }
+
+  // Periodically fetch new data every 15 seconds
+  void _startPeriodicFetch() {
+    _timer = Timer.periodic(const Duration(seconds: 15), (_) {
+      isNewVouchers();
+    });
+  }
+
+  // Stop periodic fetching
+  void _stopPeriodicFetch() {
+    _timer?.cancel();
+  }
+
+  void _handleNotificationsButtonPress() async {
+    await _markNotificationsAsRead();
+    _showNotificationsDialog();
   }
 
   @override
@@ -102,6 +127,36 @@ class _DealerDashboardPageState extends State<DealerDashboardPage>
     setState(() {
       _isWithdraw = isWithdraw;
     });
+  }
+
+  Future<void> isNewVouchers() async {
+    //check for isNew varialbe in the user document
+    // and set the isNewVoucher variable accordingly
+    // also after setting isNewVoucher to true or false, update the isNew variable in the user document
+    // which should now be false
+
+    try {
+      FirebaseFirestore.instance
+          .collection('Dealers')
+          .doc(widget.uid)
+          .get()
+          .then((value) {
+        if (value.exists) {
+          if (value.data()!['isNewVouchers'] == true && isNewVoucher == false) {
+            setState(() {
+              isNewVoucher = true;
+            });
+          } else if (value.data()!['isNewVouchers'] == false &&
+              isNewVoucher == true) {
+            setState(() {
+              isNewVoucher = false;
+            });
+          }
+        }
+      });
+    } on Exception catch (e) {
+      print('Error is $e');
+    }
   }
 
 // Method to check if the keyboard is visible
@@ -140,7 +195,7 @@ class _DealerDashboardPageState extends State<DealerDashboardPage>
                         });
                       },
                       physics: isKeyboardVisible(context)
-                          ? NeverScrollableScrollPhysics()
+                          ? const NeverScrollableScrollPhysics()
                           : const AlwaysScrollableScrollPhysics(),
                       itemCount: 4, // Number of pages
                       itemBuilder: (context, index) {
@@ -248,7 +303,7 @@ class _DealerDashboardPageState extends State<DealerDashboardPage>
                   EasyDebounce.debounce(
                     'notifications-debouncer', // Debouncer ID
                     Duration(milliseconds: 500), // Debounce duration
-                    _showNotificationsDialog, // Wrapped function
+                    _handleNotificationsButtonPress, // Wrapped function
                   );
                 },
               ),
@@ -266,7 +321,16 @@ class _DealerDashboardPageState extends State<DealerDashboardPage>
 
                       if (data != null && data.containsKey('notifications')) {
                         List<dynamic> notificationstemp = data['notifications'];
-                        notificationsCount = notificationstemp.length;
+
+                        // Filter notifications based on read status
+                        List<dynamic> unreadNotifications =
+                            notificationstemp.where((notification) {
+                          // Check if 'read' field is null or false
+                          return notification['read'] == null ||
+                              notification['read'] == false;
+                        }).toList();
+
+                        notificationsCount = unreadNotifications.length;
                       }
                     }
 
@@ -287,9 +351,10 @@ class _DealerDashboardPageState extends State<DealerDashboardPage>
                             ? ''
                             : notificationsCount.toString(),
                         style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 10,
-                            fontFamily: GoogleFonts.montserrat().fontFamily),
+                          color: Colors.white,
+                          fontSize: 10,
+                          fontFamily: GoogleFonts.montserrat().fontFamily,
+                        ),
                         textAlign: TextAlign.center,
                       ),
                     );
@@ -380,13 +445,12 @@ class _DealerDashboardPageState extends State<DealerDashboardPage>
                                     ],
                                   ).createShader(bounds),
                                   child: Text(
-                                    'Rehnaa',
-                                    style: TextStyle(
+                                    'REHNAA.PK',
+                                    style: GoogleFonts.belleza(
                                       fontSize: 24,
-                                      fontFamily:
-                                          GoogleFonts.montserrat().fontFamily,
                                       fontWeight: FontWeight.bold,
                                       color: Colors.white,
+                                      letterSpacing: 1.75,
                                     ),
                                   ),
                                 ),
@@ -401,14 +465,14 @@ class _DealerDashboardPageState extends State<DealerDashboardPage>
                       thickness: 0.5,
                     ),
                     _buildSidebarItem(
-                      icon: Icons.description,
-                      label: 'Contract',
+                      icon: Icons.email_sharp,
+                      label: 'E-stamp papers',
                       onTap: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const ContractPage(
-                              identifier: 'Dealer',
+                            builder: (context) => DealerEstampPage(
+                              uid: widget.uid,
                             ),
                           ),
                         );
@@ -419,15 +483,25 @@ class _DealerDashboardPageState extends State<DealerDashboardPage>
                       icon: Icons.receipt,
                       label: 'Vouchers',
                       onTap: () {
+                        //firebase call set users isNewVouchers to false
+                        FirebaseFirestore.instance
+                            .collection('Dealers')
+                            .doc(widget.uid)
+                            .set({
+                          'isNewVouchers': false,
+                        }, SetOptions(merge: true));
+
+                        setState(() {
+                          isNewVoucher = false;
+                        });
                         Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (context) => const NewVouchersPage(),
                           ),
                         );
-                        // _closeSidebar();
                       },
-                      showBadge: true,
+                      showBadge: isNewVoucher,
                     ),
                     _buildSidebarItem(
                       icon: Icons.lock,
@@ -467,6 +541,7 @@ class _DealerDashboardPageState extends State<DealerDashboardPage>
                         // Implement sign-out functionality here
                         // For example, clear user session, navigate to login page, etc.
                         _signOutUser();
+                        // throw UnimplementedError();
                       },
                     ),
                   ],

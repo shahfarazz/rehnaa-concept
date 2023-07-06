@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
@@ -13,6 +14,7 @@ import 'package:rehnaa/backend/models/dealermodel.dart';
 import 'package:rehnaa/frontend/Screens/faq.dart';
 import 'package:rehnaa/frontend/helper/Dealerdashboard_pages/dealerInvoice.dart';
 
+import '../../Screens/pdf_dealers.dart';
 import '../Landlorddashboard_pages/landlordinvoice.dart';
 import '../Landlorddashboard_pages/skeleton.dart';
 // import 'package:rehnaa/frontend/helper/Dealerdashboard_pages/dealerinvoice.dart';
@@ -55,6 +57,16 @@ class _DealerDashboardContentState extends State<DealerDashboardContent>
         .collection('Dealers')
         .doc(widget.uid)
         .snapshots();
+  }
+
+  String generateInvoiceNumber() {
+    var rng = Random();
+    // Generate a random number between 10000 and 99999.
+    int randomNumber = rng.nextInt(90000) + 10000;
+    // Combine the prefix and the random number to form the invoice number.
+    String invoiceNumber =
+        'INV' + DateTime.now().year.toString() + randomNumber.toString();
+    return invoiceNumber;
   }
 
   Future<Dealer> getDealerFromFirestore(String uid) async {
@@ -284,11 +296,15 @@ class _DealerDashboardContentState extends State<DealerDashboardContent>
                                         .toString()
                                         .padLeft(6, '0');
 
+                                    String invoiceNumber =
+                                        generateInvoiceNumber();
+
                                     FirebaseFirestore.instance
                                         .collection('AdminRequests')
                                         .doc(widget.uid)
                                         .set({
-                                      'withdrawRequest': FieldValue.arrayUnion([
+                                      'withdrawRequestDealer':
+                                          FieldValue.arrayUnion([
                                         {
                                           'fullname':
                                               '${dealer.firstName} ${dealer.lastName}',
@@ -296,30 +312,26 @@ class _DealerDashboardContentState extends State<DealerDashboardContent>
                                           'paymentMethod': selectedOption,
                                           'uid': widget.uid,
                                           'requestID': randomID,
-                                          // Convert to desired format
+                                          'invoiceNumber': invoiceNumber,
+                                          'tenantname': 'Rehnaa App'
                                         }
                                       ]),
                                       'timestamp': Timestamp.now(),
                                     }, SetOptions(merge: true));
 
+                                    PDFDealerPage pdfInstance = PDFDealerPage();
+                                    pdfInstance.createState().createPdf(
+                                        '${dealer.firstName} ${dealer.lastName}',
+                                        dealer.agencyAddress,
+                                        dealer.agencyName,
+                                        withdrawalAmount,
+                                        selectedOption,
+                                        invoiceNumber);
                                     setState(() {
                                       isWithdraw = true;
                                     });
-
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              DealerInvoicePage(
-                                                dealerName:
-                                                    '${dealer.firstName} ${dealer.lastName}',
-                                                // paymentDateTime: DateTime.now(),
-                                                balance: dealer.balance,
-                                                amount: withdrawalAmount,
-                                                transactionMode: selectedOption,
-                                                id: widget.uid,
-                                              )),
-                                    );
+                                    Navigator.of(context).pop();
+                                    Navigator.of(context).pop();
                                   } else {
                                     Fluttertoast.showToast(
                                       msg: 'Invalid withdrawal amount',
@@ -393,7 +405,7 @@ class _DealerDashboardContentState extends State<DealerDashboardContent>
     final Size size = MediaQuery.of(context).size;
 
     if (kDebugMode) {
-      print('UID: ${widget.uid}');
+      // print('UID: ${widget.uid}');
     }
 
     return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
@@ -406,11 +418,11 @@ class _DealerDashboardContentState extends State<DealerDashboardContent>
           return Text('Error: ${snapshot.error}');
         } else if (snapshot.hasData) {
           // Convert the snapshot to JSON
-          print('Snapshot: ${snapshot.data!.data()}');
+          // print('Snapshot: ${snapshot.data!.data()}');
           Map<String, dynamic> json =
               snapshot.data!.data() as Map<String, dynamic>;
           if (kDebugMode) {
-            print('Dealer JSON: $json');
+            // print('Dealer JSON: $json');
           }
           // Use the Dealer.fromJson method to create a Dealer instance
           Dealer dealer = Dealer.fromJson(json);
@@ -420,6 +432,14 @@ class _DealerDashboardContentState extends State<DealerDashboardContent>
               if (mounted) {
                 setState(() {
                   isWithdraw = true;
+                });
+              }
+            });
+          } else {
+            SchedulerBinding.instance!.addPostFrameCallback((_) {
+              if (mounted) {
+                setState(() {
+                  isWithdraw = false;
                 });
               }
             });
@@ -456,6 +476,7 @@ class _DealerDashboardContentState extends State<DealerDashboardContent>
                   Padding(
                     padding: const EdgeInsets.only(bottom: 8.0),
                     child: CircleAvatar(
+                      backgroundColor: Colors.transparent,
                       radius: 75,
                       child: ClipOval(
                         child: dealer.pathToImage != null &&
@@ -474,17 +495,10 @@ class _DealerDashboardContentState extends State<DealerDashboardContent>
                                     loadingBuilder:
                                         (context, child, loadingProgress) {
                                       if (loadingProgress == null) return child;
-                                      return Center(
-                                        child: CircularProgressIndicator(
-                                          color: Colors.green,
-                                          value: loadingProgress
-                                                      .expectedTotalBytes !=
-                                                  null
-                                              ? loadingProgress
-                                                      .cumulativeBytesLoaded /
-                                                  loadingProgress
-                                                      .expectedTotalBytes!
-                                              : null,
+                                      return const Center(
+                                        child: SpinKitFadingCube(
+                                          color:
+                                              Color.fromARGB(255, 30, 197, 83),
                                         ),
                                       );
                                     },

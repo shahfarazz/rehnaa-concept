@@ -461,9 +461,9 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
                                                           },
                                                         );
                                                       } else {
-                                                        return Center(
+                                                        return const Center(
                                                           child:
-                                                              const SpinKitFadingCube(
+                                                              SpinKitFadingCube(
                                                             color:
                                                                 Color.fromARGB(
                                                                     255,
