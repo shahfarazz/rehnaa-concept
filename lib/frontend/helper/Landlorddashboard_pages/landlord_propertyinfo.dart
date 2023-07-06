@@ -3,6 +3,7 @@ import 'package:easy_image_viewer/easy_image_viewer.dart';
 import 'package:flutter/material.dart';
 // ignore: depend_on_referenced_packages
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../backend/models/propertymodel.dart';
@@ -119,8 +120,9 @@ class PropertyCarousel extends StatelessWidget {
                       imageUrl:
                           imagePath, // TODO define a new property.iconimagepath
 
-                      placeholder: (context, url) =>
-                          const CircularProgressIndicator(),
+                      placeholder: (context, url) => const SpinKitFadingCube(
+                        color: Color.fromARGB(255, 30, 197, 83),
+                      ),
                       errorWidget: (context, url, error) =>
                           const Icon(Icons.error),
                       fit: BoxFit.cover,

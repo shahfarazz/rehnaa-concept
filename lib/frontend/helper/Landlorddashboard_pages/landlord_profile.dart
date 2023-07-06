@@ -632,10 +632,7 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
     final authService = AuthenticationService();
     return Scaffold(
       body: FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-        future: FirebaseFirestore.instance
-            .collection(widget.callerType)
-            .doc(widget.uid)
-            .get(),
+        future: fetchUserProfile(),
         builder: (context, snapshot) {
           Size size = MediaQuery.of(context).size;
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -681,534 +678,716 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
             contactInfo = 'Phone: $emailOrPhone';
           }
 
-          return Container(
-              constraints: BoxConstraints(),
-              child: AnimatedSize(
-                duration: const Duration(milliseconds: 200),
-                curve: Curves.easeInOut,
+          return RefreshIndicator(
+              onRefresh: _refreshUserProfile,
+              child: Container(
+                constraints: BoxConstraints(),
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      const SizedBox(height: 40),
-                      GestureDetector(
-                        onTap: () {
-                          _openImagePicker();
-                        },
-                        child: Stack(
+                    physics: AlwaysScrollableScrollPhysics(),
+                    child: AnimatedSize(
+                      duration: const Duration(milliseconds: 200),
+                      curve: Curves.easeInOut,
+                      child: SingleChildScrollView(
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            //add a testing crash button that rethrows the error
-                            // ElevatedButton(
-                            //     onPressed: () {
-                            //       throw Exception('Test Crash');
-                            //     },
-                            //     child: Text('Throw error')),
-                            CircleAvatar(
-                              radius: 75,
-                              backgroundColor: Colors.transparent,
-                              child: ClipOval(
-                                child: pathToImage != null &&
-                                        pathToImage!.isNotEmpty
-                                    ? (pathToImage!.startsWith('assets')
-                                        ? Image.asset(
-                                            pathToImage!,
-                                            width: 150,
-                                            height: 150,
-                                          )
-                                        : Image.network(
-                                            fit: BoxFit.fill,
-                                            pathToImage!,
-                                            width: 150,
-                                            height: 150,
-                                            loadingBuilder: (context, child,
-                                                loadingProgress) {
-                                              if (loadingProgress == null)
-                                                return child;
-                                              return Center(
-                                                child: const SpinKitFadingCube(
-                                                  color: Color.fromARGB(
-                                                      255, 30, 197, 83),
-                                                ),
-                                              );
-                                            },
-                                          ))
-                                    : Image.asset(
-                                        'assets/defaulticon.png',
-                                        width: 150,
-                                        height: 150,
-                                      ),
-                              ),
-                            ),
-                            Positioned(
-                              bottom: 0,
-                              right: 0,
-                              child: Container(
-                                padding: EdgeInsets.all(6),
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: Colors.white,
-                                ),
-                                child: Icon(
-                                  Icons.camera_alt,
-                                  color: Colors.green,
-                                  size: 20,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      Text(
-                        '$firstName $lastName',
-                        style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            fontFamily: GoogleFonts.montserrat().fontFamily),
-                      ),
-                      Text(
-                        description,
-                        style: TextStyle(
-                            fontSize: 18,
-                            color: Colors.grey,
-                            fontFamily: GoogleFonts.montserrat().fontFamily),
-                      ),
-                      const SizedBox(height: 20),
-                      const Divider(),
-                      ProfileInfoItem(
-                        icon: Icons.email,
-                        title: isEmail ? 'Email' : 'Contact',
-                        subtitle: contactInfo,
-                      ),
-                      FutureBuilder<String>(
-                        future: _getLocation(),
-                        builder: (BuildContext context,
-                            AsyncSnapshot<String> snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return const SpinKitFadingCube(
-                              color: Color.fromARGB(255, 30, 197, 83),
-                            );
-                          } else if (snapshot.hasError ||
-                              snapshot.data == null) {
-                            return Container(); // Empty container, the item will not be shown
-                          } else {
-                            return ProfileInfoItem(
-                              icon: Icons.location_on,
-                              title: 'Location',
-                              subtitle: snapshot.data ?? '', // The location
-                            );
-                          }
-                        },
-                      ),
-                      StatefulBuilder(
-                        builder: (BuildContext context, StateSetter setState) {
-                          return Column(
-                            children: [
-                              GestureDetector(
-                                onTap: () {
-                                  setState(() {
-                                    showChangePassword = !showChangePassword;
-                                  });
-                                },
-                                child: Row(
-                                  children: [
-                                    const SizedBox(width: 17, height: 60),
-                                    Icon(
-                                      Icons.settings,
-                                      color: Colors.grey[600],
+                            const SizedBox(height: 40),
+                            GestureDetector(
+                              onTap: () {
+                                _openImagePicker();
+                              },
+                              child: Stack(
+                                children: [
+                                  //add a testing crash button that rethrows the error
+                                  // ElevatedButton(
+                                  //     onPressed: () {
+                                  //       throw Exception('Test Crash');
+                                  //     },
+                                  //     child: Text('Throw error')),
+                                  CircleAvatar(
+                                    radius: 75,
+                                    backgroundColor: Colors.transparent,
+                                    child: ClipOval(
+                                      child: pathToImage != null &&
+                                              pathToImage!.isNotEmpty
+                                          ? (pathToImage!.startsWith('assets')
+                                              ? Image.asset(
+                                                  pathToImage!,
+                                                  width: 150,
+                                                  height: 150,
+                                                )
+                                              : Image.network(
+                                                  fit: BoxFit.fill,
+                                                  pathToImage!,
+                                                  width: 150,
+                                                  height: 150,
+                                                  loadingBuilder: (context,
+                                                      child, loadingProgress) {
+                                                    if (loadingProgress == null)
+                                                      return child;
+                                                    return Center(
+                                                      child:
+                                                          const SpinKitFadingCube(
+                                                        color: Color.fromARGB(
+                                                            255, 30, 197, 83),
+                                                      ),
+                                                    );
+                                                  },
+                                                ))
+                                          : Image.asset(
+                                              'assets/defaulticon.png',
+                                              width: 150,
+                                              height: 150,
+                                            ),
                                     ),
-                                    const SizedBox(width: 31),
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
+                                  ),
+                                  Positioned(
+                                    bottom: 0,
+                                    right: 0,
+                                    child: Container(
+                                      padding: EdgeInsets.all(6),
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: Colors.white,
+                                      ),
+                                      child: Icon(
+                                        Icons.camera_alt,
+                                        color: Colors.green,
+                                        size: 20,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 20),
+                            Text(
+                              '$firstName $lastName',
+                              style: TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                  fontFamily:
+                                      GoogleFonts.montserrat().fontFamily),
+                            ),
+                            Text(
+                              description,
+                              style: TextStyle(
+                                  fontSize: 18,
+                                  color: Colors.grey,
+                                  fontFamily:
+                                      GoogleFonts.montserrat().fontFamily),
+                            ),
+                            const SizedBox(height: 20),
+                            const Divider(),
+                            ProfileInfoItem(
+                              icon: Icons.email,
+                              title: isEmail ? 'Email' : 'Contact',
+                              subtitle: contactInfo,
+                            ),
+                            FutureBuilder<String>(
+                              future: _getLocation(),
+                              builder: (BuildContext context,
+                                  AsyncSnapshot<String> snapshot) {
+                                if (snapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return const SpinKitFadingCube(
+                                    color: Color.fromARGB(255, 30, 197, 83),
+                                  );
+                                } else if (snapshot.hasError ||
+                                    snapshot.data == null) {
+                                  return Container(); // Empty container, the item will not be shown
+                                } else {
+                                  return ProfileInfoItem(
+                                    icon: Icons.location_on,
+                                    title: 'Location',
+                                    subtitle:
+                                        snapshot.data ?? '', // The location
+                                  );
+                                }
+                              },
+                            ),
+                            StatefulBuilder(
+                              builder:
+                                  (BuildContext context, StateSetter setState) {
+                                return Column(
+                                  children: [
+                                    GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          showChangePassword =
+                                              !showChangePassword;
+                                        });
+                                      },
+                                      child: Row(
                                         children: [
-                                          const SizedBox(height: 18),
-                                          Text(
-                                            'Additional Settings',
-                                            style: TextStyle(
-                                                fontSize: 16,
-                                                color: Colors.black,
-                                                fontWeight: FontWeight.bold,
-                                                fontFamily:
-                                                    GoogleFonts.montserrat()
-                                                        .fontFamily),
+                                          const SizedBox(width: 17, height: 60),
+                                          Icon(
+                                            Icons.settings,
+                                            color: Colors.grey[600],
                                           ),
-                                          const SizedBox(height: 4),
-                                          Text(
-                                            'Click to access additional settings',
-                                            style: TextStyle(
-                                                fontSize: 14,
-                                                color: Colors.grey[700],
-                                                fontFamily:
-                                                    GoogleFonts.montserrat()
-                                                        .fontFamily),
+                                          const SizedBox(width: 31),
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                const SizedBox(height: 18),
+                                                Text(
+                                                  'Additional Settings',
+                                                  style: TextStyle(
+                                                      fontSize: 16,
+                                                      color: Colors.black,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontFamily: GoogleFonts
+                                                              .montserrat()
+                                                          .fontFamily),
+                                                ),
+                                                const SizedBox(height: 4),
+                                                Text(
+                                                  'Click to access additional settings',
+                                                  style: TextStyle(
+                                                      fontSize: 14,
+                                                      color: Colors.grey[700],
+                                                      fontFamily: GoogleFonts
+                                                              .montserrat()
+                                                          .fontFamily),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          SizedBox(
+                                            height: 20,
+                                            child: LayoutBuilder(
+                                              builder: (context, constraints) {
+                                                return AnimatedSwitcher(
+                                                  duration: const Duration(
+                                                      milliseconds: 200),
+                                                  transitionBuilder:
+                                                      (child, animation) {
+                                                    final height =
+                                                        constraints.maxHeight;
+                                                    return ScaleTransition(
+                                                      scale: CurvedAnimation(
+                                                        parent: animation,
+                                                        curve: Curves.easeInOut,
+                                                      ),
+                                                      child: child,
+                                                    );
+                                                  },
+                                                  child: showChangePassword
+                                                      ? const Icon(
+                                                          Icons.arrow_drop_up,
+                                                          color: Colors.grey,
+                                                          key: Key('arrow_up'),
+                                                        )
+                                                      : const Icon(
+                                                          Icons.arrow_drop_down,
+                                                          color: Colors.grey,
+                                                          key:
+                                                              Key('arrow_down'),
+                                                        ),
+                                                );
+                                              },
+                                            ),
                                           ),
                                         ],
                                       ),
                                     ),
-                                    SizedBox(
-                                      height: 20,
-                                      child: LayoutBuilder(
-                                        builder: (context, constraints) {
-                                          return AnimatedSwitcher(
-                                            duration: const Duration(
-                                                milliseconds: 200),
-                                            transitionBuilder:
-                                                (child, animation) {
-                                              final height =
-                                                  constraints.maxHeight;
-                                              return ScaleTransition(
-                                                scale: CurvedAnimation(
-                                                  parent: animation,
-                                                  curve: Curves.easeInOut,
-                                                ),
-                                                child: child,
-                                              );
-                                            },
-                                            child: showChangePassword
-                                                ? const Icon(
-                                                    Icons.arrow_drop_up,
-                                                    color: Colors.grey,
-                                                    key: Key('arrow_up'),
-                                                  )
-                                                : const Icon(
-                                                    Icons.arrow_drop_down,
-                                                    color: Colors.grey,
-                                                    key: Key('arrow_down'),
-                                                  ),
-                                          );
-                                        },
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              AnimatedSwitcher(
-                                duration: const Duration(milliseconds: 200),
-                                transitionBuilder: (child, animation) {
-                                  return SlideTransition(
-                                    position: Tween<Offset>(
-                                      begin: const Offset(0, -0.5),
-                                      end: Offset.zero,
-                                    ).animate(animation),
-                                    child: FadeTransition(
-                                      opacity: animation,
-                                      child: child,
-                                    ),
-                                  );
-                                },
-                                child: showChangePassword
-                                    ? Column(
-                                        key: const Key('additional_settings'),
-                                        children: [
-                                          const SizedBox(
-                                            height: 17,
-                                            width: 8,
+                                    AnimatedSwitcher(
+                                      duration:
+                                          const Duration(milliseconds: 200),
+                                      transitionBuilder: (child, animation) {
+                                        return SlideTransition(
+                                          position: Tween<Offset>(
+                                            begin: const Offset(0, -0.5),
+                                            end: Offset.zero,
+                                          ).animate(animation),
+                                          child: FadeTransition(
+                                            opacity: animation,
+                                            child: child,
                                           ),
-                                          ProfileInfoItem(
-                                            icon: Icons.lock,
-                                            title: 'Change Password',
-                                            subtitle:
-                                                'Click to change your password',
-                                            onTap: () {
-                                              showDialog(
-                                                  context: context,
-                                                  builder: (context) {
-                                                    return StatefulBuilder(
-                                                      builder:
-                                                          (BuildContext context,
-                                                              setState) {
-                                                        return AlertDialog(
-                                                          title: Text(
-                                                              'Change Password'),
-                                                          content: Column(
-                                                            mainAxisSize:
-                                                                MainAxisSize
-                                                                    .min,
-                                                            children: [
-                                                              TextField(
-                                                                controller:
-                                                                    _oldPasswordController,
-                                                                obscureText:
-                                                                    _obscurePassword,
-                                                                decoration:
-                                                                    InputDecoration(
-                                                                  iconColor:
-                                                                      Colors
-                                                                          .green,
-                                                                  focusColor:
-                                                                      Colors
-                                                                          .green,
-                                                                  hoverColor:
-                                                                      Colors
-                                                                          .green,
-                                                                  labelText:
-                                                                      'Old Password',
-                                                                  suffixIcon:
-                                                                      GestureDetector(
-                                                                    onTap: () {
-                                                                      setState(
-                                                                          () {
-                                                                        _obscurePassword =
-                                                                            !_obscurePassword;
-                                                                      });
-                                                                    },
-                                                                    child: Icon(
-                                                                      _obscurePassword
-                                                                          ? Icons
-                                                                              .visibility
-                                                                          : Icons
-                                                                              .visibility_off,
-                                                                    ),
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                              TextField(
-                                                                controller:
-                                                                    _newPasswordController,
-                                                                obscureText:
-                                                                    _obscurePassword2,
-                                                                decoration:
-                                                                    InputDecoration(
-                                                                  labelText:
-                                                                      'New Password',
-                                                                  suffixIcon:
-                                                                      GestureDetector(
-                                                                    onTap: () {
-                                                                      setState(
-                                                                          () {
-                                                                        _obscurePassword2 =
-                                                                            !_obscurePassword2;
-                                                                      });
-                                                                    },
-                                                                    child: Icon(
-                                                                      _obscurePassword2
-                                                                          ? Icons
-                                                                              .visibility
-                                                                          : Icons
-                                                                              .visibility_off,
-                                                                    ),
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                          actions: [
-                                                            TextButton(
-                                                                onPressed: () {
-                                                                  Navigator.pop(
-                                                                      context);
-                                                                },
-                                                                child: Text(
-                                                                    'Cancel',
-                                                                    style: TextStyle(
-                                                                        color: Colors
-                                                                            .green))),
-                                                            TextButton(
-                                                                onPressed: () {
-                                                                  changePassword(
-                                                                      _oldPasswordController
-                                                                          .text,
-                                                                      _newPasswordController
-                                                                          .text);
-                                                                  // Navigator.pop(context);
-                                                                },
-                                                                child: Text(
-                                                                  'Change',
-                                                                  style:
-                                                                      TextStyle(
-                                                                    color: Colors
-                                                                        .green,
-                                                                  ),
-                                                                ))
-                                                          ],
-                                                        );
-                                                      },
-                                                    );
-                                                  });
-                                            },
-                                          ),
-                                          ProfileInfoItem(
-                                            icon: Icons.delete,
-                                            title: 'Delete Account',
-                                            subtitle:
-                                                'Click to delete your account',
-                                            onTap: () async {
-                                              //block the user's screen using a loading screen
-                                              showDialog(
-                                                context: context,
-                                                barrierDismissible:
-                                                    true, // Prevents dismissing the dialog by tapping outside
-                                                builder: (context) =>
-                                                    //   WillPopScope(
-                                                    // onWillPop: () async =>
-                                                    //     false, // Prevents dismissing the dialog with the back button
-                                                    AlertDialog(
-                                                  title: Text('Processing',
-                                                      style: TextStyle(
-                                                          color: Colors.green,
-                                                          fontFamily: GoogleFonts
-                                                                  .montserrat()
-                                                              .fontFamily),
-                                                      textAlign:
-                                                          TextAlign.center),
-                                                  // content:
-                                                  // CircularProgressIndicator(),
+                                        );
+                                      },
+                                      child: showChangePassword
+                                          ? Column(
+                                              key: const Key(
+                                                  'additional_settings'),
+                                              children: [
+                                                const SizedBox(
+                                                  height: 17,
+                                                  width: 8,
                                                 ),
-                                                // ),
-                                              );
-
-                                              User? currentUser = FirebaseAuth
-                                                  .instance.currentUser;
-                                              String? phoneNumber =
-                                                  currentUser?.phoneNumber;
-                                              bool isPhoneNumberLogin =
-                                                  phoneNumber != null;
-
-                                              if (isPhoneNumberLogin) {
-                                                String? enteredVerificationCode;
-                                                print(
-                                                    'phone number is $phoneNumber');
-
-                                                // Send verification code via SMS
-                                                await FirebaseAuth.instance
-                                                    .verifyPhoneNumber(
-                                                  phoneNumber: phoneNumber!,
-                                                  verificationCompleted:
-                                                      (PhoneAuthCredential
-                                                          credential) async {
-                                                    try {
-                                                      // Reauthenticate the user with the credential
-                                                      print(
-                                                          'credential is $credential');
-                                                      await currentUser
-                                                          ?.reauthenticateWithCredential(
-                                                              credential);
-
-                                                      // Delete the user account
-                                                      await currentUser
-                                                          ?.delete();
-
-                                                      // Show a success message to the user
-                                                      ScaffoldMessenger.of(
-                                                              context)
-                                                          .showSnackBar(
-                                                        SnackBar(
-                                                          content: Text(
-                                                              'Account deleted successfully.'),
-                                                        ),
-                                                      );
-                                                    } catch (e) {
-                                                      // Show an error message if the account deletion fails
-                                                      ScaffoldMessenger.of(
-                                                              context)
-                                                          .showSnackBar(
-                                                        SnackBar(
-                                                          content: Text(e
-                                                              .toString()
-                                                              .substring(30)),
-                                                        ),
-                                                      );
-                                                      print('Error: $e');
-                                                    }
+                                                ProfileInfoItem(
+                                                  icon: Icons.lock,
+                                                  title: 'Change Password',
+                                                  subtitle:
+                                                      'Click to change your password',
+                                                  onTap: () {
+                                                    showDialog(
+                                                        context: context,
+                                                        builder: (context) {
+                                                          return StatefulBuilder(
+                                                            builder:
+                                                                (BuildContext
+                                                                        context,
+                                                                    setState) {
+                                                              return AlertDialog(
+                                                                title: Text(
+                                                                    'Change Password'),
+                                                                content: Column(
+                                                                  mainAxisSize:
+                                                                      MainAxisSize
+                                                                          .min,
+                                                                  children: [
+                                                                    TextField(
+                                                                      controller:
+                                                                          _oldPasswordController,
+                                                                      obscureText:
+                                                                          _obscurePassword,
+                                                                      decoration:
+                                                                          InputDecoration(
+                                                                        iconColor:
+                                                                            Colors.green,
+                                                                        focusColor:
+                                                                            Colors.green,
+                                                                        hoverColor:
+                                                                            Colors.green,
+                                                                        labelText:
+                                                                            'Old Password',
+                                                                        suffixIcon:
+                                                                            GestureDetector(
+                                                                          onTap:
+                                                                              () {
+                                                                            setState(() {
+                                                                              _obscurePassword = !_obscurePassword;
+                                                                            });
+                                                                          },
+                                                                          child:
+                                                                              Icon(
+                                                                            _obscurePassword
+                                                                                ? Icons.visibility
+                                                                                : Icons.visibility_off,
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                    TextField(
+                                                                      controller:
+                                                                          _newPasswordController,
+                                                                      obscureText:
+                                                                          _obscurePassword2,
+                                                                      decoration:
+                                                                          InputDecoration(
+                                                                        labelText:
+                                                                            'New Password',
+                                                                        suffixIcon:
+                                                                            GestureDetector(
+                                                                          onTap:
+                                                                              () {
+                                                                            setState(() {
+                                                                              _obscurePassword2 = !_obscurePassword2;
+                                                                            });
+                                                                          },
+                                                                          child:
+                                                                              Icon(
+                                                                            _obscurePassword2
+                                                                                ? Icons.visibility
+                                                                                : Icons.visibility_off,
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                                actions: [
+                                                                  TextButton(
+                                                                      onPressed:
+                                                                          () {
+                                                                        Navigator.pop(
+                                                                            context);
+                                                                      },
+                                                                      child: Text(
+                                                                          'Cancel',
+                                                                          style:
+                                                                              TextStyle(color: Colors.green))),
+                                                                  TextButton(
+                                                                      onPressed:
+                                                                          () {
+                                                                        changePassword(
+                                                                            _oldPasswordController.text,
+                                                                            _newPasswordController.text);
+                                                                        // Navigator.pop(context);
+                                                                      },
+                                                                      child:
+                                                                          Text(
+                                                                        'Change',
+                                                                        style:
+                                                                            TextStyle(
+                                                                          color:
+                                                                              Colors.green,
+                                                                        ),
+                                                                      ))
+                                                                ],
+                                                              );
+                                                            },
+                                                          );
+                                                        });
                                                   },
-                                                  verificationFailed:
-                                                      (FirebaseAuthException
-                                                          e) {
-                                                    // Handle verification failure
-                                                    ScaffoldMessenger.of(
-                                                            context)
-                                                        .showSnackBar(
-                                                      SnackBar(
-                                                        content: Text(e
-                                                            .toString()
-                                                            .substring(30)),
-                                                      ),
-                                                    );
-                                                    print(
-                                                        'Phone number verification failed: ${e.message}');
-                                                  },
-                                                  codeSent: (String
-                                                          verificationId,
-                                                      [int?
-                                                          forceResendingToken]) async {
-                                                    // Prompt the user to enter the verification code
-                                                    enteredVerificationCode =
-                                                        await showDialog(
+                                                ),
+                                                ProfileInfoItem(
+                                                  icon: Icons.delete,
+                                                  title: 'Delete Account',
+                                                  subtitle:
+                                                      'Click to delete your account',
+                                                  onTap: () async {
+                                                    //block the user's screen using a loading screen
+                                                    showDialog(
                                                       context: context,
+                                                      barrierDismissible:
+                                                          true, // Prevents dismissing the dialog by tapping outside
                                                       builder: (context) =>
+                                                          //   WillPopScope(
+                                                          // onWillPop: () async =>
+                                                          //     false, // Prevents dismissing the dialog with the back button
                                                           AlertDialog(
                                                         title: Text(
-                                                            'Phone Verification'),
-                                                        content: TextFormField(
-                                                          controller:
-                                                              _enterCodeController,
-                                                          decoration:
-                                                              InputDecoration(
-                                                            labelText:
-                                                                'Enter the verification code',
-                                                          ),
-                                                          validator: (value) {
-                                                            if (value == null ||
-                                                                value.isEmpty) {
-                                                              return 'Please enter the verification code';
-                                                            }
-                                                            return null;
-                                                          },
-                                                        ),
-                                                        actions: [
-                                                          TextButton(
-                                                            onPressed: () {
-                                                              Navigator.of(
-                                                                      context)
-                                                                  .pop(null);
-                                                              Navigator.pop(
-                                                                  context);
-                                                            },
-                                                            child: Text(
-                                                              'Cancel',
-                                                              style: TextStyle(
+                                                            'Processing',
+                                                            style: TextStyle(
                                                                 color: Colors
                                                                     .green,
                                                                 fontFamily: GoogleFonts
                                                                         .montserrat()
-                                                                    .fontFamily,
+                                                                    .fontFamily),
+                                                            textAlign: TextAlign
+                                                                .center),
+                                                        // content:
+                                                        // CircularProgressIndicator(),
+                                                      ),
+                                                      // ),
+                                                    );
+
+                                                    User? currentUser =
+                                                        FirebaseAuth.instance
+                                                            .currentUser;
+                                                    String? phoneNumber =
+                                                        currentUser
+                                                            ?.phoneNumber;
+                                                    bool isPhoneNumberLogin =
+                                                        phoneNumber != null;
+
+                                                    if (isPhoneNumberLogin) {
+                                                      String?
+                                                          enteredVerificationCode;
+                                                      print(
+                                                          'phone number is $phoneNumber');
+
+                                                      // Send verification code via SMS
+                                                      await FirebaseAuth
+                                                          .instance
+                                                          .verifyPhoneNumber(
+                                                        phoneNumber:
+                                                            phoneNumber!,
+                                                        verificationCompleted:
+                                                            (PhoneAuthCredential
+                                                                credential) async {
+                                                          try {
+                                                            // Reauthenticate the user with the credential
+                                                            print(
+                                                                'credential is $credential');
+                                                            await currentUser
+                                                                ?.reauthenticateWithCredential(
+                                                                    credential);
+
+                                                            // Delete the user account
+                                                            await currentUser
+                                                                ?.delete();
+
+                                                            // Show a success message to the user
+                                                            ScaffoldMessenger
+                                                                    .of(context)
+                                                                .showSnackBar(
+                                                              SnackBar(
+                                                                content: Text(
+                                                                    'Account deleted successfully.'),
                                                               ),
+                                                            );
+                                                          } catch (e) {
+                                                            // Show an error message if the account deletion fails
+                                                            ScaffoldMessenger
+                                                                    .of(context)
+                                                                .showSnackBar(
+                                                              SnackBar(
+                                                                content: Text(e
+                                                                    .toString()
+                                                                    .substring(
+                                                                        30)),
+                                                              ),
+                                                            );
+                                                            print('Error: $e');
+                                                          }
+                                                        },
+                                                        verificationFailed:
+                                                            (FirebaseAuthException
+                                                                e) {
+                                                          // Handle verification failure
+                                                          ScaffoldMessenger.of(
+                                                                  context)
+                                                              .showSnackBar(
+                                                            SnackBar(
+                                                              content: Text(e
+                                                                  .toString()
+                                                                  .substring(
+                                                                      30)),
                                                             ),
+                                                          );
+                                                          print(
+                                                              'Phone number verification failed: ${e.message}');
+                                                        },
+                                                        codeSent: (String
+                                                                verificationId,
+                                                            [int?
+                                                                forceResendingToken]) async {
+                                                          // Prompt the user to enter the verification code
+                                                          enteredVerificationCode =
+                                                              await showDialog(
+                                                            context: context,
+                                                            builder:
+                                                                (context) =>
+                                                                    AlertDialog(
+                                                              title: Text(
+                                                                  'Phone Verification'),
+                                                              content:
+                                                                  TextFormField(
+                                                                controller:
+                                                                    _enterCodeController,
+                                                                decoration:
+                                                                    InputDecoration(
+                                                                  labelText:
+                                                                      'Enter the verification code',
+                                                                ),
+                                                                validator:
+                                                                    (value) {
+                                                                  if (value ==
+                                                                          null ||
+                                                                      value
+                                                                          .isEmpty) {
+                                                                    return 'Please enter the verification code';
+                                                                  }
+                                                                  return null;
+                                                                },
+                                                              ),
+                                                              actions: [
+                                                                TextButton(
+                                                                  onPressed:
+                                                                      () {
+                                                                    Navigator.of(
+                                                                            context)
+                                                                        .pop(
+                                                                            null);
+                                                                    Navigator.pop(
+                                                                        context);
+                                                                  },
+                                                                  child: Text(
+                                                                    'Cancel',
+                                                                    style:
+                                                                        TextStyle(
+                                                                      color: Colors
+                                                                          .green,
+                                                                      fontFamily:
+                                                                          GoogleFonts.montserrat()
+                                                                              .fontFamily,
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                                TextButton(
+                                                                  onPressed:
+                                                                      () async {
+                                                                    enteredVerificationCode =
+                                                                        _enterCodeController
+                                                                            .text;
+                                                                    if (enteredVerificationCode !=
+                                                                        null) {
+                                                                      // Create PhoneAuthCredential using the entered verification code
+                                                                      PhoneAuthCredential
+                                                                          credential =
+                                                                          PhoneAuthProvider
+                                                                              .credential(
+                                                                        verificationId:
+                                                                            verificationId,
+                                                                        smsCode:
+                                                                            enteredVerificationCode!,
+                                                                      );
+
+                                                                      try {
+                                                                        // Reauthenticate the user with the credential
+                                                                        await currentUser
+                                                                            ?.reauthenticateWithCredential(credential);
+
+                                                                        // // Delete the user account
+                                                                        // await currentUser
+                                                                        //     ?.delete();
+
+                                                                        FirebaseFirestore
+                                                                            .instance
+                                                                            .collection('users')
+                                                                            .doc(currentUser?.uid)
+                                                                            .set({
+                                                                          'isDisabled':
+                                                                              true,
+                                                                        }, SetOptions(merge: true));
+
+                                                                        // Show a success message to the user
+                                                                        ScaffoldMessenger.of(context)
+                                                                            .showSnackBar(
+                                                                          SnackBar(
+                                                                            content:
+                                                                                Text('Account deleted successfully.'),
+                                                                          ),
+                                                                        );
+
+                                                                        // Sign out the user
+                                                                        await FirebaseAuth
+                                                                            .instance
+                                                                            .signOut();
+                                                                        // navigate to splash screen
+                                                                        Navigator.of(context)
+                                                                            .pushReplacement(
+                                                                          MaterialPageRoute(
+                                                                            builder: (context) =>
+                                                                                SplashScreen(),
+                                                                          ),
+                                                                        );
+                                                                      } catch (e) {
+                                                                        // Show an error message if the reauthentication fails
+                                                                        ScaffoldMessenger.of(context)
+                                                                            .showSnackBar(
+                                                                          SnackBar(
+                                                                            content:
+                                                                                Text(e.toString().substring(30)),
+                                                                          ),
+                                                                        );
+                                                                        print(
+                                                                            'Error: $e');
+                                                                      }
+                                                                    }
+                                                                  },
+                                                                  child: Text(
+                                                                    'Verify',
+                                                                    style:
+                                                                        TextStyle(
+                                                                      color: Colors
+                                                                          .green,
+                                                                      fontFamily:
+                                                                          GoogleFonts.montserrat()
+                                                                              .fontFamily,
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          );
+                                                        },
+                                                        codeAutoRetrievalTimeout:
+                                                            (String
+                                                                verificationId) {},
+                                                      );
+                                                    } else {
+                                                      String? enteredPassword;
+
+                                                      // Show a password prompt dialog to the user
+                                                      enteredPassword =
+                                                          await showDialog(
+                                                        context: context,
+                                                        builder: (context) =>
+                                                            AlertDialog(
+                                                          title: Text(
+                                                              'Password Confirmation'),
+                                                          content:
+                                                              TextFormField(
+                                                            controller:
+                                                                _enterPasswordController,
+                                                            obscureText: true,
+                                                            decoration:
+                                                                InputDecoration(
+                                                              labelText:
+                                                                  'Enter your password',
+                                                            ),
+                                                            validator: (value) {
+                                                              if (value ==
+                                                                      null ||
+                                                                  value
+                                                                      .isEmpty) {
+                                                                return 'Please enter your password';
+                                                              }
+                                                              return null;
+                                                            },
                                                           ),
-                                                          TextButton(
-                                                            onPressed:
-                                                                () async {
-                                                              enteredVerificationCode =
-                                                                  _enterCodeController
-                                                                      .text;
-                                                              if (enteredVerificationCode !=
-                                                                  null) {
-                                                                // Create PhoneAuthCredential using the entered verification code
-                                                                PhoneAuthCredential
-                                                                    credential =
-                                                                    PhoneAuthProvider
-                                                                        .credential(
-                                                                  verificationId:
-                                                                      verificationId,
-                                                                  smsCode:
-                                                                      enteredVerificationCode!,
-                                                                );
+                                                          actions: [
+                                                            TextButton(
+                                                              onPressed: () =>
+                                                                  Navigator.of(
+                                                                          context)
+                                                                      .pop(
+                                                                          null),
+                                                              child: Text(
+                                                                  'Cancel'),
+                                                            ),
+                                                            TextButton(
+                                                              onPressed:
+                                                                  () async {
+                                                                enteredPassword =
+                                                                    _enterPasswordController
+                                                                        .text;
+                                                                if (enteredPassword !=
+                                                                    null) {
+                                                                  // Reauthenticate the user with the entered password
+                                                                  AuthCredential
+                                                                      credential =
+                                                                      EmailAuthProvider
+                                                                          .credential(
+                                                                    email: currentUser
+                                                                            ?.email ??
+                                                                        '',
+                                                                    password:
+                                                                        enteredPassword!,
+                                                                  );
 
-                                                                try {
-                                                                  // Reauthenticate the user with the credential
-                                                                  await currentUser
-                                                                      ?.reauthenticateWithCredential(
-                                                                          credential);
+                                                                  // Delete the user account
+                                                                  try {
+                                                                    await currentUser
+                                                                        ?.reauthenticateWithCredential(
+                                                                            credential);
 
-                                                                  // // Delete the user account
-                                                                  // await currentUser
-                                                                  //     ?.delete();
+                                                                    //navigate to splash screen with root context
+                                                                    Navigator.of(
+                                                                            context,
+                                                                            rootNavigator:
+                                                                                true)
+                                                                        .pushReplacement(
+                                                                      MaterialPageRoute(
+                                                                        builder:
+                                                                            (context) =>
+                                                                                LoginPage(),
+                                                                      ),
+                                                                    );
+                                                                  } catch (e) {
+                                                                    ScaffoldMessenger.of(
+                                                                            context)
+                                                                        .showSnackBar(
+                                                                      SnackBar(
+                                                                        content: Text(e
+                                                                            .toString()
+                                                                            .substring(30)),
+                                                                      ),
+                                                                    );
+                                                                    print(
+                                                                        'Error: $e');
+                                                                  }
 
-                                                                  FirebaseFirestore
+                                                                  // firebase isDisabled true
+                                                                  await FirebaseFirestore
                                                                       .instance
                                                                       .collection(
                                                                           'users')
@@ -1219,201 +1398,50 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
                                                                         true,
                                                                   }, SetOptions(merge: true));
 
-                                                                  // Show a success message to the user
-                                                                  ScaffoldMessenger.of(
-                                                                          context)
-                                                                      .showSnackBar(
-                                                                    SnackBar(
-                                                                      content: Text(
-                                                                          'Account deleted successfully.'),
-                                                                    ),
-                                                                  );
-
-                                                                  // Sign out the user
-                                                                  await FirebaseAuth
-                                                                      .instance
-                                                                      .signOut();
-                                                                  // navigate to splash screen
-                                                                  Navigator.of(
-                                                                          context)
-                                                                      .pushReplacement(
-                                                                    MaterialPageRoute(
-                                                                      builder:
-                                                                          (context) =>
-                                                                              SplashScreen(),
-                                                                    ),
-                                                                  );
-                                                                } catch (e) {
-                                                                  // Show an error message if the reauthentication fails
-                                                                  ScaffoldMessenger.of(
-                                                                          context)
-                                                                      .showSnackBar(
-                                                                    SnackBar(
-                                                                      content: Text(e
-                                                                          .toString()
-                                                                          .substring(
-                                                                              30)),
-                                                                    ),
-                                                                  );
-                                                                  print(
-                                                                      'Error: $e');
+                                                                  // // Sign out the user
+                                                                  // await FirebaseAuth.instance
+                                                                  //     .signOut();
                                                                 }
-                                                              }
-                                                            },
-                                                            child: Text(
-                                                              'Verify',
-                                                              style: TextStyle(
-                                                                color: Colors
-                                                                    .green,
-                                                                fontFamily: GoogleFonts
-                                                                        .montserrat()
-                                                                    .fontFamily,
-                                                              ),
+                                                              },
+                                                              child: Text(
+                                                                  'Confirm'),
                                                             ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    );
+                                                          ],
+                                                        ),
+                                                      );
+                                                    }
                                                   },
-                                                  codeAutoRetrievalTimeout:
-                                                      (String
-                                                          verificationId) {},
-                                                );
-                                              } else {
-                                                String? enteredPassword;
-
-                                                // Show a password prompt dialog to the user
-                                                enteredPassword =
-                                                    await showDialog(
-                                                  context: context,
-                                                  builder: (context) =>
-                                                      AlertDialog(
-                                                    title: Text(
-                                                        'Password Confirmation'),
-                                                    content: TextFormField(
-                                                      controller:
-                                                          _enterPasswordController,
-                                                      obscureText: true,
-                                                      decoration:
-                                                          InputDecoration(
-                                                        labelText:
-                                                            'Enter your password',
-                                                      ),
-                                                      validator: (value) {
-                                                        if (value == null ||
-                                                            value.isEmpty) {
-                                                          return 'Please enter your password';
-                                                        }
-                                                        return null;
-                                                      },
-                                                    ),
-                                                    actions: [
-                                                      TextButton(
-                                                        onPressed: () =>
-                                                            Navigator.of(
-                                                                    context)
-                                                                .pop(null),
-                                                        child: Text('Cancel'),
-                                                      ),
-                                                      TextButton(
-                                                        onPressed: () async {
-                                                          enteredPassword =
-                                                              _enterPasswordController
-                                                                  .text;
-                                                          if (enteredPassword !=
-                                                              null) {
-                                                            // Reauthenticate the user with the entered password
-                                                            AuthCredential
-                                                                credential =
-                                                                EmailAuthProvider
-                                                                    .credential(
-                                                              email: currentUser
-                                                                      ?.email ??
-                                                                  '',
-                                                              password:
-                                                                  enteredPassword!,
-                                                            );
-
-                                                            // Delete the user account
-                                                            try {
-                                                              await currentUser
-                                                                  ?.reauthenticateWithCredential(
-                                                                      credential);
-
-                                                              //navigate to splash screen with root context
-                                                              Navigator.of(
-                                                                      context,
-                                                                      rootNavigator:
-                                                                          true)
-                                                                  .pushReplacement(
-                                                                MaterialPageRoute(
-                                                                  builder:
-                                                                      (context) =>
-                                                                          LoginPage(),
-                                                                ),
-                                                              );
-                                                            } catch (e) {
-                                                              ScaffoldMessenger
-                                                                      .of(context)
-                                                                  .showSnackBar(
-                                                                SnackBar(
-                                                                  content: Text(e
-                                                                      .toString()
-                                                                      .substring(
-                                                                          30)),
-                                                                ),
-                                                              );
-                                                              print(
-                                                                  'Error: $e');
-                                                            }
-
-                                                            // firebase isDisabled true
-                                                            await FirebaseFirestore
-                                                                .instance
-                                                                .collection(
-                                                                    'users')
-                                                                .doc(currentUser
-                                                                    ?.uid)
-                                                                .set(
-                                                                    {
-                                                                  'isDisabled':
-                                                                      true,
-                                                                },
-                                                                    SetOptions(
-                                                                        merge:
-                                                                            true));
-
-                                                            // // Sign out the user
-                                                            // await FirebaseAuth.instance
-                                                            //     .signOut();
-                                                          }
-                                                        },
-                                                        child: Text('Confirm'),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                );
-                                              }
-                                            },
-                                          ),
-                                        ],
-                                      )
-                                    : const SizedBox(
-                                        width: 0,
-                                        height: 0,
-                                      ), // Empty SizedBox
-                              ),
-                            ],
-                          );
-                        },
+                                                ),
+                                              ],
+                                            )
+                                          : const SizedBox(
+                                              width: 0,
+                                              height: 0,
+                                            ), // Empty SizedBox
+                                    ),
+                                  ],
+                                );
+                              },
+                            ),
+                          ],
+                        ),
                       ),
-                    ],
-                  ),
-                ),
+                    )),
               ));
         },
       ),
     );
+  }
+
+  Future<DocumentSnapshot<Map<String, dynamic>>> fetchUserProfile() {
+    return FirebaseFirestore.instance
+        .collection(widget.callerType)
+        .doc(widget.uid)
+        .get();
+  }
+
+  Future<void> _refreshUserProfile() async {
+    setState(() {});
   }
 }
 

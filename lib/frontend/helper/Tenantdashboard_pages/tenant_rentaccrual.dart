@@ -34,11 +34,16 @@ class _TenantRentAccrualPageState extends State<TenantRentAccrualPage> {
         .get();
 
     tenant = Tenant.fromJson(myTenant.data()!);
+    // print('dateJoined is ${tenant!.dateJoined}');
 
     if (myTenant.data()?['isApplied'] == true) {
       // setState(() {
       isApplied = true;
       // });
+    }
+
+    if (mounted) {
+      setState(() {});
     }
   }
 
@@ -257,7 +262,7 @@ class _TenantRentAccrualPageState extends State<TenantRentAccrualPage> {
                                       ?.toDate()
                                       .toString()
                                       .substring(0, 10) ??
-                                  'Date Joined',
+                                  'Old User type datejoined not available',
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,

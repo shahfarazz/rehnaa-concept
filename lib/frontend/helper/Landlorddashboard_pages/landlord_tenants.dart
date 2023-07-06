@@ -42,18 +42,27 @@ class _LandlordTenantsPageState extends State<LandlordTenantsPage>
   void initState() {
     super.initState();
     _loadTenants();
-    _startPeriodicFetching();
+    // _startPeriodicFetching();
   }
 
-  void _startPeriodicFetching() {
-    _timer = Timer.periodic(
-      const Duration(seconds: 30),
-      (_) => _loadTenants(),
-    );
-  }
+  // void _startPeriodicFetching() {
+  //   _timer = Timer.periodic(
+  //     const Duration(seconds: 30),
+  //     (_) => _loadTenants(),
+  //   );
+  // }
 
-  void _stopPeriodicFetching() {
-    _timer?.cancel();
+  // void _stopPeriodicFetching() {
+  //   _timer?.cancel();
+  // }
+
+  Future<void> _refreshUserProfile() async {
+    setState(() {
+      _tenants = [];
+      refs = [];
+      shouldDisplayContent = false;
+      _loadTenants();
+    });
   }
 
   @override
@@ -62,7 +71,7 @@ class _LandlordTenantsPageState extends State<LandlordTenantsPage>
         .complete(); // Complete the Completer to cancel the Future.delayed() call
     _pageController.dispose(); // Dispose the PageController
     super.dispose();
-    _stopPeriodicFetching();
+    // _stopPeriodicFetching();
   }
 
   // Fetch tenant data from Firestore
@@ -288,15 +297,19 @@ class _LandlordTenantsPageState extends State<LandlordTenantsPage>
           ],
         );
       } else {
-        return PageView.builder(
-          controller: _pageController,
-          itemCount: pageCount,
-          itemBuilder: (context, index) {
-            int startIndex = index * _pageSize;
-            return Column(
-              children: _buildTenantCards(startIndex),
-            );
-          },
+        return Container(
+          height:
+              size.height * 0.9, // Adjust this value according to your needs
+          child: PageView.builder(
+            controller: _pageController,
+            itemCount: pageCount,
+            itemBuilder: (context, index) {
+              int startIndex = index * _pageSize;
+              return Column(
+                children: _buildTenantCards(startIndex),
+              );
+            },
+          ),
         );
       }
     }
@@ -317,22 +330,27 @@ class _LandlordTenantsPageState extends State<LandlordTenantsPage>
               ),
             ),
           ),
-          StatefulBuilder(
-            builder: (context, setState) {
-              return Expanded(
-                child: buildTenantsList(),
-              );
-            },
-          ),
-          SmoothPageIndicator(
-            controller: _pageController,
-            count: max(1, pageCount.isFinite ? pageCount.toInt() : 0),
-            effect: const WormEffect(
-              dotColor: Colors.grey,
-              activeDotColor: Color(0xff33907c),
-              dotHeight: 10.0,
-              dotWidth: 10.0,
-              spacing: 8.0,
+          Expanded(
+            child: RefreshIndicator(
+              onRefresh: _refreshUserProfile,
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    buildTenantsList(),
+                    SmoothPageIndicator(
+                      controller: _pageController,
+                      count: max(1, pageCount.isFinite ? pageCount.toInt() : 0),
+                      effect: const WormEffect(
+                        dotColor: Colors.grey,
+                        activeDotColor: Color(0xff33907c),
+                        dotHeight: 10.0,
+                        dotWidth: 10.0,
+                        spacing: 8.0,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
           SizedBox(height: size.height * 0.03),

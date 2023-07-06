@@ -4,6 +4,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:rehnaa/frontend/helper/Landlorddashboard_pages/skeleton.dart';
 import '../../../backend/models/landlordmodel.dart';
@@ -339,9 +340,8 @@ class PropertyCard extends StatelessWidget {
                 width: double.infinity,
                 child: CachedNetworkImage(
                   imageUrl: property.imagePath[0],
-                  placeholder: (context, url) =>
-                      const CircularProgressIndicator(
-                    color: Colors.green,
+                  placeholder: (context, url) => const SpinKitFadingCube(
+                    color: Color.fromARGB(255, 30, 197, 83),
                   ),
                   errorWidget: (context, url, error) => const Icon(Icons.error),
                   fit: BoxFit.cover,

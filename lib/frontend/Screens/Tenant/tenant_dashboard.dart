@@ -553,6 +553,7 @@ class _DashboardPageState extends State<TenantDashboardPage>
                           MaterialPageRoute(
                             builder: (context) => TenantSecurityDepositPage(
                               uid: widget.uid,
+                              callerType: 'Tenants',
                             ),
                           ),
                         );

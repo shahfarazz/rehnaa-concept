@@ -21,6 +21,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:easy_debounce/easy_debounce.dart';
 
 import '../../helper/Landlorddashboard_pages/landlordproperties.dart';
+import '../../helper/Tenantdashboard_pages/tenant_security_deposit.dart';
 
 class LandlordDashboardPage extends StatefulWidget {
   final String uid; // UID of the landlord
@@ -556,6 +557,22 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
                           context,
                           MaterialPageRoute(
                             builder: (context) => const FAQPage(),
+                          ),
+                        );
+                        // _closeSidebar();
+                      },
+                    ),
+                    _buildSidebarItem(
+                      icon: Icons.security,
+                      label: 'Security Deposit',
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => TenantSecurityDepositPage(
+                              uid: widget.uid,
+                              callerType: 'Landlords',
+                            ),
                           ),
                         );
                         // _closeSidebar();
