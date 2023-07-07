@@ -1,68 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../backend/models/dealermodel.dart';
 import '../../../backend/models/landlordmodel.dart';
-
-class ContractCard extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final String data;
-
-  const ContractCard(
-      {Key? key, required this.icon, required this.label, required this.data})
-      : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15.0), // rounded corners
-      ),
-      elevation: 5, // shadow
-      child: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Icon(
-              icon,
-              size: 24,
-              color: const Color(0xff33907c),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    label,
-                    style: GoogleFonts.montserrat(
-                      fontWeight: FontWeight.bold, // bold contract label
-                      fontSize: 18,
-                      color: const Color(0xff33907c),
-                    ),
-                  ),
-                  const SizedBox(height: 5),
-                  Text(
-                    data,
-                    style: GoogleFonts.montserrat(
-                      fontWeight: FontWeight.normal, // normal contract data
-                      fontSize: 16,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
 
 class LandlordsOnboardedInfoPage extends StatelessWidget {
   final Landlord landlord;
-  const LandlordsOnboardedInfoPage({super.key, required this.landlord});
+  final Dealer dealer;
+  const LandlordsOnboardedInfoPage(
+      {super.key, required this.landlord, required this.dealer});
 
   @override
   Widget build(BuildContext context) {
@@ -153,49 +99,50 @@ class LandlordsOnboardedInfoPage extends StatelessWidget {
                               ContractCard(
                                 icon: Icons.person,
                                 label: 'Tenant Name:',
-                                data: landlord.tenant == null ||
-                                        landlord.tenant!.isEmpty
-                                    ? 'No tenant yet'
-                                    : landlord.tenant![0].firstName ?? '',
+                                data: dealer?.landlordMap?[landlord.tempID]
+                                    ?['eStampTenantName'],
                               ),
                               SizedBox(height: 16),
                               ContractCard(
                                 icon: Icons.calendar_today,
                                 label: 'Contract Start Date:',
-                                data: landlord.contractStartDate ?? '',
+                                data: dealer?.landlordMap?[landlord.tempID]
+                                    ?['eStampContractStartDate'],
                               ),
                               SizedBox(height: 16),
                               ContractCard(
                                 icon: Icons.calendar_today,
                                 label: 'Contract End Date:',
-                                data: landlord.contractEndDate ?? '',
+                                data: dealer?.landlordMap?[landlord.tempID]
+                                    ?['eStampContractEndDate'],
                               ),
                               SizedBox(height: 16),
                               ContractCard(
                                 icon: Icons.place,
                                 label: 'Property Address:',
-                                data: landlord.property.isEmpty
-                                    ? ''
-                                    : landlord.property[0].address ?? '',
+                                data: dealer?.landlordMap?[landlord.tempID]
+                                    ?['eStampPropertyAddress'],
                               ),
                               SizedBox(height: 16),
                               ContractCard(
-                                  icon: Icons.money_rounded,
-                                  label: 'Property rent amount:',
-                                  data: landlord.property.isEmpty
-                                      ? ''
-                                      : landlord.property[0].price.toString()),
+                                icon: Icons.money_rounded,
+                                label: 'Property rent amount:',
+                                data: dealer?.landlordMap?[landlord.tempID]
+                                    ?['eStampPropertyRentAmount'],
+                              ),
                               SizedBox(height: 16),
                               ContractCard(
                                 icon: Icons.request_page,
                                 label: 'Upfront Bonus:',
-                                data: '',
+                                data: dealer?.landlordMap?[landlord.tempID]
+                                    ?['eStampUpfrontBonus'],
                               ),
                               SizedBox(height: 16),
                               ContractCard(
                                 icon: Icons.request_page,
                                 label: 'Monthly Profit:',
-                                data: landlord.monthlyRent ?? '',
+                                data: dealer?.landlordMap?[landlord.tempID]
+                                    ?['eStampMonthlyProfit'],
                               ),
                               SizedBox(height: 24),
                             ],
@@ -296,6 +243,63 @@ class ExpandedImageDialog extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class ContractCard extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String data;
+
+  const ContractCard(
+      {Key? key, required this.icon, required this.label, required this.data})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15.0), // rounded corners
+      ),
+      elevation: 5, // shadow
+      child: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Icon(
+              icon,
+              size: 24,
+              color: const Color(0xff33907c),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: GoogleFonts.montserrat(
+                      fontWeight: FontWeight.bold, // bold contract label
+                      fontSize: 18,
+                      color: const Color(0xff33907c),
+                    ),
+                  ),
+                  const SizedBox(height: 5),
+                  Text(
+                    data,
+                    style: GoogleFonts.montserrat(
+                      fontWeight: FontWeight.normal, // normal contract data
+                      fontSize: 16,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -119,7 +119,7 @@ class LandlordTenantInfoPage extends StatelessWidget {
                   const SizedBox(height: 10.0),
                   Center(
                     child: Text(
-                      tenant.description,
+                      tenant.description ?? 'No Description',
                       textAlign: TextAlign.center,
                       style: GoogleFonts.montserrat(
                         fontSize: 16.0,
@@ -162,34 +162,38 @@ class LandlordTenantInfoPage extends StatelessWidget {
                           ),
 
                           const SizedBox(height: 10.0),
-                          Center(
-                            child: WhiteBox(
-                              icon: Icons.numbers,
-                              iconColor: const Color(0xff33907c),
-                              label: 'CNIC Number',
-                              value: decryptString(tenant.cnicNumber),
-                            ),
-                          ),
+                          tenant.cnicNumber != null
+                              ? Center(
+                                  child: WhiteBox(
+                                    icon: Icons.numbers,
+                                    iconColor: const Color(0xff33907c),
+                                    label: 'CNIC Number',
+                                    value: decryptString(tenant.cnicNumber!),
+                                  ),
+                                )
+                              : Container(),
                           const SizedBox(height: 10.0),
                           Center(
                             child: WhiteBox(
                               icon: Icons.email,
                               iconColor: const Color(0xff33907c),
                               label: 'Contact Number',
-                              value: tenant.emailOrPhone,
+                              value: tenant.emailOrPhone!,
                             ),
                           ),
                           const SizedBox(height: 10.0),
-                          Center(
-                            child: WhiteBox(
-                              icon: Icons.verified_user,
-                              label: 'Tasdeeq Verification',
-                              iconColor: const Color(0xff33907c),
-                              value: tenant.tasdeeqVerification
-                                  ? 'Verified'
-                                  : 'Not Verified',
-                            ),
-                          ),
+                          tenant.tasdeeqVerification != null
+                              ? Center(
+                                  child: WhiteBox(
+                                    icon: Icons.verified_user,
+                                    label: 'Tasdeeq Verification',
+                                    iconColor: const Color(0xff33907c),
+                                    value: tenant.tasdeeqVerification!
+                                        ? 'Verified'
+                                        : 'Not Verified',
+                                  ),
+                                )
+                              : Container(),
                           const SizedBox(height: 10.0),
                           Center(
                             child: WhiteBox(
@@ -200,16 +204,18 @@ class LandlordTenantInfoPage extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(height: 10.0),
-                          Center(
-                            child: WhiteBox(
-                              icon: Icons.local_police,
-                              iconColor: const Color(0xff33907c),
-                              label: 'Police Verification',
-                              value: tenant.policeVerification
-                                  ? 'Verified'
-                                  : 'Not Verified',
-                            ),
-                          ),
+                          tenant.policeVerification != null
+                              ? Center(
+                                  child: WhiteBox(
+                                    icon: Icons.local_police,
+                                    iconColor: const Color(0xff33907c),
+                                    label: 'Police Verification',
+                                    value: tenant.policeVerification!
+                                        ? 'Verified'
+                                        : 'Not Verified',
+                                  ),
+                                )
+                              : Container(),
                           const SizedBox(height: 10.0),
                           Center(
                             child: WhiteBox(

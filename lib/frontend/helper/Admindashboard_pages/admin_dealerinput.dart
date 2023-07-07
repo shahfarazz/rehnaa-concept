@@ -259,6 +259,82 @@ class _AdminDealerInputPageState extends State<AdminDealerInputPage> {
                       'balance': balanceInt,
                     });
 
+                    if (dealer.balance >
+                        (double.tryParse(balanceController.text) ?? 0.0)) {
+                      await FirebaseFirestore.instance
+                          .collection('rentPayments')
+                          .add({
+                        'tenantname': 'Rehnaa App',
+                        'LandlordRef': FirebaseFirestore.instance
+                            .collection('Dealers')
+                            .doc(dealer.tempID),
+                        'amount':
+                            -(double.tryParse(balanceController.text) ?? 0.0) +
+                                dealer.balance,
+                        'date': DateTime.now(),
+                        'isMinus': true,
+                        // 'description': 'Balance updated by dealer',
+                        'paymentType': '',
+                      }).then((value) {
+                        //add the rentpayment document reference to the tenant's
+                        // rentpayment array
+                        FirebaseFirestore.instance
+                            .collection('Dealers')
+                            .doc(dealer.tempID)
+                            .update({
+                          'rentpaymentRef': FieldValue.arrayUnion([value])
+                        });
+                        FirebaseFirestore.instance
+                            .collection('Notifications')
+                            .doc(dealer.tempID)
+                            .update({
+                          'notifications': FieldValue.arrayUnion([
+                            {
+                              // 'amount': data.requestedAmount,
+                              'title': 'Balance updated by Rehnaa Team Admin',
+                            }
+                          ])
+                        });
+                      });
+                    } else if (dealer.balance <
+                        (double.tryParse(balanceController.text) ?? 0.0)) {
+                      await FirebaseFirestore.instance
+                          .collection('rentPayments')
+                          .add({
+                        'tenantname': 'Rehnaa App',
+                        'LandlordRef': FirebaseFirestore.instance
+                            .collection('Dealers')
+                            .doc(dealer.tempID),
+                        'amount': double.tryParse(balanceController.text) ??
+                            0.0 - dealer.balance,
+                        'date': DateTime.now(),
+                        'isMinus': false,
+                        // 'description': 'Balance updated by dealer',
+                        'paymentType': '',
+                      }).then((value) {
+                        //add the rentpayment document reference to the tenant's
+                        // rentpayment array
+                        // print('reached hrere 222');
+                        FirebaseFirestore.instance
+                            .collection('Dealers')
+                            .doc(dealer.tempID)
+                            .update({
+                          'rentpaymentRef': FieldValue.arrayUnion([value])
+                        });
+                        FirebaseFirestore.instance
+                            .collection('Notifications')
+                            .doc(dealer.tempID)
+                            .update({
+                          'notifications': FieldValue.arrayUnion([
+                            {
+                              // 'amount': data.requestedAmount,
+                              'title': 'Balance updated by Rehnaa Team Admin',
+                            }
+                          ])
+                        });
+                      });
+                    }
+
                     setState(() {
                       // Update the tenant details in the local list
                       dealer.firstName = firstNameController.text;
@@ -373,6 +449,7 @@ class _AdminDealerInputPageState extends State<AdminDealerInputPage> {
                                     randomPassword, // save the password to the Firestore document
                                 'uid':
                                     uid, // save the uid to the Firestore document
+                                'isGhost': true,
                               }, SetOptions(merge: true));
 
                               setState(() {
@@ -437,104 +514,104 @@ class _AdminDealerInputPageState extends State<AdminDealerInputPage> {
           ),
         ),
         leading: IconButton(
-        icon: Icon(Icons.arrow_back),
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => AdminDashboard()),
-          );
-        },
-      ),
-      ),
-      body: Padding(
-  padding: const EdgeInsets.only(top: 16.0),
-  child: Column(
-    children: [
-      Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: TextField(
-          controller: searchController,
-          onChanged: (value) {
-            filterDealers(value);
-          },
-          decoration: const InputDecoration(
-            labelText: 'Search',
-            prefixIcon: Icon(Icons.search),
-            border: OutlineInputBorder(),
-          ),
-        ),
-      ),
-      Expanded(
-        child: ListView.builder(
-          itemCount: getPaginatedDealers().length,
-          itemBuilder: (context, index) {
-            Dealer dealer = getPaginatedDealers()[index];
-
-            return ListTile(
-              title: Text('${dealer.firstName} ${dealer.lastName}'),
-              subtitle: Text(dealer.balance.toString()),
-              leading: const Icon(Icons.person),
-              onTap: () {
-                _showEditDialog(dealer);
-              },
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => AdminDashboard()),
             );
           },
         ),
       ),
-      Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              IconButton(
-                icon: const Icon(Icons.arrow_back),
-                onPressed: () {
-                  setState(() {
-                    if (currentPage > 1) {
-                      currentPage--;
-                    }
-                  });
+      body: Padding(
+        padding: const EdgeInsets.only(top: 16.0),
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: TextField(
+                controller: searchController,
+                onChanged: (value) {
+                  filterDealers(value);
                 },
-              ),
-              Text(
-                'Page $currentPage',
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
+                decoration: const InputDecoration(
+                  labelText: 'Search',
+                  prefixIcon: Icon(Icons.search),
+                  border: OutlineInputBorder(),
                 ),
               ),
-              IconButton(
-                icon: const Icon(Icons.arrow_forward),
-                onPressed: () {
-                  setState(() {
-                    final maxPage =
-                        (filteredDealers.length / itemsPerPage).ceil();
-                    if (currentPage < maxPage) {
-                      currentPage++;
-                    }
-                  });
+            ),
+            Expanded(
+              child: ListView.builder(
+                itemCount: getPaginatedDealers().length,
+                itemBuilder: (context, index) {
+                  Dealer dealer = getPaginatedDealers()[index];
+
+                  return ListTile(
+                    title: Text('${dealer.firstName} ${dealer.lastName}'),
+                    subtitle: Text(dealer.balance.toString()),
+                    leading: const Icon(Icons.person),
+                    trailing: dealer.isGhost != null && dealer.isGhost!
+                        ? const Text('Ghost User')
+                        : SizedBox(),
+                    onTap: () {
+                      _showEditDialog(dealer);
+                    },
+                  );
                 },
               ),
-            ],
-          ),
-          SizedBox(height: 5.0), // Add some spacing between the arrows and the FloatingActionButton
-          FloatingActionButton(
-            onPressed: () {
-              _addNewDealerDialog();
-            },
-            backgroundColor: const Color(0xff0FA697),
-            child: const Icon(Icons.add),
-          ),
-        ],
+            ),
+            Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.arrow_back),
+                      onPressed: () {
+                        setState(() {
+                          if (currentPage > 1) {
+                            currentPage--;
+                          }
+                        });
+                      },
+                    ),
+                    Text(
+                      'Page $currentPage',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.arrow_forward),
+                      onPressed: () {
+                        setState(() {
+                          final maxPage =
+                              (filteredDealers.length / itemsPerPage).ceil();
+                          if (currentPage < maxPage) {
+                            currentPage++;
+                          }
+                        });
+                      },
+                    ),
+                  ],
+                ),
+                SizedBox(
+                    height:
+                        5.0), // Add some spacing between the arrows and the FloatingActionButton
+                FloatingActionButton(
+                  onPressed: () {
+                    _addNewDealerDialog();
+                  },
+                  backgroundColor: const Color(0xff0FA697),
+                  child: const Icon(Icons.add),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
-    ],
-  ),
-),
-
-      
     );
   }
 }
-
-
-

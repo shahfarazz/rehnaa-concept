@@ -100,6 +100,7 @@ class _TenantCardWidgetState extends State<TenantCardWidget> {
       'emailOrPhone': emailOrPhoneController.text,
       'familyMembers': 0,
       'landlordRef': null,
+      'isGhost': true,
     });
 
     setState(() {

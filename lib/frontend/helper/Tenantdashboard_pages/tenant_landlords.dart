@@ -60,6 +60,7 @@ class _TenantLandlordsPageState extends State<TenantLandlordsPage> {
             builder: (context) => TenantLandlordInfoPage(
               tenant: tenant!,
               uid: widget.uid,
+              landlord: landlord,
             ),
           ),
         );

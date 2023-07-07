@@ -3,14 +3,19 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 // import 'package:rehnaa/backend/services/helperfunctions.dart';
 // import '../../../backend/models/landlordmodel.dart';
+import '../../../backend/models/landlordmodel.dart';
 import '../../../backend/models/tenantsmodel.dart';
 
 class TenantLandlordInfoPage extends StatelessWidget {
   final Tenant tenant;
   final String uid;
+  final Landlord landlord;
 
   const TenantLandlordInfoPage(
-      {Key? key, required this.tenant, required this.uid})
+      {Key? key,
+      required this.tenant,
+      required this.uid,
+      required this.landlord})
       : super(key: key);
 
   @override
@@ -163,57 +168,57 @@ class TenantLandlordInfoPage extends StatelessWidget {
                           ),
 
                           const SizedBox(height: 10.0),
-                          tenant.contractStartDate != ''
+                          landlord.contractStartDate != ''
                               ? Center(
                                   child: WhiteBox(
                                     icon: Icons.numbers,
                                     iconColor: const Color(0xff33907c),
                                     label: 'Contract Start Date',
-                                    value: tenant.contractStartDate!,
+                                    value: landlord.contractStartDate!,
                                   ),
                                 )
                               : const SizedBox.shrink(),
                           const SizedBox(height: 10.0),
-                          tenant.contractEndDate != ''
+                          landlord.contractEndDate != ''
                               ? Center(
                                   child: WhiteBox(
                                     icon: Icons.numbers,
                                     iconColor: const Color(0xff33907c),
                                     label: 'Contract End Date',
-                                    value: tenant.contractEndDate!,
+                                    value: landlord.contractEndDate!,
                                   ),
                                 )
                               : const SizedBox.shrink(),
                           const SizedBox(height: 10.0),
-                          tenant.propertyAddress != ''
+                          landlord.property[0].address != ''
                               ? Center(
                                   child: WhiteBox(
                                     icon: Icons.home,
                                     iconColor: const Color(0xff33907c),
                                     label: 'Property Address',
-                                    value: tenant.propertyAddress!,
+                                    value: landlord.property[0].address,
                                   ),
                                 )
                               : const SizedBox.shrink(),
                           const SizedBox(height: 10.0),
-                          tenant.upfrontBonus != ''
+                          landlord.upfrontBonus != ''
                               ? Center(
                                   child: WhiteBox(
                                     icon: Icons.money,
                                     iconColor: const Color(0xff33907c),
                                     label: 'Upfront Bonus',
-                                    value: tenant.upfrontBonus!,
+                                    value: landlord.upfrontBonus!,
                                   ),
                                 )
                               : const SizedBox.shrink(),
                           const SizedBox(height: 10.0),
-                          tenant.monthlyProfit != ''
+                          landlord.monthlyProfit != ''
                               ? Center(
                                   child: WhiteBox(
                                     icon: Icons.money,
                                     iconColor: const Color(0xff33907c),
                                     label: 'Monthly Profit',
-                                    value: tenant.monthlyProfit!,
+                                    value: landlord.monthlyProfit!,
                                   ),
                                 )
                               : const SizedBox.shrink(),

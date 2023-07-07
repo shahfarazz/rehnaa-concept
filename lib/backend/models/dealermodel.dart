@@ -11,6 +11,7 @@ class Dealer {
 
   final List<DocumentReference<Map<String, dynamic>>>? landlordRef;
   Map<String, Map<String, dynamic>>? landlordMap;
+  bool? isGhost;
 
   Dealer(
       {required this.firstName,
@@ -21,7 +22,8 @@ class Dealer {
       this.tempID,
       this.agencyName,
       this.agencyAddress,
-      this.landlordMap});
+      this.landlordMap,
+      this.isGhost});
 
   factory Dealer.fromJson(Map<String, dynamic> json) {
     return Dealer(
@@ -39,6 +41,7 @@ class Dealer {
       landlordMap: json['landlordMap'] != null
           ? Map<String, Map<String, dynamic>>.from(json['landlordMap'])
           : null,
+      isGhost: json['isGhost'] ?? false,
     );
   }
 

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:rehnaa/frontend/helper/Dealerdashboard_pages/landlordonboardedinfo.dart';
 
+import '../../../backend/models/dealermodel.dart';
 import '../../../backend/models/landlordmodel.dart';
 
 class DealerLandlordOnboardedPage extends StatefulWidget {
@@ -18,6 +19,7 @@ class DealerLandlordOnboardedPage extends StatefulWidget {
 class _DealerLandlordOnboardedPageState
     extends State<DealerLandlordOnboardedPage> {
   List<Landlord> landlords = [];
+  Dealer? dealer;
 
   bool isLoading = true;
 
@@ -32,6 +34,7 @@ class _DealerLandlordOnboardedPageState
       Map<String, dynamic>? data = documentSnapshot.data()!;
       // print('data: ${data['landlordRef'][0].id}');
       List<dynamic> landlordRef = data['landlordRef'];
+      dealer = Dealer.fromJson(data);
 
       List<Landlord> landlordList = [];
 
@@ -40,6 +43,7 @@ class _DealerLandlordOnboardedPageState
         DocumentSnapshot<Map<String, dynamic>> documentSnapshot =
             await landlordID.get();
         Landlord landlord = Landlord.fromJson(documentSnapshot.data());
+        landlord.tempID = documentSnapshot.id;
         landlordList.add(landlord);
       }
 
@@ -214,6 +218,7 @@ class _DealerLandlordOnboardedPageState
                                     builder: (context) =>
                                         LandlordsOnboardedInfoPage(
                                       landlord: landlord,
+                                      dealer: dealer!,
                                     ),
                                   ),
                                 );

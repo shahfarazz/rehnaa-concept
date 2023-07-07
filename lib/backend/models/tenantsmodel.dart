@@ -4,16 +4,16 @@ import 'package:rehnaa/backend/models/landlordmodel.dart';
 class Tenant {
   String firstName;
   String lastName;
-  String description;
+  String? description;
   num rating;
   num balance;
-  num creditPoints;
+  num? creditPoints;
   //  String propertyDetails;
-  String cnicNumber;
-  String emailOrPhone;
-  bool tasdeeqVerification;
-  bool policeVerification;
-  num familyMembers;
+  String? cnicNumber;
+  String? emailOrPhone;
+  bool? tasdeeqVerification;
+  bool? policeVerification;
+  num? familyMembers;
   DocumentReference<Map<String, dynamic>>? landlordRef;
   DocumentReference<Map<String, dynamic>>? propertyRef;
   List<DocumentReference<Map<String, dynamic>>>? rentpaymentRef;
@@ -31,6 +31,7 @@ class Tenant {
   // ignore: prefer_typing_uninitialized_variables
   var monthlyProfit;
   var discount;
+  bool? isGhost;
 
   Tenant({
     required this.firstName,
@@ -60,6 +61,7 @@ class Tenant {
     this.upfrontBonus,
     this.monthlyProfit,
     this.discount,
+    this.isGhost,
   });
 
   factory Tenant.fromJson(Map<String, dynamic> json) {
@@ -73,11 +75,11 @@ class Tenant {
       // propertyDetails: json['propertyDetails'] ?? 'No property details',
       cnicNumber: json['cnicNumber'] ?? 'N/A',
       emailOrPhone: json['emailOrPhone'] ?? 'N/A',
-      tasdeeqVerification: json['tasdeeqVerification'] ?? false,
+      tasdeeqVerification: json['tasdeeqVerification'] ?? null,
       familyMembers: json['familyMembers'] ?? 0,
       landlordRef: json['landlordRef'],
       pathToImage: json['pathToImage'] ?? 'assets/defaultimage.png',
-      policeVerification: json['policeVerification'] ?? false,
+      policeVerification: json['policeVerification'] ?? null,
       dateJoined: json['dateJoined'],
       rentpaymentRef: json['rentpaymentRef'] != null
           ? List<DocumentReference<Map<String, dynamic>>>.from(
@@ -91,6 +93,7 @@ class Tenant {
       upfrontBonus: json['upfrontBonus'] ?? '',
       monthlyProfit: json['monthlyProfit'] ?? '',
       discount: json['discount'] ?? 0.24234234,
+      isGhost: json['isGhost'] ?? false,
     );
   }
 
@@ -117,7 +120,9 @@ class Tenant {
     if (landlordRef != null) {
       DocumentSnapshot<Map<String, dynamic>> snapshot =
           await landlordRef!.get();
+
       landlord = Landlord.fromJson(snapshot.data());
+      landlord?.tempID = snapshot.id;
       return landlord;
     }
     return null;

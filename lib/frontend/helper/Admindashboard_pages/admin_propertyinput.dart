@@ -612,7 +612,8 @@ class _PropertyCardWidgetState extends State<PropertyCardWidget> {
                   style: const TextStyle(color: Colors.red),
                 ),
               TextField(
-                decoration: const InputDecoration(labelText: 'Tenant Review'),
+                decoration:
+                    const InputDecoration(labelText: 'Past Tenant Review'),
                 onChanged: (value) {
                   setState(() {
                     tenantReview = value;
@@ -900,7 +901,7 @@ class _PropertyCardWidgetState extends State<PropertyCardWidget> {
 
     if (tenantReview.isEmpty) {
       setState(() {
-        tenantReviewError = 'Tenant Review is required.';
+        tenantReviewError = 'Past Tenant Review is required.';
         isValid = false;
       });
     } else {

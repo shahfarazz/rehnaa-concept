@@ -303,6 +303,7 @@ class _AdminRequestsPageState extends State<AdminRequestsPage> {
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     itemCount: getPaginatedRequests().length,
+                    reverse: true,
                     itemBuilder: (context, index) {
                       final request = getPaginatedRequests()[index];
                       return LandlordWithdrawalCard(data: request);

@@ -29,6 +29,16 @@ class _AdminEstampsEditorPageState extends State<AdminEstampsEditorPage> {
   TextEditingController eStampDeliveredDateController = TextEditingController();
   TextEditingController eStampPoliceVerificationController =
       TextEditingController();
+  TextEditingController eStampContractStartDateController =
+      TextEditingController();
+  TextEditingController eStampContractEndDateController =
+      TextEditingController();
+  TextEditingController eStampPropertyAddressController =
+      TextEditingController();
+  TextEditingController eStampPropertyRentAmountController =
+      TextEditingController();
+  TextEditingController eStampUpfrontBonusController = TextEditingController();
+  TextEditingController eStampMonthlyProfitController = TextEditingController();
 
   @override
   void initState() {
@@ -42,15 +52,28 @@ class _AdminEstampsEditorPageState extends State<AdminEstampsEditorPage> {
       Map<String, dynamic>? landlordData = landlordMap[widget.landlord.tempID];
       if (landlordData != null) {
         setState(() {
-          eStampAddressController.text = landlordData['eStampAddress'];
-          eStampDateController.text = landlordData['eStampDate'];
-          eStampChargesController.text = landlordData['eStampCharges'];
-          eStampTenantNameController.text = landlordData['eStampTenantName'];
-          eStampValueController.text = landlordData['eStampValue'];
+          eStampAddressController.text = landlordData['eStampAddress'] ?? '';
+          eStampDateController.text = landlordData['eStampDate'] ?? '';
+          eStampChargesController.text = landlordData['eStampCharges'] ?? '';
+          eStampTenantNameController.text =
+              landlordData['eStampTenantName'] ?? '';
+          eStampValueController.text = landlordData['eStampValue'] ?? '';
           eStampDeliveredDateController.text =
-              landlordData['eStampDeliveredDate'];
+              landlordData['eStampDeliveredDate'] ?? '';
           eStampPoliceVerificationController.text =
-              landlordData['eStampPoliceVerification'];
+              landlordData['eStampPoliceVerification'] ?? '';
+          eStampContractStartDateController.text =
+              landlordData['eStampContractStartDate'] ?? '';
+          eStampContractEndDateController.text =
+              landlordData['eStampContractEndDate'] ?? '';
+          eStampPropertyAddressController.text =
+              landlordData['eStampPropertyAddress'] ?? '';
+          eStampPropertyRentAmountController.text =
+              landlordData['eStampPropertyRentAmount'] ?? '';
+          eStampUpfrontBonusController.text =
+              landlordData['eStampUpfrontBonus'] ?? '';
+          eStampMonthlyProfitController.text =
+              landlordData['eStampMonthlyProfit'] ?? '';
         });
       }
     }
@@ -67,6 +90,12 @@ class _AdminEstampsEditorPageState extends State<AdminEstampsEditorPage> {
       'eStampValue': eStampValueController.text,
       'eStampDeliveredDate': eStampDeliveredDateController.text,
       'eStampPoliceVerification': eStampPoliceVerificationController.text,
+      'eStampContractStartDate': eStampContractStartDateController.text,
+      'eStampContractEndDate': eStampContractEndDateController.text,
+      'eStampPropertyAddress': eStampPropertyAddressController.text,
+      'eStampPropertyRentAmount': eStampPropertyRentAmountController.text,
+      'eStampUpfrontBonus': eStampUpfrontBonusController.text,
+      'eStampMonthlyProfit': eStampMonthlyProfitController.text,
     };
 
     Map<String, Map<String, dynamic>> updatedLandlordMap = {
@@ -100,107 +129,162 @@ class _AdminEstampsEditorPageState extends State<AdminEstampsEditorPage> {
     print('reached herer with dealer  ${dealer.tempID}');
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Admin Estamps Editor'),
-        leading: IconButton(
-            icon: Icon(Icons.arrow_back),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => AdminDashboard()),
-              );
-            }),
-        flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Color(0xff0FA697),
-                Color(0xff45BF7A),
-                Color(0xff0DF205),
-              ],
+        appBar: AppBar(
+          title: const Text('Admin Estamps Editor'),
+          leading: IconButton(
+              icon: Icon(Icons.arrow_back),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => AdminDashboard()),
+                );
+              }),
+          flexibleSpace: Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Color(0xff0FA697),
+                  Color(0xff45BF7A),
+                  Color(0xff0DF205),
+                ],
+              ),
             ),
           ),
         ),
-      ),
-      body: Padding(
-        padding: EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            TextField(
-              controller: eStampAddressController,
-              onChanged: (value) {
-                setState(() {});
-              },
-              decoration: InputDecoration(
-                labelText: 'eStamp Address',
-              ),
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: EdgeInsets.all(16.0),
+            child: Column(
+              children: [
+                TextField(
+                  controller: eStampAddressController,
+                  onChanged: (value) {
+                    setState(() {});
+                  },
+                  decoration: InputDecoration(
+                    labelText: 'eStamp Address',
+                  ),
+                ),
+                TextField(
+                  controller: eStampDateController,
+                  onChanged: (value) {
+                    setState(() {});
+                  },
+                  decoration: InputDecoration(
+                    labelText: 'eStamp Date',
+                  ),
+                ),
+                TextField(
+                  controller: eStampChargesController,
+                  onChanged: (value) {
+                    setState(() {});
+                  },
+                  decoration: InputDecoration(
+                    labelText: 'eStamp Charges',
+                  ),
+                ),
+                TextField(
+                  controller: eStampTenantNameController,
+                  onChanged: (value) {
+                    setState(() {});
+                  },
+                  decoration: InputDecoration(
+                    labelText: 'eStamp Tenant Name',
+                  ),
+                ),
+                TextField(
+                  controller: eStampValueController,
+                  onChanged: (value) {
+                    setState(() {});
+                  },
+                  decoration: InputDecoration(
+                    labelText: 'eStamp Value',
+                  ),
+                ),
+                TextField(
+                  controller: eStampDeliveredDateController,
+                  onChanged: (value) {
+                    setState(() {});
+                  },
+                  decoration: InputDecoration(
+                    labelText: 'eStamp Delivered Date',
+                  ),
+                ),
+                TextField(
+                  controller: eStampPoliceVerificationController,
+                  onChanged: (value) {
+                    setState(() {});
+                  },
+                  decoration: InputDecoration(
+                    labelText: 'eStamp Police Verification',
+                  ),
+                ),
+                TextField(
+                  controller: eStampContractStartDateController,
+                  onChanged: (value) {
+                    setState(() {});
+                  },
+                  decoration: InputDecoration(
+                    labelText: 'eStamp Contract Start Date',
+                  ),
+                ),
+                TextField(
+                  controller: eStampContractEndDateController,
+                  onChanged: (value) {
+                    setState(() {});
+                  },
+                  decoration: InputDecoration(
+                    labelText: 'eStamp Contract End Date',
+                  ),
+                ),
+                TextField(
+                  controller: eStampPropertyAddressController,
+                  onChanged: (value) {
+                    setState(() {});
+                  },
+                  decoration: InputDecoration(
+                    labelText: 'eStamp Property Address',
+                  ),
+                ),
+                TextField(
+                  controller: eStampPropertyRentAmountController,
+                  onChanged: (value) {
+                    setState(() {});
+                  },
+                  decoration: InputDecoration(
+                    labelText: 'eStamp Property Rent Amount',
+                  ),
+                ),
+                TextField(
+                  controller: eStampUpfrontBonusController,
+                  onChanged: (value) {
+                    setState(() {});
+                  },
+                  decoration: InputDecoration(
+                    labelText: 'eStamp Upfront Bonus',
+                  ),
+                ),
+                TextField(
+                  controller: eStampMonthlyProfitController,
+                  onChanged: (value) {
+                    setState(() {});
+                  },
+                  decoration: InputDecoration(
+                    labelText: 'eStamp Monthly Profit',
+                  ),
+                ),
+                SizedBox(height: 16.0),
+                ElevatedButton(
+                  onPressed: () {
+                    saveLandlordMap(dealer.tempID!);
+                  },
+                  child: Text('Save'),
+                ),
+              ],
             ),
-            TextField(
-              controller: eStampDateController,
-              onChanged: (value) {
-                setState(() {});
-              },
-              decoration: InputDecoration(
-                labelText: 'eStamp Date',
-              ),
-            ),
-            TextField(
-              controller: eStampChargesController,
-              onChanged: (value) {
-                setState(() {});
-              },
-              decoration: InputDecoration(
-                labelText: 'eStamp Charges',
-              ),
-            ),
-            TextField(
-              controller: eStampTenantNameController,
-              onChanged: (value) {
-                setState(() {});
-              },
-              decoration: InputDecoration(
-                labelText: 'eStamp Tenant Name',
-              ),
-            ),
-            TextField(
-              controller: eStampValueController,
-              onChanged: (value) {
-                setState(() {});
-              },
-              decoration: InputDecoration(
-                labelText: 'eStamp Value',
-              ),
-            ),
-            TextField(
-              controller: eStampDeliveredDateController,
-              onChanged: (value) {
-                setState(() {});
-              },
-              decoration: InputDecoration(
-                labelText: 'eStamp Delivered Date',
-              ),
-            ),
-            TextField(
-              controller: eStampPoliceVerificationController,
-              onChanged: (value) {
-                setState(() {});
-              },
-              decoration: InputDecoration(
-                labelText: 'eStamp Police Verification',
-              ),
-            ),
-            SizedBox(height: 16.0),
-            ElevatedButton(
-              onPressed: () {
-                saveLandlordMap(dealer.tempID!);
-              },
-              child: Text('Save'),
-            ),
-          ],
-        ),
-      ),
-    );
+          ),
+        ));
   }
 }

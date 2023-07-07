@@ -155,16 +155,18 @@ class RentPaymentInfoPage extends StatelessWidget {
                       // make a box where pdf will be shown
                       GestureDetector(
                           onTap: () {
-                            print('receiptUrl: $receiptUrl');
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => PDFScreen(
-                                  path: receiptUrl,
-                                  displayAppBar: true,
+                            // print('receiptUrl: $receiptUrl');
+                            if (receiptUrl != 'No pdf') {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => PDFScreen(
+                                    path: receiptUrl,
+                                    displayAppBar: true,
+                                  ),
                                 ),
-                              ),
-                            );
+                              );
+                            }
                           },
                           child: Center(
                             child: WhiteBox(

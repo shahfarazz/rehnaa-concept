@@ -28,7 +28,10 @@ class Landlord {
   String? rating;
   String? contractStartDate;
   String? contractEndDate;
-  String? monthlyRent;
+  var monthlyRent;
+  var upfrontBonus;
+  var monthlyProfit;
+  bool? isGhost;
 
   Landlord({
     required this.firstName,
@@ -55,6 +58,9 @@ class Landlord {
     this.contractStartDate,
     this.contractEndDate,
     this.monthlyRent,
+    this.upfrontBonus,
+    this.monthlyProfit,
+    this.isGhost,
   });
 
   static Landlord fromJson(Map<String, dynamic>? json) {
@@ -86,6 +92,9 @@ class Landlord {
       contractStartDate: json['contractStartDate'] ?? '',
       contractEndDate: json['contractEndDate'] ?? '',
       monthlyRent: json['monthlyRent'] ?? '',
+      upfrontBonus: json['upfrontBonus'] ?? '',
+      monthlyProfit: json['monthlyProfit'] ?? '',
+      isGhost: json['isGhost'] ?? false,
     );
 
     // await landlord.fetchData();

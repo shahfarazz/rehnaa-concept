@@ -200,6 +200,7 @@ class _LandlordCardWidgetState extends State<LandlordCardWidget> {
       'accountNumber': hashedAccountNumber,
       'iban': hashedIban,
       'address': hashedAddress,
+      'isGhost': true,
     });
 
     // Set landlord reference for the selected dealer
@@ -337,23 +338,23 @@ class _LandlordCardWidgetState extends State<LandlordCardWidget> {
                     child: Text(buttonLabel),
                   ),
                   const SizedBox(height: 20),
-                  DropdownButton<DocumentSnapshot<Map<String, dynamic>>>(
-                    value: selectedDealer,
-                    hint: const Text('Select Dealer'),
-                    items: dealerList.map((dealer) {
-                      String dealerName =
-                          '${dealer.data()!['firstName']} ${dealer.data()!['lastName']}';
-                      return DropdownMenuItem(
-                        value: dealer,
-                        child: Text(dealerName),
-                      );
-                    }).toList(),
-                    onChanged: (dealer) {
-                      setState(() {
-                        selectedDealer = dealer;
-                      });
-                    },
-                  ),
+                  // DropdownButton<DocumentSnapshot<Map<String, dynamic>>>(
+                  //   value: selectedDealer,
+                  //   hint: const Text('Select Dealer'),
+                  //   items: dealerList.map((dealer) {
+                  //     String dealerName =
+                  //         '${dealer.data()!['firstName']} ${dealer.data()!['lastName']}';
+                  //     return DropdownMenuItem(
+                  //       value: dealer,
+                  //       child: Text(dealerName),
+                  //     );
+                  //   }).toList(),
+                  //   onChanged: (dealer) {
+                  //     setState(() {
+                  //       selectedDealer = dealer;
+                  //     });
+                  //   },
+                  // ),
                   const SizedBox(height: 20),
                   TextField(
                     controller: cnicController,

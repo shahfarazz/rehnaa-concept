@@ -34,7 +34,7 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
   String invoiceNumber = '';
   String pdfUrl = '';
   Timer? _timer;
-  bool isWithdrawType = false;
+  bool isMinus = false;
 
   @override
   bool get wantKeepAlive => true;
@@ -113,13 +113,23 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
           // print('rentpayment ref is $rentPaymentRef')
           // print('rentpayment found and is ${data}');
 
-          rentPayment.pdfUrl = await FirebaseFirestore.instance
-              .collection('invoices')
-              .doc(rentPayment.invoiceNumber)
-              .get()
-              .then((value) => value.data()!['url']);
-          isWithdrawType =
-              data['landlordRef'] != null || data['dealerRef'] != null;
+          // if(rentPayment.pdfUrl != null){
+
+          // }
+
+          if (rentPayment.isMinus != null) {
+            // print('idher rehnaa');
+            isMinus = rentPayment.isMinus!;
+          } else {
+            rentPayment.isMinus =
+                data['landlordRef'] != null || data['dealerRef'] != null;
+            // print('bhai idher mat ajanan');
+            rentPayment.pdfUrl = await FirebaseFirestore.instance
+                .collection('invoices')
+                .doc(rentPayment.invoiceNumber)
+                .get()
+                .then((value) => value.data()!['url']);
+          }
 
           // if (widget.callerType == 'Landlords') {
           //   // firstName = data['tenantname'] ?? 'Old doc no tenantname';
@@ -207,10 +217,12 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
               builder: (context) => RentPaymentInfoPage(
                 rentPayment: rentPayment,
                 firstName: widget.callerType == 'Tenants'
-                    ? firstName
+                    ? rentPayment.tenantname == 'Old document'
+                        ? firstName
+                        : rentPayment.tenantname!
                     : rentPayment.tenantname!,
                 lastName: lastName,
-                receiptUrl: rentPayment.pdfUrl!,
+                receiptUrl: rentPayment.pdfUrl ?? 'No pdf',
               ),
             ),
           );
@@ -245,7 +257,9 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
                         children: [
                           Text(
                             widget.callerType == 'Tenants'
-                                ? '$firstName $lastName'
+                                ? rentPayment.tenantname == 'Old document'
+                                    ? '$firstName $lastName'
+                                    : rentPayment.tenantname!
                                 : rentPayment.tenantname!,
                             style: GoogleFonts.montserrat(
                               fontSize: size.width * 0.04,
@@ -290,7 +304,7 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Text(
-                              isWithdrawType ? '-' : '+',
+                              rentPayment.isMinus! ? '-' : '+',
                               style: GoogleFonts.montserrat(
                                 fontSize: size.width * 0.04,
                                 fontWeight: FontWeight.bold,

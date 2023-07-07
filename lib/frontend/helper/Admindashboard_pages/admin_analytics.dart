@@ -178,7 +178,7 @@ class _AdminAnalyticsPageState extends State<AdminAnalyticsPage> {
                       ),
                       SizedBox(
                           height: 200,
-                          width: 400,
+                          width: 1000,
                           child: MyBarGraph(xyValues: locationAnalytics))
                     ],
                   );

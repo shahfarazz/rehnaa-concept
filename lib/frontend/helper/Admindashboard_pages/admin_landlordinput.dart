@@ -37,6 +37,7 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
 
   List<DocumentReference<Map<String, dynamic>>> selectedTenants = [];
   List<DocumentReference<Map<String, dynamic>>> selectedRentPayments = [];
+  List<DocumentReference<Map<String, dynamic>>> selectedDealers = [];
 
   @override
   void initState() {
@@ -214,6 +215,7 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
     selectedProperties = List.from(landlord.propertyRef ?? []);
     selectedTenants = List.from(landlord.tenantRef ?? []);
     selectedRentPayments = List.from(landlord.rentpaymentRef ?? []);
+    selectedDealers = List.from(landlord.dealerRef ?? []);
 
     final TextEditingController dealerRefController =
         TextEditingController(text: landlord.dealerRef?.toString() ?? '');
@@ -235,6 +237,19 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
     final hashedRaastId = encryptString(raastIdController.text);
     final hashedAccountNumber = encryptString(accountNumberController.text);
     final hashedIban = encryptString(ibanController.text);
+
+    final TextEditingController contractStartDateController =
+        TextEditingController(
+            text: landlord.contractStartDate?.toString() ?? '');
+    final TextEditingController contractEndDateController =
+        TextEditingController(text: landlord.contractEndDate?.toString() ?? '');
+    final TextEditingController monthlyRentController =
+        TextEditingController(text: landlord.monthlyRent?.toString() ?? '');
+    final TextEditingController upfrontBonusController =
+        TextEditingController(text: landlord.upfrontBonus?.toString() ?? '');
+
+    final TextEditingController monthlyProfitController =
+        TextEditingController(text: landlord.monthlyProfit?.toString() ?? '');
 
     showDialog(
       context: context,
@@ -323,14 +338,34 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
                     );
                   },
                 ),
-                const SizedBox(height: 20),
-                Visibility(
-                  visible: landlord.dealerRef != null,
-                  child: TextField(
-                    controller: dealerRefController,
-                    decoration: const InputDecoration(labelText: 'Dealer Ref'),
-                  ),
+                StatefulBuilder(
+                  builder: (BuildContext context, StateSetter setState) {
+                    return ListTile(
+                      title: const Text('Select Dealers'),
+                      subtitle: Text(
+                        selectedDealers.length.toString() + ' dealers selected',
+                      ),
+                      onTap: () {
+                        setState(() {
+                          _showDealerSelectionDialog(() {
+                            setState(() {
+                              // Update the state of selectedDealers here
+                              // print('selectedDealers: $selectedDealers');
+                            });
+                          });
+                        });
+                      },
+                    );
+                  },
                 ),
+                const SizedBox(height: 20),
+                // Visibility(
+                //   visible: landlord.dealerRef != null,
+                //   child: TextField(
+                //     controller: dealerRefController,
+                //     decoration: const InputDecoration(labelText: 'Dealer Ref'),
+                //   ),
+                // ),
                 TextField(
                   controller: cnicController,
                   decoration: const InputDecoration(labelText: 'CNIC'),
@@ -356,6 +391,29 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
                   controller: ibanController,
                   decoration: const InputDecoration(labelText: 'IBAN'),
                 ),
+                TextField(
+                  controller: contractStartDateController,
+                  decoration:
+                      const InputDecoration(labelText: 'Contract Start Date'),
+                ),
+                TextField(
+                  controller: contractEndDateController,
+                  decoration:
+                      const InputDecoration(labelText: 'Contract End Date'),
+                ),
+                TextField(
+                  controller: monthlyRentController,
+                  decoration: const InputDecoration(labelText: 'Monthly Rent'),
+                ),
+                TextField(
+                  controller: upfrontBonusController,
+                  decoration: const InputDecoration(labelText: 'Upfront Bonus'),
+                ),
+                TextField(
+                  controller: monthlyProfitController,
+                  decoration:
+                      const InputDecoration(labelText: 'Monthly Profit'),
+                ),
                 const SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: () async {
@@ -373,9 +431,7 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
                       'propertyRef': selectedProperties,
                       'tenantRef': selectedTenants,
                       'rentpaymentRef': selectedRentPayments,
-                      'dealerRef': dealerRefController.text.isNotEmpty
-                          ? dealerRefController.text
-                          : FieldValue.delete(),
+                      'dealerRef': selectedDealers,
                       'cnic': cnicController.text.isNotEmpty
                           ? encryptString(cnicController.text)
                           : FieldValue.delete(),
@@ -394,7 +450,107 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
                       'address': addressController.text.isNotEmpty
                           ? encryptString(addressController.text)
                           : FieldValue.delete(),
-                    }, SetOptions(merge: true)).then((_) {
+                      'contractStartDate':
+                          contractStartDateController.text.isNotEmpty &&
+                                  contractStartDateController.text != 'null'
+                              ? contractStartDateController.text
+                              : FieldValue.delete(),
+                      'contractEndDate':
+                          contractEndDateController.text.isNotEmpty &&
+                                  contractEndDateController.text != 'null'
+                              ? contractEndDateController.text
+                              : FieldValue.delete(),
+                      'monthlyRent': monthlyRentController.text.isNotEmpty
+                          ? monthlyRentController.text ?? 0.0
+                          : FieldValue.delete(),
+                      'upfrontBonus': upfrontBonusController.text.isNotEmpty
+                          ? upfrontBonusController.text ?? 0.0
+                          : FieldValue.delete(),
+                      'monthlyProfit': monthlyProfitController.text.isNotEmpty
+                          ? monthlyProfitController.text ?? 0.0
+                          : FieldValue.delete(),
+                    }, SetOptions(merge: true)).then((_) async {
+                      if (landlord.balance >
+                          (double.tryParse(balanceController.text) ?? 0.0)) {
+                        await FirebaseFirestore.instance
+                            .collection('rentPayments')
+                            .add({
+                          'tenantname': 'Rehnaa App',
+                          'LandlordRef': FirebaseFirestore.instance
+                              .collection('Landlords')
+                              .doc(landlord.tempID),
+                          'amount': -(double.tryParse(balanceController.text) ??
+                                  0.0) +
+                              landlord.balance,
+                          'date': DateTime.now(),
+                          'isMinus': true,
+                          // 'description': 'Balance updated by landlord',
+                          'paymentType': '',
+                        }).then((value) {
+                          //add the rentpayment document reference to the tenant's
+                          // rentpayment array
+                          FirebaseFirestore.instance
+                              .collection('Landlords')
+                              .doc(landlord.tempID)
+                              .update({
+                            'rentpaymentRef': FieldValue.arrayUnion([value])
+                          });
+
+                          //send a notification to the Landlord
+
+                          FirebaseFirestore.instance
+                              .collection('Notifications')
+                              .doc(landlord.tempID)
+                              .update({
+                            'notifications': FieldValue.arrayUnion([
+                              {
+                                // 'amount': data.requestedAmount,
+                                'title': 'Balance updated by Rehnaa Team Admin',
+                              }
+                            ])
+                          });
+                        });
+                      } else if (landlord.balance <
+                          (double.tryParse(balanceController.text) ?? 0.0)) {
+                        await FirebaseFirestore.instance
+                            .collection('rentPayments')
+                            .add({
+                          'tenantname': 'Rehnaa App',
+                          'LandlordRef': FirebaseFirestore.instance
+                              .collection('Landlords')
+                              .doc(landlord.tempID),
+                          'amount': ((double.tryParse(balanceController.text) ??
+                                  0.0) -
+                              landlord.balance),
+                          'date': DateTime.now(),
+                          'isMinus': false,
+                          // 'description': 'Balance updated by landlord',
+                          'paymentType': '',
+                        }).then((value) {
+                          //add the rentpayment document reference to the tenant's
+                          // rentpayment array
+                          // print('reached hrere 222');
+                          FirebaseFirestore.instance
+                              .collection('Landlords')
+                              .doc(landlord.tempID)
+                              .update({
+                            'rentpaymentRef': FieldValue.arrayUnion([value])
+                          });
+
+                          FirebaseFirestore.instance
+                              .collection('Notifications')
+                              .doc(landlord.tempID)
+                              .update({
+                            'notifications': FieldValue.arrayUnion([
+                              {
+                                // 'amount': data.requestedAmount,
+                                'title': 'Balance updated by Rehnaa Team Admin',
+                              }
+                            ])
+                          });
+                        });
+                      }
+
                       Fluttertoast.showToast(
                         msg: 'Landlord details updated successfully!',
                         toastLength: Toast.LENGTH_SHORT,
@@ -402,7 +558,11 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
                         backgroundColor: Colors.green,
                         textColor: Colors.white,
                       );
-                      Navigator.pop(context); // Close the edit dialog
+                      // Navigator.pop(context); // Close the edit dialog
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (context) {
+                        return AdminLandlordInputPage();
+                      }));
                     }).catchError((error) {
                       print('error is $error');
                       Fluttertoast.showToast(
@@ -656,6 +816,82 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
     );
   }
 
+  void _showDealerSelectionDialog(void Function() onSelectionDone) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Text('Select Dealers'),
+              content: SingleChildScrollView(
+                child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                  stream: FirebaseFirestore.instance
+                      .collection('Dealers')
+                      .snapshots(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      List<QueryDocumentSnapshot<Map<String, dynamic>>>
+                          dealerDocs = snapshot.data!.docs;
+                      return Column(
+                        children: dealerDocs.map((dealerDoc) {
+                          String dealerName = dealerDoc['firstName'] +
+                              ' ' +
+                              dealerDoc['lastName'];
+                          bool isSelected =
+                              selectedDealers.contains(dealerDoc.reference);
+                          return CheckboxListTile(
+                            title: Text(dealerName),
+                            value: isSelected,
+                            onChanged: (value) {
+                              setState(() {
+                                if (value == true) {
+                                  if (!selectedDealers
+                                      .contains(dealerDoc.reference)) {
+                                    selectedDealers.add(dealerDoc.reference);
+                                  }
+                                } else {
+                                  selectedDealers.remove(dealerDoc.reference);
+                                }
+                              });
+                            },
+                          );
+                        }).toList(),
+                      );
+                    } else {
+                      return Container(
+                          padding: EdgeInsets.only(left: 150.0),
+                          child: CircularProgressIndicator());
+                    }
+                  },
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context); // Close the dialog
+                  },
+                  child: const Text('Cancel'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    onSelectionDone();
+
+                    Navigator.pop(
+                      context,
+                      List.from(selectedDealers),
+                    ); // Pass selected dealers back to the caller
+                  },
+                  child: const Text('Done'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -712,6 +948,9 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
                     title: Text('${landlord.firstName} ${landlord.lastName}'),
                     subtitle: Text(landlord.balance.toString()),
                     leading: const Icon(Icons.person),
+                    trailing: landlord.isGhost != null && landlord.isGhost!
+                        ? const Text('Ghost User')
+                        : SizedBox(),
                     onTap: () => openLandlordDetailsDialog(landlord),
                   );
                 },
