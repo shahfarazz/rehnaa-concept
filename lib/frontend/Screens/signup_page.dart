@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:crypto/crypto.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -328,8 +329,8 @@ class _SignUpPageState extends State<SignUpPage> {
               SizedBox(height: MediaQuery.of(context).size.height * 0.02),
               buildSignInText(),
               if (isLoading)
-                const CircularProgressIndicator(
-                  color: Colors.green,
+                const SpinKitFadingCube(
+                  color: Color.fromARGB(255, 30, 197, 83),
                 ),
               const SizedBox(height: 50.0),
             ],

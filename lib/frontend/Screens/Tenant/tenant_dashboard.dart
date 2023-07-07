@@ -567,7 +567,9 @@ class _DashboardPageState extends State<TenantDashboardPage>
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => TenantMonthlyRentOffPage(),
+                            builder: (context) => TenantMonthlyRentOffPage(
+                              uid: widget.uid,
+                            ),
                           ),
                         );
                         // _closeSidebar();

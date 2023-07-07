@@ -1,21 +1,33 @@
 import 'dart:math';
 
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:confetti/confetti.dart';
 
+import '../../../backend/models/tenantsmodel.dart';
+
 class TenantMonthlyRentOffPage extends StatefulWidget {
+  final String uid;
+  const TenantMonthlyRentOffPage({Key? key, required this.uid})
+      : super(key: key);
   @override
   _TenantMonthlyRentOffPageState createState() =>
       _TenantMonthlyRentOffPageState();
 }
 
 class _TenantMonthlyRentOffPageState extends State<TenantMonthlyRentOffPage>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   late ConfettiController _confettiController;
   late AnimationController _animationController;
   double _currentRotation = 0;
   bool _animationFinished = false; // New state variable
+  bool _isPageVisible = false;
+  bool _isContentDimensionsEstablished = false;
+  bool _isPageReady = false;
+
   final PageController _pageController = PageController();
   final List<String> _userImages = const [
     'assets/defaulticon.png',
@@ -25,6 +37,29 @@ class _TenantMonthlyRentOffPageState extends State<TenantMonthlyRentOffPage>
     'assets/image2.jpg'
     // Add more user images...
   ];
+
+  List<Tenant> winnerTenants = [];
+
+  Future<List<Tenant>> fetchWinnerTenants() async {
+    if (winnerTenants.length > 0) {
+      return winnerTenants;
+    }
+
+    var value = await FirebaseFirestore.instance.collection('Tenants').get();
+
+    for (var element in value.docs) {
+      // print('did this');
+      // print(element.data());
+      if (element.data()['isRentOffWinner'] == true) {
+        // print(element.data());
+        Tenant tempWinner = Tenant.fromJson(element.data());
+        tempWinner.tempID = element.id;
+        // tempWinner.pathToImage = 'assets/defaulticon.png';
+        winnerTenants.add(tempWinner);
+      }
+    }
+    return winnerTenants;
+  }
 
   @override
   void initState() {
@@ -48,7 +83,8 @@ class _TenantMonthlyRentOffPageState extends State<TenantMonthlyRentOffPage>
         });
       }
     });
-    _animationController.forward();
+
+    // fetchWinnerTenants();
   }
 
   @override
@@ -67,255 +103,345 @@ class _TenantMonthlyRentOffPageState extends State<TenantMonthlyRentOffPage>
     _confettiController =
         ConfettiController(duration: const Duration(seconds: 5));
     _confettiController.play();
+    _animationController.reset();
+    _animationController.dispose();
+    _animationController = AnimationController(
+      duration: const Duration(seconds: 8),
+      vsync: this,
+    );
+    _animationFinished = false;
+    _animationController.forward();
+    _animationController.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        setState(() {
+          _animationFinished =
+              true; // Set the state variable when the animation finishes
+        });
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _confettiController.play();
-    });
     final Size size = MediaQuery.of(context).size;
 
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Container(
-          height: size.height * 1,
-          child: PageView.builder(
-            controller: _pageController,
-            itemCount: _userImages.length,
-            itemBuilder: (context, index) {
-              return SingleChildScrollView(
-                child: Stack(
-                  children: [
-                    Container(
-                      height: size.height * 0.5,
-                      child: ClipPath(
-                        clipper: DiagonalClipper(),
-                        child: Container(
-                          height: size.height * 0.5,
-                          decoration: const BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                              colors: [
-                                Color(0xff0FA697),
-                                Color(0xff45BF7A),
-                                Color(0xff0DF205),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      top: 65.0,
-                      left: 10.0,
-                      child: GestureDetector(
-                        onTap: () {
-                          Navigator.pop(context);
-                        },
-                        child: Container(
-                          width: 40,
-                          height: 40,
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Color(0xFF33907C),
-                            gradient: LinearGradient(
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                              colors: [
-                                Color(0xff0FA697),
-                                Color(0xff45BF7A),
-                                Color(0xff0DF205),
-                              ],
-                            ),
-                          ),
-                          child: const Icon(
-                            Icons.arrow_back,
-                            size: 20,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      top: size.height *
-                          0.4, // adjust this according to your layout
-                      right: 9,
-                      child: Icon(Icons.arrow_forward_ios, color: Colors.black),
-                    ),
-                    Positioned(
-                      top: size.height *
-                          0.4, // adjust this according to your layout
-                      right: 10.0,
-                      child: Icon(Icons.arrow_forward_ios, color: Colors.black),
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        SizedBox(height: size.height * 0.05),
-                        // Display "Monthly Rent OFF Winner" text
-                        Align(
-                          alignment: Alignment.topCenter,
-                          child: ConfettiWidget(
-                            confettiController: _confettiController,
-                            blastDirection:
-                                -1.5708, // Upward direction in radians (90 degrees)
-                            emissionFrequency: 0.05,
-                            numberOfParticles: 20,
-                            maxBlastForce: 20,
-                            minBlastForce: 10,
-                            gravity: 0.2,
-                            colors: const [
-                              Colors.green,
-                              Colors.blue,
-                              Colors.orange,
-                              Colors.yellow,
-                            ],
-                          ),
-                        ),
-                        SizedBox(height: size.height * 0.105),
+        body: SingleChildScrollView(
+      child: Container(
+        height: size.height * 1,
+        child: FutureBuilder(
+            future: fetchWinnerTenants(),
+            builder: (context, snapshot) {
+              List<Tenant> winnerTenants = snapshot.data ?? [];
 
-                        Text(
-                          'Monthly Rent OFF Winner',
-                          style: GoogleFonts.montserrat(
-                            fontSize: 22.0,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-                        SizedBox(height: size.height * 0.03),
-                        // Replace your CircleAvatar widget with the revolving images
-                        _animationFinished
-                            ? CircleAvatar(
-                                radius: size.width * 0.2,
-                                backgroundColor: Colors.white,
-                                backgroundImage:
-                                    const AssetImage('assets/defaulticon.png'),
-                              )
-                            : Transform.rotate(
-                                angle: 3.14159,
-                                child: Stack(
-                                  alignment: Alignment.center,
-                                  children: _userImages
-                                      .asMap()
-                                      .entries
-                                      .map(
-                                        (entry) => Transform(
-                                          transform: Matrix4.rotationY(
-                                                  _currentRotation) *
-                                              Matrix4.rotationZ(
-                                                  _currentRotation),
-                                          alignment: Alignment.center,
-                                          child: Transform.translate(
-                                            offset: Offset(
-                                              100 *
-                                                  cos(_currentRotation +
-                                                      (2 *
-                                                          pi *
-                                                          entry.key /
-                                                          _userImages.length)),
-                                              0.0,
-                                            ),
-                                            child: Transform.scale(
-                                              scale: _animationController.value,
-                                              child: CircleAvatar(
-                                                radius: 30.0,
-                                                backgroundColor: Colors.white,
-                                                backgroundImage:
-                                                    AssetImage(entry.value),
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      )
-                                      .toList(),
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(
+                  child: SpinKitFadingCube(
+                    color: Color.fromARGB(255, 30, 197, 83),
+                  ),
+                );
+              } else if (snapshot.hasError) {
+                return Center(child: Text('Error: ${snapshot.error}'));
+              } else if (winnerTenants.length > 0) {
+                // WidgetsBinding.instance!.addPostFrameCallback((_) {
+                //   _animationController.forward();
+                // });
+                return PageView.builder(
+                  controller: _pageController,
+                  itemCount: winnerTenants.length,
+                  // onPageChanged: (index) {
+                  //   setState(() {
+                  //     _isPageReady = false;
+                  //   });
+                  // },
+
+                  itemBuilder: (context, index) {
+                    // print('winnerTenants: ${winnerTenants.length}}');
+                    // if (!_animationFinished) {
+                    //   print('reached here');
+                    //   _animationController.forward();
+                    // }
+                    // final isCurrentPage =
+                    //     index == _pageController.page?.round();
+
+                    // _animationFinished = true;
+                    return SingleChildScrollView(
+                      child: Stack(
+                        children: [
+                          Container(
+                            height: size.height * 0.5,
+                            child: ClipPath(
+                              clipper: DiagonalClipper(),
+                              child: Container(
+                                height: size.height * 0.5,
+                                decoration: const BoxDecoration(
+                                  gradient: LinearGradient(
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                    colors: [
+                                      Color(0xff0FA697),
+                                      Color(0xff45BF7A),
+                                      Color(0xff0DF205),
+                                    ],
+                                  ),
                                 ),
                               ),
-                        SizedBox(height: size.height * 0.03),
-                        // Display dummy description
-                        Center(
-                          child: Text(
-                            'Asad Khan',
-                            textAlign: TextAlign.center,
-                            style: GoogleFonts.montserrat(
-                              fontSize: 20.0,
-                              color: const Color(0xff33907c),
-                              fontWeight: FontWeight.bold,
                             ),
                           ),
-                        ),
-                        SizedBox(height: size.height * 0.03),
-                        Padding(
-                          padding:
-                              EdgeInsets.symmetric(horizontal: size.width * 0),
-                          child: Column(
+                          Positioned(
+                            top: 65.0,
+                            left: 10.0,
+                            child: GestureDetector(
+                              onTap: () {
+                                Navigator.pop(context);
+                              },
+                              child: Container(
+                                  width: 40,
+                                  height: 40,
+                                  decoration: const BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: Color(0xFF33907C),
+                                    gradient: LinearGradient(
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
+                                      colors: [
+                                        Color(0xff0FA697),
+                                        Color(0xff45BF7A),
+                                        Color(0xff0DF205),
+                                      ],
+                                    ),
+                                  ),
+                                  child: const Icon(
+                                    Icons.arrow_back,
+                                    size: 20,
+                                    color: Colors.white,
+                                  )),
+                            ),
+                          ),
+                          Positioned(
+                              top: size.height *
+                                  0.4, // adjust this according to your layout
+                              right: 9,
+                              child: index + 1 < winnerTenants.length
+                                  ? Icon(Icons.arrow_forward_ios,
+                                      color: Colors.black)
+                                  : SizedBox.shrink()),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              SizedBox(height: size.height * 0.03),
-                              Center(
-                                child: FractionallySizedBox(
-                                  widthFactor: 0.8,
-                                  child: WhiteBox(
-                                    label: 'Credit Score',
-                                    value: '9.6',
-                                    points: '120',
-                                  ),
+                              SizedBox(height: size.height * 0.05),
+                              // Display "Monthly Rent OFF Winner" text
+                              Align(
+                                alignment: Alignment.topCenter,
+                                child: ConfettiWidget(
+                                  confettiController: _confettiController,
+                                  blastDirection:
+                                      -1.5708, // Upward direction in radians (90 degrees)
+                                  emissionFrequency: 0.05,
+                                  numberOfParticles: 20,
+                                  maxBlastForce: 20,
+                                  minBlastForce: 10,
+                                  gravity: 0.2,
+                                  colors: const [
+                                    Colors.green,
+                                    Colors.blue,
+                                    Colors.orange,
+                                    Colors.yellow,
+                                  ],
+                                ),
+                              ),
+                              SizedBox(height: size.height * 0.105),
+
+                              Text(
+                                'Monthly Rent OFF Winner',
+                                style: GoogleFonts.montserrat(
+                                  fontSize: 22.0,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
                                 ),
                               ),
                               SizedBox(height: size.height * 0.03),
+                              // Replace your CircleAvatar widget with the revolving images
+                              _animationFinished
+                                  ? CircleAvatar(
+                                      radius: size.width * 0.2,
+                                      backgroundColor: Colors.white,
+                                      backgroundImage: winnerTenants[index]
+                                              .pathToImage!
+                                              .contains('assets')
+                                          ? AssetImage(
+                                              winnerTenants[index].pathToImage!)
+                                          : CachedNetworkImageProvider(
+                                              winnerTenants[index].pathToImage!,
+                                            ) as ImageProvider,
+                                    )
+                                  : AnimatedBuilder(
+                                      animation: _animationController,
+                                      builder: (BuildContext context,
+                                          Widget? child) {
+                                        return Transform.rotate(
+                                          angle: _animationController.value *
+                                              2 *
+                                              pi,
+                                          child: Stack(
+                                            alignment: Alignment.center,
+                                            children: winnerTenants
+                                                .asMap()
+                                                .entries
+                                                .map(
+                                                  (entry) => Transform(
+                                                    transform: Matrix4.rotationY(
+                                                            _animationController
+                                                                    .value *
+                                                                2 *
+                                                                pi) *
+                                                        Matrix4.rotationZ(
+                                                            _animationController
+                                                                    .value *
+                                                                2 *
+                                                                pi),
+                                                    alignment: Alignment.center,
+                                                    child: Transform.translate(
+                                                      offset: Offset(
+                                                        100 *
+                                                            cos(_animationController
+                                                                        .value *
+                                                                    2 *
+                                                                    pi +
+                                                                (2 *
+                                                                    pi *
+                                                                    entry.key /
+                                                                    winnerTenants
+                                                                        .length)),
+                                                        0.0,
+                                                      ),
+                                                      child: Transform.scale(
+                                                        scale:
+                                                            _animationController
+                                                                .value,
+                                                        child: CircleAvatar(
+                                                          radius: 30.0,
+                                                          backgroundColor:
+                                                              Colors.white,
+                                                          backgroundImage: entry
+                                                                  .value
+                                                                  .pathToImage!
+                                                                  .contains(
+                                                                      'assets')
+                                                              ? AssetImage(entry
+                                                                  .value
+                                                                  .pathToImage!)
+                                                              : CachedNetworkImageProvider(
+                                                                  entry.value
+                                                                      .pathToImage!,
+                                                                ) as ImageProvider,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                )
+                                                .toList(),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                              SizedBox(height: size.height * 0.03),
+                              // Display dummy description
                               Center(
-                                child: FractionallySizedBox(
-                                  widthFactor: 0.8,
-                                  child: WhiteBox(
-                                    label: 'Location',
-                                    value: 'Johar Town',
+                                child: Text(
+                                  '${winnerTenants[index].firstName} ${winnerTenants[index].lastName}',
+                                  textAlign: TextAlign.center,
+                                  style: GoogleFonts.montserrat(
+                                    fontSize: 20.0,
+                                    color: const Color(0xff33907c),
+                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
                               ),
-                              SizedBox(height: 10.0),
-                              Center(
-                                child: FractionallySizedBox(
-                                  widthFactor: 0.8,
-                                  child: WhiteBox(
-                                    label: 'Rent Off:',
-                                    value: '15%',
-                                  ),
+                              SizedBox(height: size.height * 0.03),
+                              Padding(
+                                padding:
+                                    EdgeInsets.only(bottom: size.height * 0.07),
+                                child: Column(
+                                  children: [
+                                    SizedBox(height: size.height * 0.03),
+                                    Center(
+                                      child: FractionallySizedBox(
+                                        widthFactor: 0.8,
+                                        child: WhiteBox(
+                                          label: 'Credit Score',
+                                          value: winnerTenants[index]
+                                              .creditPoints
+                                              .toString(),
+                                          // points: '120',
+                                        ),
+                                      ),
+                                    ),
+                                    // SizedBox(height: size.height * 0.03),
+                                    SizedBox(height: 10.0),
+                                    Center(
+                                      child: FractionallySizedBox(
+                                        widthFactor: 0.8,
+                                        child: WhiteBox(
+                                          label: 'Rent Off:',
+                                          value: winnerTenants[index]
+                                                      .discount
+                                                      .toString() ==
+                                                  '0.24234234'
+                                              ? 'old document'
+                                              : winnerTenants[index]
+                                                  .discount
+                                                  .toString(),
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(height: 10.0),
+                                    Center(
+                                      child: FractionallySizedBox(
+                                        widthFactor: 0.8,
+                                        child: WhiteBox(
+                                          label: 'Property Address',
+                                          value: winnerTenants[index]
+                                                  .propertyAddress ??
+                                              'No address found',
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(height: 10.0),
+                                    Center(
+                                      child: FractionallySizedBox(
+                                        widthFactor: 0.8,
+                                        child: WhiteBox(
+                                          label: 'Join Date:',
+                                          value: winnerTenants[index]
+                                              .dateJoined!
+                                              .toDate()
+                                              .toString()
+                                              .substring(0, 10),
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(height: 20.0),
+                                  ],
                                 ),
                               ),
-                              SizedBox(height: 10.0),
-                              Center(
-                                child: FractionallySizedBox(
-                                  widthFactor: 0.8,
-                                  child: WhiteBox(
-                                    label: 'Property Address',
-                                    value: 'Property Address goes here',
-                                  ),
-                                ),
-                              ),
-                              SizedBox(height: 10.0),
-                              Center(
-                                child: FractionallySizedBox(
-                                  widthFactor: 0.8,
-                                  child: WhiteBox(
-                                    label: 'Join Date:',
-                                    value: '01/01/2021',
-                                  ),
-                                ),
-                              ),
-                              SizedBox(height: 10.0),
                             ],
                           ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              );
-            },
-          ),
-        ),
+                        ],
+                      ),
+                    );
+                  },
+                );
+              } else {
+                return const Center(
+                  child: SpinKitFadingCube(
+                    color: Color.fromARGB(255, 30, 197, 83),
+                  ),
+                );
+              }
+            }),
       ),
-    );
+    ));
   }
 }
 

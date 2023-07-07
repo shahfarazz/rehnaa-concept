@@ -1,32 +1,11 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class Tenant {
-  final String firstName;
-  final String lastName;
-  final double rating;
-  final int rent;
-  final String propertyDetails;
-  final String emailOrPhone;
-  final int familyMembers;
-  final String? pathToImage;
-  final String docid;
-
-  Tenant({
-    required this.firstName,
-    required this.lastName,
-    required this.rating,
-    required this.rent,
-    required this.propertyDetails,
-    required this.emailOrPhone,
-    required this.familyMembers,
-    required this.pathToImage,
-    required this.docid,
-  });
-}
+import '../../../backend/models/tenantsmodel.dart';
 
 class AdminRentOffWinnerPage extends StatefulWidget {
   @override
@@ -38,7 +17,7 @@ class _AdminRentOffWinnerPageState extends State<AdminRentOffWinnerPage> {
   List<Tenant> filteredTenants = [];
   TextEditingController searchController = TextEditingController();
   int currentPage = 1;
-  int itemsPerPage = 3;
+  int itemsPerPage = 5;
 
   @override
   void initState() {
@@ -58,12 +37,16 @@ class _AdminRentOffWinnerPageState extends State<AdminRentOffWinnerPage> {
             firstName: doc['firstName'] ?? '',
             lastName: doc['lastName'] ?? '',
             rating: doc['rating'] ?? 0.0,
-            rent: doc['rent'] ?? 0,
-            propertyDetails: doc['propertyDetails'] ?? '',
+            balance: doc['balance'] ?? 0,
             emailOrPhone: doc['emailOrPhone'] ?? '',
             familyMembers: doc['familyMembers'] ?? 0,
             pathToImage: doc['pathToImage'] ?? '',
-            docid: doc1.id,
+            tempID: doc1.id,
+            cnicNumber: '',
+            creditPoints: 0,
+            description: '',
+            tasdeeqVerification: true,
+            policeVerification: true,
           );
         }).toList();
         filteredTenants = List.from(tenants);
@@ -155,9 +138,11 @@ class _AdminRentOffWinnerPageState extends State<AdminRentOffWinnerPage> {
                     elevation: 2.0,
                     child: ListTile(
                       leading: CircleAvatar(
-                        backgroundImage: AssetImage(
-                          tenant.pathToImage ?? 'assets/placeholder.png',
-                        ),
+                        backgroundColor: Colors.transparent,
+                        backgroundImage: tenant.pathToImage!.contains('assets')
+                            ? AssetImage(tenant.pathToImage!)
+                            : CachedNetworkImageProvider(tenant.pathToImage!)
+                                as ImageProvider,
                       ),
                       title: Text(
                         '${tenant.firstName} ${tenant.lastName}',
@@ -167,66 +152,132 @@ class _AdminRentOffWinnerPageState extends State<AdminRentOffWinnerPage> {
                         ),
                       ),
                       subtitle: Text(
-                        'Rent: ${tenant.rent}',
+                        'Rent: ${tenant.balance}',
                         style: const TextStyle(
                           fontSize: 16.0,
                         ),
                       ),
                       onTap: () async {
+                        num? newTotal;
+                        bool isWinner = false;
                         double? discount = await showDialog<double>(
                           context: context,
                           builder: (BuildContext context) {
                             TextEditingController controller =
                                 TextEditingController();
-                            return AlertDialog(
-                              title: const Text('Enter Discount'),
-                              content: TextField(
-                                controller: controller,
-                                keyboardType:
-                                    const TextInputType.numberWithOptions(
-                                        decimal: true),
-                                inputFormatters: <TextInputFormatter>[
-                                  FilteringTextInputFormatter.allow(
-                                      RegExp(r'^\d+\.?\d{0,2}')),
-                                ],
-                                decoration: const InputDecoration(
-                                  hintText: 'Percentage discount',
-                                ),
-                              ),
-                              actions: <Widget>[
-                                TextButton(
-                                  child: const Text('Confirm'),
-                                  onPressed: () {
-                                    double? enteredDiscount =
-                                        double.tryParse(controller.text);
-                                    if (enteredDiscount != null &&
-                                        enteredDiscount >= 0 &&
-                                        enteredDiscount <= 100) {
-                                      Navigator.of(context)
-                                          .pop(enteredDiscount);
-                                    } else {
-                                      Fluttertoast.showToast(
-                                        msg:
-                                            'Please enter a valid discount between 0 and 100.',
-                                        toastLength: Toast.LENGTH_SHORT,
-                                        gravity: ToastGravity.BOTTOM,
-                                        backgroundColor: Colors.red,
-                                        textColor: Colors.white,
-                                      );
-                                    }
-                                  },
-                                ),
-                              ],
+                            return StatefulBuilder(
+                              builder: (BuildContext context, setState) {
+                                return AlertDialog(
+                                  title: const Text('Enter Discount'),
+                                  content: TextField(
+                                    onChanged: (value) {
+                                      var enteredDiscount =
+                                          double.tryParse(controller.text);
+                                      if (enteredDiscount != null &&
+                                          enteredDiscount >= 0 &&
+                                          enteredDiscount <= 100) {
+                                        newTotal = tenant.balance -
+                                            (tenant.balance *
+                                                enteredDiscount /
+                                                100);
+                                        // print('newTotal is $newTotal');
+                                        setState(() {
+                                          newTotal = newTotal;
+                                        });
+                                      } else {
+                                        setState(() {
+                                          newTotal = tenant.balance;
+                                        });
+                                        // newTotal = 0;
+                                      }
+                                    },
+                                    controller: controller,
+                                    keyboardType:
+                                        const TextInputType.numberWithOptions(
+                                            decimal: true),
+                                    inputFormatters: <TextInputFormatter>[
+                                      FilteringTextInputFormatter.allow(
+                                          RegExp(r'^\d+\.?\d{0,2}')),
+                                    ],
+                                    decoration: InputDecoration(
+                                      hintText: 'Percentage discount',
+                                    ),
+                                  ),
+                                  actions: <Widget>[
+                                    // checkbox to ask if the tenant is a rentoff winner
+                                    Row(
+                                      children: [
+                                        Checkbox(
+                                          value: isWinner,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              isWinner = value!;
+                                            });
+                                          },
+                                        ),
+                                        const Text('Rentoff Winner'),
+                                      ],
+                                    ),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        newTotal != null
+                                            ? Text('New total: $newTotal')
+                                            : const SizedBox(
+                                                width: 20,
+                                              ),
+                                        TextButton(
+                                          child: const Text('Cancel'),
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                          },
+                                        ),
+                                        TextButton(
+                                          child: const Text('Confirm'),
+                                          onPressed: () {
+                                            double? enteredDiscount =
+                                                double.tryParse(
+                                                    controller.text);
+                                            if (enteredDiscount != null &&
+                                                enteredDiscount >= 0 &&
+                                                enteredDiscount <= 100) {
+                                              Navigator.of(context)
+                                                  .pop(enteredDiscount);
+                                            } else {
+                                              Fluttertoast.showToast(
+                                                msg:
+                                                    'Please enter a valid discount between 0 and 100.',
+                                                toastLength: Toast.LENGTH_SHORT,
+                                                gravity: ToastGravity.BOTTOM,
+                                                backgroundColor: Colors.red,
+                                                textColor: Colors.white,
+                                              );
+                                            }
+                                          },
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                );
+                              },
                             );
                           },
                         );
                         if (discount != null) {
                           // Apply the discount to the tenant's rent
-                          FirebaseFirestore.instance
+                          print('discount is $discount');
+                          print('newTotal is $newTotal');
+                          print('isWinner is $isWinner');
+
+                          // Update the tenant's balance
+                          await FirebaseFirestore.instance
                               .collection('Tenants')
-                              .doc(tenant.docid)
+                              .doc(tenant.tempID)
                               .update({
-                            'rent': tenant.rent * (1 - discount / 100),
+                            'balance': newTotal,
+                            'isRentOffWinner': isWinner,
+                            'discount': discount,
                           });
                         }
 

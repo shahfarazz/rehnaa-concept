@@ -6,7 +6,7 @@ class Tenant {
   String lastName;
   String description;
   num rating;
-  num rent;
+  num balance;
   num creditPoints;
   //  String propertyDetails;
   String cnicNumber;
@@ -30,13 +30,14 @@ class Tenant {
   var upfrontBonus;
   // ignore: prefer_typing_uninitialized_variables
   var monthlyProfit;
+  var discount;
 
   Tenant({
     required this.firstName,
     required this.lastName,
     required this.description,
     required this.rating,
-    required this.rent,
+    required this.balance,
     required this.creditPoints,
     // required this.propertyDetails,
     required this.cnicNumber,
@@ -58,6 +59,7 @@ class Tenant {
     this.monthlyRent,
     this.upfrontBonus,
     this.monthlyProfit,
+    this.discount,
   });
 
   factory Tenant.fromJson(Map<String, dynamic> json) {
@@ -66,7 +68,7 @@ class Tenant {
       lastName: json['lastName'],
       description: json['description'] ?? 'No description',
       rating: json['rating'] ?? 0.0,
-      rent: json['balance'] ?? 0.0,
+      balance: json['balance'] ?? 0.0,
       creditPoints: json['creditPoints'] ?? 0,
       // propertyDetails: json['propertyDetails'] ?? 'No property details',
       cnicNumber: json['cnicNumber'] ?? 'N/A',
@@ -84,10 +86,11 @@ class Tenant {
       address: json['address'] ?? '',
       contractStartDate: json['contractStartDate'] ?? '',
       contractEndDate: json['contractEndDate'] ?? '',
-      propertyAddress: json['propertyAddress'] ?? '',
+      propertyAddress: json['propertyAddress'] ?? 'No address found',
       monthlyRent: json['monthlyRent'] ?? '',
       upfrontBonus: json['upfrontBonus'] ?? '',
       monthlyProfit: json['monthlyProfit'] ?? '',
+      discount: json['discount'] ?? 0.24234234,
     );
   }
 
@@ -97,7 +100,7 @@ class Tenant {
       'lastName': lastName,
       'description': description,
       'rating': rating,
-      'rent': rent,
+      'balance': balance,
       'creditPoints': creditPoints,
       // 'propertyDetails': propertyDetails,
       'cnicNumber': cnicNumber,
@@ -130,7 +133,7 @@ class Tenant {
       lastName: 'Tenant',
       description: 'This is a dummy tenant',
       rating: 4.5,
-      rent: 1000,
+      balance: 1000,
       creditPoints: 100,
       // propertyDetails: 'Dummy property',
       cnicNumber: '123456789',

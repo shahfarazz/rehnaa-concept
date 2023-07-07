@@ -93,7 +93,7 @@ class _TenantCardWidgetState extends State<TenantCardWidget> {
       'lastName': lastName,
       'description': description,
       'rating': rating,
-      'rent': rent,
+      'balance': rent,
       'pathToImage': pathToImage,
       'creditPoints': 0,
       'cnicNumber': cnicController.text,
@@ -241,10 +241,11 @@ class _TenantCardWidgetState extends State<TenantCardWidget> {
                           onPressed: validateInputs,
                           child: const Text('Submit'),
                         ),
-                        if (uploading)  Container(
-                    padding: EdgeInsets.only(left: 150.0),
-                    child: CircularProgressIndicator(),
-                  ),
+                        if (uploading)
+                          Container(
+                            padding: EdgeInsets.only(left: 150.0),
+                            child: CircularProgressIndicator(),
+                          ),
                       ],
                     ),
                   ),

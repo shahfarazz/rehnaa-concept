@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:rehnaa/backend/models/tenantsmodel.dart';
 import 'package:rehnaa/backend/services/helperfunctions.dart';
@@ -92,17 +93,9 @@ class LandlordTenantInfoPage extends StatelessWidget {
                                   loadingBuilder:
                                       (context, child, loadingProgress) {
                                     if (loadingProgress == null) return child;
-                                    return Center(
-                                      child: CircularProgressIndicator(
-                                        color: Colors.green,
-                                        value: loadingProgress
-                                                    .expectedTotalBytes !=
-                                                null
-                                            ? loadingProgress
-                                                    .cumulativeBytesLoaded /
-                                                loadingProgress
-                                                    .expectedTotalBytes!
-                                            : null,
+                                    return const Center(
+                                      child: SpinKitFadingCube(
+                                        color: Color.fromARGB(255, 30, 197, 83),
                                       ),
                                     );
                                   },

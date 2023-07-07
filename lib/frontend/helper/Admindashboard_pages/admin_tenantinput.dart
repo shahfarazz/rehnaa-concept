@@ -101,7 +101,7 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
                     ),
                   ),
                   subtitle: Text(
-                    'Rent: \$${tenant.rent.toStringAsFixed(2)}',
+                    'Rent: \$${tenant.balance.toStringAsFixed(2)}',
                     style: const TextStyle(
                       fontSize: 16,
                     ),
@@ -166,7 +166,7 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
     final TextEditingController descriptionController =
         TextEditingController(text: tenant.description);
     final TextEditingController rentController =
-        TextEditingController(text: tenant.rent.toString());
+        TextEditingController(text: tenant.balance.toString());
     final TextEditingController creditPointsController =
         TextEditingController(text: tenant.creditPoints.toString());
     final TextEditingController cnicNumberController =
@@ -288,7 +288,7 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
                       tenant.firstName = firstNameController.text;
                       tenant.lastName = lastNameController.text;
                       tenant.description = descriptionController.text;
-                      tenant.rent = int.tryParse(rentController.text) ?? 0;
+                      tenant.balance = int.tryParse(rentController.text) ?? 0;
                       tenant.creditPoints =
                           int.tryParse(creditPointsController.text) ?? 0;
                       tenant.cnicNumber = cnicNumberController.text.isNotEmpty
@@ -464,7 +464,7 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
 
                   return ListTile(
                     title: Text('${tenant.firstName} ${tenant.lastName}'),
-                    subtitle: Text(tenant.rent.toString()),
+                    subtitle: Text(tenant.balance.toString()),
                     leading: const Icon(Icons.person),
                     onTap: () {
                       _showEditDialog(tenant);

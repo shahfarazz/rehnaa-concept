@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
@@ -222,7 +223,7 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                                   ),
                                 ),
                                 onPressed: () {
-                                  if (amount > 0 && amount <= tenant.rent) {
+                                  if (amount > 0 && amount <= tenant.balance) {
                                     Fluttertoast.showToast(
                                       msg:
                                           'An admin will contact you soon regarding your payment via: $selectedOption',
@@ -305,7 +306,7 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                                             '${landlord.firstName} ${landlord.lastName}',
                                             landlord.address,
                                             tenant.address,
-                                            tenant.rent.toDouble(),
+                                            tenant.balance.toDouble(),
                                             amount,
                                             selectedOption,
                                             widget.uid,
@@ -326,7 +327,7 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                                         //             invoiceNumber:
                                         //                 invoiceNumber,
                                         //             balance:
-                                        //                 tenant.rent.toDouble(),
+                                        //                 tenant.balance.toDouble(),
                                         //             paymentMode: selectedOption,
                                         //             uid: widget.uid,
                                         //             landlordAddress:
@@ -452,8 +453,8 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
               }
             });
           }
-          // Format the rent for display
-          String formattedRent = NumberFormat('#,##0').format(tenant.rent);
+          // Format the balance for display
+          String formattedRent = NumberFormat('#,##0').format(tenant.balance);
 
           Size size = MediaQuery.of(context).size;
 
@@ -499,17 +500,10 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                                               loadingProgress) {
                                             if (loadingProgress == null)
                                               return child;
-                                            return Center(
-                                              child: CircularProgressIndicator(
-                                                color: Colors.green,
-                                                value: loadingProgress
-                                                            .expectedTotalBytes !=
-                                                        null
-                                                    ? loadingProgress
-                                                            .cumulativeBytesLoaded /
-                                                        loadingProgress
-                                                            .expectedTotalBytes!
-                                                    : null,
+                                            return const Center(
+                                              child: SpinKitFadingCube(
+                                                color: Color.fromARGB(
+                                                    255, 30, 197, 83),
                                               ),
                                             );
                                           },

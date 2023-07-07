@@ -52,16 +52,16 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
       showDialog(
           context: context,
           builder: (BuildContext context) {
-            return AlertDialog(
+            return const AlertDialog(
               content: Row(
                 children: [
-                  const CircularProgressIndicator(
-                    color: Colors.green,
+                  SpinKitFadingCube(
+                    color: Color.fromARGB(255, 30, 197, 83),
                   ),
-                  const SizedBox(
+                  SizedBox(
                     width: 20,
                   ),
-                  const Text('Changing password...'),
+                  Text('Changing password...'),
                 ],
               ),
             );

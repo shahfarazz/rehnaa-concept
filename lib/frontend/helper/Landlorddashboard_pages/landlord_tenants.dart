@@ -225,7 +225,7 @@ class _LandlordTenantsPageState extends State<LandlordTenantsPage>
                     ),
                   ),
                   Text(
-                    ' ${tenant.rent}',
+                    ' ${tenant.balance}',
                     style: GoogleFonts.montserrat(
                       fontSize: 14.0,
                       fontWeight: FontWeight.bold,
