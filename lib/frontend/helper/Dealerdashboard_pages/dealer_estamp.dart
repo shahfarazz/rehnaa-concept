@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../backend/models/dealermodel.dart';
 import '../../../backend/models/landlordmodel.dart';
 import '../../Screens/contract.dart';
 import 'dealer_estamp_info.dart';
@@ -22,6 +23,7 @@ class _DealerEstampPageState extends State<DealerEstampPage> {
   List<Landlord> filteredLandlords = [];
   List<Landlord> landlords = [];
   bool isLoading = true;
+  Dealer? dealer;
   @override
   void initState() {
     super.initState();
@@ -73,6 +75,8 @@ class _DealerEstampPageState extends State<DealerEstampPage> {
       // print('data: ${data['landlordRef'][0].id}');
       List<dynamic> landlordRef = data['landlordRef'];
 
+      dealer = Dealer.fromJson(data);
+
       List<Landlord> landlordList = [];
 
       for (var landlordID in landlordRef!) {
@@ -80,7 +84,9 @@ class _DealerEstampPageState extends State<DealerEstampPage> {
         DocumentSnapshot<Map<String, dynamic>> documentSnapshot =
             await landlordID.get();
         Landlord landlord = Landlord.fromJson(documentSnapshot.data());
+        landlord.tempID = landlordID.id;
         landlordList.add(landlord);
+        // print('dealer landlordmap: ${dealer.landlordMap?[landlord.tempID]}');
       }
 
       setState(() {
@@ -90,7 +96,7 @@ class _DealerEstampPageState extends State<DealerEstampPage> {
       });
       return landlords;
     } catch (e) {
-      print(e);
+      print('error is $e');
       // setState(() {
       isLoading = false;
       // });
@@ -210,6 +216,7 @@ class _DealerEstampPageState extends State<DealerEstampPage> {
                                   MaterialPageRoute(
                                     builder: (context) => DealerEstampInfoPage(
                                       landlord: landlord,
+                                      dealer: dealer!,
                                     ),
                                   ),
                                 );
@@ -233,9 +240,8 @@ class _DealerEstampPageState extends State<DealerEstampPage> {
                                         fontWeight: FontWeight.bold),
                                   ),
                                   subtitle: Text(
-                                    landlord.property.isEmpty
-                                        ? 'No Property/Address not added'
-                                        : landlord.property[0].address,
+                                    dealer?.landlordMap?[landlord.tempID]
+                                        ?['eStampAddress'],
                                     style: TextStyle(
                                         color: Colors.green,
                                         fontFamily:
@@ -243,9 +249,10 @@ class _DealerEstampPageState extends State<DealerEstampPage> {
                                         fontWeight: FontWeight.bold),
                                   ),
                                   trailing: Text(
-                                    landlord.contractStartDate == ''
-                                        ? 'No Contract\n\n${landlord.monthlyRent == "" ? "No Rent" : landlord.monthlyRent}'
-                                        : '${landlord.contractStartDate!}\n ${landlord.monthlyRent == "" ? "No Rent" : landlord.monthlyRent}',
+                                    '${dealer?.landlordMap?[landlord.tempID]?['eStampDate']}\n\nRs.${dealer?.landlordMap?[landlord.tempID]?['eStampCharges']}',
+                                    // landlord.contractStartDate == ''
+                                    //     ? 'No Contract\n\n${landlord.monthlyRent == "" ? "No Rent" : landlord.monthlyRent}'
+                                    //     : '${landlord.contractStartDate!}\n ${landlord.monthlyRent == "" ? "No Rent" : landlord.monthlyRent}',
                                     style: TextStyle(
                                       color: Colors.black,
                                       fontFamily:

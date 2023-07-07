@@ -10,6 +10,7 @@ import '../../../backend/services/helperfunctions.dart';
 import '../../helper/Admindashboard_pages/admin_analytics.dart';
 import '../../helper/Admindashboard_pages/admin_contracts.dart';
 import '../../helper/Admindashboard_pages/admin_dealerinput.dart';
+import '../../helper/Admindashboard_pages/admin_estamps.dart';
 import '../../helper/Admindashboard_pages/admin_landlord_tenant_info.dart';
 import '../../helper/Admindashboard_pages/admin_landlordinput.dart';
 import '../../helper/Admindashboard_pages/admin_propertyinput.dart';
@@ -579,6 +580,39 @@ class _AdminDashboardState extends State<AdminDashboard> {
                           builder: (context) => AdminReviewsTestimonialsPage(),
                         ),
                       );
+                    },
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CustomButton(
+                    color: Colors.grey,
+                    icon: Icons.pending,
+                    text: 'Dealer Landlord\nE-stamp Creator',
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => AdminEstampsPage(),
+                        ),
+                      );
+                    },
+                  ),
+                  const SizedBox(width: 20),
+                  CustomButton(
+                    color: Colors.brown,
+                    icon: Icons.auto_fix_high_outlined,
+                    text: 'Enable/Disable\nUser Accounts',
+                    onPressed: () {
+                      // Navigator.push(
+                      //   context,
+                      //   MaterialPageRoute(
+                      //     builder: (context) => AdminReviewsTestimonialsPage(),
+                      //   ),
+                      // );
                     },
                   ),
                 ],

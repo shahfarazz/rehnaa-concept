@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../backend/models/dealermodel.dart';
 import '../../../backend/models/landlordmodel.dart';
 
 class ContractCard extends StatelessWidget {
@@ -62,7 +63,9 @@ class ContractCard extends StatelessWidget {
 
 class DealerEstampInfoPage extends StatelessWidget {
   final Landlord landlord;
-  const DealerEstampInfoPage({super.key, required this.landlord});
+  final Dealer dealer;
+  const DealerEstampInfoPage(
+      {super.key, required this.landlord, required this.dealer});
 
   @override
   Widget build(BuildContext context) {
@@ -151,50 +154,63 @@ class DealerEstampInfoPage extends StatelessWidget {
                               ),
                               SizedBox(height: 16),
                               ContractCard(
-                                icon: Icons.person,
-                                label: 'Tenant Name:',
-                                data: landlord.tenant == null ||
-                                        landlord.tenant!.isEmpty
-                                    ? 'No tenant yet'
-                                    : landlord.tenant![0].firstName ?? '',
-                              ),
+                                  icon: Icons.person,
+                                  label: 'Tenant Name:',
+                                  data: dealer.landlordMap?[landlord.tempID]
+                                      ?['eStampTenantName']
+                                  // landlord.tenant == null ||
+                                  //         landlord.tenant!.isEmpty
+                                  //     ? 'No tenant yet'
+                                  //     : landlord.tenant![0].firstName ?? '',
+                                  ),
                               SizedBox(height: 16),
                               ContractCard(
                                 icon: Icons.calendar_today,
                                 label: 'Request Date:',
-                                data: landlord.contractStartDate ?? '',
+                                data: dealer.landlordMap?[landlord.tempID]
+                                    ?['eStampDate'],
                               ),
                               SizedBox(height: 16),
                               ContractCard(
                                 icon: Icons.calendar_today,
                                 label: 'E-stamp Value:',
-                                data: 'Rs. 1000',
+                                data: dealer.landlordMap?[landlord.tempID]
+                                    ?['eStampValue'],
                               ),
                               SizedBox(height: 16),
                               ContractCard(
-                                icon: Icons.place,
-                                label: 'Property Address:',
-                                data: landlord.property.isEmpty
-                                    ? ''
-                                    : landlord.property[0].address ?? '',
+                                icon: Icons.calendar_today,
+                                label: 'Delivered Date:',
+                                data: dealer.landlordMap?[landlord.tempID]
+                                    ?['eStampDeliveredDate'],
+
+                                // landlord.property.isEmpty
+                                //     ? ''
+                                //     : landlord.property[0].address ?? '',
                               ),
                               SizedBox(height: 16),
                               ContractCard(
                                   icon: Icons.money_rounded,
                                   label: 'Charges:',
-                                  data: landlord.property.isEmpty
-                                      ? ''
-                                      : landlord.property[0].price.toString()),
+                                  data: dealer.landlordMap?[landlord.tempID]
+                                      ?['eStampCharges']
+                                  // landlord.property.isEmpty
+                                  //     ? ''
+                                  //     : landlord.property[0].price.toString()
+
+                                  ),
                               SizedBox(height: 16),
                               ContractCard(
-                                icon: Icons.request_page,
-                                label: 'Police Verification:',
-                                data: landlord.tenant == null ||
-                                        landlord.tenant!.isEmpty
-                                    ? 'No tenant yet'
-                                    : landlord.tenant![0].policeVerification
-                                        .toString(),
-                              ),
+                                  icon: Icons.request_page,
+                                  label: 'Police Verification:',
+                                  data: dealer.landlordMap?[landlord.tempID]
+                                      ?['eStampPoliceVerification']
+                                  // landlord.tenant == null ||
+                                  //         landlord.tenant!.isEmpty
+                                  //     ? 'No tenant yet'
+                                  //     : landlord.tenant![0].policeVerification
+                                  //         .toString(),
+                                  ),
                               // SizedBox(height: 16),
                               // ContractCard(
                               //   icon: Icons.request_page,
