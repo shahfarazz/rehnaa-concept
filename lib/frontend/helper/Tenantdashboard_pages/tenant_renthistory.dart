@@ -94,85 +94,86 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
     List<RentPayment> newRentPayments = []; // Store the new rent payments
 
     // Fetch each rent payment document using the document references
-    try {
-      // int count = 0;
-      for (DocumentReference<Map<String, dynamic>> rentPaymentRef
-          in rentPaymentRefs) {
-        // count++;
+    // try {
+    // int count = 0;
+    for (DocumentReference<Map<String, dynamic>> rentPaymentRef
+        in rentPaymentRefs) {
+      // count++;
 
-        DocumentSnapshot<Map<String, dynamic>> rentPaymentSnapshot =
-            await rentPaymentRef.get();
+      DocumentSnapshot<Map<String, dynamic>> rentPaymentSnapshot =
+          await rentPaymentRef.get();
 
-        Map<String, dynamic>? data = rentPaymentSnapshot.data();
-        // if (count == 2) {
-        // print('rentpayment ref  $rentPaymentRef');
-        //   // print('reached here with rent payments as $data');
+      Map<String, dynamic>? data = rentPaymentSnapshot.data();
+      // if (count == 2) {
+      // print('rentpayment ref  $rentPaymentRef');
+      //   // print('reached here with rent payments as $data');
+      // }
+      if (data != null) {
+        RentPayment rentPayment = await RentPayment.fromJson(data);
+        // print('rentpayment ref is $rentPaymentRef')
+        // print('rentpayment found and is ${data}');
+
+        // if(rentPayment.pdfUrl != null){
+
         // }
-        if (data != null) {
-          RentPayment rentPayment = await RentPayment.fromJson(data);
-          // print('rentpayment ref is $rentPaymentRef')
-          // print('rentpayment found and is ${data}');
 
-          // if(rentPayment.pdfUrl != null){
-
-          // }
-
-          if (rentPayment.isMinus != null) {
-            // print('idher rehnaa');
-            isMinus = rentPayment.isMinus!;
-          } else {
-            rentPayment.isMinus =
-                data['landlordRef'] != null || data['dealerRef'] != null;
-            // print('bhai idher mat ajanan');
-            rentPayment.pdfUrl = await FirebaseFirestore.instance
-                .collection('invoices')
-                .doc(rentPayment.invoiceNumber)
-                .get()
-                .then((value) => value.data()!['url']);
-          }
-
-          // if (widget.callerType == 'Landlords') {
-          //   // firstName = data['tenantname'] ?? 'Old doc no tenantname';
-          // }
-
-          // print('rentpayment found and is ${rentPayment}');
-          // setState(() {
-          //   shouldDisplay = true;
-          // });
-
-          // print('now adding $count to new rent payments');
-
-          newRentPayments.add(rentPayment); // Add the new rent payment
+        if (rentPayment.isMinus != null) {
+          // print('idher rehnaa');
+          isMinus = rentPayment.isMinus!;
+        } else {
+          rentPayment.isMinus =
+              data['landlordRef'] != null || data['dealerRef'] != null;
+          // print('bhai idher mat ajanan');
+          rentPayment.pdfUrl = await FirebaseFirestore.instance
+              .collection('invoices')
+              .doc(rentPayment.invoiceNumber)
+              .get()
+              .then((value) => value.data()!['url']);
         }
-      }
-      // print('count after loop: $count');
 
-      // for (var e in _rentPayments) {
-      //   print('e.amount is ${e.amount}');
-      // }
+        // if (widget.callerType == 'Landlords') {
+        //   // firstName = data['tenantname'] ?? 'Old doc no tenantname';
+        // }
 
-      // Check for changes in rent payments
-      if (!listEquals(_rentPayments, newRentPayments)) {
-        setState(() {
-          _rentPayments = newRentPayments; // Update the rent payments list
-          shouldDisplay = true;
-        });
-      }
+        // print('rentpayment found and is ${rentPayment}');
+        // setState(() {
+        //   shouldDisplay = true;
+        // });
 
-      // if (kDebugMode) {
-      //   print('Rent payments: $_rentPayments');
-      // }
-    } catch (e) {
-      if (mounted) {
-        setState(() {
-          shouldDisplay = false;
-        });
-      }
+        // print('now adding $count to new rent payments');
 
-      if (kDebugMode) {
-        print('Error fetching rent payments: $e');
+        newRentPayments.add(rentPayment); // Add the new rent payment
       }
     }
+    // print('count after loop: $count');
+
+    // for (var e in _rentPayments) {
+    //   print('e.amount is ${e.amount}');
+    // }
+
+    // Check for changes in rent payments
+    if (!listEquals(_rentPayments, newRentPayments)) {
+      setState(() {
+        _rentPayments = newRentPayments; // Update the rent payments list
+        shouldDisplay = true;
+      });
+    }
+
+    // if (kDebugMode) {
+    //   print('Rent payments: $_rentPayments');
+    // }
+    // }
+    // catch (e) {
+    //   if (mounted) {
+    //     setState(() {
+    //       shouldDisplay = false;
+    //     });
+    //   }
+
+    //   if (kDebugMode) {
+    //     print('Error fetching rent payments: $e');
+    //   }
+    // }
   }
 
   final PageController _pageController = PageController(initialPage: 0);

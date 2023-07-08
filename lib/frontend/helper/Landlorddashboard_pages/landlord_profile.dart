@@ -1302,7 +1302,14 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
                                                         builder: (context) =>
                                                             AlertDialog(
                                                           title: Text(
-                                                              'Password Confirmation'),
+                                                              'Password Confirmation',
+                                                              style: TextStyle(
+                                                                color: Colors
+                                                                    .green,
+                                                                fontFamily: GoogleFonts
+                                                                        .montserrat()
+                                                                    .fontFamily,
+                                                              )),
                                                           content:
                                                               TextFormField(
                                                             controller:
@@ -1312,6 +1319,14 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
                                                                 InputDecoration(
                                                               labelText:
                                                                   'Enter your password',
+                                                              labelStyle:
+                                                                  TextStyle(
+                                                                color:
+                                                                    Colors.grey,
+                                                                fontFamily: GoogleFonts
+                                                                        .montserrat()
+                                                                    .fontFamily,
+                                                              ),
                                                             ),
                                                             validator: (value) {
                                                               if (value ==
@@ -1325,13 +1340,23 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
                                                           ),
                                                           actions: [
                                                             TextButton(
-                                                              onPressed: () =>
-                                                                  Navigator.of(
-                                                                          context)
-                                                                      .pop(
-                                                                          null),
+                                                              onPressed: () {
+                                                                Navigator.of(
+                                                                        context)
+                                                                    .pop(null);
+                                                                Navigator.pop(
+                                                                    context);
+                                                              },
                                                               child: Text(
-                                                                  'Cancel'),
+                                                                  'Cancel',
+                                                                  style:
+                                                                      TextStyle(
+                                                                    color: Colors
+                                                                        .green,
+                                                                    fontFamily:
+                                                                        GoogleFonts.montserrat()
+                                                                            .fontFamily,
+                                                                  )),
                                                             ),
                                                             TextButton(
                                                               onPressed:
@@ -1403,7 +1428,15 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
                                                                 }
                                                               },
                                                               child: Text(
-                                                                  'Confirm'),
+                                                                  'Confirm',
+                                                                  style:
+                                                                      TextStyle(
+                                                                    color: Colors
+                                                                        .green,
+                                                                    fontFamily:
+                                                                        GoogleFonts.montserrat()
+                                                                            .fontFamily,
+                                                                  )),
                                                             ),
                                                           ],
                                                         ),

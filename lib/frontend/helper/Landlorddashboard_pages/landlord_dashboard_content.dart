@@ -392,11 +392,11 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
                                                                           '${tenant.firstName} ${tenant.lastName}',
                                                                       'requestID':
                                                                           randomID,
+                                                                      'timestamp':
+                                                                          Timestamp
+                                                                              .now(),
                                                                     }
                                                                   ]),
-                                                                  'timestamp':
-                                                                      Timestamp
-                                                                          .now(),
                                                                 },
                                                                     SetOptions(
                                                                         merge:

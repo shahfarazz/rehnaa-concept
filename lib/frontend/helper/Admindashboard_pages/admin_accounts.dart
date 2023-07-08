@@ -53,6 +53,10 @@ class _AdminAccountsControlPageState extends State<AdminAccountsControlPage> {
             return ListView.builder(
               itemCount: snapshot.data.docs.length,
               itemBuilder: (context, index) {
+                if (snapshot.data.docs[index]['type'] == 'Admin') {
+                  return Container();
+                }
+
                 // print(snapshot.data.docs[index]['firstName'] +
                 //     ' ' +
                 //     snapshot.data.docs[index]['lastName']);

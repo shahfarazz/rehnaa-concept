@@ -274,9 +274,9 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                                           'uid': widget.uid,
                                           'invoiceNumber': invoiceNumber,
                                           'requestID': randomID,
+                                          'timestamp': Timestamp.now()
                                         }
                                       ]),
-                                      'timestamp': Timestamp.now()
                                     }, SetOptions(merge: true));
 
                                     setState(() {

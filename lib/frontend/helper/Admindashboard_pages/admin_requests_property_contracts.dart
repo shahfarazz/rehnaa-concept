@@ -124,7 +124,10 @@ class _AdminPropertyContractsPageState
       'tenantID': widget.tenantID,
     });
 
-    FirebaseFirestore.instance.collection('Tenants').doc(widget.tenantID).set({
+    FirebaseFirestore.instance
+        .collection('Tenants')
+        .doc(widget.tenantID)
+        .update({
       'contractStartDate': contractStartDate,
       'contractEndDate': contractEndDate,
       'propertyAddress': propertyAddress,
@@ -134,7 +137,7 @@ class _AdminPropertyContractsPageState
     FirebaseFirestore.instance
         .collection('Landlords')
         .doc(widget.landlordID)
-        .set({
+        .update({
       'contractStartDate': contractStartDate,
       'contractEndDate': contractEndDate,
       'propertyAddress': propertyAddress,

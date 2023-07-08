@@ -260,41 +260,46 @@ class _LandlordTenantsPageState extends State<LandlordTenantsPage>
       if (_tenants.isEmpty && !shouldDisplayContent) {
         return const LandlordTenantSkeleton();
       } else if (_tenants.isEmpty && shouldDisplayContent) {
-        return Column(
-          children: [
-            Card(
-              elevation: 4.0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20.0),
-              ),
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20.0),
-                  color: Colors.white,
-                ),
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(
-                      Icons.error_outline_rounded,
-                      size: 48.0,
-                      color: Color(0xff33907c),
+        return RefreshIndicator(
+          onRefresh: _refreshUserProfile,
+          child: SingleChildScrollView(
+              physics: AlwaysScrollableScrollPhysics(),
+              child: Column(
+                children: [
+                  Card(
+                    elevation: 4.0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20.0),
                     ),
-                    const SizedBox(height: 16.0),
-                    Text(
-                      'No tenants to show',
-                      style: GoogleFonts.montserrat(
-                        fontSize: 20.0,
-                        // fontWeight: FontWeight.bold,
-                        color: const Color(0xff33907c),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20.0),
+                        color: Colors.white,
+                      ),
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(
+                            Icons.error_outline_rounded,
+                            size: 48.0,
+                            color: Color(0xff33907c),
+                          ),
+                          const SizedBox(height: 16.0),
+                          Text(
+                            'No tenants to show',
+                            style: GoogleFonts.montserrat(
+                              fontSize: 20.0,
+                              // fontWeight: FontWeight.bold,
+                              color: const Color(0xff33907c),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                  ],
-                ),
-              ),
-            )
-          ],
+                  )
+                ],
+              )),
         );
       } else {
         return Container(
