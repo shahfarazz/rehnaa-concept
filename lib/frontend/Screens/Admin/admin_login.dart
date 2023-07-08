@@ -16,17 +16,23 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
   // bool isAdmin = false;
 
   void checkAlreadyLoggedIn() {
-    if (FirebaseAuth.instance.currentUser != null) {
-      FirebaseFirestore.instance
-          .collection('users')
-          .doc(FirebaseAuth.instance.currentUser!.uid)
-          .get()
-          .then((value) {
-        if (value.data()!['type'] == 'Admin') {
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => const AdminDashboard()));
-        }
-      });
+    try {
+      if (FirebaseAuth.instance.currentUser != null) {
+        FirebaseFirestore.instance
+            .collection('users')
+            .doc(FirebaseAuth.instance.currentUser!.uid)
+            .get()
+            .then((value) {
+          if (value.data()!['type'] == 'Admin') {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => const AdminDashboard()));
+          }
+        });
+      }
+    } catch (e) {
+      print(e);
     }
   }
 
