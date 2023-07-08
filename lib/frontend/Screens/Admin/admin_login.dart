@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:rehnaa/frontend/Screens/Admin/admindashboard.dart';
 
 class AdminLoginPage extends StatefulWidget {
-  const AdminLoginPage({super.key});
+  const AdminLoginPage({Key? key}) : super(key: key);
 
   @override
   State<AdminLoginPage> createState() => _AdminLoginPageState();
@@ -13,7 +13,8 @@ class AdminLoginPage extends StatefulWidget {
 class _AdminLoginPageState extends State<AdminLoginPage> {
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
-  // bool isAdmin = false;
+  bool _isPasswordVisible =
+      false; // Added variable to track password visibility
 
   void checkAlreadyLoggedIn() {
     try {
@@ -131,10 +132,25 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
                 labelText: 'Email',
               ),
             ),
-            TextField(
+            TextFormField(
               controller: _passwordController,
-              decoration: const InputDecoration(
+              obscureText:
+                  !_isPasswordVisible, // Set obscureText based on visibility state
+              decoration: InputDecoration(
                 labelText: 'Password',
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    _isPasswordVisible
+                        ? Icons.visibility
+                        : Icons.visibility_off,
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      _isPasswordVisible =
+                          !_isPasswordVisible; // Toggle password visibility
+                    });
+                  },
+                ),
               ),
             ),
             ElevatedButton(
