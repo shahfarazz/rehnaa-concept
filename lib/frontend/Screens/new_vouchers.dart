@@ -7,6 +7,8 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:easy_image_viewer/easy_image_viewer.dart';
 
+import '../helper/Tenantdashboard_pages/tenant_propertyinfo.dart';
+
 class NewVouchersPage extends StatefulWidget {
   const NewVouchersPage({super.key});
 
@@ -128,12 +130,17 @@ class _NewVouchersPageState extends State<NewVouchersPage> {
                                 Card(
                                   child: GestureDetector(
                                     onTap: () async {
-                                      final imageProvider =
-                                          CachedNetworkImageProvider(
-                                              images[reversedIndex]);
-
-                                      await showImageViewer(
-                                          context, imageProvider);
+                                      // FullScreenImagePage
+                                      var reversedImages = images.reversed;
+                                      Navigator.push(context,
+                                          MaterialPageRoute(builder: (context) {
+                                        return FullScreenImagePage(
+                                          currentIndex: index,
+                                          imagePaths: reversedImages
+                                              .map((image) => image.toString())
+                                              .toList(),
+                                        );
+                                      }));
                                     },
                                     child: SizedBox(
                                       width: 200,
