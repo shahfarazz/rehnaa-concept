@@ -7,6 +7,7 @@ import 'package:rehnaa/frontend/helper/Admindashboard_pages/admin_requests.dart'
 import 'package:rehnaa/frontend/helper/Admindashboard_pages/admin_tenantinput.dart';
 
 import '../../../backend/services/helperfunctions.dart';
+import '../../helper/Admindashboard_pages/admin_accounts.dart';
 import '../../helper/Admindashboard_pages/admin_analytics.dart';
 import '../../helper/Admindashboard_pages/admin_contracts.dart';
 import '../../helper/Admindashboard_pages/admin_dealerinput.dart';
@@ -607,12 +608,12 @@ class _AdminDashboardState extends State<AdminDashboard> {
                     icon: Icons.auto_fix_high_outlined,
                     text: 'Enable/Disable\nUser Accounts',
                     onPressed: () {
-                      // Navigator.push(
-                      //   context,
-                      //   MaterialPageRoute(
-                      //     builder: (context) => AdminReviewsTestimonialsPage(),
-                      //   ),
-                      // );
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => AdminAccountsControlPage(),
+                        ),
+                      );
                     },
                   ),
                 ],

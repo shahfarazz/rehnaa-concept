@@ -416,19 +416,95 @@ class _AdminDealerInputPageState extends State<AdminDealerInputPage> {
 
                             validateInputs();
 
-                            // Generate a random email and password for the dealer
-                            String randomEmail =
-                                "dealer${Random().nextInt(10000)}@example.com"; // ensure it's a unique email
-                            String randomPassword =
-                                "password${Random().nextInt(10000)}"; // simple password, consider making it more complex
+                            var emailController = TextEditingController();
+                            var passwordController = TextEditingController();
+
+                            //ask the user to enter the email and password for the dealer
+                            await showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return Dialog(
+                                    child: SingleChildScrollView(
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          const ListTile(
+                                            title: Text(
+                                                'Enter Email and Password'),
+                                          ),
+                                          TextField(
+                                            controller: emailController,
+                                            decoration: const InputDecoration(
+                                                labelText: 'Email'),
+                                          ),
+                                          TextField(
+                                            controller: passwordController,
+                                            decoration: const InputDecoration(
+                                                labelText: 'Password'),
+                                          ),
+                                          ElevatedButton(
+                                            onPressed: () async {
+                                              //pop out of the dialog
+                                              // and the email and password is saved in the
+                                              // controllers
+                                              //check if email is a valid email
+                                              //by checking if it contains @ and .
+                                              if (emailController.text
+                                                      .contains('@') &&
+                                                  emailController.text
+                                                      .contains('.')) {
+                                                //check if password is at least 6 characters long and contains a number
+                                                if (passwordController
+                                                            .text.length >=
+                                                        6 &&
+                                                    passwordController.text
+                                                        .contains(
+                                                            RegExp(r'[0-9]'))) {
+                                                  Navigator.of(context).pop();
+                                                  //show snackbar that the dealer is being added
+                                                  ScaffoldMessenger.of(context)
+                                                      .showSnackBar(
+                                                    const SnackBar(
+                                                      content: Text(
+                                                          'Adding dealer...'),
+                                                    ),
+                                                  );
+                                                } else {
+                                                  ScaffoldMessenger.of(context)
+                                                      .showSnackBar(
+                                                    const SnackBar(
+                                                      content: Text(
+                                                          'Password must be at least 6 characters long and contain a number'),
+                                                    ),
+                                                  );
+                                                }
+                                              } else {
+                                                ScaffoldMessenger.of(context)
+                                                    .showSnackBar(
+                                                  const SnackBar(
+                                                    content: Text(
+                                                        'Please enter a valid email'),
+                                                  ),
+                                                );
+                                              }
+
+                                              // Navigator.of(context).pop();
+                                            },
+                                            child: const Text('Save'),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                });
 
                             try {
                               // Create a user with the random email and password
                               UserCredential userCredential = await FirebaseAuth
                                   .instance
                                   .createUserWithEmailAndPassword(
-                                email: randomEmail,
-                                password: randomPassword,
+                                email: emailController.text,
+                                password: passwordController.text,
                               );
 
                               // Get the uid of the newly created user
@@ -443,10 +519,10 @@ class _AdminDealerInputPageState extends State<AdminDealerInputPage> {
                                 'lastName': lastNameController.text,
                                 'balance': balanceInt,
                                 'pathToImage': pathToImage,
-                                'email':
-                                    randomEmail, // save the email to the Firestore document
-                                'password':
-                                    randomPassword, // save the password to the Firestore document
+                                // 'email': emailController.text,
+                                // save the email to the Firestore document
+                                // 'password': passwordController.text,
+                                // save the password to the Firestore document
                                 'uid':
                                     uid, // save the uid to the Firestore document
                                 'isGhost': true,
