@@ -166,74 +166,78 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
     super.build(context);
-    return Scaffold(
-      appBar: _buildAppBar(size),
-      resizeToAvoidBottomInset: false,
-      body: GestureDetector(
-        onTap: () {
-          if (_isSidebarOpen) {
-            _closeSidebar();
-          }
-          FocusScope.of(context).unfocus();
+    return WillPopScope(
+        onWillPop: () async {
+          return false;
         },
-        child: Stack(
-          children: [
-            Transform.translate(
-              offset: Offset(_isSidebarOpen ? size.width * 0.7 : 0, 0),
-              child: Column(
-                children: [
-                  Expanded(
-                    child: PageView.builder(
-                      controller: _pageController,
-                      onPageChanged: (index) {
-                        setState(() {
-                          _currentIndex = index;
-                        });
-                      },
-                      physics: isKeyboardVisible(context)
-                          ? NeverScrollableScrollPhysics()
-                          : const AlwaysScrollableScrollPhysics(),
-                      itemCount: 5,
-                      itemBuilder: (context, index) {
-                        switch (index) {
-                          case 0:
-                            return LandlordDashboardContent(
-                              uid: widget.uid,
-                              isWithdraw: _isWithdraw,
-                              onUpdateWithdrawState: updateWithdrawState,
-                            );
-                          case 1:
-                            return LandlordTenantsPage(
-                              uid: widget.uid,
-                            );
-                          case 2:
-                            return LandlordPropertiesPage(
-                              uid: widget.uid,
-                              // isWithdraw: _isWithdraw,
-                            );
-                          case 3:
-                            return TenantRentHistoryPage(
-                                uid: widget.uid, callerType: 'Landlords');
-                          case 4:
-                            return LandlordProfilePage(
-                              uid: widget.uid,
-                              callerType: 'Landlords',
-                            );
-                          default:
-                            return Container();
-                        }
-                      },
-                    ),
+        child: Scaffold(
+          appBar: _buildAppBar(size),
+          resizeToAvoidBottomInset: false,
+          body: GestureDetector(
+            onTap: () {
+              if (_isSidebarOpen) {
+                _closeSidebar();
+              }
+              FocusScope.of(context).unfocus();
+            },
+            child: Stack(
+              children: [
+                Transform.translate(
+                  offset: Offset(_isSidebarOpen ? size.width * 0.7 : 0, 0),
+                  child: Column(
+                    children: [
+                      Expanded(
+                        child: PageView.builder(
+                          controller: _pageController,
+                          onPageChanged: (index) {
+                            setState(() {
+                              _currentIndex = index;
+                            });
+                          },
+                          physics: isKeyboardVisible(context)
+                              ? NeverScrollableScrollPhysics()
+                              : const AlwaysScrollableScrollPhysics(),
+                          itemCount: 5,
+                          itemBuilder: (context, index) {
+                            switch (index) {
+                              case 0:
+                                return LandlordDashboardContent(
+                                  uid: widget.uid,
+                                  isWithdraw: _isWithdraw,
+                                  onUpdateWithdrawState: updateWithdrawState,
+                                );
+                              case 1:
+                                return LandlordTenantsPage(
+                                  uid: widget.uid,
+                                );
+                              case 2:
+                                return LandlordPropertiesPage(
+                                  uid: widget.uid,
+                                  // isWithdraw: _isWithdraw,
+                                );
+                              case 3:
+                                return TenantRentHistoryPage(
+                                    uid: widget.uid, callerType: 'Landlords');
+                              case 4:
+                                return LandlordProfilePage(
+                                  uid: widget.uid,
+                                  callerType: 'Landlords',
+                                );
+                              default:
+                                return Container();
+                            }
+                          },
+                        ),
+                      ),
+                      _buildBottomNavigationBar(),
+                    ],
                   ),
-                  _buildBottomNavigationBar(),
-                ],
-              ),
+                ),
+                if (_isSidebarOpen) _buildSidebar(size),
+              ],
             ),
-            if (_isSidebarOpen) _buildSidebar(size),
-          ],
-        ),
-      ),
-    );
+          ),
+        ));
   }
 
   PreferredSizeWidget _buildAppBar(Size size) {
