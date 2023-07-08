@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -16,8 +18,10 @@ import '../../helper/Landlorddashboard_pages/landlord_interestfreeloan.dart';
 // import '../../helper/Landlorddashboard_pages/landlord_renthistory.dart';
 import '../../helper/Landlorddashboard_pages/landlord_tenants.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:easy_debounce/easy_debounce.dart';
 
 import '../../helper/Landlorddashboard_pages/landlordproperties.dart';
+import '../../helper/Tenantdashboard_pages/tenant_security_deposit.dart';
 
 class LandlordDashboardPage extends StatefulWidget {
   final String uid; // UID of the landlord
@@ -40,6 +44,7 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
   late Stream<DocumentSnapshot<Map<String, dynamic>>> _notificationStream;
   late Stream<DocumentSnapshot<Map<String, dynamic>>> _notificationStream2;
   bool isNewVoucher = false;
+  Timer? _timer;
 
   @override
   void initState() {
@@ -57,6 +62,19 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
         .doc(widget.uid)
         .snapshots();
     isNewVouchers();
+    _startPeriodicFetch();
+  }
+
+  // Periodically fetch new data every 15 seconds
+  void _startPeriodicFetch() {
+    _timer = Timer.periodic(const Duration(seconds: 15), (_) {
+      isNewVouchers();
+    });
+  }
+
+  // Stop periodic fetching
+  void _stopPeriodicFetch() {
+    _timer?.cancel();
   }
 
   @override
@@ -65,6 +83,7 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
     _sidebarController.dispose();
     _notificationStream.drain();
     _notificationStream2.drain();
+    _stopPeriodicFetch();
     super.dispose();
   }
 
@@ -92,11 +111,12 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
           .get()
           .then((value) {
         if (value.exists) {
-          if (value.data()!['isNewVouchers'] == true) {
+          if (value.data()!['isNewVouchers'] == true && isNewVoucher == false) {
             setState(() {
               isNewVoucher = true;
             });
-          } else {
+          } else if (value.data()!['isNewVouchers'] == false &&
+              isNewVoucher == true) {
             setState(() {
               isNewVoucher = false;
             });
@@ -135,6 +155,11 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
 // Method to check if the keyboard is visible
   bool isKeyboardVisible(BuildContext context) {
     return MediaQuery.of(context).viewInsets.bottom > 0;
+  }
+
+  void _handleNotificationsButtonPress() async {
+    await _markNotificationsAsRead();
+    _showNotificationsDialog();
   }
 
   @override
@@ -273,9 +298,12 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
             children: [
               IconButton(
                 icon: const Icon(Icons.notifications_active),
-                onPressed: () async {
-                  await _markNotificationsAsRead();
-                  _showNotificationsDialog();
+                onPressed: () {
+                  EasyDebounce.debounce(
+                    'notifications-debouncer', // Debouncer ID
+                    Duration(milliseconds: 500), // Debounce duration
+                    _handleNotificationsButtonPress, // Wrapped function
+                  );
                 },
               ),
               Positioned(
@@ -450,29 +478,33 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
                         // _closeSidebar();
                       },
                     ),
-                    _buildSidebarItem(
-                      icon: Icons.receipt,
-                      label: 'Vouchers',
-                      onTap: () {
-                        //firebase call set users isNewVouchers to false
-                        FirebaseFirestore.instance
-                            .collection('Landlords')
-                            .doc(widget.uid)
-                            .update({'isNewVouchers': false});
+                    StatefulBuilder(
+                      builder: (BuildContext context, setState) {
+                        return _buildSidebarItem(
+                          icon: Icons.receipt,
+                          label: 'Vouchers',
+                          onTap: () {
+                            //firebase call set users isNewVouchers to false
+                            FirebaseFirestore.instance
+                                .collection('Landlords')
+                                .doc(widget.uid)
+                                .set({
+                              'isNewVouchers': false,
+                            }, SetOptions(merge: true));
 
-                        setState(() {
-                          isNewVoucher = false;
-                        });
-
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const NewVouchersPage(),
-                          ),
+                            setState(() {
+                              isNewVoucher = false;
+                            });
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const NewVouchersPage(),
+                              ),
+                            );
+                          },
+                          showBadge: isNewVoucher,
                         );
-                        // _closeSidebar();
                       },
-                      showBadge: isNewVoucher,
                     ),
                     _buildSidebarItem(
                       icon: Icons.receipt_long,
@@ -525,6 +557,22 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
                           context,
                           MaterialPageRoute(
                             builder: (context) => const FAQPage(),
+                          ),
+                        );
+                        // _closeSidebar();
+                      },
+                    ),
+                    _buildSidebarItem(
+                      icon: Icons.security,
+                      label: 'Security Deposit',
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => TenantSecurityDepositPage(
+                              uid: widget.uid,
+                              callerType: 'Landlords',
+                            ),
                           ),
                         );
                         // _closeSidebar();
@@ -686,39 +734,35 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
                         ),
                         Column(
                           children: <Widget>[
-                            Padding(
-                              padding: const EdgeInsets.only(
-                                top: 0.0,
-                                left: 20.0,
-                                right: 20.0,
-                                bottom: 0.0,
-                              ),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: <Widget>[
-                                  Hero(
-                                    tag: 'notificationTitle',
-                                    child: Text(
-                                      'Notifications',
-                                      style: TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                        fontFamily:
-                                            GoogleFonts.montserrat().fontFamily,
-                                      ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                SizedBox(width: size.width * 0.15),
+                                Hero(
+                                  tag: 'notificationTitle',
+                                  child: Text(
+                                    'Notifications',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                      fontFamily:
+                                          GoogleFonts.montserrat().fontFamily,
                                     ),
                                   ),
-                                  IconButton(
-                                    icon: const Icon(Icons.close),
-                                    onPressed: () {
-                                      Navigator.pop(context);
-                                    },
-                                    color: Colors.white,
-                                  ),
-                                ],
-                              ),
+                                ),
+                                IconButton(
+                                  padding:
+                                      EdgeInsets.only(left: size.width * 0.1),
+                                  alignment: Alignment.centerRight,
+                                  icon: const Icon(Icons.close),
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                  color: Colors.white,
+                                ),
+                              ],
                             ),
                             const Divider(
                               height: 0,

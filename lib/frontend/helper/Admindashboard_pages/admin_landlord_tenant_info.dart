@@ -112,7 +112,7 @@ class _AdminLandlordTenantInfoPageState
             lastName: doc['lastName'] ?? '',
             description: doc['description'] ?? '',
             rating: doc['rating'] ?? 0.0,
-            rent: doc['rent'] ?? 0,
+            balance: doc['balance'] ?? 0,
             creditPoints: doc['creditPoints'] ?? 0,
             cnicNumber: doc['cnicNumber'] ?? '',
             emailOrPhone: doc['emailOrPhone'] ?? '',
@@ -296,7 +296,7 @@ class _AdminLandlordTenantInfoPageState
                                     ),
                                   ),
                                   subtitle: Text(
-                                    'Rent: ${tenant.rent}',
+                                    'Rent: ${tenant.balance}',
                                     style: const TextStyle(
                                       fontSize: 16.0,
                                     ),

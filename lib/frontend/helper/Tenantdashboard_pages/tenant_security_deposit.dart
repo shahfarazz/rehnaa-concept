@@ -3,12 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
+import '../../../backend/models/landlordmodel.dart';
 import '../../../backend/models/tenantsmodel.dart';
 import '../../Screens/Landlord/landlord_dashboard.dart';
 
 class TenantSecurityDepositPage extends StatefulWidget {
   final String uid;
-  const TenantSecurityDepositPage({super.key, required this.uid});
+  final String callerType;
+  const TenantSecurityDepositPage(
+      {super.key, required this.uid, required this.callerType});
 
   @override
   State<TenantSecurityDepositPage> createState() =>
@@ -17,17 +20,22 @@ class TenantSecurityDepositPage extends StatefulWidget {
 
 class _TenantSecurityDepositPageState extends State<TenantSecurityDepositPage> {
   Tenant? tenant;
+  Landlord? landlord;
   bool isApplySecurity = false;
   var depositAmount = 100000;
 
   Future<void> checkisApplySecurity() async {
     var myTenant = await FirebaseFirestore.instance
-        .collection('Tenants')
+        .collection(widget.callerType)
         .doc(widget.uid)
         .get();
 
     setState(() {
-      tenant = Tenant.fromJson(myTenant.data()!);
+      if (widget.callerType == 'Tenants') {
+        tenant = Tenant.fromJson(myTenant.data()!);
+      } else if (widget.callerType == 'Landlords') {
+        landlord = Landlord.fromJson(myTenant.data()!);
+      }
     });
 
     if (myTenant.data()?['isApplySecurity'] == true) {
@@ -178,7 +186,7 @@ class _TenantSecurityDepositPageState extends State<TenantSecurityDepositPage> {
                                   isApplySecurity = true;
                                 });
                                 FirebaseFirestore.instance
-                                    .collection('Tenants')
+                                    .collection(widget.callerType)
                                     .doc(widget.uid)
                                     .set({
                                   'isApplySecurity': true,
@@ -285,9 +293,15 @@ class _TenantSecurityDepositPageState extends State<TenantSecurityDepositPage> {
                             //     padding:
                             //         EdgeInsets.only(left: size.width * 0.27)),
                             Text(
-                              DateFormat('dd MMMM yyyy').format(
-                                  tenant?.dateJoined?.toDate() ??
-                                      DateTime.now()),
+                              widget.callerType == 'Tenants'
+                                  ? DateFormat('dd MMMM yyyy').format(
+                                      tenant?.dateJoined?.toDate() ??
+                                          DateTime.now())
+                                  : widget.callerType == 'Landlords'
+                                      ? DateFormat('dd MMMM yyyy').format(
+                                          landlord?.dateJoined?.toDate() ??
+                                              DateTime.now())
+                                      : '',
 
                               // 'Date Joined',
                               style: TextStyle(

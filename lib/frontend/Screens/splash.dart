@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -36,6 +37,7 @@ class _SplashScreenState extends State<SplashScreen> {
       // ignore: use_build_context_synchronously
 
       // checking if user is Tenant or Landlord
+      FirebaseCrashlytics.instance.setUserIdentifier(user.uid);
 
       FirebaseFirestore.instance
           .collection('users')
@@ -80,6 +82,9 @@ class _SplashScreenState extends State<SplashScreen> {
     }
   }
 
+  // store the current year in a String variable
+  String year = DateTime.now().year.toString();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -97,10 +102,10 @@ class _SplashScreenState extends State<SplashScreen> {
                 ), // replace this with your actual asset path
               ),
             ),
-            const Padding(
+            Padding(
               padding: EdgeInsets.only(bottom: 20.0),
               child: Text(
-                "@ 2022, Rehnaa",
+                "@ ${year}, Rehnaa",
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: Color(0xff33907c),

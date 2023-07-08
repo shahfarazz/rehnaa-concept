@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:rehnaa/frontend/helper/Landlorddashboard_pages/skeleton.dart';
 import '../../../backend/models/landlordmodel.dart';
@@ -22,17 +25,26 @@ class LandlordPropertiesPage extends StatefulWidget {
 class _LandlordPropertiesPageState extends State<LandlordPropertiesPage>
     with AutomaticKeepAliveClientMixin<LandlordPropertiesPage> {
   List<Property> properties = [];
-  late Stream<List<DocumentSnapshot<Map<String, dynamic>>>> _propertyStream;
+  // late Stream<List<DocumentSnapshot<Map<String, dynamic>>>> _propertyStream;
   String firstName = '';
   String lastName = '';
 
   bool shouldDisplay = false;
+  bool isEmptyList = false;
   @override
+  Stream<List<DocumentSnapshot<Map<String, dynamic>>>> _propertyStream =
+      const Stream.empty();
+  Timer? _propertyStreamTimer;
+  List<DocumentReference<Map<String, dynamic>>> propertyDataList = [];
+
   void initState() {
     super.initState();
-    // _loadProperties();
-    _propertyStream = const Stream.empty();
     _loadProperties(); // Initialize the stream for the properties
+  }
+
+  void dispose() {
+    _cancelPropertyStreamTimer();
+    super.dispose();
   }
 
   void _loadProperties() {
@@ -40,7 +52,77 @@ class _LandlordPropertiesPageState extends State<LandlordPropertiesPage>
       setState(() {
         _propertyStream = stream;
       });
+      _startPropertyStreamTimer(); // Start the timer to periodically update the property stream
     });
+  }
+
+  Future<void> _updatePropertyStream() async {
+    _cancelPropertyStreamTimer(); // Cancel the timer before updating the stream
+
+    // Fetch the latest property references from the Landlords collection
+    final landlordSnapshot = await FirebaseFirestore.instance
+        .collection('Landlords')
+        .doc(widget.uid)
+        .get();
+
+    if (landlordSnapshot.exists) {
+      // print('nahi yahan');
+      Map<String, dynamic> data = landlordSnapshot.data()!;
+      List<DocumentReference<Map<String, dynamic>>> propertyDataList2 =
+          (data['propertyRef'] as List<dynamic>)
+              .cast<DocumentReference<Map<String, dynamic>>>();
+
+      if (propertyDataList.map((ref) => ref.path).toList().toString() !=
+          propertyDataList2.map((ref) => ref.path).toList().toString()) {
+        // print('propertyDataList is $propertyDataList');
+        // print('propertyDataList2 is ${propertyDataList2.length}');
+
+        Iterable<Stream<DocumentSnapshot<Map<String, dynamic>>>>
+            propertySnapshotsStreams =
+            propertyDataList2.map((ref) => ref.snapshots());
+
+        properties = []; // Clear the properties list
+        // Combine the property snapshot streams into a single stream
+        if (propertyDataList2.isEmpty) {
+          // print('reached here and doing this');
+          // Set the propertyDataList to null if propertyDataList2 is null
+          setState(() {
+            // _propertyStream.drain();
+            _propertyStream = const Stream.empty();
+            propertyDataList = [];
+            isEmptyList = true;
+          });
+        } else {
+          Stream<List<DocumentSnapshot<Map<String, dynamic>>>> combinedStream =
+              CombineLatestStream.list(propertySnapshotsStreams);
+
+          setState(() {
+            _propertyStream = combinedStream;
+            propertyDataList = propertyDataList2;
+            isEmptyList = false;
+          });
+        }
+      }
+    } else {
+      print('yahan reach horha hai');
+      setState(() {
+        properties =
+            []; // Handle the case where the landlord document doesn't exist
+        _propertyStream = Stream.empty();
+      });
+    }
+
+    _startPropertyStreamTimer(); // Restart the timer for periodic updates
+  }
+
+  void _startPropertyStreamTimer() {
+    _propertyStreamTimer = Timer.periodic(const Duration(seconds: 5), (_) {
+      _updatePropertyStream();
+    });
+  }
+
+  void _cancelPropertyStreamTimer() {
+    _propertyStreamTimer?.cancel();
   }
 
   Future<Stream<List<DocumentSnapshot<Map<String, dynamic>>>>>
@@ -62,9 +144,8 @@ class _LandlordPropertiesPageState extends State<LandlordPropertiesPage>
         firstName = landlord.firstName;
         lastName = landlord.lastName;
 
-        List<DocumentReference<Map<String, dynamic>>> propertyDataList =
-            (data['propertyRef'] as List<dynamic>)
-                .cast<DocumentReference<Map<String, dynamic>>>();
+        propertyDataList = (data['propertyRef'] as List<dynamic>)
+            .cast<DocumentReference<Map<String, dynamic>>>();
 
         Iterable<Stream<DocumentSnapshot<Map<String, dynamic>>>>
             propertySnapshotsStreams =
@@ -101,9 +182,10 @@ class _LandlordPropertiesPageState extends State<LandlordPropertiesPage>
       stream: _propertyStream,
       builder: (context, snapshot) {
         Size size = MediaQuery.of(context).size;
+        // print('data is ${snapshot.data?.map((e) => e.data())}');
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const LandlordPropertiesSkeleton();
-        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+        } else if (isEmptyList || !snapshot.hasData || snapshot.data!.isEmpty) {
           return Column(
             children: [
               SizedBox(height: size.height * 0.03),
@@ -170,6 +252,7 @@ class _LandlordPropertiesPageState extends State<LandlordPropertiesPage>
                   location: property.location,
                   address: property.address,
                   type: property.type,
+                  area: property.area ?? 0,
                   onTap: () {
                     Navigator.push(
                       context,
@@ -207,6 +290,7 @@ class PropertyCard extends StatelessWidget {
   final String location;
   final String address;
   final String type;
+  final num area;
 
   const PropertyCard({
     super.key,
@@ -218,7 +302,18 @@ class PropertyCard extends StatelessWidget {
     required this.location,
     required this.address,
     required this.type,
+    required this.area,
   });
+
+  String capitalizeFirstLetter(String text) {
+    if (text.isEmpty) return '';
+    return text
+        .split(' ')
+        .map((word) =>
+            word.substring(0, 1).toUpperCase() +
+            word.substring(1).toLowerCase())
+        .join(' ');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -226,7 +321,7 @@ class PropertyCard extends StatelessWidget {
     final screenWidth = mediaQuery.size.width;
     final screenHeight = mediaQuery.size.height;
 
-    print('property.imagepath is ${property.imagePath}');
+    // print('property.imagepath is ${property.imagePath}');
 
     return GestureDetector(
       onTap: onTap,
@@ -245,9 +340,8 @@ class PropertyCard extends StatelessWidget {
                 width: double.infinity,
                 child: CachedNetworkImage(
                   imageUrl: property.imagePath[0],
-                  placeholder: (context, url) =>
-                      const CircularProgressIndicator(
-                    color: Colors.green,
+                  placeholder: (context, url) => const SpinKitFadingCube(
+                    color: Color.fromARGB(255, 30, 197, 83),
                   ),
                   errorWidget: (context, url, error) => const Icon(Icons.error),
                   fit: BoxFit.cover,
@@ -259,7 +353,7 @@ class PropertyCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      property.title,
+                      capitalizeFirstLetter(property.title),
                       style: GoogleFonts.montserrat(
                         fontSize: screenWidth * 0.04,
                         fontWeight: FontWeight.bold,
@@ -267,7 +361,6 @@ class PropertyCard extends StatelessWidget {
                       ),
                     ),
                     SizedBox(height: screenHeight * 0.005),
-
                     Text(
                       '$location\n$address',
                       style: TextStyle(fontSize: screenWidth * 0.035),
@@ -275,6 +368,13 @@ class PropertyCard extends StatelessWidget {
                     SizedBox(height: screenHeight * 0.01),
                     Row(
                       children: [
+                        Icon(Icons.area_chart, size: screenWidth * 0.035),
+                        SizedBox(width: screenWidth * 0.01),
+                        Text(
+                          '${property.area?.round()} Marlas / ${(property.area! * 272).round()} Sqft',
+                          style: TextStyle(fontSize: screenWidth * 0.035),
+                        ),
+                        SizedBox(width: screenWidth * 0.01),
                         Icon(Icons.king_bed_outlined,
                             size: screenWidth * 0.035),
                         SizedBox(width: screenWidth * 0.01),
@@ -295,8 +395,10 @@ class PropertyCard extends StatelessWidget {
                     Row(
                       children: [
                         CircleAvatar(
-                          backgroundImage: AssetImage(
-                            pathToImage ?? 'assets/userimage.png',
+                          child: ClipOval(
+                            child: pathToImage!.startsWith('https')
+                                ? CachedNetworkImage(imageUrl: pathToImage!)
+                                : Image.asset(pathToImage!),
                           ),
                           radius: screenWidth * 0.025,
                         ),
@@ -312,7 +414,6 @@ class PropertyCard extends StatelessWidget {
                         ),
                       ],
                     ),
-                    // SizedBox(height: 10),
                   ],
                 ),
               ),

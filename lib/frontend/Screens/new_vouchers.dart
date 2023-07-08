@@ -1,8 +1,11 @@
 import 'dart:async';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:easy_image_viewer/easy_image_viewer.dart';
 
 class NewVouchersPage extends StatefulWidget {
   const NewVouchersPage({super.key});
@@ -17,9 +20,11 @@ class _NewVouchersPageState extends State<NewVouchersPage> {
   // I want to load the images as fast as possible
 
   var images = [];
+  var imageNames = [];
   double loadingProgress = 0.0;
   bool isLoading = true;
   Timer? loadingTimer;
+  String? searchQuery = '';
 
   void _loadImages() {
     FirebaseFirestore.instance
@@ -29,6 +34,7 @@ class _NewVouchersPageState extends State<NewVouchersPage> {
         .then((value) {
       setState(() {
         images = value.data()?['urls'];
+        imageNames = value.data()?['names'];
         isLoading = false;
       });
     });
@@ -56,6 +62,7 @@ class _NewVouchersPageState extends State<NewVouchersPage> {
 
   @override
   //return a list of images fetched using the url in images, wrapped in a card with a listview
+  @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
@@ -65,62 +72,97 @@ class _NewVouchersPageState extends State<NewVouchersPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Padding(padding: EdgeInsets.only(top: size.height * 0.3)),
-                CircularProgressIndicator(
-                  color: Colors.green,
-                  value: loadingProgress,
-                )
+                const SpinKitFadingCube(
+                  color: Color.fromARGB(255, 30, 197, 83),
+                ),
               ],
             )
           : images.length == 0
               ? Center(child: Text('No Vouchers Available Yet'))
-              : ListView.builder(
-                  addAutomaticKeepAlives: true,
-                  itemCount: images.length,
-                  itemBuilder: (context, index) {
-                    return Column(
-                      children: [
-                        SizedBox(height: size.height * 0.02),
-                        Text(
-                          'Voucher ${index + 1}',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
+              : Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: TextField(
+                        onChanged: (value) {
+                          setState(() {
+                            searchQuery = value.toLowerCase();
+                          });
+                        },
+                        decoration: InputDecoration(
+                          focusedBorder: UnderlineInputBorder(
+                            borderSide: BorderSide(color: Colors.green),
+                          ),
+                          hintText: 'Search',
+                          hintStyle: TextStyle(
                             color: Colors.green,
                             fontFamily: GoogleFonts.montserrat().fontFamily,
                           ),
+                          prefixIcon: Icon(Icons.search, color: Colors.green),
                         ),
-                        Card(
-                          child: GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => ExpandedImageDialog(
-                                    imagePath: images[index],
+                      ),
+                    ),
+                    Expanded(
+                      child: ListView.builder(
+                        addAutomaticKeepAlives: true,
+                        itemCount: images.length,
+                        itemBuilder: (context, index) {
+                          int reversedIndex = images.length - 1 - index;
+                          String imageName = imageNames[reversedIndex];
+
+                          if (searchQuery != null &&
+                              imageName.toLowerCase().contains(searchQuery!)) {
+                            return Column(
+                              children: [
+                                SizedBox(height: size.height * 0.02),
+                                Text(
+                                  '$imageName',
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.green,
+                                    fontFamily:
+                                        GoogleFonts.montserrat().fontFamily,
                                   ),
                                 ),
-                              );
-                            },
-                            child: SizedBox(
-                              width: 200,
-                              height: 200,
-                              child: Image.network(images[index],
-                                  fit: BoxFit.cover,
-                                  loadingBuilder:
-                                      (context, child, loadingProgress) =>
-                                          Center(
-                                            child: loadingProgress == null
-                                                ? child
-                                                : CircularProgressIndicator(
-                                                    color: Colors.green,
-                                                  ),
-                                          )),
-                            ),
-                          ),
-                        )
-                      ],
-                    );
-                  },
+                                Card(
+                                  child: GestureDetector(
+                                    onTap: () async {
+                                      final imageProvider =
+                                          CachedNetworkImageProvider(
+                                              images[reversedIndex]);
+
+                                      await showImageViewer(
+                                          context, imageProvider);
+                                    },
+                                    child: SizedBox(
+                                      width: 200,
+                                      height: 200,
+                                      child: Image.network(
+                                          images[reversedIndex],
+                                          fit: BoxFit.cover,
+                                          loadingBuilder: (context, child,
+                                                  loadingProgress) =>
+                                              Center(
+                                                child: loadingProgress == null
+                                                    ? child
+                                                    : const SpinKitFadingCube(
+                                                        color: Color.fromARGB(
+                                                            255, 30, 197, 83),
+                                                      ),
+                                              )),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            );
+                          } else {
+                            return Container();
+                          }
+                        },
+                      ),
+                    ),
+                  ],
                 ),
     );
   }
@@ -206,66 +248,5 @@ class HexagonClipper extends CustomClipper<Path> {
   @override
   bool shouldReclip(CustomClipper<Path> oldClipper) {
     return false;
-  }
-}
-
-class ExpandedImageDialog extends StatelessWidget {
-  final String imagePath;
-
-  const ExpandedImageDialog({Key? key, required this.imagePath})
-      : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Dialog(
-      insetPadding: EdgeInsets.zero,
-      child: Stack(
-        children: [
-          Container(
-            constraints: const BoxConstraints.expand(),
-            child: InteractiveViewer(
-              boundaryMargin: const EdgeInsets.all(20),
-              minScale: 0.5,
-              maxScale: 5.0,
-              child: Image.network(
-                imagePath,
-                fit: BoxFit.contain,
-              ),
-            ),
-          ),
-          Positioned(
-            top: 65.0,
-            left: 10.0,
-            child: GestureDetector(
-              onTap: () {
-                Navigator.pop(context);
-              },
-              child: Container(
-                width: 40,
-                height: 40,
-                decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Color(0xFF33907C),
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      Color(0xff0FA697),
-                      Color(0xff45BF7A),
-                      Color(0xff0DF205),
-                    ],
-                  ),
-                ),
-                child: const Icon(
-                  Icons.arrow_back,
-                  size: 20,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
   }
 }

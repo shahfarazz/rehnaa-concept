@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
@@ -185,10 +186,11 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
                       borderRadius: BorderRadius.circular(20.0),
                     ),
                   ),
-                  child: const Text(
+                  child: Text(
                     'Cancel',
                     style: TextStyle(
                       color: Colors.white,
+                      fontFamily: GoogleFonts.montserrat().fontFamily,
                     ),
                   ),
                   onPressed: () {
@@ -203,10 +205,11 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
                       borderRadius: BorderRadius.circular(20.0),
                     ),
                   ),
-                  child: const Text(
+                  child: Text(
                     'Next',
                     style: TextStyle(
                       color: Colors.white,
+                      fontFamily: GoogleFonts.montserrat().fontFamily,
                     ),
                   ),
                   onPressed: () {
@@ -232,6 +235,11 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
                                 withdrawalAmount =
                                     double.tryParse(value) ?? 0.0;
                               },
+                              decoration: InputDecoration(
+                                focusedBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.green),
+                                ),
+                              ),
                             ),
                             actions: <Widget>[
                               TextButton(
@@ -261,55 +269,6 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
                                       generateInvoiceNumber();
                                   if (withdrawalAmount > 0 &&
                                       withdrawalAmount <= landlord.balance) {
-                                    Fluttertoast.showToast(
-                                      msg:
-                                          'An admin will contact you soon regarding your payment via: $selectedOption',
-                                      toastLength: Toast.LENGTH_SHORT,
-                                      gravity: ToastGravity.BOTTOM,
-                                      timeInSecForIosWeb: 3,
-                                      backgroundColor: const Color(0xff45BF7A),
-                                    );
-                                    FirebaseFirestore.instance
-                                        .collection('Notifications')
-                                        .doc(widget.uid)
-                                        .set({
-                                      'notifications': FieldValue.arrayUnion([
-                                        {
-                                          'title':
-                                              'Withdraw Request by ${'${landlord.firstName} ${landlord.lastName}'}',
-                                          'amount': 'Rs${withdrawalAmount}',
-                                        }
-                                      ]),
-                                    }, SetOptions(merge: true));
-                                    FirebaseFirestore.instance
-                                        .collection('Landlords')
-                                        .doc(widget.uid)
-                                        .set({
-                                      'isWithdraw': true,
-                                    }, SetOptions(merge: true));
-
-                                    FirebaseFirestore.instance
-                                        .collection('AdminRequests')
-                                        .doc(widget.uid)
-                                        .set({
-                                      'withdrawRequest': FieldValue.arrayUnion([
-                                        {
-                                          'fullname':
-                                              '${landlord.firstName} ${landlord.lastName}',
-                                          'amount': withdrawalAmount,
-                                          'paymentMethod': selectedOption,
-                                          'uid': widget.uid,
-                                          'invoiceNumber': invoiceNumber,
-                                          // Convert to desired format
-                                        }
-                                      ]),
-                                      'timestamp': Timestamp.now(),
-                                    }, SetOptions(merge: true));
-
-                                    setState(() {
-                                      isWithdraw = true;
-                                    });
-
                                     //showdialog box let user select particular tenant and then show pdf editor page
                                     // because we have to use landlord.tenantref.get() and then use that snapshot to get tenant data
                                     // first listview of tenantref list then futurebuilder to get each tenantref.get() and then use that snapshot to get tenant data
@@ -345,38 +304,174 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
                                                           onTap: () {
                                                             Navigator.pop(
                                                                 context);
-                                                            Navigator.push(
-                                                              context,
-                                                              MaterialPageRoute(
-                                                                  builder:
-                                                                      (context) =>
-                                                                          PDFEditorPage(
-                                                                            tenantName:
-                                                                                '${tenant.firstName} ${tenant.lastName}',
-                                                                            balance:
-                                                                                tenant.rent.toDouble(),
-                                                                            landlordName:
-                                                                                '${landlord.firstName} ${landlord.lastName}',
-                                                                            amount:
-                                                                                withdrawalAmount,
-                                                                            paymentMode:
-                                                                                selectedOption,
-                                                                            uid:
-                                                                                widget.uid,
-                                                                            landlordAddress:
-                                                                                landlord.address,
-                                                                            tenantAddress:
-                                                                                tenant.address,
-                                                                            invoiceNumber:
-                                                                                invoiceNumber,
-                                                                          )),
+                                                            Fluttertoast
+                                                                .showToast(
+                                                              msg:
+                                                                  'An admin will contact you soon regarding your payment request via: $selectedOption',
+                                                              toastLength: Toast
+                                                                  .LENGTH_SHORT,
+                                                              gravity:
+                                                                  ToastGravity
+                                                                      .BOTTOM,
+                                                              timeInSecForIosWeb:
+                                                                  3,
+                                                              backgroundColor:
+                                                                  const Color(
+                                                                      0xff45BF7A),
                                                             );
+                                                            FirebaseFirestore
+                                                                .instance
+                                                                .collection(
+                                                                    'Notifications')
+                                                                .doc(widget.uid)
+                                                                .set(
+                                                                    {
+                                                                  'notifications':
+                                                                      FieldValue
+                                                                          .arrayUnion([
+                                                                    {
+                                                                      'title':
+                                                                          'Withdraw Request by ${'${landlord.firstName} ${landlord.lastName}'}',
+                                                                      'amount':
+                                                                          'Rs${withdrawalAmount}',
+                                                                    }
+                                                                  ]),
+                                                                },
+                                                                    SetOptions(
+                                                                        merge:
+                                                                            true));
+                                                            FirebaseFirestore
+                                                                .instance
+                                                                .collection(
+                                                                    'Landlords')
+                                                                .doc(widget.uid)
+                                                                .set(
+                                                                    {
+                                                                  'isWithdraw':
+                                                                      true,
+                                                                },
+                                                                    SetOptions(
+                                                                        merge:
+                                                                            true));
+
+                                                            // Generate a random ID
+                                                            final Random
+                                                                random =
+                                                                Random();
+                                                            final String
+                                                                randomID =
+                                                                random
+                                                                    .nextInt(
+                                                                        999999)
+                                                                    .toString()
+                                                                    .padLeft(
+                                                                        6, '0');
+
+                                                            FirebaseFirestore
+                                                                .instance
+                                                                .collection(
+                                                                    'AdminRequests')
+                                                                .doc(widget.uid)
+                                                                .set(
+                                                                    {
+                                                                  'withdrawRequest':
+                                                                      FieldValue
+                                                                          .arrayUnion([
+                                                                    {
+                                                                      'fullname':
+                                                                          '${landlord.firstName} ${landlord.lastName}',
+                                                                      'amount':
+                                                                          withdrawalAmount,
+                                                                      'paymentMethod':
+                                                                          selectedOption,
+                                                                      'uid': widget
+                                                                          .uid,
+                                                                      'invoiceNumber':
+                                                                          invoiceNumber,
+                                                                      'tenantname':
+                                                                          '${tenant.firstName} ${tenant.lastName}',
+                                                                      'requestID':
+                                                                          randomID,
+                                                                    }
+                                                                  ]),
+                                                                  'timestamp':
+                                                                      Timestamp
+                                                                          .now(),
+                                                                },
+                                                                    SetOptions(
+                                                                        merge:
+                                                                            true));
+
+                                                            setState(() {
+                                                              isWithdraw = true;
+                                                            });
+                                                            Navigator.pop(
+                                                                context);
+                                                            Navigator.pop(
+                                                                context);
+                                                            PDFEditorPage
+                                                                pdfinstance =
+                                                                PDFEditorPage();
+
+                                                            pdfinstance.createState().createPdf(
+                                                                tenant.firstName +
+                                                                    ' ' +
+                                                                    tenant
+                                                                        .lastName,
+                                                                landlord.firstName +
+                                                                    ' ' +
+                                                                    landlord
+                                                                        .lastName,
+                                                                landlord
+                                                                    .address,
+                                                                tenant.address,
+                                                                landlord.balance
+                                                                    .toDouble(),
+                                                                withdrawalAmount,
+                                                                selectedOption,
+                                                                widget.uid,
+                                                                invoiceNumber);
+
+                                                            // Navigator.push(
+                                                            //   context,
+                                                            //   MaterialPageRoute(
+                                                            //       builder:
+                                                            //           (context) =>
+                                                            //               PDFEditorPage(
+                                                            //                 tenantName:
+                                                            //                     '${tenant.firstName} ${tenant.lastName}',
+                                                            //                 balance:
+                                                            //                     tenant.rent.toDouble(),
+                                                            //                 landlordName:
+                                                            //                     '${landlord.firstName} ${landlord.lastName}',
+                                                            //                 amount:
+                                                            //                     withdrawalAmount,
+                                                            //                 paymentMode:
+                                                            //                     selectedOption,
+                                                            //                 uid:
+                                                            //                     widget.uid,
+                                                            //                 landlordAddress:
+                                                            //                     landlord.address,
+                                                            //                 tenantAddress:
+                                                            //                     tenant.address,
+                                                            //                 invoiceNumber:
+                                                            //                     invoiceNumber,
+                                                            //               )),
+                                                            // );
                                                           },
                                                         );
                                                       } else {
-                                                        return Center(
-                                                            child:
-                                                                CircularProgressIndicator());
+                                                        return const Center(
+                                                          child:
+                                                              SpinKitFadingCube(
+                                                            color:
+                                                                Color.fromARGB(
+                                                                    255,
+                                                                    30,
+                                                                    197,
+                                                                    83),
+                                                          ),
+                                                        );
                                                       }
                                                     },
                                                   );
@@ -576,16 +671,9 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
                                           if (loadingProgress == null)
                                             return child;
                                           return Center(
-                                            child: CircularProgressIndicator(
-                                              color: Colors.green,
-                                              value: loadingProgress
-                                                          .expectedTotalBytes !=
-                                                      null
-                                                  ? loadingProgress
-                                                          .cumulativeBytesLoaded /
-                                                      loadingProgress
-                                                          .expectedTotalBytes!
-                                                  : null,
+                                            child: const SpinKitFadingCube(
+                                              color: Color.fromARGB(
+                                                  255, 30, 197, 83),
                                             ),
                                           );
                                         },

@@ -14,7 +14,7 @@ class Property {
   String title;
   String location;
   String address;
-  double price;
+  double? price;
   DocumentReference<Map<String, dynamic>>? landlordRef;
   DocumentReference<Map<String, dynamic>>? tenantRef;
   Landlord? landlord;
@@ -22,6 +22,8 @@ class Property {
   double tenantRating;
   String tenantReview;
   String? propertyID;
+  num? area;
+  bool? shouldShow;
 
   Property({
     required this.imagePath,
@@ -44,6 +46,8 @@ class Property {
     required this.tenantReview,
     this.propertyID,
     this.tenantRef,
+    this.area,
+    this.shouldShow,
   });
 
   static Property fromJson(Map<String, dynamic> json) {
@@ -60,13 +64,14 @@ class Property {
       description: json['description'],
       title: json['title'],
       location: json['location'],
-      price: json['price'].toDouble(),
+      price: json['price'].toDouble() ?? 0.0,
       landlordRef: json['landlordRef'],
       rehnaaRating: json['rehnaaRating'].toDouble(),
       tenantRating: json['tenantRating'].toDouble(),
       tenantReview: json['tenantReview'],
       address: json['address'] ?? 'No address provided',
       tenantRef: json['tenantRef'],
+      area: json['area'] ?? 0.0,
       // landlord: Landlord.fromJson(json['landlord']),
     );
 

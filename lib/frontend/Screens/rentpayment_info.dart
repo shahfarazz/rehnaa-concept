@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:rehnaa/backend/models/rentpaymentmodel.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -154,15 +155,18 @@ class RentPaymentInfoPage extends StatelessWidget {
                       // make a box where pdf will be shown
                       GestureDetector(
                           onTap: () {
-                            print('receiptUrl: $receiptUrl');
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => PDFScreen(
-                                  path: receiptUrl,
+                            // print('receiptUrl: $receiptUrl');
+                            if (receiptUrl != 'No pdf') {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => PDFScreen(
+                                    path: receiptUrl,
+                                    displayAppBar: true,
+                                  ),
                                 ),
-                              ),
-                            );
+                              );
+                            }
                           },
                           child: Center(
                             child: WhiteBox(
@@ -201,8 +205,10 @@ class RentPaymentInfoPage extends StatelessWidget {
 
 class PDFScreen extends StatefulWidget {
   final String? path;
+  bool displayAppBar;
 
-  PDFScreen({Key? key, this.path}) : super(key: key);
+  PDFScreen({Key? key, this.path, required this.displayAppBar})
+      : super(key: key);
 
   @override
   _PDFScreenState createState() => _PDFScreenState();
@@ -233,21 +239,32 @@ class _PDFScreenState extends State<PDFScreen> {
     }
 
     // Update the local path state
-    setState(() {
-      localPath = file.path;
-    });
+    if (mounted) {
+      setState(() {
+        localPath = file.path;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: _buildAppBar(MediaQuery.of(context).size, context),
+      appBar: widget.displayAppBar
+          ? _buildAppBar(MediaQuery.of(context).size, context)
+          : null,
       body: localPath.isEmpty
-          ? Center(child: CircularProgressIndicator())
+          ? Center(
+              child: const SpinKitFadingCube(
+                color: Color.fromARGB(255, 30, 197, 83),
+              ),
+            )
           : SfPdfViewer.file(
               File(localPath),
+              scrollDirection: PdfScrollDirection.vertical,
               canShowScrollHead: false,
               canShowScrollStatus: false,
+              enableTextSelection: false,
+              pageLayoutMode: PdfPageLayoutMode.single,
             ),
     );
   }

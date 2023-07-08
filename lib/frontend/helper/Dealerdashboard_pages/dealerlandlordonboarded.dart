@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:rehnaa/frontend/helper/Dealerdashboard_pages/landlordonboardedinfo.dart';
 
+import '../../../backend/models/dealermodel.dart';
 import '../../../backend/models/landlordmodel.dart';
 
 class DealerLandlordOnboardedPage extends StatefulWidget {
@@ -18,6 +19,7 @@ class DealerLandlordOnboardedPage extends StatefulWidget {
 class _DealerLandlordOnboardedPageState
     extends State<DealerLandlordOnboardedPage> {
   List<Landlord> landlords = [];
+  Dealer? dealer;
 
   bool isLoading = true;
 
@@ -30,14 +32,18 @@ class _DealerLandlordOnboardedPageState
               .get();
 
       Map<String, dynamic>? data = documentSnapshot.data()!;
-      List<dynamic>? landlordRef = data['landlordRef'];
+      // print('data: ${data['landlordRef'][0].id}');
+      List<dynamic> landlordRef = data['landlordRef'];
+      dealer = Dealer.fromJson(data);
 
       List<Landlord> landlordList = [];
 
       for (var landlordID in landlordRef!) {
+        print('landlordID: ${landlordID.id}');
         DocumentSnapshot<Map<String, dynamic>> documentSnapshot =
             await landlordID.get();
         Landlord landlord = Landlord.fromJson(documentSnapshot.data());
+        landlord.tempID = documentSnapshot.id;
         landlordList.add(landlord);
       }
 
@@ -87,6 +93,13 @@ class _DealerLandlordOnboardedPageState
     });
   }
 
+  Future<void> _refreshFunction() async {
+    setState(() {
+      isLoading = true;
+      fetchLandlords();
+    });
+  }
+
   @override
   void dispose() {
     searchFocusNode.dispose();
@@ -101,24 +114,21 @@ class _DealerLandlordOnboardedPageState
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
-          child: ListView(
+          child: Column(
             children: [
-              // const SizedBox(height: 60),
-              SizedBox(
-                height: size.height * 0.05,
-              ),
+              SizedBox(height: size.height * 0.05),
               Container(
-                child: Text("Landlords Onboarded",
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.montserrat(
-                      fontSize: 24,
-                      color: const Color(0xff33907c),
-                      fontWeight: FontWeight.bold,
-                    )),
+                child: Text(
+                  "Landlords Onboarded",
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.montserrat(
+                    fontSize: 24,
+                    color: const Color(0xff33907c),
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
-              SizedBox(
-                height: size.height * 0.05,
-              ),
+              SizedBox(height: size.height * 0.05),
               Container(
                 decoration: BoxDecoration(
                   color: Colors.white,
@@ -150,97 +160,103 @@ class _DealerLandlordOnboardedPageState
                   ),
                 ),
               ),
-
-              // const SizedBox(height: 40),
-              // if (isLoading)
-              //   const Center(
-              //     child: CircularProgressIndicator(
-              //       color: Colors.green,
-              //     ),
-              //   ),
               Expanded(
                 child: filteredLandlords.isEmpty
-                    ? Column(children: [
-                        SizedBox(height: size.height * 0.05),
-                        Card(
-                          elevation: 4.0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20.0),
-                          ),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(20.0),
-                              color: Colors.white,
-                            ),
-                            padding: const EdgeInsets.all(16.0),
+                    ? RefreshIndicator(
+                        onRefresh: _refreshFunction,
+                        child: SingleChildScrollView(
+                            physics: const AlwaysScrollableScrollPhysics(),
                             child: Column(
-                              mainAxisSize: MainAxisSize.min,
                               children: [
-                                const Icon(
-                                  Icons.error_outline,
-                                  size: 48.0,
-                                  color: Color(0xff33907c),
-                                ),
-                                const SizedBox(height: 16.0),
-                                Text(
-                                  'No Landlords onboarded yet',
-                                  textAlign: TextAlign.center,
-                                  style: GoogleFonts.montserrat(
-                                    fontSize: 20.0,
-                                    // fontWeight: FontWeight.bold,
-                                    color: const Color(0xff33907c),
+                                SizedBox(height: size.height * 0.05),
+                                Card(
+                                  elevation: 4.0,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20.0),
+                                  ),
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(20.0),
+                                      color: Colors.white,
+                                    ),
+                                    padding: const EdgeInsets.all(16.0),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        const Icon(
+                                          Icons.error_outline,
+                                          size: 48.0,
+                                          color: Color(0xff33907c),
+                                        ),
+                                        const SizedBox(height: 16.0),
+                                        Text(
+                                          'No Landlords onboarded yet',
+                                          textAlign: TextAlign.center,
+                                          style: GoogleFonts.montserrat(
+                                            fontSize: 20.0,
+                                            // fontWeight: FontWeight.bold,
+                                            color: const Color(0xff33907c),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ],
-                            ),
-                          ),
-                        ),
-                      ])
-                    : ListView.builder(
-                        itemCount: filteredLandlords.length,
-                        itemBuilder: (context, index) {
-                          final landlord = filteredLandlords[index];
-                          return GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      LandlordsOnboardedInfoPage(
-                                    landlord: landlord,
+                            )))
+                    : RefreshIndicator(
+                        onRefresh: _refreshFunction,
+                        child: ListView.builder(
+                          itemCount: filteredLandlords.length,
+                          itemBuilder: (context, index) {
+                            final landlord = filteredLandlords[index];
+                            return GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        LandlordsOnboardedInfoPage(
+                                      landlord: landlord,
+                                      dealer: dealer!,
+                                    ),
                                   ),
+                                );
+                              },
+                              child: Card(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10.0),
                                 ),
-                              );
-                            },
-                            child: Card(
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10.0),
-                              ),
-                              elevation: 5.0,
-                              child: ListTile(
-                                contentPadding: const EdgeInsets.symmetric(
-                                    horizontal: 20.0, vertical: 10.0),
-                                title: Text(
+                                elevation: 5.0,
+                                child: ListTile(
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 20.0, vertical: 10.0),
+                                  title: Text(
                                     landlord.firstName +
                                         " " +
                                         landlord.lastName,
                                     style: TextStyle(
+                                        color: Colors.green,
                                         fontFamily:
                                             GoogleFonts.montserrat().fontFamily,
-                                        fontWeight: FontWeight.bold)),
-                                trailing: Text(landlord.balance.toString(),
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  trailing: Text(
+                                    landlord.balance.toString(),
                                     style: TextStyle(
-                                      color: Colors.grey,
+                                      color: Colors.black,
                                       fontFamily:
                                           GoogleFonts.montserrat().fontFamily,
-                                    )),
-                                // subtitle: Text('dummy'),
+                                    ),
+                                  ),
+                                  // subtitle: Text('dummy'),
+                                ),
                               ),
-                            ),
-                          );
-                        },
+                            );
+                          },
+                        ),
                       ),
-              ),
+              )
             ],
           ),
         ),

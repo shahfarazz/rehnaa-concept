@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'dart:ui';
 
-import 'package:firebase_auth/firebase_auth.dart';
+// import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+// import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -11,9 +11,9 @@ import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:rehnaa/backend/models/landlordmodel.dart';
 import 'package:rehnaa/frontend/Screens/faq.dart';
-import 'package:rehnaa/frontend/helper/Landlorddashboard_pages/landlordinvoice.dart';
+// import 'package:rehnaa/frontend/helper/Landlorddashboard_pages/landlordinvoice.dart';
 import 'landlord_dashboard_content.dart';
-import 'skeleton.dart';
+// import 'skeleton.dart';
 
 class InterestFreeLoanPage extends StatefulWidget {
   final String uid;
@@ -124,13 +124,159 @@ class _InterestFreeLoanPageState extends State<InterestFreeLoanPage>
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 20),
-                        
                       ],
                     ),
                   ),
                 ),
                 const SizedBox(height: 20),
-                
+                Container(
+                  width: MediaQuery.of(context).size.width * 0.6,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(30.0),
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: //isApplied
+                          // ? [Colors.grey, Colors.grey, Colors.grey]
+                          [
+                        Color(0xff0FA697),
+                        Color(0xff45BF7A),
+                        Color(0xff0DF205),
+                      ],
+                    ),
+                  ),
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(30.0),
+                      onTap: () async {
+                        Timestamp? joinDate = await FirebaseFirestore.instance
+                            .collection('Landlords')
+                            .doc(widget.uid)
+                            .get()
+                            .then((value) {
+                          return value.data()!['dateJoined'];
+                        });
+
+                        DateTime? joinDateTime = joinDate?.toDate();
+                        DateTime? now = DateTime.now();
+
+                        if (now.difference(joinDateTime!).inDays < 180) {
+                          Fluttertoast.showToast(
+                            msg:
+                                'You must be a member for 6 months to apply for an interest free loan.',
+                            toastLength: Toast.LENGTH_LONG,
+                            gravity: ToastGravity.BOTTOM,
+                            timeInSecForIosWeb: 1,
+                            backgroundColor: Colors.green,
+                            textColor: Colors.white,
+                            fontSize: 16.0,
+                          );
+                        } else {
+                          // setState(() {
+                          //   isWithdraw = true;
+                          // });
+                          // Fluttertoast.showToast(
+                          //   msg: 'Your request has been sent to the admin.',
+                          //   toastLength: Toast.LENGTH_LONG,
+                          //   gravity: ToastGravity.BOTTOM,
+                          //   timeInSecForIosWeb: 1,
+                          //   backgroundColor: Colors.grey[300],
+                          //   textColor: Colors.black,
+                          //   fontSize: 16.0,
+                          // );
+                          // FirebaseFirestore.instance
+                          //     .collection('AdminRequests')
+                          //     .doc(widget.uid)
+                          //     .set({
+                          //   'interestFreeLoanRequest': FieldValue.arrayUnion([
+                          //     {
+                          //       'fullname':
+                          //           '${landlord?.firstName} ${landlord?.lastName}',
+                          //       'uid': widget.uid,
+                          //     }
+                          //   ]),
+                          //   'timestamp': Timestamp.now()
+                          // }, SetOptions(merge: true));
+                        }
+
+                        // if (isApplied) {
+                        //   return;
+                        // }
+                        // // Handle button press
+                        // setState(() {
+                        //   isApplied = true;
+                        // });
+                        // FirebaseFirestore.instance
+                        //     .collection('Landlords')
+                        //     .doc(widget.uid)
+                        //     .set({
+                        //   'isApplied': true,
+                        // }, SetOptions(merge: true));
+
+                        // //send an AdminRequest for the tenant
+                        // // FirebaseFirestore.instance
+                        // //     .collection('AdminRequests')
+                        // //     .doc(widget.uid)
+                        // //     .set({
+                        // //   'rentAccrualRequest': FieldValue.arrayUnion([
+                        // //     {
+                        // //       'fullname':
+                        // //           '${landlord?.firstName} ${landlord?.lastName}',
+                        // //       'uid': widget.uid,
+                        // //     }
+                        // //   ]),
+                        // //   'timestamp': Timestamp.now()
+                        // // }, SetOptions(merge: true)); //TODO implement this call
+
+                        // //send a notification to the tenant that the request has been sent
+                        // FirebaseFirestore.instance
+                        //     .collection('Notifications')
+                        //     .doc(widget.uid)
+                        //     .set({
+                        //   'notifications': FieldValue.arrayUnion([
+                        //     {
+                        //       'title':
+                        //           'Your request for rent advance has been sent to the admin.',
+                        //     }
+                        //   ])
+                        // }, SetOptions(merge: true));
+
+                        // // show in green snackbar that the request has been sent
+                        // ScaffoldMessenger.of(context).showSnackBar(
+                        //   SnackBar(
+                        //     backgroundColor: Colors.green,
+                        //     content: Text(
+                        //       'Your request for rent advance has been sent to the admin.\nRehnaa team will contact you shortly. Thanks',
+                        //       style: TextStyle(
+                        //         fontSize: 18,
+                        //         fontFamily: GoogleFonts.montserrat().fontFamily,
+                        //       ),
+                        //     ),
+                        //   ),
+                        // );
+                      },
+                      child: Ink(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 16.0,
+                          horizontal: 32.0,
+                        ),
+                        child: Center(
+                          child: Text(
+                            // isApplied ? 'Applied' :
+                            'Apply',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: GoogleFonts.montserrat().fontFamily,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
                 Center(
                   child: buildTextCard2(
                     BoxConstraints(
@@ -147,7 +293,7 @@ class _InterestFreeLoanPageState extends State<InterestFreeLoanPage>
   }
 
   Widget buildTextCard2(BoxConstraints constraints) {
-        final Size size = MediaQuery.of(context).size;
+    final Size size = MediaQuery.of(context).size;
 
     return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
       stream: _landlordStream,
@@ -174,59 +320,58 @@ class _InterestFreeLoanPageState extends State<InterestFreeLoanPage>
             });
           }
           return Center(
-                  child: Container(
-                    padding: const EdgeInsets.all(16.0),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(20.0),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey.withOpacity(0.3),
-                          spreadRadius: 2,
-                          blurRadius: 5,
-                          offset: const Offset(0, 3),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment
-                          .center, // Align contents vertically in the center
-                      children: [
-                        Row(
-                          children: [
-                            Padding(
-                                padding:
-                                    EdgeInsets.only(left: size.width * 0.27)),
-                            Text(
-                               DateFormat('dd MMMM yyyy').format(landlord?.dateJoined?.toDate() ?? DateTime.now()),
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                fontFamily: GoogleFonts.montserrat().fontFamily,
-                                color: Color(0xff45BF7A),
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 10),
-                        Row(
-                          children: [
-                            Padding(
-                                padding:
-                                    EdgeInsets.only(left: size.width * 0.27)),
-                            Text(
-                              'Date Joined',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontFamily: GoogleFonts.montserrat().fontFamily,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
+            child: Container(
+              padding: const EdgeInsets.all(16.0),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20.0),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.3),
+                    spreadRadius: 2,
+                    blurRadius: 5,
+                    offset: const Offset(0, 3),
                   ),
-                );
+                ],
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment
+                    .center, // Align contents vertically in the center
+                children: [
+                  Row(
+                    children: [
+                      Padding(
+                          padding: EdgeInsets.only(left: size.width * 0.27)),
+                      Text(
+                        DateFormat('dd MMMM yyyy').format(
+                            landlord?.dateJoined?.toDate() ?? DateTime.now()),
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: GoogleFonts.montserrat().fontFamily,
+                          color: Color(0xff45BF7A),
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Padding(
+                          padding: EdgeInsets.only(left: size.width * 0.27)),
+                      Text(
+                        'Date Joined',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontFamily: GoogleFonts.montserrat().fontFamily,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          );
         }
         return Container();
       },

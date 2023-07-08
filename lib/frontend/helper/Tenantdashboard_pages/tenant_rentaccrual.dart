@@ -1,9 +1,13 @@
+import 'dart:math';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../backend/models/tenantsmodel.dart';
+import '../../Screens/Landlord/landlord_dashboard.dart';
 
 class TenantRentAccrualPage extends StatefulWidget {
   String uid;
@@ -30,11 +34,16 @@ class _TenantRentAccrualPageState extends State<TenantRentAccrualPage> {
         .get();
 
     tenant = Tenant.fromJson(myTenant.data()!);
+    // print('dateJoined is ${tenant!.dateJoined}');
 
     if (myTenant.data()?['isApplied'] == true) {
       // setState(() {
       isApplied = true;
       // });
+    }
+
+    if (mounted) {
+      setState(() {});
     }
   }
 
@@ -42,6 +51,7 @@ class _TenantRentAccrualPageState extends State<TenantRentAccrualPage> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
+      appBar: _buildAppBar(size, context),
       body: SingleChildScrollView(
         child: Container(
           color: Colors.grey[200], // Set the background color
@@ -110,7 +120,33 @@ class _TenantRentAccrualPageState extends State<TenantRentAccrualPage> {
                             color: Colors.transparent,
                             child: InkWell(
                               borderRadius: BorderRadius.circular(30.0),
-                              onTap: () {
+                              onTap: () async {
+                                Timestamp? joinDate = await FirebaseFirestore
+                                    .instance
+                                    .collection('Tenants')
+                                    .doc(widget.uid)
+                                    .get()
+                                    .then((value) {
+                                  return value.data()!['dateJoined'];
+                                });
+
+                                DateTime? joinDateTime = joinDate?.toDate();
+                                DateTime? now = DateTime.now();
+
+                                if (now.difference(joinDateTime!).inDays <
+                                    180) {
+                                  Fluttertoast.showToast(
+                                    msg:
+                                        'You must be a member for 6 months to apply for Rent Accrual.',
+                                    toastLength: Toast.LENGTH_LONG,
+                                    gravity: ToastGravity.BOTTOM,
+                                    timeInSecForIosWeb: 1,
+                                    backgroundColor: Colors.green,
+                                    textColor: Colors.white,
+                                    fontSize: 16.0,
+                                  );
+                                  return;
+                                }
                                 if (isApplied) {
                                   return;
                                 }
@@ -125,6 +161,13 @@ class _TenantRentAccrualPageState extends State<TenantRentAccrualPage> {
                                   'isApplied': true,
                                 }, SetOptions(merge: true));
 
+                                // Generate a random ID
+                                final Random random = Random();
+                                final String randomID = random
+                                    .nextInt(999999)
+                                    .toString()
+                                    .padLeft(6, '0');
+
                                 //send an AdminRequest for the tenant
                                 FirebaseFirestore.instance
                                     .collection('AdminRequests')
@@ -135,6 +178,7 @@ class _TenantRentAccrualPageState extends State<TenantRentAccrualPage> {
                                       'fullname':
                                           '${tenant?.firstName} ${tenant?.lastName}',
                                       'uid': widget.uid,
+                                      'requestID': randomID,
                                     }
                                   ]),
                                   'timestamp': Timestamp.now()
@@ -174,7 +218,7 @@ class _TenantRentAccrualPageState extends State<TenantRentAccrualPage> {
                                 ),
                                 child: Center(
                                   child: Text(
-                                    isApplied ? 'Applied' : 'Apply',
+                                    isApplied! ? 'Applied' : 'Apply',
                                     style: TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.bold,
@@ -218,7 +262,7 @@ class _TenantRentAccrualPageState extends State<TenantRentAccrualPage> {
                                       ?.toDate()
                                       .toString()
                                       .substring(0, 10) ??
-                                  'Date Joined',
+                                  'Old User type datejoined not available',
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
@@ -252,4 +296,67 @@ class _TenantRentAccrualPageState extends State<TenantRentAccrualPage> {
       ),
     );
   }
+}
+
+PreferredSizeWidget _buildAppBar(Size size, context) {
+  return AppBar(
+    toolbarHeight: 70,
+    title: Padding(
+      padding: EdgeInsets.only(
+        right:
+            MediaQuery.of(context).size.width * 0.14, // 55% of the page width
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Stack(
+            children: [
+              ClipPath(
+                clipper: HexagonClipper(),
+                child: Transform.scale(
+                  scale: 0.87,
+                  child: Container(
+                    color: Colors.white,
+                    width: 60,
+                    height: 60,
+                  ),
+                ),
+              ),
+              ClipPath(
+                clipper: HexagonClipper(),
+                child: Image.asset(
+                  'assets/mainlogo.png',
+                  width: 60,
+                  height: 60,
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ],
+          ),
+          // const SizedBox(width: 8),
+        ],
+      ),
+    ),
+    actions: <Widget>[
+      Padding(
+        padding: const EdgeInsets.only(top: 15.0),
+        child: Stack(
+          children: [],
+        ),
+      ),
+    ],
+    flexibleSpace: Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Color(0xff0FA697),
+            Color(0xff45BF7A),
+            Color(0xff0DF205),
+          ],
+        ),
+      ),
+    ),
+  );
 }

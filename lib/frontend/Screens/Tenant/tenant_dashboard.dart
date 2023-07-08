@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:easy_debounce/easy_debounce.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -15,6 +18,7 @@ import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenant_renthistory.
 import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenant_dashboard_content.dart';
 import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenantmonthlyrentoff.dart';
 
+import '../../helper/Tenantdashboard_pages/tenant_landlords.dart';
 import '../../helper/Tenantdashboard_pages/tenant_rented_property.dart';
 import '../../helper/Tenantdashboard_pages/tenant_security_deposit.dart';
 import '../new_vouchers.dart';
@@ -45,6 +49,7 @@ class _DashboardPageState extends State<TenantDashboardPage>
   bool isNewVoucher = false;
 
   bool _isWithdraw = false;
+  Timer? _timer;
 
   @override
   void initState() {
@@ -63,6 +68,25 @@ class _DashboardPageState extends State<TenantDashboardPage>
         .doc(widget.uid)
         .snapshots();
     isNewVouchers();
+    _startPeriodicFetch();
+  }
+
+  // Periodically fetch new data every 16 seconds
+  void _startPeriodicFetch() {
+    // print('start periodic fetch');
+    _timer = Timer.periodic(const Duration(seconds: 15), (_) {
+      isNewVouchers();
+    });
+  }
+
+  void _handleNotificationsButtonPress() async {
+    await _markNotificationsAsRead();
+    _showNotificationsDialog();
+  }
+
+  // Stop periodic fetching
+  void _stopPeriodicFetch() {
+    _timer?.cancel();
   }
 
   @override
@@ -71,6 +95,7 @@ class _DashboardPageState extends State<TenantDashboardPage>
     _sidebarController.dispose(); // Dispose the AnimationController
     super.dispose();
     // _getNotifs();
+    _stopPeriodicFetch();
     _notificationStream.drain();
     _notificationStream2.drain();
   }
@@ -99,17 +124,19 @@ class _DashboardPageState extends State<TenantDashboardPage>
           .get()
           .then((value) {
         if (value.exists) {
-          if (value.data()!['isNewVouchers'] == true) {
+          if (value.data()!['isNewVouchers'] == true && isNewVoucher == false) {
             setState(() {
               isNewVoucher = true;
             });
-          } else {
+          } else if (value.data()!['isNewVouchers'] == false &&
+              isNewVoucher == true) {
             setState(() {
               isNewVoucher = false;
             });
           }
         }
       });
+      // print('isNewVoucher is $isNewVoucher');
     } catch (e) {
       print('error is $e');
     }
@@ -222,7 +249,7 @@ class _DashboardPageState extends State<TenantDashboardPage>
                                           updateWithdrawState,
                                     );
                                   case 1:
-                                    return TenantRentAccrualPage(
+                                    return TenantLandlordsPage(
                                       uid: widget.uid,
                                     );
                                   case 2:
@@ -323,9 +350,12 @@ class _DashboardPageState extends State<TenantDashboardPage>
             children: [
               IconButton(
                 icon: const Icon(Icons.notifications_active),
-                onPressed: () async {
-                  await _markNotificationsAsRead();
-                  _showNotificationsDialog();
+                onPressed: () {
+                  EasyDebounce.debounce(
+                    'notifications-debouncer', // Debouncer ID
+                    Duration(milliseconds: 500), // Debounce duration
+                    _handleNotificationsButtonPress, // Wrapped function
+                  );
                 },
               ),
               Positioned(
@@ -523,6 +553,7 @@ class _DashboardPageState extends State<TenantDashboardPage>
                           MaterialPageRoute(
                             builder: (context) => TenantSecurityDepositPage(
                               uid: widget.uid,
+                              callerType: 'Tenants',
                             ),
                           ),
                         );
@@ -536,35 +567,41 @@ class _DashboardPageState extends State<TenantDashboardPage>
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => TenantMonthlyRentOffPage(),
+                            builder: (context) => TenantMonthlyRentOffPage(
+                              uid: widget.uid,
+                            ),
                           ),
                         );
                         // _closeSidebar();
                       },
                     ),
-                    _buildSidebarItem(
-                      icon: Icons.receipt,
-                      label: 'Vouchers',
-                      onTap: () {
-                        //firebase call set users isNewVouchers to false
-                        FirebaseFirestore.instance
-                            .collection('Tenants')
-                            .doc(widget.uid)
-                            .set({
-                          'isNewVouchers': false,
-                        }, SetOptions(merge: true));
+                    StatefulBuilder(
+                      builder: (BuildContext context, setState) {
+                        return _buildSidebarItem(
+                          icon: Icons.receipt,
+                          label: 'Vouchers',
+                          onTap: () {
+                            //firebase call set users isNewVouchers to false
+                            FirebaseFirestore.instance
+                                .collection('Tenants')
+                                .doc(widget.uid)
+                                .set({
+                              'isNewVouchers': false,
+                            }, SetOptions(merge: true));
 
-                        setState(() {
-                          isNewVoucher = false;
-                        });
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const NewVouchersPage(),
-                          ),
+                            setState(() {
+                              isNewVoucher = false;
+                            });
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const NewVouchersPage(),
+                              ),
+                            );
+                          },
+                          showBadge: isNewVoucher,
                         );
                       },
-                      showBadge: isNewVoucher,
                     ),
                     _buildSidebarItem(
                       icon: Icons.lock,
@@ -587,6 +624,21 @@ class _DashboardPageState extends State<TenantDashboardPage>
                           context,
                           MaterialPageRoute(
                             builder: (context) => const FAQPage(),
+                          ),
+                        );
+                        // _closeSidebar();
+                      },
+                    ),
+                    _buildSidebarItem(
+                      icon: Icons.real_estate_agent,
+                      label: 'Rent Accrual',
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => TenantRentAccrualPage(
+                              uid: widget.uid,
+                            ),
                           ),
                         );
                         // _closeSidebar();
@@ -718,38 +770,35 @@ class _DashboardPageState extends State<TenantDashboardPage>
                         ),
                         Column(
                           children: <Widget>[
-                            Padding(
-                              padding: const EdgeInsets.only(
-                                top: 0.0,
-                                left: 20.0,
-                                right: 20.0,
-                                bottom: 0.0,
-                              ),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: <Widget>[
-                                  Hero(
-                                    tag: 'notificationTitle',
-                                    child: Text(
-                                      'Notifications',
-                                      style: TextStyle(
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.white,
-                                          fontFamily: GoogleFonts.montserrat()
-                                              .fontFamily),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                SizedBox(width: size.width * 0.15),
+                                Hero(
+                                  tag: 'notificationTitle',
+                                  child: Text(
+                                    'Notifications',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                      fontFamily:
+                                          GoogleFonts.montserrat().fontFamily,
                                     ),
                                   ),
-                                  IconButton(
-                                    icon: const Icon(Icons.close),
-                                    onPressed: () {
-                                      Navigator.pop(context);
-                                    },
-                                    color: Colors.white,
-                                  ),
-                                ],
-                              ),
+                                ),
+                                IconButton(
+                                  padding:
+                                      EdgeInsets.only(left: size.width * 0.1),
+                                  alignment: Alignment.centerRight,
+                                  icon: const Icon(Icons.close),
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                  color: Colors.white,
+                                ),
+                              ],
                             ),
                             const Divider(
                               height: 0,
@@ -768,266 +817,208 @@ class _DashboardPageState extends State<TenantDashboardPage>
                                         thumbVisibility: true,
                                         child: SingleChildScrollView(
                                           child: Column(
-                                            children: notificationstemp.isEmpty
-                                                ? [
-                                                    Center(
-                                                      child: Card(
-                                                        elevation: 4.0,
-                                                        shape:
-                                                            RoundedRectangleBorder(
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(
-                                                                      20.0),
-                                                        ),
-                                                        child: Container(
-                                                          decoration:
-                                                              BoxDecoration(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        20.0),
-                                                            color: Colors.white,
+                                            children: notificationstemp.reversed
+                                                .map((notification) {
+                                              String title =
+                                                  notification['title'] ?? '';
+                                              var amount =
+                                                  notification['amount'] ?? '';
+
+                                              // Generate a unique key for each notification using its index
+                                              Key dismissibleKey = UniqueKey();
+
+                                              return Dismissible(
+                                                key: dismissibleKey,
+                                                direction:
+                                                    DismissDirection.horizontal,
+                                                confirmDismiss: (_) async {
+                                                  return await showDialog(
+                                                    context: context,
+                                                    builder:
+                                                        (BuildContext context) {
+                                                      return AlertDialog(
+                                                        title: const Text(
+                                                            "Delete Notification"),
+                                                        content: const Text(
+                                                            "Are you sure you want to delete this notification?"),
+                                                        actions: <Widget>[
+                                                          TextButton(
+                                                            onPressed: () =>
+                                                                Navigator.of(
+                                                                        context)
+                                                                    .pop(false),
+                                                            child: const Text(
+                                                                "Cancel"),
                                                           ),
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .all(16.0),
-                                                          child: Column(
-                                                            mainAxisSize:
-                                                                MainAxisSize
-                                                                    .min,
-                                                            children: [
-                                                              const Icon(
-                                                                Icons
-                                                                    .error_outline_outlined,
-                                                                size: 48.0,
-                                                                color: Color(
-                                                                    0xff33907c),
-                                                              ),
-                                                              const SizedBox(
-                                                                  height: 16.0),
-                                                              Text(
-                                                                'No notifications to show',
-                                                                style: GoogleFonts
-                                                                    .montserrat(
-                                                                  fontSize:
-                                                                      20.0,
-                                                                  // fontWeight: FontWeight.bold,
-                                                                  color: const Color(
-                                                                      0xff33907c),
-                                                                ),
-                                                              ),
-                                                            ],
+                                                          TextButton(
+                                                            onPressed: () =>
+                                                                Navigator.of(
+                                                                        context)
+                                                                    .pop(true),
+                                                            child: const Text(
+                                                                "Delete"),
                                                           ),
-                                                        ),
-                                                      ),
-                                                    )
-                                                  ]
-                                                : notificationstemp.reversed
-                                                    .map((notification) {
-                                                    String title =
-                                                        notification['title'] ??
-                                                            '';
-                                                    var amount = notification[
-                                                            'amount'] ??
-                                                        '';
+                                                        ],
+                                                      );
+                                                    },
+                                                  );
+                                                },
+                                                onDismissed: (_) {
+                                                  // Remove the notification from the list
+                                                  setState(() {
+                                                    notificationstemp
+                                                        .remove(notification);
+                                                  });
 
-                                                    // Generate a unique key for each notification using its index
-                                                    Key dismissibleKey =
-                                                        UniqueKey();
+                                                  FirebaseFirestore.instance
+                                                      .collection(
+                                                          'Notifications')
+                                                      .doc(widget.uid)
+                                                      .update({
+                                                    'notifications':
+                                                        FieldValue.arrayRemove(
+                                                            [notification])
+                                                  });
 
-                                                    // print(
-                                                    //     'notificanstemp is $notificationstemp');
-
-                                                    return Dismissible(
-                                                      key: dismissibleKey,
-                                                      direction:
-                                                          DismissDirection
-                                                              .horizontal,
-                                                      confirmDismiss:
-                                                          (_) async {
-                                                        return await showDialog(
-                                                          context: context,
-                                                          builder: (BuildContext
-                                                              context) {
-                                                            return AlertDialog(
-                                                              title: const Text(
-                                                                  "Delete Notification"),
-                                                              content: const Text(
-                                                                  "Are you sure you want to delete this notification?"),
-                                                              actions: <Widget>[
-                                                                TextButton(
-                                                                  onPressed: () =>
-                                                                      Navigator.of(
-                                                                              context)
-                                                                          .pop(
-                                                                              false),
-                                                                  child: const Text(
-                                                                      "Cancel"),
-                                                                ),
-                                                                TextButton(
-                                                                  onPressed: () =>
-                                                                      Navigator.of(
-                                                                              context)
-                                                                          .pop(
-                                                                              true),
-                                                                  child: const Text(
-                                                                      "Delete"),
-                                                                ),
-                                                              ],
-                                                            );
-                                                          },
-                                                        );
-                                                      },
-                                                      onDismissed: (_) {
-                                                        // Remove the notification from the list
-                                                        setState(() {
-                                                          notificationstemp
-                                                              .remove(
-                                                                  notification);
-                                                        });
-
-                                                        FirebaseFirestore
-                                                            .instance
-                                                            .collection(
-                                                                'Notifications')
-                                                            .doc(widget.uid)
-                                                            .update({
-                                                          'notifications':
-                                                              FieldValue
-                                                                  .arrayRemove([
-                                                            notification
-                                                          ])
-                                                        });
-
-                                                        // Show a snackbar! This snackbar could also contain "Undo" actions
-                                                        ScaffoldMessenger.of(
-                                                                context)
-                                                            .showSnackBar(
-                                                          SnackBar(
-                                                            backgroundColor:
-                                                                Colors
-                                                                    .green[400],
-                                                            content: Text(
-                                                                'Notification dismissed'),
-                                                            duration:
-                                                                const Duration(
-                                                                    seconds: 2),
-                                                          ),
-                                                        );
-                                                      },
-                                                      background: Container(
-                                                        color: Colors.red,
-                                                        child: const Icon(
-                                                            Icons.delete,
-                                                            color:
-                                                                Colors.white),
-                                                        alignment: Alignment
-                                                            .centerLeft,
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .only(left: 16),
-                                                      ),
-                                                      child: Column(
+                                                  // Show a snackbar! This snackbar could also contain "Undo" actions
+                                                  ScaffoldMessenger.of(context)
+                                                      .showSnackBar(
+                                                    SnackBar(
+                                                      backgroundColor:
+                                                          Colors.green[400],
+                                                      content: Text(
+                                                          'Notification dismissed'),
+                                                      duration: const Duration(
+                                                          seconds: 2),
+                                                    ),
+                                                  );
+                                                },
+                                                background: Container(
+                                                  color: Colors.red,
+                                                  child: const Icon(
+                                                      Icons.delete,
+                                                      color: Colors.white),
+                                                  alignment:
+                                                      Alignment.centerLeft,
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          left: 16),
+                                                ),
+                                                child: Column(
+                                                  children: <Widget>[
+                                                    Padding(
+                                                      padding: const EdgeInsets
+                                                              .symmetric(
+                                                          vertical: 8.0),
+                                                      child: Row(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
                                                         children: <Widget>[
-                                                          Padding(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                        .symmetric(
-                                                                    vertical:
-                                                                        8.0),
-                                                            child: Row(
+                                                          SizedBox(
+                                                            width: 24.0,
+                                                            child: Padding(
+                                                              padding: EdgeInsets
+                                                                  .only(
+                                                                      left:
+                                                                          8.0),
+                                                              child: Text(
+                                                                '\u2022',
+                                                                style:
+                                                                    TextStyle(
+                                                                  fontSize:
+                                                                      24.0,
+                                                                  fontFamily: GoogleFonts
+                                                                          .montserrat()
+                                                                      .fontFamily,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                  color: Color(
+                                                                      0xFF45BF7A),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          const SizedBox(
+                                                              width: 12.0),
+                                                          Expanded(
+                                                            child: Column(
                                                               crossAxisAlignment:
                                                                   CrossAxisAlignment
                                                                       .start,
-                                                              children: <Widget>[
-                                                                SizedBox(
-                                                                  width: 24.0,
-                                                                  child:
-                                                                      Padding(
-                                                                    padding: EdgeInsets
-                                                                        .only(
-                                                                            left:
-                                                                                8.0),
-                                                                    child: Text(
-                                                                      '\u2022',
-                                                                      style:
-                                                                          TextStyle(
-                                                                        fontSize:
-                                                                            24.0,
-                                                                        fontWeight:
-                                                                            FontWeight.bold,
-                                                                        fontFamily:
-                                                                            GoogleFonts.montserrat().fontFamily,
-                                                                        color: Color(
-                                                                            0xFF45BF7A),
+                                                              children: [
+                                                                Text(
+                                                                  title,
+                                                                  style:
+                                                                      TextStyle(
+                                                                    fontSize:
+                                                                        18.0,
+                                                                    fontFamily:
+                                                                        GoogleFonts.montserrat()
+                                                                            .fontFamily,
+                                                                  ),
+                                                                ),
+                                                                if (amount
+                                                                    .isNotEmpty)
+                                                                  Padding(
+                                                                    padding:
+                                                                        const EdgeInsets
+                                                                            .only(
+                                                                      left:
+                                                                          24.0,
+                                                                      top: 4.0,
+                                                                    ),
+                                                                    child:
+                                                                        RichText(
+                                                                      text:
+                                                                          TextSpan(
+                                                                        style:
+                                                                            TextStyle(
+                                                                          fontSize:
+                                                                              16.0,
+                                                                          fontFamily:
+                                                                              GoogleFonts.montserrat().fontFamily,
+                                                                          color:
+                                                                              Colors.black,
+                                                                        ),
+                                                                        children: [
+                                                                          TextSpan(
+                                                                            text:
+                                                                                'Amount: ',
+                                                                            style:
+                                                                                TextStyle(
+                                                                              fontFamily: GoogleFonts.montserrat().fontFamily,
+                                                                            ),
+                                                                          ),
+                                                                          TextSpan(
+                                                                            text:
+                                                                                amount,
+                                                                            style:
+                                                                                TextStyle(
+                                                                              fontWeight: FontWeight.bold,
+                                                                              color: Color(0xFF45BF7A),
+                                                                              fontFamily: GoogleFonts.montserrat().fontFamily,
+                                                                            ),
+                                                                          ),
+                                                                        ],
                                                                       ),
                                                                     ),
                                                                   ),
-                                                                ),
-                                                                const SizedBox(
-                                                                    width:
-                                                                        12.0),
-                                                                Expanded(
-                                                                  child: Column(
-                                                                    crossAxisAlignment:
-                                                                        CrossAxisAlignment
-                                                                            .start,
-                                                                    children: [
-                                                                      Text(
-                                                                        title,
-                                                                        style: TextStyle(
-                                                                            fontSize:
-                                                                                18.0,
-                                                                            fontFamily:
-                                                                                GoogleFonts.montserrat().fontFamily),
-                                                                      ),
-                                                                      if (amount
-                                                                          .isNotEmpty)
-                                                                        Padding(
-                                                                          padding:
-                                                                              const EdgeInsets.only(
-                                                                            left:
-                                                                                24.0,
-                                                                            top:
-                                                                                4.0,
-                                                                          ),
-                                                                          child:
-                                                                              RichText(
-                                                                            text:
-                                                                                TextSpan(
-                                                                              style: TextStyle(
-                                                                                fontSize: 16.0,
-                                                                                fontFamily: GoogleFonts.montserrat().fontFamily,
-                                                                                color: Colors.black,
-                                                                              ),
-                                                                              children: [
-                                                                                TextSpan(
-                                                                                  text: 'Amount: ',
-                                                                                  style: TextStyle(fontFamily: GoogleFonts.montserrat().fontFamily),
-                                                                                ),
-                                                                                TextSpan(
-                                                                                  text: amount,
-                                                                                  style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF45BF7A), fontFamily: GoogleFonts.montserrat().fontFamily),
-                                                                                ),
-                                                                              ],
-                                                                            ),
-                                                                          ),
-                                                                        ),
-                                                                    ],
-                                                                  ),
-                                                                ),
                                                               ],
                                                             ),
                                                           ),
-                                                          const Divider(
-                                                            height: 0,
-                                                            color: Colors.grey,
-                                                          ),
                                                         ],
                                                       ),
-                                                    );
-                                                  }).toList(),
+                                                    ),
+                                                    const Divider(
+                                                      height: 0,
+                                                      color: Colors.grey,
+                                                    ),
+                                                  ],
+                                                ),
+                                              );
+                                            }).toList(),
                                           ),
                                         ))),
                               ),
@@ -1099,8 +1090,7 @@ class _DashboardPageState extends State<TenantDashboardPage>
         currentIndex: _currentIndex,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.real_estate_agent), label: 'Accrual'),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Landlord'),
           BottomNavigationBarItem(
               icon: Icon(Icons.home_work), label: 'Property'),
           BottomNavigationBarItem(icon: Icon(Icons.history), label: 'History'),

@@ -5,6 +5,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_image_compress/flutter_image_compress.dart';
@@ -183,10 +184,8 @@ class _VouchersPageState extends State<VouchersPage>
                         child: CachedNetworkImage(
                           imageUrl: voucher.url,
                           fit: BoxFit.cover,
-                          placeholder: (context, url) =>
-                              CircularProgressIndicator(
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                                Color(0xFF45BF7A)),
+                          placeholder: (context, url) => SpinKitFadingCube(
+                            color: Color.fromARGB(255, 30, 197, 83),
                           ),
                           errorWidget: (context, url, error) =>
                               Icon(Icons.error),

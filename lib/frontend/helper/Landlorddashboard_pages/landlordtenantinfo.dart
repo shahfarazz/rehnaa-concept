@@ -1,7 +1,8 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:rehnaa/backend/models/tenantsmodel.dart';
+import 'package:rehnaa/backend/services/helperfunctions.dart';
 
 class LandlordTenantInfoPage extends StatelessWidget {
   final Tenant tenant;
@@ -92,17 +93,9 @@ class LandlordTenantInfoPage extends StatelessWidget {
                                   loadingBuilder:
                                       (context, child, loadingProgress) {
                                     if (loadingProgress == null) return child;
-                                    return Center(
-                                      child: CircularProgressIndicator(
-                                        color: Colors.green,
-                                        value: loadingProgress
-                                                    .expectedTotalBytes !=
-                                                null
-                                            ? loadingProgress
-                                                    .cumulativeBytesLoaded /
-                                                loadingProgress
-                                                    .expectedTotalBytes!
-                                            : null,
+                                    return const Center(
+                                      child: SpinKitFadingCube(
+                                        color: Color.fromARGB(255, 30, 197, 83),
                                       ),
                                     );
                                   },
@@ -126,7 +119,7 @@ class LandlordTenantInfoPage extends StatelessWidget {
                   const SizedBox(height: 10.0),
                   Center(
                     child: Text(
-                      tenant.description,
+                      tenant.description ?? 'No Description',
                       textAlign: TextAlign.center,
                       style: GoogleFonts.montserrat(
                         fontSize: 16.0,
@@ -169,34 +162,38 @@ class LandlordTenantInfoPage extends StatelessWidget {
                           ),
 
                           const SizedBox(height: 10.0),
-                          Center(
-                            child: WhiteBox(
-                              icon: Icons.numbers,
-                              iconColor: const Color(0xff33907c),
-                              label: 'CNIC Number',
-                              value: tenant.cnicNumber,
-                            ),
-                          ),
+                          tenant.cnicNumber != null
+                              ? Center(
+                                  child: WhiteBox(
+                                    icon: Icons.numbers,
+                                    iconColor: const Color(0xff33907c),
+                                    label: 'CNIC Number',
+                                    value: decryptString(tenant.cnicNumber!),
+                                  ),
+                                )
+                              : Container(),
                           const SizedBox(height: 10.0),
                           Center(
                             child: WhiteBox(
                               icon: Icons.email,
                               iconColor: const Color(0xff33907c),
                               label: 'Contact Number',
-                              value: tenant.emailOrPhone,
+                              value: tenant.emailOrPhone!,
                             ),
                           ),
                           const SizedBox(height: 10.0),
-                          Center(
-                            child: WhiteBox(
-                              icon: Icons.verified_user,
-                              label: 'Tasdeeq Verification',
-                              iconColor: const Color(0xff33907c),
-                              value: tenant.tasdeeqVerification
-                                  ? 'Verified'
-                                  : 'Not Verified',
-                            ),
-                          ),
+                          tenant.tasdeeqVerification != null
+                              ? Center(
+                                  child: WhiteBox(
+                                    icon: Icons.verified_user,
+                                    label: 'Tasdeeq Verification',
+                                    iconColor: const Color(0xff33907c),
+                                    value: tenant.tasdeeqVerification!
+                                        ? 'Verified'
+                                        : 'Not Verified',
+                                  ),
+                                )
+                              : Container(),
                           const SizedBox(height: 10.0),
                           Center(
                             child: WhiteBox(
@@ -207,17 +204,27 @@ class LandlordTenantInfoPage extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(height: 10.0),
+                          tenant.policeVerification != null
+                              ? Center(
+                                  child: WhiteBox(
+                                    icon: Icons.local_police,
+                                    iconColor: const Color(0xff33907c),
+                                    label: 'Police Verification',
+                                    value: tenant.policeVerification!
+                                        ? 'Verified'
+                                        : 'Not Verified',
+                                  ),
+                                )
+                              : Container(),
+                          const SizedBox(height: 10.0),
                           Center(
                             child: WhiteBox(
-                              icon: Icons.local_police,
+                              icon: Icons.info,
                               iconColor: const Color(0xff33907c),
-                              label: 'Police Verification',
-                              value: tenant.policeVerification
-                                  ? 'Verified'
-                                  : 'Not Verified',
+                              label: 'Other Information',
+                              value: 'N/A',
                             ),
                           ),
-                          const SizedBox(height: 10.0),
                         ],
                       ),
                     ),

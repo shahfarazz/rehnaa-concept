@@ -12,6 +12,7 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:rehnaa/backend/services/helperfunctions.dart';
 import 'package:rehnaa/frontend/Screens/Admin/admindashboard.dart';
 
 import '../../../backend/models/landlordmodel.dart';
@@ -100,7 +101,7 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
                     ),
                   ),
                   subtitle: Text(
-                    'Rent: \$${tenant.rent.toStringAsFixed(2)}',
+                    'Rent: \$${tenant.balance.toStringAsFixed(2)}',
                     style: const TextStyle(
                       fontSize: 16,
                     ),
@@ -165,19 +166,40 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
     final TextEditingController descriptionController =
         TextEditingController(text: tenant.description);
     final TextEditingController rentController =
-        TextEditingController(text: tenant.rent.toString());
+        TextEditingController(text: tenant.balance.toString());
     final TextEditingController creditPointsController =
         TextEditingController(text: tenant.creditPoints.toString());
     final TextEditingController cnicNumberController =
-        TextEditingController(text: tenant.cnicNumber);
+        TextEditingController(text: decryptString(tenant.cnicNumber ?? ''));
     final TextEditingController emailOrPhoneController =
         TextEditingController(text: tenant.emailOrPhone);
     final TextEditingController familyMembersController =
         TextEditingController(text: tenant.familyMembers.toString());
     final TextEditingController ratingController =
         TextEditingController(text: tenant.rating.toString());
+    bool tasdeeqVerification = tenant.tasdeeqVerification ?? false;
+    bool policeVerification = tenant.policeVerification ?? false;
+    final TextEditingController addressController =
+        TextEditingController(text: tenant.address ?? '');
 
-    final hashedCnic = hashString(cnicNumberController.text);
+    final TextEditingController contractStartDateController =
+        TextEditingController(text: tenant.contractStartDate ?? '');
+    final TextEditingController contractEndDateController =
+        TextEditingController(text: tenant.contractEndDate ?? '');
+    //propertyAddress
+    final TextEditingController propertyAddressController =
+        TextEditingController(text: tenant.propertyAddress ?? '');
+    // monthlyRent
+    final TextEditingController monthlyRentController =
+        TextEditingController(text: tenant.monthlyRent.toString());
+    //upfrontBonus
+    final TextEditingController upfrontBonusController =
+        TextEditingController(text: tenant.upfrontBonus.toString());
+    //monthlyProfit
+    final TextEditingController monthlyProfitController =
+        TextEditingController(text: tenant.monthlyProfit.toString());
+
+    final hashedCnic = encryptString(cnicNumberController.text);
 
     showDialog(
       context: context,
@@ -232,6 +254,69 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
                   decoration: const InputDecoration(labelText: 'Rating'),
                   keyboardType: TextInputType.number,
                 ),
+                TextField(
+                  controller: addressController,
+                  decoration: const InputDecoration(labelText: 'Address'),
+                ),
+                TextField(
+                  controller: contractStartDateController,
+                  decoration:
+                      const InputDecoration(labelText: 'Contract Start Date'),
+                ),
+                TextField(
+                  controller: contractEndDateController,
+                  decoration:
+                      const InputDecoration(labelText: 'Contract End Date'),
+                ),
+                TextField(
+                  controller: propertyAddressController,
+                  decoration:
+                      const InputDecoration(labelText: 'Property Address'),
+                ),
+                TextField(
+                  controller: monthlyRentController,
+                  decoration: const InputDecoration(labelText: 'Monthly Rent'),
+                ),
+                TextField(
+                  controller: upfrontBonusController,
+                  decoration: const InputDecoration(labelText: 'Upfront Bonus'),
+                ),
+                TextField(
+                  controller: monthlyProfitController,
+                  decoration:
+                      const InputDecoration(labelText: 'Monthly Profit'),
+                ),
+
+                //field to ask for bool value from user for police verification
+                //give options yes / no
+                StatefulBuilder(
+                  builder: (BuildContext context, StateSetter setState) {
+                    return CheckboxListTile(
+                      title: const Text('Police Verification'),
+                      value: policeVerification,
+                      onChanged: (bool? value) {
+                        setState(() {
+                          policeVerification = value ?? false;
+                        });
+                      },
+                    );
+                  },
+                ),
+                //field to ask for bool value from user for tasdeeq verification
+                //give options yes / no
+                StatefulBuilder(
+                  builder: (BuildContext context, StateSetter setState) {
+                    return CheckboxListTile(
+                      title: const Text('Tasdeeq Verification'),
+                      value: tasdeeqVerification,
+                      onChanged: (bool? value) {
+                        setState(() {
+                          tasdeeqVerification = value ?? false;
+                        });
+                      },
+                    );
+                  },
+                ),
                 const SizedBox(height: 20),
                 StatefulBuilder(
                   builder: (BuildContext context, StateSetter setState) {
@@ -262,24 +347,37 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
                   onPressed: () async {
                     // Update the tenant details in Firebase
 
-                    FirebaseFirestore.instance
+                    //if the balance has been updated we need to create a rentPayments
+                    // document and set tenantname to "Rehnaa App"
+                    // and tenantRef to the tenant's tempID's document reference
+
+                    await FirebaseFirestore.instance
                         .collection('Tenants')
                         .doc(tenant.tempID)
                         .update({
                       'firstName': firstNameController.text,
                       'lastName': lastNameController.text,
                       'description': descriptionController.text,
-                      'rent': double.tryParse(rentController.text) ?? 0.0,
+                      'balance': double.tryParse(rentController.text) ?? 0.0,
                       'creditPoints':
                           int.tryParse(creditPointsController.text) ?? 0,
                       'cnicNumber': cnicNumberController.text.isNotEmpty
-                          ? hashedCnic
+                          ? encryptString(cnicNumberController.text)
                           : '',
                       'emailOrPhone': emailOrPhoneController.text,
                       'familyMembers':
                           int.tryParse(familyMembersController.text) ?? 0,
                       'rating': double.tryParse(ratingController.text) ?? 0.0,
-                      'landlordRef': landlordRef
+                      'landlordRef': landlordRef,
+                      'propertyAddress': propertyAddressController.text,
+                      'address': addressController.text,
+                      'contractStartDate': contractStartDateController.text,
+                      'contractEndDate': contractEndDateController.text,
+                      'monthlyRent': monthlyRentController.text ?? '',
+                      'upfrontBonus': upfrontBonusController.text ?? '',
+                      'monthlyProfit': monthlyProfitController.text ?? '',
+                      'policeVerification': policeVerification,
+                      'tasdeeqVerification': tasdeeqVerification,
                     });
 
                     setState(() {
@@ -287,7 +385,7 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
                       tenant.firstName = firstNameController.text;
                       tenant.lastName = lastNameController.text;
                       tenant.description = descriptionController.text;
-                      tenant.rent = int.tryParse(rentController.text) ?? 0;
+                      tenant.balance = int.tryParse(rentController.text) ?? 0;
                       tenant.creditPoints =
                           int.tryParse(creditPointsController.text) ?? 0;
                       tenant.cnicNumber = cnicNumberController.text.isNotEmpty
@@ -299,6 +397,90 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
                       tenant.rating =
                           double.tryParse(ratingController.text) ?? 0.0;
                     });
+
+                    if (tenant.balance >
+                        (double.tryParse(rentController.text) ?? 0.0)) {
+                      await FirebaseFirestore.instance
+                          .collection('rentPayments')
+                          .add({
+                        'tenantname': 'Rehnaa App',
+                        'tenantRef': FirebaseFirestore.instance
+                            .collection('Tenants')
+                            .doc(tenant.tempID),
+                        'amount':
+                            -(double.tryParse(rentController.text) ?? 0.0) +
+                                (tenant.balance),
+                        'date': DateTime.now(),
+                        'isMinus': true,
+                        'paymentType': '',
+                        // 'description': 'Balance updated by landlord',
+                        // 'paymentType': 'Bank Transfer',
+                      }).then((value) {
+                        //add the rentpayment document reference to the tenant's
+                        // rentpayment array
+                        FirebaseFirestore.instance
+                            .collection('Tenants')
+                            .doc(tenant.tempID)
+                            .update({
+                          'rentpaymentRef': FieldValue.arrayUnion([value])
+                        });
+
+                        FirebaseFirestore.instance
+                            .collection('Notifications')
+                            .doc(tenant.tempID)
+                            .update({
+                          'notifications': FieldValue.arrayUnion([
+                            {
+                              // 'amount': data.requestedAmount,
+                              'title': 'Balance updated by Rehnaa Team Admin',
+                            }
+                          ])
+                        });
+                      });
+                    } else if (tenant.balance <
+                        (double.tryParse(rentController.text) ?? 0.0)) {
+                      await FirebaseFirestore.instance
+                          .collection('rentPayments')
+                          .add({
+                        'tenantname': 'Rehnaa App',
+                        'tenantRef': FirebaseFirestore.instance
+                            .collection('Tenants')
+                            .doc(tenant.tempID),
+                        'amount': double.tryParse(rentController.text) ??
+                            0.0 - tenant.balance,
+                        'date': DateTime.now(),
+                        'isMinus': false,
+                        // 'description': 'Balance updated by landlord',
+                        'paymentType': '',
+                      }).then((value) {
+                        //add the rentpayment document reference to the tenant's
+                        // rentpayment array
+                        FirebaseFirestore.instance
+                            .collection('Tenants')
+                            .doc(tenant.tempID)
+                            .update({
+                          'rentpaymentRef': FieldValue.arrayUnion([value])
+                        });
+                        FirebaseFirestore.instance
+                            .collection('Notifications')
+                            .doc(tenant.tempID)
+                            .update({
+                          'notifications': FieldValue.arrayUnion([
+                            {
+                              // 'amount': data.requestedAmount,
+                              'title': 'Balance updated by Rehnaa Team Admin',
+                            }
+                          ])
+                        });
+                      });
+                    }
+
+                    //snackbar to show that tenant has been updated
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Tenant updated successfully'),
+                      ),
+                    );
 
                     Navigator.of(context).pop(); // Close the dialog
                   },
@@ -428,14 +610,14 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
           ),
         ),
         leading: IconButton(
-        icon: Icon(Icons.arrow_back),
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => AdminDashboard()),
-          );
-        },
-      ),
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => AdminDashboard()),
+            );
+          },
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.only(top: 16.0),
@@ -463,8 +645,11 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
 
                   return ListTile(
                     title: Text('${tenant.firstName} ${tenant.lastName}'),
-                    subtitle: Text(tenant.rent.toString()),
+                    subtitle: Text(tenant.balance.toString()),
                     leading: const Icon(Icons.person),
+                    trailing: tenant.isGhost != null && tenant.isGhost!
+                        ? const Text('Ghost User')
+                        : SizedBox(),
                     onTap: () {
                       _showEditDialog(tenant);
                     },
@@ -506,8 +691,7 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
                 ),
               ],
             ),
-      buildFloatingActionButton(context),
-
+            buildFloatingActionButton(context),
           ],
         ),
       ),

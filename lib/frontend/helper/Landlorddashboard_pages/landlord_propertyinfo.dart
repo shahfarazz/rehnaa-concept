@@ -1,11 +1,13 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:easy_image_viewer/easy_image_viewer.dart';
 import 'package:flutter/material.dart';
 // ignore: depend_on_referenced_packages
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../backend/models/propertymodel.dart';
-import 'package:photo_view/photo_view.dart';
+// import 'package:photo_view/photo_view.dart';
 
 class PropertyPage extends StatefulWidget {
   final Property property;
@@ -107,14 +109,10 @@ class PropertyCarousel extends StatelessWidget {
             return Builder(
               builder: (BuildContext context) {
                 return GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) =>
-                            ExpandedImageDialog(imageProvider: imagePath),
-                      ),
-                    );
+                  onTap: () async {
+                    final imageProvider = CachedNetworkImageProvider(imagePath);
+
+                    await showImageViewer(context, imageProvider);
                   },
                   child: Hero(
                     tag: imagePath,
@@ -122,8 +120,9 @@ class PropertyCarousel extends StatelessWidget {
                       imageUrl:
                           imagePath, // TODO define a new property.iconimagepath
 
-                      placeholder: (context, url) =>
-                          const CircularProgressIndicator(),
+                      placeholder: (context, url) => const SpinKitFadingCube(
+                        color: Color.fromARGB(255, 30, 197, 83),
+                      ),
                       errorWidget: (context, url, error) =>
                           const Icon(Icons.error),
                       fit: BoxFit.cover,
@@ -323,6 +322,12 @@ class PropertyDetails extends StatelessWidget {
                           child: Row(
                             children: [
                               SizedBox(width: screenWidth * 0.025),
+                              PropertySpecs(
+                                icon: Icons.area_chart_outlined,
+                                text:
+                                    '${property.area?.round()} Marlas/ ${(property.area! * 272).round()} Sqft',
+                              ),
+                              SizedBox(width: screenWidth * 0.02),
                               if (property.beds > 0)
                                 PropertySpecs(
                                   icon: Icons.king_bed_outlined,
@@ -610,70 +615,6 @@ class GradientButton extends StatelessWidget {
             ),
           ),
         ),
-      ),
-    );
-  }
-}
-
-class ExpandedImageDialog extends StatelessWidget {
-  final String imageProvider;
-
-  const ExpandedImageDialog({Key? key, required this.imageProvider})
-      : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Dialog(
-      insetPadding: EdgeInsets.zero,
-      child: Stack(
-        children: [
-          Container(
-            constraints: const BoxConstraints.expand(),
-            child: PhotoView(
-              imageProvider: CachedNetworkImageProvider(imageProvider),
-              backgroundDecoration: BoxDecoration(
-                color: Colors.transparent,
-              ),
-              minScale: PhotoViewComputedScale.contained * 1.0,
-              maxScale: PhotoViewComputedScale.covered * 2.0,
-              initialScale: PhotoViewComputedScale.contained,
-              basePosition: Alignment.center,
-              heroAttributes: const PhotoViewHeroAttributes(tag: "someTag"),
-              customSize: MediaQuery.of(context).size,
-            ),
-          ),
-          Positioned(
-            top: 65.0,
-            left: 10.0,
-            child: GestureDetector(
-              onTap: () {
-                Navigator.pop(context);
-              },
-              child: Container(
-                width: 40,
-                height: 40,
-                decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Color(0xFF33907C),
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      Color(0xff0FA697),
-                      Color(0xff45BF7A),
-                      Color(0xff0DF205),
-                    ],
-                  ),
-                ),
-                child: const Icon(
-                  Icons.arrow_back,
-                  size: 20,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }

@@ -6,17 +6,24 @@ class Dealer {
   double balance;
   String? pathToImage;
   String? tempID;
+  String? agencyName;
+  String? agencyAddress;
 
   final List<DocumentReference<Map<String, dynamic>>>? landlordRef;
+  Map<String, Map<String, dynamic>>? landlordMap;
+  bool? isGhost;
 
-  Dealer({
-    required this.firstName,
-    required this.lastName,
-    required this.balance,
-    this.landlordRef,
-    this.pathToImage,
-    this.tempID,
-  });
+  Dealer(
+      {required this.firstName,
+      required this.lastName,
+      required this.balance,
+      this.landlordRef,
+      this.pathToImage,
+      this.tempID,
+      this.agencyName,
+      this.agencyAddress,
+      this.landlordMap,
+      this.isGhost});
 
   factory Dealer.fromJson(Map<String, dynamic> json) {
     return Dealer(
@@ -28,6 +35,13 @@ class Dealer {
           ? List<DocumentReference<Map<String, dynamic>>>.from(
               json['landlordRef'].map((ref) => ref as DocumentReference))
           : null,
+      tempID: json['tempID'],
+      agencyName: json['agencyName'] ?? '',
+      agencyAddress: json['agencyAddress'] ?? '',
+      landlordMap: json['landlordMap'] != null
+          ? Map<String, Map<String, dynamic>>.from(json['landlordMap'])
+          : null,
+      isGhost: json['isGhost'] ?? false,
     );
   }
 

@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
@@ -13,7 +14,7 @@ import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenantinvoice.dart'
 
 import 'package:responsive_framework/responsive_framework.dart';
 import '../../../backend/models/landlordmodel.dart';
-import '../../Screens/pdf_landlord.dart';
+// import '../../Screens/pdf_landlord.dart';
 import '../../Screens/pdf_tenant.dart';
 import '../Landlorddashboard_pages/landlord_dashboard_content.dart';
 
@@ -84,9 +85,9 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                 ),
               ),
 
-              titlePadding: const EdgeInsets.fromLTRB(
-                  20.0, 16.0, 16.0, 0.0), // padding above title
-              contentPadding: const EdgeInsets.fromLTRB(16.0, 20.0, 16.0, 8.0),
+              // titlePadding: const EdgeInsets.fromLTRB(
+              //     20.0, 16.0, 16.0, 0.0), // padding above title
+              // contentPadding: const EdgeInsets.fromLTRB(16.0, 20.0, 16.0, 8.0),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
@@ -144,10 +145,11 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                       borderRadius: BorderRadius.circular(20.0),
                     ),
                   ),
-                  child: const Text(
+                  child: Text(
                     'Cancel',
                     style: TextStyle(
                       color: Colors.white,
+                      fontFamily: GoogleFonts.montserrat().fontFamily,
                     ),
                   ),
                   onPressed: () {
@@ -162,10 +164,11 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                       borderRadius: BorderRadius.circular(20.0),
                     ),
                   ),
-                  child: const Text(
+                  child: Text(
                     'Next',
                     style: TextStyle(
                       color: Colors.white,
+                      fontFamily: GoogleFonts.montserrat().fontFamily,
                     ),
                   ),
                   onPressed: () {
@@ -190,6 +193,11 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                               onChanged: (value) {
                                 amount = double.tryParse(value) ?? 0.0;
                               },
+                              decoration: InputDecoration(
+                                focusedBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.green),
+                                ),
+                              ),
                             ),
                             actions: <Widget>[
                               TextButton(
@@ -215,7 +223,7 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                                   ),
                                 ),
                                 onPressed: () {
-                                  if (amount > 0 && amount <= tenant.rent) {
+                                  if (amount > 0 && amount <= tenant.balance) {
                                     Fluttertoast.showToast(
                                       msg:
                                           'An admin will contact you soon regarding your payment via: $selectedOption',
@@ -246,6 +254,13 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                                     String invoiceNumber =
                                         generateInvoiceNumber();
 
+                                    // Generate a random ID
+                                    final Random random = Random();
+                                    final String randomID = random
+                                        .nextInt(999999)
+                                        .toString()
+                                        .padLeft(6, '0');
+
                                     FirebaseFirestore.instance
                                         .collection('AdminRequests')
                                         .doc(widget.uid)
@@ -258,6 +273,7 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                                           'paymentMethod': selectedOption,
                                           'uid': widget.uid,
                                           'invoiceNumber': invoiceNumber,
+                                          'requestID': randomID,
                                         }
                                       ]),
                                       'timestamp': Timestamp.now()
@@ -280,30 +296,48 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                                         // print(
                                         // 'reached here landlord is ${landlord.firstName} ${landlord.lastName}}');
 
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  PDFEditorTenantPage(
-                                                    tenantName:
-                                                        '${tenant.firstName} ${tenant.lastName}',
-                                                    landlordName:
-                                                        '${landlord.firstName} ${landlord.lastName}',
-                                                    amount: amount,
-                                                    invoiceNumber:
-                                                        invoiceNumber,
-                                                    balance:
-                                                        tenant.rent.toDouble(),
-                                                    paymentMode: selectedOption,
-                                                    uid: widget.uid,
-                                                    landlordAddress:
-                                                        landlord.address,
-                                                    tenantAddress:
-                                                        tenant.address,
-                                                    cnic: landlord.cnic ??
-                                                        'No cnic provided',
-                                                  )),
-                                        );
+                                        Navigator.pop(context);
+                                        Navigator.pop(context);
+                                        PDFEditorTenantPage pdfinstance =
+                                            PDFEditorTenantPage();
+
+                                        pdfinstance.createState().createPdf(
+                                            '${tenant.firstName} ${tenant.lastName}',
+                                            '${landlord.firstName} ${landlord.lastName}',
+                                            landlord.address,
+                                            tenant.address,
+                                            tenant.balance.toDouble(),
+                                            amount,
+                                            selectedOption,
+                                            widget.uid,
+                                            invoiceNumber,
+                                            landlord.cnic ??
+                                                'No cnic provided');
+
+                                        // Navigator.push(
+                                        //   context,
+                                        //   MaterialPageRoute(
+                                        //       builder: (context) =>
+                                        //           PDFEditorTenantPage(
+                                        //             tenantName:
+                                        //                 '${tenant.firstName} ${tenant.lastName}',
+                                        //             landlordName:
+                                        //                 '${landlord.firstName} ${landlord.lastName}',
+                                        //             amount: amount,
+                                        //             invoiceNumber:
+                                        //                 invoiceNumber,
+                                        //             balance:
+                                        //                 tenant.balance.toDouble(),
+                                        //             paymentMode: selectedOption,
+                                        //             uid: widget.uid,
+                                        //             landlordAddress:
+                                        //                 landlord.address,
+                                        //             tenantAddress:
+                                        //                 tenant.address,
+                                        //             cnic: landlord.cnic ??
+                                        //                 'No cnic provided',
+                                        //           )),
+                                        // );
                                       }
                                     });
                                   } else {
@@ -365,8 +399,13 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
             width: 50,
             height: 30,
           ),
-          const SizedBox(width: 20),
-          Text(optionName),
+          const SizedBox(width: 8.0), // Add some spacing
+          Expanded(
+            child: Text(
+              optionName,
+              style: TextStyle(fontFamily: GoogleFonts.montserrat().fontFamily),
+            ),
+          ),
         ],
       ),
       onTap: onTap,
@@ -392,7 +431,7 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
           // Handle any error that occurred while fetching the data
           return Text('Error: ${snapshot.error}');
         } else if (snapshot.hasData) {
-          print('snapshot: ${snapshot.data?.data()}');
+          // print('snapshot: ${snapshot.data?.data()}');
           Map<String, dynamic> json =
               snapshot.data?.data() as Map<String, dynamic>;
           // Fetch tenant
@@ -414,8 +453,8 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
               }
             });
           }
-          // Format the rent for display
-          String formattedRent = NumberFormat('#,##0').format(tenant.rent);
+          // Format the balance for display
+          String formattedRent = NumberFormat('#,##0').format(tenant.balance);
 
           Size size = MediaQuery.of(context).size;
 
@@ -461,17 +500,10 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                                               loadingProgress) {
                                             if (loadingProgress == null)
                                               return child;
-                                            return Center(
-                                              child: CircularProgressIndicator(
-                                                color: Colors.green,
-                                                value: loadingProgress
-                                                            .expectedTotalBytes !=
-                                                        null
-                                                    ? loadingProgress
-                                                            .cumulativeBytesLoaded /
-                                                        loadingProgress
-                                                            .expectedTotalBytes!
-                                                    : null,
+                                            return const Center(
+                                              child: SpinKitFadingCube(
+                                                color: Color.fromARGB(
+                                                    255, 30, 197, 83),
                                               ),
                                             );
                                           },

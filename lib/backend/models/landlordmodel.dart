@@ -7,7 +7,7 @@ import 'tenantsmodel.dart';
 class Landlord {
   final String firstName;
   final String lastName;
-  final double balance;
+  final num balance;
   final String? pathToImage;
   final List<DocumentReference<Map<String, dynamic>>>? tenantRef;
   final List<DocumentReference<Map<String, dynamic>>> propertyRef;
@@ -25,6 +25,13 @@ class Landlord {
   String? emailOrPhone;
   Timestamp? dateJoined;
   String? address;
+  String? rating;
+  String? contractStartDate;
+  String? contractEndDate;
+  var monthlyRent;
+  var upfrontBonus;
+  var monthlyProfit;
+  bool? isGhost;
 
   Landlord({
     required this.firstName,
@@ -47,13 +54,20 @@ class Landlord {
     this.emailOrPhone,
     this.dateJoined,
     this.address,
+    this.rating,
+    this.contractStartDate,
+    this.contractEndDate,
+    this.monthlyRent,
+    this.upfrontBonus,
+    this.monthlyProfit,
+    this.isGhost,
   });
 
   static Landlord fromJson(Map<String, dynamic>? json) {
     Landlord landlord = Landlord(
       firstName: json!['firstName'],
       lastName: json['lastName'],
-      balance: json['balance'] != null ? json['balance'].toDouble() : 0.0,
+      balance: json['balance'] ?? 0.0,
       tenantRef: json['tenantRef'] != null
           ? List<DocumentReference<Map<String, dynamic>>>.from(
               json['tenantRef'].map((ref) => ref as DocumentReference))
@@ -74,6 +88,13 @@ class Landlord {
       emailOrPhone: json['emailOrPhone'] ?? '',
       dateJoined: json['dateJoined'],
       address: json['address'] ?? '',
+      rating: json['rating'] ?? '0.0',
+      contractStartDate: json['contractStartDate'] ?? '',
+      contractEndDate: json['contractEndDate'] ?? '',
+      monthlyRent: json['monthlyRent'] ?? '',
+      upfrontBonus: json['upfrontBonus'] ?? '',
+      monthlyProfit: json['monthlyProfit'] ?? '',
+      isGhost: json['isGhost'] ?? false,
     );
 
     // await landlord.fetchData();
@@ -104,12 +125,18 @@ class Landlord {
     }
   }
 
-  Future<void> getProperty() async {
-    property = [];
+  Future<List<Property>?> getProperty() async {
+    List<Property>? propertiesList = [];
 
-    for (DocumentReference<Map<String, dynamic>> ref in propertyRef) {
-      DocumentSnapshot<Map<String, dynamic>> snapshot = await ref.get();
-      property.add(await Property.fromJson(snapshot.data()!));
+    try {
+      for (DocumentReference<Map<String, dynamic>> ref in propertyRef) {
+        DocumentSnapshot<Map<String, dynamic>> snapshot = await ref.get();
+        propertiesList.add(Property.fromJson(snapshot.data()!));
+      }
+      return propertiesList;
+    } catch (e) {
+      // TODO
+      return propertiesList;
     }
   }
 

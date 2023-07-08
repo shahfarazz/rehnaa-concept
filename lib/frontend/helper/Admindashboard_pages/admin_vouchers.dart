@@ -7,6 +7,8 @@ import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:image_picker/image_picker.dart';
 import 'dart:html' as html;
 
+import 'package:rehnaa/frontend/Screens/Admin/admindashboard.dart';
+
 class AdminVouchersPage extends StatefulWidget {
   const AdminVouchersPage({Key? key}) : super(key: key);
 
@@ -28,6 +30,8 @@ class _AdminVouchersPageState extends State<AdminVouchersPage> {
   double uploadProgress = 0.0;
   bool isLoading = false;
   String? urls;
+  List<String>? names = [];
+  String? nameval;
 
   @override
   void initState() {
@@ -68,54 +72,174 @@ class _AdminVouchersPageState extends State<AdminVouchersPage> {
 
         final encodedImage = await completer.future;
 
-        Reference storageReference = FirebaseStorage.instance
-            .ref()
-            .child('images/vouchers/${DateTime.now().millisecondsSinceEpoch}');
-        UploadTask uploadTask = storageReference.putString(encodedImage,
-            format: PutStringFormat.dataUrl);
-        await uploadTask;
-        String imageUrl = await storageReference.getDownloadURL();
-
         //create or update a new collection called Vouchers and add the imageurl to firestore
 
-        await FirebaseFirestore.instance
-            .collection('Vouchers')
-            .doc('voucherkey')
-            .set({
-          //add the url to a list of urls
-          'urls': FieldValue.arrayUnion([imageUrl])
-        }, SetOptions(merge: true));
+        //showdialog to ask for the name of the voucher
 
-        setState(() {
-          isLoading = false;
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const AdminVouchersPage(),
-            ),
-          );
-        });
+        // ignore: use_build_context_synchronously
+        showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+                  title: const Text('Enter the name of the voucher'),
+                  content: TextField(
+                    onChanged: (value) {
+                      setState(() {
+                        nameval = value;
+                      });
+                    },
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: const Text('Cancel'),
+                    ),
+                    TextButton(
+                      onPressed: () async {
+                        try {
+                          names?.add(nameval!);
+                        } catch (e) {
+                          // TODO
+                        }
+                        Reference storageReference = FirebaseStorage.instance
+                            .ref()
+                            .child(
+                                'images/vouchers/${DateTime.now().millisecondsSinceEpoch}');
+                        UploadTask uploadTask = storageReference.putString(
+                            encodedImage,
+                            format: PutStringFormat.dataUrl);
+                        await uploadTask;
+                        String imageUrl =
+                            await storageReference.getDownloadURL();
+                        await FirebaseFirestore.instance
+                            .collection('Vouchers')
+                            .doc('voucherkey')
+                            .set({
+                          //add the url to a list of urls
+                          'urls': FieldValue.arrayUnion([imageUrl]),
+                          'names': FieldValue.arrayUnion([nameval])
+                        }, SetOptions(merge: true));
 
-        WriteBatch batch = FirebaseFirestore.instance.batch();
+                        setState(() {
+                          isLoading = false;
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const AdminVouchersPage(),
+                            ),
+                          );
+                        });
 
-        // Update documents in the Tenants collection
-        QuerySnapshot tenantsQuerySnapshot =
-            await FirebaseFirestore.instance.collection('Tenants').get();
-        tenantsQuerySnapshot.docs.forEach((tenantDoc) {
-          batch.set(tenantDoc.reference, {'isNewVouchers': true},
-              SetOptions(merge: true));
-        });
+                        WriteBatch batch = FirebaseFirestore.instance.batch();
 
-        // Update documents in the Landlords collection
-        QuerySnapshot landlordsQuerySnapshot =
-            await FirebaseFirestore.instance.collection('Landlords').get();
-        landlordsQuerySnapshot.docs.forEach((landlordDoc) {
-          batch.set(landlordDoc.reference, {'isNewVouchers': true},
-              SetOptions(merge: true));
-        });
+                        // Update documents in the Tenants collection
+                        QuerySnapshot tenantsQuerySnapshot =
+                            await FirebaseFirestore.instance
+                                .collection('Tenants')
+                                .get();
+                        QuerySnapshot notifsQuerySnapshot =
+                            await FirebaseFirestore.instance
+                                .collection('Notifications')
+                                .get();
 
-        // Commit the batched write operation
-        await batch.commit();
+                        //in all notification documents append to the notifications array
+                        // with a title:"New Voucher has been added".
+
+                        notifsQuerySnapshot.docs.forEach((notifDoc) {
+                          batch.set(
+                              notifDoc.reference,
+                              {
+                                'notifications': FieldValue.arrayUnion([
+                                  {
+                                    'title': 'New Voucher has been added',
+                                  }
+                                ])
+                              },
+                              SetOptions(merge: true));
+                        });
+
+                        tenantsQuerySnapshot.docs.forEach((tenantDoc) {
+                          batch.set(tenantDoc.reference,
+                              {'isNewVouchers': true}, SetOptions(merge: true));
+                        });
+
+                        // Update documents in the Landlords collection
+                        QuerySnapshot landlordsQuerySnapshot =
+                            await FirebaseFirestore.instance
+                                .collection('Landlords')
+                                .get();
+
+                        landlordsQuerySnapshot.docs.forEach((landlordDoc) {
+                          batch.set(landlordDoc.reference,
+                              {'isNewVouchers': true}, SetOptions(merge: true));
+                        });
+
+                        // Commit the batch
+                        await batch.commit();
+                      },
+                      child: const Text('Add'),
+                    ),
+                  ],
+                ));
+
+        // await FirebaseFirestore.instance
+        //     .collection('Vouchers')
+        //     .doc('voucherkey')
+        //     .set({
+        //   //add the url to a list of urls
+        //   'urls': FieldValue.arrayUnion([imageUrl])
+        // }, SetOptions(merge: true));
+
+        // setState(() {
+        //   isLoading = false;
+        //   Navigator.pushReplacement(
+        //     context,
+        //     MaterialPageRoute(
+        //       builder: (context) => const AdminVouchersPage(),
+        //     ),
+        //   );
+        // });
+
+        // WriteBatch batch = FirebaseFirestore.instance.batch();
+
+        // // Update documents in the Tenants collection
+        // QuerySnapshot tenantsQuerySnapshot =
+        //     await FirebaseFirestore.instance.collection('Tenants').get();
+        // QuerySnapshot notifsQuerySnapshot =
+        //     await FirebaseFirestore.instance.collection('Notifications').get();
+
+        // //in all notification documents append to the notifications array
+        // // with a title:"New Voucher has been added".
+
+        // notifsQuerySnapshot.docs.forEach((notifDoc) {
+        //   batch.set(
+        //       notifDoc.reference,
+        //       {
+        //         'notifications': FieldValue.arrayUnion([
+        //           {
+        //             'title': 'New Voucher has been added',
+        //           }
+        //         ])
+        //       },
+        //       SetOptions(merge: true));
+        // });
+
+        // tenantsQuerySnapshot.docs.forEach((tenantDoc) {
+        //   batch.set(tenantDoc.reference, {'isNewVouchers': true},
+        //       SetOptions(merge: true));
+        // });
+
+        // // Update documents in the Landlords collection
+        // QuerySnapshot landlordsQuerySnapshot =
+        //     await FirebaseFirestore.instance.collection('Landlords').get();
+        // landlordsQuerySnapshot.docs.forEach((landlordDoc) {
+        //   batch.set(landlordDoc.reference, {'isNewVouchers': true},
+        //       SetOptions(merge: true));
+        // });
+
+        // // Commit the batched write operation
+        // await batch.commit();
       }
     } else {
       setState(() {
@@ -135,6 +259,17 @@ class _AdminVouchersPageState extends State<AdminVouchersPage> {
         String url = await ref.getDownloadURL();
         vouchersList.add(Voucher(url, ref));
       }
+
+      FirebaseFirestore.instance
+          .collection('Vouchers')
+          .doc('voucherkey')
+          .get()
+          .then((value) {
+        for (var name in value.data()!['names']) {
+          names?.add(name);
+        }
+      });
+
       return vouchersList;
     } catch (error) {
       print('Error fetching vouchers: $error');
@@ -154,6 +289,14 @@ class _AdminVouchersPageState extends State<AdminVouchersPage> {
       await firebase_storage.FirebaseStorage.instance
           .ref(vouchers[index].ref.fullPath)
           .delete();
+
+      //delete name from names array at index
+      FirebaseFirestore.instance
+          .collection('Vouchers')
+          .doc('voucherkey')
+          .update({
+        'names': FieldValue.arrayRemove([names![index]])
+      });
       setState(() {
         vouchers.removeAt(index);
       });
@@ -196,7 +339,15 @@ class _AdminVouchersPageState extends State<AdminVouchersPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Landlord & Tenant Info'),
+        title: const Text('Vouchers'),
+        leading: IconButton(
+            icon: Icon(Icons.arrow_back),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => AdminDashboard()),
+              );
+            }),
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
@@ -232,7 +383,7 @@ class _AdminVouchersPageState extends State<AdminVouchersPage> {
                         addAutomaticKeepAlives: true,
                         itemBuilder: (context, index) {
                           return ListTile(
-                            title: Text('Voucher ${index + 1}'),
+                            title: Text(names![index]), //voucher name
                             leading: Image.network(snapshot.data![index].url),
                             trailing: IconButton(
                               onPressed: () {

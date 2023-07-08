@@ -1,15 +1,19 @@
+import 'dart:math';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 // ignore: depend_on_referenced_packages
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:rehnaa/frontend/Screens/Tenant/tenant_dashboard.dart';
-import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenant_dashboard_content.dart';
-import 'package:photo_view/photo_view.dart';
+// import 'package:rehnaa/frontend/Screens/Tenant/tenant_dashboard.dart';
+// import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenant_dashboard_content.dart';
+// import 'package:photo_view/photo_view.dart';
 
 import '../../../backend/models/propertymodel.dart';
 import '../../../backend/models/tenantsmodel.dart';
+import 'package:easy_image_viewer/easy_image_viewer.dart';
 
 class TenantPropertyPage extends StatefulWidget {
   final Property property;
@@ -120,14 +124,10 @@ class PropertyCarousel extends StatelessWidget {
             return Builder(
               builder: (BuildContext context) {
                 return GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) =>
-                            ExpandedImageDialog(imageProvider: imagePath),
-                      ),
-                    );
+                  onTap: () async {
+                    final imageProvider = CachedNetworkImageProvider(imagePath);
+
+                    await showImageViewer(context, imageProvider);
                   },
                   child: Hero(
                     tag: imagePath,
@@ -135,8 +135,11 @@ class PropertyCarousel extends StatelessWidget {
                       imageUrl:
                           imagePath, // TODO define a new property.iconimagepath
 
-                      placeholder: (context, url) =>
-                          const CircularProgressIndicator(),
+                      placeholder: (context, url) => const Center(
+                        child: SpinKitFadingCube(
+                          color: Color.fromARGB(255, 30, 197, 83),
+                        ),
+                      ),
                       errorWidget: (context, url, error) =>
                           const Icon(Icons.error),
                       fit: BoxFit.cover,
@@ -365,6 +368,12 @@ class PropertyDetails extends StatelessWidget {
                                 physics: const AlwaysScrollableScrollPhysics(),
                                 child: Row(
                                   children: [
+                                    SizedBox(width: screenWidth * 0.02),
+                                    PropertySpecs(
+                                      icon: Icons.area_chart_outlined,
+                                      text:
+                                          '${property.area?.round()} Marlas/ ${(property.area! * 272).round()} Sqft',
+                                    ),
                                     SizedBox(width: screenWidth * 0.035),
                                     if (property.beds > 0)
                                       PropertySpecs(
@@ -423,11 +432,12 @@ class PropertyDetails extends StatelessWidget {
                     ),
                     const SizedBox(height: 12),
                     Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         // const SizedBox(width: 8),
                         // const Spacer(),
-                        Padding(
-                            padding: EdgeInsets.only(left: screenWidth * 0.3)),
+                        // Padding(
+                        //     padding: EdgeInsets.only(left: screenWidth * 0.3)),
                         Center(
                           child: isRequested
                               ? GradientButton(
@@ -445,6 +455,13 @@ class PropertyDetails extends StatelessWidget {
                                     Map<String, dynamic> propertyMap =
                                         property.toMap();
 
+                                    // Generate a random ID
+                                    final Random random = Random();
+                                    final String randomID = random
+                                        .nextInt(999999)
+                                        .toString()
+                                        .padLeft(6, '0');
+
                                     // Send request to admin
                                     FirebaseFirestore.instance
                                         .collection('AdminRequests')
@@ -457,6 +474,7 @@ class PropertyDetails extends StatelessWidget {
                                           'uid': uid,
                                           'property': propertyMap,
                                           'propertyID': propertyID,
+                                          'requestID': randomID,
                                         }
                                       ]),
                                       'timestamp': Timestamp.now(),
@@ -604,7 +622,11 @@ class PropertyDetails extends StatelessWidget {
         } else if (snapshot.hasError) {
           return Text('Error: ${snapshot.error}');
         } else {
-          return const CircularProgressIndicator();
+          return const Center(
+            child: SpinKitFadingCube(
+              color: Color.fromARGB(255, 30, 197, 83),
+            ),
+          );
         }
       },
     );
@@ -694,19 +716,20 @@ class GradientButton extends StatelessWidget {
           onTap: onPressed,
           child: Padding(
             padding: const EdgeInsets.symmetric(
-              horizontal: 5,
+              horizontal: 12,
               vertical: 12,
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(
-                  Icons.arrow_forward,
-                  color: Colors.white,
-                ),
+                // const Icon(
+                //   Icons.arrow_forward,
+                //   color: Colors.white,
+                // ),
                 const SizedBox(width: 8),
                 Text(
                   text,
+                  textAlign: TextAlign.center,
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 16,
@@ -716,70 +739,6 @@ class GradientButton extends StatelessWidget {
             ),
           ),
         ),
-      ),
-    );
-  }
-}
-
-class ExpandedImageDialog extends StatelessWidget {
-  final String imageProvider;
-
-  const ExpandedImageDialog({Key? key, required this.imageProvider})
-      : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Dialog(
-      insetPadding: EdgeInsets.zero,
-      child: Stack(
-        children: [
-          Container(
-            constraints: const BoxConstraints.expand(),
-            child: PhotoView(
-              imageProvider: CachedNetworkImageProvider(imageProvider),
-              backgroundDecoration: BoxDecoration(
-                color: Colors.transparent,
-              ),
-              minScale: PhotoViewComputedScale.contained * 1.0,
-              maxScale: PhotoViewComputedScale.covered * 2.0,
-              initialScale: PhotoViewComputedScale.contained,
-              basePosition: Alignment.center,
-              heroAttributes: const PhotoViewHeroAttributes(tag: "someTag"),
-              customSize: MediaQuery.of(context).size,
-            ),
-          ),
-          Positioned(
-            top: 65.0,
-            left: 10.0,
-            child: GestureDetector(
-              onTap: () {
-                Navigator.pop(context);
-              },
-              child: Container(
-                width: 40,
-                height: 40,
-                decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Color(0xFF33907C),
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      Color(0xff0FA697),
-                      Color(0xff45BF7A),
-                      Color(0xff0DF205),
-                    ],
-                  ),
-                ),
-                child: const Icon(
-                  Icons.arrow_back,
-                  size: 20,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }

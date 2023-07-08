@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:crypto/crypto.dart';
+import 'package:rehnaa/backend/services/helperfunctions.dart';
 import 'dart:convert';
 import '../../../backend/models/landlordmodel.dart';
 import '../../../backend/models/dealermodel.dart';
@@ -176,12 +177,12 @@ class _LandlordCardWidgetState extends State<LandlordCardWidget> {
     await uploadImages();
 
     // Hash sensitive information
-    final hashedCnic = hashString(cnicController.text);
-    final hashedBankName = hashString(bankNameController.text);
-    final hashedRaastId = hashString(raastIdController.text);
-    final hashedAccountNumber = hashString(accountNumberController.text);
-    final hashedIban = hashString(ibanController.text);
-    final hashedAddress = hashString(addressController.text);
+    final hashedCnic = encryptString(cnicController.text);
+    final hashedBankName = encryptString(bankNameController.text);
+    final hashedRaastId = encryptString(raastIdController.text);
+    final hashedAccountNumber = encryptString(accountNumberController.text);
+    final hashedIban = encryptString(ibanController.text);
+    final hashedAddress = encryptString(addressController.text);
 
     // Add landlord details to Firestore
     DocumentReference<Map<String, dynamic>> landlordDocRef =
@@ -199,6 +200,7 @@ class _LandlordCardWidgetState extends State<LandlordCardWidget> {
       'accountNumber': hashedAccountNumber,
       'iban': hashedIban,
       'address': hashedAddress,
+      'isGhost': true,
     });
 
     // Set landlord reference for the selected dealer
@@ -336,23 +338,23 @@ class _LandlordCardWidgetState extends State<LandlordCardWidget> {
                     child: Text(buttonLabel),
                   ),
                   const SizedBox(height: 20),
-                  DropdownButton<DocumentSnapshot<Map<String, dynamic>>>(
-                    value: selectedDealer,
-                    hint: const Text('Select Dealer'),
-                    items: dealerList.map((dealer) {
-                      String dealerName =
-                          '${dealer.data()!['firstName']} ${dealer.data()!['lastName']}';
-                      return DropdownMenuItem(
-                        value: dealer,
-                        child: Text(dealerName),
-                      );
-                    }).toList(),
-                    onChanged: (dealer) {
-                      setState(() {
-                        selectedDealer = dealer;
-                      });
-                    },
-                  ),
+                  // DropdownButton<DocumentSnapshot<Map<String, dynamic>>>(
+                  //   value: selectedDealer,
+                  //   hint: const Text('Select Dealer'),
+                  //   items: dealerList.map((dealer) {
+                  //     String dealerName =
+                  //         '${dealer.data()!['firstName']} ${dealer.data()!['lastName']}';
+                  //     return DropdownMenuItem(
+                  //       value: dealer,
+                  //       child: Text(dealerName),
+                  //     );
+                  //   }).toList(),
+                  //   onChanged: (dealer) {
+                  //     setState(() {
+                  //       selectedDealer = dealer;
+                  //     });
+                  //   },
+                  // ),
                   const SizedBox(height: 20),
                   TextField(
                     controller: cnicController,
@@ -399,10 +401,11 @@ class _LandlordCardWidgetState extends State<LandlordCardWidget> {
                           onPressed: validateInputs,
                           child: const Text('Submit'),
                         ),
-                        if (uploading) Container(
-                    padding: EdgeInsets.only(left: 150.0),
-                    child: CircularProgressIndicator(),
-                  ),
+                        if (uploading)
+                          Container(
+                            padding: EdgeInsets.only(left: 150.0),
+                            child: CircularProgressIndicator(),
+                          ),
                       ],
                     ),
                   ),

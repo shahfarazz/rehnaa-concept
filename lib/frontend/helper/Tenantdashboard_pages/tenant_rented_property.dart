@@ -8,7 +8,7 @@ import 'package:rehnaa/frontend/helper/Landlorddashboard_pages/landlord_property
 import '../../../backend/models/propertymodel.dart';
 // import '../../Screens/Admin/admindashboard.dart';
 import '../Landlorddashboard_pages/landlordproperties.dart';
-import 'Tenant_propertyinfo.dart';
+import 'tenant_propertyinfo.dart';
 
 class TenantRentedPropertyPage extends StatefulWidget {
   String uid;

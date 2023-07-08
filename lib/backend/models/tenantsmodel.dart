@@ -4,16 +4,16 @@ import 'package:rehnaa/backend/models/landlordmodel.dart';
 class Tenant {
   String firstName;
   String lastName;
-  String description;
-  double rating;
-  var rent;
-  int creditPoints;
+  String? description;
+  num rating;
+  num balance;
+  num? creditPoints;
   //  String propertyDetails;
-  String cnicNumber;
-  String emailOrPhone;
-  bool tasdeeqVerification;
-  bool policeVerification;
-  int familyMembers;
+  String? cnicNumber;
+  String? emailOrPhone;
+  bool? tasdeeqVerification;
+  bool? policeVerification;
+  num? familyMembers;
   DocumentReference<Map<String, dynamic>>? landlordRef;
   DocumentReference<Map<String, dynamic>>? propertyRef;
   List<DocumentReference<Map<String, dynamic>>>? rentpaymentRef;
@@ -22,28 +22,47 @@ class Tenant {
   String? tempID;
   Timestamp? dateJoined;
   String? address;
+  String? contractStartDate;
+  String? contractEndDate;
+  String? propertyAddress;
+  String? monthlyRent;
+  // ignore: prefer_typing_uninitialized_variables
+  var upfrontBonus;
+  // ignore: prefer_typing_uninitialized_variables
+  var monthlyProfit;
+  var discount;
+  bool? isGhost;
 
-  Tenant(
-      {required this.firstName,
-      required this.lastName,
-      required this.description,
-      required this.rating,
-      required this.rent,
-      required this.creditPoints,
-      // required this.propertyDetails,
-      required this.cnicNumber,
-      required this.emailOrPhone,
-      required this.tasdeeqVerification,
-      required this.familyMembers,
-      required this.policeVerification,
-      this.landlordRef,
-      this.landlord,
-      this.pathToImage,
-      this.tempID,
-      this.propertyRef,
-      this.dateJoined,
-      this.rentpaymentRef,
-      this.address});
+  Tenant({
+    required this.firstName,
+    required this.lastName,
+    required this.description,
+    required this.rating,
+    required this.balance,
+    required this.creditPoints,
+    // required this.propertyDetails,
+    required this.cnicNumber,
+    required this.emailOrPhone,
+    required this.tasdeeqVerification,
+    required this.familyMembers,
+    required this.policeVerification,
+    this.landlordRef,
+    this.landlord,
+    this.pathToImage,
+    this.tempID,
+    this.propertyRef,
+    this.dateJoined,
+    this.rentpaymentRef,
+    this.address,
+    this.contractStartDate,
+    this.contractEndDate,
+    this.propertyAddress,
+    this.monthlyRent,
+    this.upfrontBonus,
+    this.monthlyProfit,
+    this.discount,
+    this.isGhost,
+  });
 
   factory Tenant.fromJson(Map<String, dynamic> json) {
     return Tenant(
@@ -51,22 +70,30 @@ class Tenant {
       lastName: json['lastName'],
       description: json['description'] ?? 'No description',
       rating: json['rating'] ?? 0.0,
-      rent: json['balance'] ?? 0.0,
+      balance: json['balance'] ?? 0.0,
       creditPoints: json['creditPoints'] ?? 0,
       // propertyDetails: json['propertyDetails'] ?? 'No property details',
       cnicNumber: json['cnicNumber'] ?? 'N/A',
       emailOrPhone: json['emailOrPhone'] ?? 'N/A',
-      tasdeeqVerification: json['tasdeeqVerification'] ?? false,
+      tasdeeqVerification: json['tasdeeqVerification'] ?? null,
       familyMembers: json['familyMembers'] ?? 0,
       landlordRef: json['landlordRef'],
       pathToImage: json['pathToImage'] ?? 'assets/defaultimage.png',
-      policeVerification: json['policeVerification'] ?? false,
+      policeVerification: json['policeVerification'] ?? null,
       dateJoined: json['dateJoined'],
       rentpaymentRef: json['rentpaymentRef'] != null
           ? List<DocumentReference<Map<String, dynamic>>>.from(
               json['rentpaymentRef'].map((ref) => ref as DocumentReference))
           : null,
       address: json['address'] ?? '',
+      contractStartDate: json['contractStartDate'] ?? '',
+      contractEndDate: json['contractEndDate'] ?? '',
+      propertyAddress: json['propertyAddress'] ?? 'No address found',
+      monthlyRent: json['monthlyRent'] ?? '',
+      upfrontBonus: json['upfrontBonus'] ?? '',
+      monthlyProfit: json['monthlyProfit'] ?? '',
+      discount: json['discount'] ?? 0.24234234,
+      isGhost: json['isGhost'] ?? false,
     );
   }
 
@@ -76,7 +103,7 @@ class Tenant {
       'lastName': lastName,
       'description': description,
       'rating': rating,
-      'rent': rent,
+      'balance': balance,
       'creditPoints': creditPoints,
       // 'propertyDetails': propertyDetails,
       'cnicNumber': cnicNumber,
@@ -89,12 +116,16 @@ class Tenant {
     };
   }
 
-  Future<void> getLandlord() async {
+  Future<Landlord?> getLandlord() async {
     if (landlordRef != null) {
       DocumentSnapshot<Map<String, dynamic>> snapshot =
           await landlordRef!.get();
-      landlord = await Landlord.fromJson(snapshot.data());
+
+      landlord = Landlord.fromJson(snapshot.data());
+      landlord?.tempID = snapshot.id;
+      return landlord;
     }
+    return null;
   }
 
   static void addDummyTenant() async {
@@ -107,7 +138,7 @@ class Tenant {
       lastName: 'Tenant',
       description: 'This is a dummy tenant',
       rating: 4.5,
-      rent: 1000,
+      balance: 1000,
       creditPoints: 100,
       // propertyDetails: 'Dummy property',
       cnicNumber: '123456789',

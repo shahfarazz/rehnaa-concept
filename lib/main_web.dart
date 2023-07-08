@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:rehnaa/frontend/Screens/login_page.dart';
 import 'package:rehnaa/frontend/Screens/signup_page.dart';
 import 'backend/services/authentication_service.dart';
+import 'frontend/Screens/Admin/admin_login.dart';
 import 'frontend/Screens/Dealer/dealer_dashboard.dart';
 import 'frontend/Screens/Landlord/landlord_dashboard.dart';
 import 'frontend/Screens/Tenant/tenant_dashboard.dart';
@@ -38,7 +39,7 @@ class MyApp extends StatelessWidget {
         // home: TenantDashboardPage(
         //     uid: 'K55YzmkUXt09OgFwnDuT'), //TODO remove this Jugaar
         // home: TeanantsSignUpDetailsPage(),
-        home: AdminDashboard(),
+        home: AdminLoginPage(),
         // home: LandlordDashboardPage(
         //   uid: '9l1ZrmtJ0lRSSIazEpFf7xWau952',
         // ),
