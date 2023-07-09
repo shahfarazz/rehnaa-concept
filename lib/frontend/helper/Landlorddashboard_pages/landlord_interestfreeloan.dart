@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'dart:ui';
 
@@ -152,6 +154,9 @@ class _InterestFreeLoanPageState extends State<InterestFreeLoanPage>
                             fontSize: 16.0,
                           );
                         } else {
+                          final Random random = Random();
+                          final String randomID =
+                              random.nextInt(999999).toString().padLeft(6, '0');
                           FirebaseFirestore.instance
                               .collection('Landlords')
                               .doc(widget.uid)
@@ -161,7 +166,7 @@ class _InterestFreeLoanPageState extends State<InterestFreeLoanPage>
                                 Landlord.fromJson(value.data()!);
                             if (isAppliedInterestLoan == false) {
                               FirebaseFirestore.instance
-                                  .collection('Landlords')
+                                  .collection('AdminRequests')
                                   .doc(widget.uid)
                                   .set({
                                 'interestFreeLoanRequest':
@@ -171,12 +176,19 @@ class _InterestFreeLoanPageState extends State<InterestFreeLoanPage>
                                         '${landlord?.firstName} ${landlord?.lastName}',
                                     'uid': widget.uid,
                                     'timestamp': Timestamp.now(),
+                                    'requestID': randomID,
                                   }
                                 ]),
                                 'timestamp': Timestamp.now()
                               }, SetOptions(merge: true));
                               setState(() {
                                 isAppliedInterestLoan = true;
+                              });
+                              FirebaseFirestore.instance
+                                  .collection('Landlords')
+                                  .doc(widget.uid)
+                                  .update({
+                                'isAppliedInterestLoan': true,
                               });
                               Fluttertoast.showToast(
                                 msg:

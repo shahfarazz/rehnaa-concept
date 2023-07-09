@@ -232,58 +232,29 @@ class _PDFDealerPageState extends State<PDFDealerPage> {
     // OpenFile.open('$path/Output.pdf');
 
     // upload the pdf to firebase storage
-    try {
-      FirebaseStorage storage = FirebaseStorage.instance;
-      Reference ref = storage.ref().child("invoice_${invoiceNumber}.pdf");
-      UploadTask uploadTask = ref.putFile(outputFile);
-      uploadTask.then((res) {
-        res.ref.getDownloadURL().then((value) {
-          print("Uploaded File URL: $value");
-          FirebaseFirestore.instance
-              .collection('invoices')
-              .doc(invoiceNumber)
-              .set({
-            // 'invoiceNumber': invoiceNumber,
-            // 'landlordName': landlordName,
-            // 'dealerAgencyAddress': dealerAgencyAddress,
-            // 'dealerName': dealerName,
-            // 'tenantAddress': tenantAddress,
-            // 'amount': amount,
-            // 'paymentMode': paymentMode,
-            // 'date': formatted,
-            'url': value,
-          });
+
+    FirebaseStorage storage = FirebaseStorage.instance;
+    Reference ref = storage.ref().child("invoice_${invoiceNumber}.pdf");
+    UploadTask uploadTask = ref.putFile(outputFile);
+    uploadTask.then((res) {
+      res.ref.getDownloadURL().then((value) {
+        print("Uploaded File URL: $value");
+        FirebaseFirestore.instance
+            .collection('invoices')
+            .doc(invoiceNumber)
+            .set({
+          // 'invoiceNumber': invoiceNumber,
+          // 'landlordName': landlordName,
+          // 'dealerAgencyAddress': dealerAgencyAddress,
+          // 'dealerName': dealerName,
+          // 'tenantAddress': tenantAddress,
+          // 'amount': amount,
+          // 'paymentMode': paymentMode,
+          // 'date': formatted,
+          'url': value,
         });
       });
-    } catch (e) {
-      try {
-        FirebaseStorage storage = FirebaseStorage.instance;
-        Reference ref = storage.ref().child("invoice_${invoiceNumber}.pdf");
-        UploadTask uploadTask = ref.putFile(outputFile);
-        uploadTask.then((res) {
-          res.ref.getDownloadURL().then((value) {
-            print("Uploaded File URL: $value");
-            FirebaseFirestore.instance
-                .collection('invoices')
-                .doc(invoiceNumber)
-                .set({
-              // 'invoiceNumber': widget.invoiceNumber,
-              // 'landlordName': widget.landlordName,
-              // 'dealerAgencyAddress': widget.dealerAgencyAddress,
-              // 'dealerName': widget.dealerName,
-              // 'tenantAddress': widget.tenantAddress,
-              // 'amount': widget.amount,
-              // 'paymentMode': widget.paymentMode,
-              // 'date': formatted,
-              'url': value,
-            });
-          });
-        });
-      } catch (e) {
-        print('tried two times error is $e');
-      }
-      // TODO
-    }
+    });
 
     return outputFile;
   }

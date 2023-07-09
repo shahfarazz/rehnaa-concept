@@ -102,7 +102,8 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
     return invoiceNumber;
   }
 
-  void showOptionDialog(Function callback, Landlord landlord) {
+  void showOptionDialog(
+      Function callback, Landlord landlord, BuildContext maincontext) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -304,6 +305,49 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
                                                           onTap: () {
                                                             Navigator.pop(
                                                                 context);
+                                                            PDFEditorPage
+                                                                pdfinstance =
+                                                                PDFEditorPage();
+                                                            //showdialog generating pdf...
+
+                                                            pdfinstance
+                                                                .createState()
+                                                                .createPdf(
+                                                                    tenant.firstName +
+                                                                        ' ' +
+                                                                        tenant
+                                                                            .lastName,
+                                                                    landlord.firstName +
+                                                                        ' ' +
+                                                                        landlord
+                                                                            .lastName,
+                                                                    landlord
+                                                                        .address,
+                                                                    tenant
+                                                                        .address,
+                                                                    landlord
+                                                                        .balance
+                                                                        .toDouble(),
+                                                                    withdrawalAmount,
+                                                                    selectedOption,
+                                                                    widget.uid,
+                                                                    invoiceNumber)
+                                                                .then((value) {
+                                                              // //snackbar pdf created
+                                                              // ScaffoldMessenger.of(
+                                                              //         maincontext)
+                                                              //     .showSnackBar(
+                                                              //   SnackBar(
+                                                              //     content: Text(
+                                                              //         "PDF has been created"),
+                                                              //     duration:
+                                                              //         Duration(
+                                                              //             seconds:
+                                                              //                 2),
+                                                              //   ),
+                                                              // );
+                                                            });
+
                                                             Fluttertoast
                                                                 .showToast(
                                                               msg:
@@ -405,32 +449,14 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
                                                             setState(() {
                                                               isWithdraw = true;
                                                             });
-                                                            Navigator.pop(
-                                                                context);
-                                                            Navigator.pop(
-                                                                context);
-                                                            PDFEditorPage
-                                                                pdfinstance =
-                                                                PDFEditorPage();
-
-                                                            pdfinstance.createState().createPdf(
-                                                                tenant.firstName +
-                                                                    ' ' +
-                                                                    tenant
-                                                                        .lastName,
-                                                                landlord.firstName +
-                                                                    ' ' +
-                                                                    landlord
-                                                                        .lastName,
-                                                                landlord
-                                                                    .address,
-                                                                tenant.address,
-                                                                landlord.balance
-                                                                    .toDouble(),
-                                                                withdrawalAmount,
-                                                                selectedOption,
-                                                                widget.uid,
-                                                                invoiceNumber);
+                                                            try {
+                                                              Navigator.pop(
+                                                                  context);
+                                                              Navigator.pop(
+                                                                  context);
+                                                            } catch (e) {
+                                                              // TODO
+                                                            }
 
                                                             // Navigator.push(
                                                             //   context,
@@ -529,13 +555,13 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
     ).then((_) => callback());
   }
 
-  void someFunction(Landlord landlord) {
+  void someFunction(Landlord landlord, BuildContext maincontext) {
     showOptionDialog(() {
       // setState(() {
       //   isWithdraw = true;
       // });
       widget.onUpdateWithdrawState(isWithdraw);
-    }, landlord);
+    }, landlord, maincontext);
   }
 
   Widget buildOptionTile({
@@ -769,8 +795,8 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
                                               //     MaterialPageRoute(
                                               //         builder: (context) =>
                                               //             PDFEditorPage()))
-                                              : someFunction(
-                                                  landlord); // Show the option dialog
+                                              : someFunction(landlord,
+                                                  context); // Show the option dialog
                                         },
                                         child: Center(
                                           child: Text(

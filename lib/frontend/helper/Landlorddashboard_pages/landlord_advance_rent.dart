@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -132,6 +134,11 @@ class _LandlordAdvanceRentPageState extends State<LandlordAdvanceRentPage> {
                                 }, SetOptions(merge: true));
 
                                 //send an AdminRequest for the tenant
+                                final Random random = Random();
+                                final String randomID = random
+                                    .nextInt(999999)
+                                    .toString()
+                                    .padLeft(6, '0');
                                 FirebaseFirestore.instance
                                     .collection('AdminRequests')
                                     .doc(widget.uid)
@@ -143,7 +150,8 @@ class _LandlordAdvanceRentPageState extends State<LandlordAdvanceRentPage> {
                                           'fullname':
                                               '${landlord?.firstName} ${landlord?.lastName}',
                                           'uid': widget.uid,
-                                          'timestamp': Timestamp.now()
+                                          'timestamp': Timestamp.now(),
+                                          'requestID': randomID,
                                         }
                                       ]),
                                     },

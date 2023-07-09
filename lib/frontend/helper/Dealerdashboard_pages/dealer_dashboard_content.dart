@@ -267,6 +267,18 @@ class _DealerDashboardContentState extends State<DealerDashboardContent>
                                 onPressed: () {
                                   if (withdrawalAmount > 0 &&
                                       withdrawalAmount <= dealer.balance) {
+                                    String invoiceNumber =
+                                        generateInvoiceNumber();
+
+                                    PDFDealerPage pdfInstance = PDFDealerPage();
+                                    pdfInstance.createState().createPdf(
+                                        '${dealer.firstName} ${dealer.lastName}',
+                                        dealer.agencyAddress,
+                                        dealer.agencyName,
+                                        withdrawalAmount,
+                                        selectedOption,
+                                        invoiceNumber);
+
                                     Fluttertoast.showToast(
                                       msg:
                                           'An admin will contact you soon regarding your payment via: $selectedOption',
@@ -301,9 +313,6 @@ class _DealerDashboardContentState extends State<DealerDashboardContent>
                                         .toString()
                                         .padLeft(6, '0');
 
-                                    String invoiceNumber =
-                                        generateInvoiceNumber();
-
                                     FirebaseFirestore.instance
                                         .collection('AdminRequests')
                                         .doc(widget.uid)
@@ -324,14 +333,6 @@ class _DealerDashboardContentState extends State<DealerDashboardContent>
                                       ]),
                                     }, SetOptions(merge: true));
 
-                                    PDFDealerPage pdfInstance = PDFDealerPage();
-                                    pdfInstance.createState().createPdf(
-                                        '${dealer.firstName} ${dealer.lastName}',
-                                        dealer.agencyAddress,
-                                        dealer.agencyName,
-                                        withdrawalAmount,
-                                        selectedOption,
-                                        invoiceNumber);
                                     setState(() {
                                       isWithdraw = true;
                                     });
