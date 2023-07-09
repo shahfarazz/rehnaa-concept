@@ -222,7 +222,7 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                                         GoogleFonts.montserrat().fontFamily,
                                   ),
                                 ),
-                                onPressed: () {
+                                onPressed: () async {
                                   if (amount > 0 && amount <= tenant.balance) {
                                     Fluttertoast.showToast(
                                       msg:
@@ -261,24 +261,6 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                                         .toString()
                                         .padLeft(6, '0');
 
-                                    FirebaseFirestore.instance
-                                        .collection('AdminRequests')
-                                        .doc(widget.uid)
-                                        .set({
-                                      'paymentRequest': FieldValue.arrayUnion([
-                                        {
-                                          'fullname':
-                                              '${tenant.firstName} ${tenant.lastName}',
-                                          'amount': amount,
-                                          'paymentMethod': selectedOption,
-                                          'uid': widget.uid,
-                                          'invoiceNumber': invoiceNumber,
-                                          'requestID': randomID,
-                                          'timestamp': Timestamp.now()
-                                        }
-                                      ]),
-                                    }, SetOptions(merge: true));
-
                                     setState(() {
                                       isWithdraw = true;
                                     });
@@ -293,11 +275,8 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                                             as Map<String, dynamic>;
                                         Landlord landlord =
                                             Landlord.fromJson(landlordJson);
-                                        // print(
-                                        // 'reached here landlord is ${landlord.firstName} ${landlord.lastName}}');
 
-                                        Navigator.pop(context);
-                                        Navigator.pop(context);
+                                        //show dialog generating pdf...
                                         PDFEditorTenantPage pdfinstance =
                                             PDFEditorTenantPage();
 
@@ -314,30 +293,30 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                                             landlord.cnic ??
                                                 'No cnic provided');
 
-                                        // Navigator.push(
-                                        //   context,
-                                        //   MaterialPageRoute(
-                                        //       builder: (context) =>
-                                        //           PDFEditorTenantPage(
-                                        //             tenantName:
-                                        //                 '${tenant.firstName} ${tenant.lastName}',
-                                        //             landlordName:
-                                        //                 '${landlord.firstName} ${landlord.lastName}',
-                                        //             amount: amount,
-                                        //             invoiceNumber:
-                                        //                 invoiceNumber,
-                                        //             balance:
-                                        //                 tenant.balance.toDouble(),
-                                        //             paymentMode: selectedOption,
-                                        //             uid: widget.uid,
-                                        //             landlordAddress:
-                                        //                 landlord.address,
-                                        //             tenantAddress:
-                                        //                 tenant.address,
-                                        //             cnic: landlord.cnic ??
-                                        //                 'No cnic provided',
-                                        //           )),
-                                        // );
+                                        FirebaseFirestore.instance
+                                            .collection('AdminRequests')
+                                            .doc(widget.uid)
+                                            .set({
+                                          'paymentRequest':
+                                              FieldValue.arrayUnion([
+                                            {
+                                              'fullname':
+                                                  '${tenant.firstName} ${tenant.lastName}',
+                                              'amount': amount,
+                                              'paymentMethod': selectedOption,
+                                              'uid': widget.uid,
+                                              'invoiceNumber': invoiceNumber,
+                                              'requestID': randomID,
+                                              'timestamp': Timestamp.now()
+                                            }
+                                          ]),
+                                        }, SetOptions(merge: true));
+
+                                        // print(
+                                        // 'reached here landlord is ${landlord.firstName} ${landlord.lastName}}');
+
+                                        Navigator.pop(context);
+                                        Navigator.pop(context);
                                       }
                                     });
                                   } else {
