@@ -37,9 +37,9 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
     }
   }
 
-  void _login() {
+  void _login() async {
     try {
-      FirebaseAuth.instance.signInWithEmailAndPassword(
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
           email: _emailController.text, password: _passwordController.text);
     } catch (e) {
       print(e);

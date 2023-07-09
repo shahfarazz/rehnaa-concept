@@ -97,19 +97,14 @@ class PropertyCarousel extends StatelessWidget {
   final List<String> imagePaths;
 
   const PropertyCarousel({
-    super.key,
+    Key? key,
     required this.currentIndex,
     required this.onPageChanged,
     required this.imagePaths,
-  });
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    // final List<String> imagePaths = [
-    //   'assets/image1.jpg',
-    //   'assets/image2.jpg',
-    // ];
-
     return Stack(
       children: [
         CarouselSlider(
@@ -125,16 +120,23 @@ class PropertyCarousel extends StatelessWidget {
               builder: (BuildContext context) {
                 return GestureDetector(
                   onTap: () async {
-                    final imageProvider = CachedNetworkImageProvider(imagePath);
+                    // final imageProvider = CachedNetworkImageProvider(imagePath);
 
-                    await showImageViewer(context, imageProvider);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => FullScreenImagePage(
+                                currentIndex: currentIndex,
+                                imagePaths: imagePaths,
+                                onPageChanged: onPageChanged,
+                                // onClose: _toggleFullScreen,
+                              )),
+                    );
                   },
                   child: Hero(
                     tag: imagePath,
                     child: CachedNetworkImage(
-                      imageUrl:
-                          imagePath, // TODO define a new property.iconimagepath
-
+                      imageUrl: imagePath,
                       placeholder: (context, url) => const Center(
                         child: SpinKitFadingCube(
                           color: Color.fromARGB(255, 30, 197, 83),
@@ -156,8 +158,9 @@ class PropertyCarousel extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 3),
             decoration: BoxDecoration(
               color: Colors.black.withOpacity(0.3),
-              borderRadius:
-                  const BorderRadius.vertical(top: Radius.circular(16)),
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(16),
+              ),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -213,6 +216,76 @@ class PropertyCarousel extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class FullScreenImagePage extends StatefulWidget {
+  final int currentIndex;
+  final List<String> imagePaths;
+  final ValueChanged<int>? onPageChanged;
+  // final VoidCallback onClose;
+
+  const FullScreenImagePage({
+    Key? key,
+    required this.currentIndex,
+    required this.imagePaths,
+    this.onPageChanged,
+    // required this.onClose,
+  }) : super(key: key);
+
+  @override
+  _FullScreenImagePageState createState() => _FullScreenImagePageState();
+}
+
+class _FullScreenImagePageState extends State<FullScreenImagePage> {
+  late PageController _pageController;
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController(initialPage: widget.currentIndex);
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () async {
+        // widget.onClose();
+        Navigator.pop(context);
+      },
+      child: Container(
+        color: Colors.black,
+        child: SafeArea(
+          child: PageView.builder(
+            controller: _pageController,
+            itemCount: widget.imagePaths.length,
+            onPageChanged: widget.onPageChanged,
+            itemBuilder: (context, index) {
+              final imagePath = widget.imagePaths[index];
+              return InteractiveViewer(
+                panEnabled: false,
+                child: CachedNetworkImage(
+                  imageUrl: imagePath,
+                  placeholder: (context, url) => const Center(
+                    child: SpinKitFadingCube(
+                      color: Color.fromARGB(255, 30, 197, 83),
+                    ),
+                  ),
+                  errorWidget: (context, url, error) => const Icon(Icons.error),
+                  fit: BoxFit.contain,
+                ),
+              );
+            },
+          ),
+        ),
+      ),
     );
   }
 }
@@ -475,9 +548,9 @@ class PropertyDetails extends StatelessWidget {
                                           'property': propertyMap,
                                           'propertyID': propertyID,
                                           'requestID': randomID,
+                                          'timestamp': Timestamp.now(),
                                         }
                                       ]),
-                                      'timestamp': Timestamp.now(),
                                     }, SetOptions(merge: true));
 
                                     // Create a notification for the tenant

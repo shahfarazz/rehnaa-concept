@@ -48,6 +48,7 @@ class _AdminRequestsPageState extends State<AdminRequestsPage> {
                   invoiceNumber: doc["withdrawRequest"][i]["invoiceNumber"],
                   altTenantName: doc["withdrawRequest"][i]["tenantname"],
                   withinArrayID: doc["withdrawRequest"][i]["requestID"],
+                  docTimestamp: doc["withdrawRequest"][i]["timestamp"],
                 ),
               );
             }
@@ -74,6 +75,7 @@ class _AdminRequestsPageState extends State<AdminRequestsPage> {
                   requestType: 'Tenant Payment Request',
                   invoiceNumber: doc["paymentRequest"][i]["invoiceNumber"],
                   withinArrayID: doc["paymentRequest"][i]["requestID"],
+                  docTimestamp: doc["paymentRequest"][i]["timestamp"],
                 ),
               );
             }
@@ -92,19 +94,21 @@ class _AdminRequestsPageState extends State<AdminRequestsPage> {
 
               adminRequests.add(
                 AdminRequestData(
-                    name: doc["rentalRequest"][i]["fullname"],
-                    requestedAmount:
-                        doc["rentalRequest"][i]["property"]["price"].toString(),
-                    uid: doc["rentalRequest"][i]["uid"],
-                    propertyTitle: doc["rentalRequest"][i]["property"]["title"],
-                    propertyLocation: doc["rentalRequest"][i]["property"]
-                        ["location"],
-                    requestID: doc.id,
-                    requestType: 'Tenant Rental Request',
-                    propertyLandlordRef: doc["rentalRequest"][i]["property"]
-                        ["landlordRef"],
-                    withinArrayID: doc["rentalRequest"][i]["requestID"],
-                    propertyID: doc["rentalRequest"][i]["propertyID"]),
+                  name: doc["rentalRequest"][i]["fullname"],
+                  requestedAmount:
+                      doc["rentalRequest"][i]["property"]["price"].toString(),
+                  uid: doc["rentalRequest"][i]["uid"],
+                  propertyTitle: doc["rentalRequest"][i]["property"]["title"],
+                  propertyLocation: doc["rentalRequest"][i]["property"]
+                      ["location"],
+                  requestID: doc.id,
+                  requestType: 'Tenant Rental Request',
+                  propertyLandlordRef: doc["rentalRequest"][i]["property"]
+                      ["landlordRef"],
+                  withinArrayID: doc["rentalRequest"][i]["requestID"],
+                  propertyID: doc["rentalRequest"][i]["propertyID"],
+                  docTimestamp: doc["rentalRequest"][i]["timestamp"],
+                ),
               );
             }
           }
@@ -125,6 +129,7 @@ class _AdminRequestsPageState extends State<AdminRequestsPage> {
                 uid: doc["rentAccrualRequest"][i]["uid"],
                 requestType: 'Rent Accrual Request',
                 requestID: doc.id,
+                docTimestamp: doc["rentAccrualRequest"][i]["timestamp"],
               ));
             }
           }
@@ -152,6 +157,67 @@ class _AdminRequestsPageState extends State<AdminRequestsPage> {
                       ["invoiceNumber"],
                   withinArrayID: doc["withdrawRequestDealer"][i]["requestID"],
                   altTenantName: doc["withdrawRequestDealer"][i]["tenantname"],
+                  docTimestamp: doc["withdrawRequestDealer"][i]["timestamp"],
+                ),
+              );
+            }
+          }
+        } catch (e) {
+          if (kDebugMode) {
+            print('Error222: $e');
+          }
+        }
+
+        //try catch for rentAdvanceRequest
+        try {
+          if (doc["rentAdvanceRequest"] != null) {
+            for (var i = 0; i < doc["rentAdvanceRequest"].length; i++) {
+              // add each request to the adminRequests list
+
+              adminRequests.add(
+                AdminRequestData(
+                  name: doc["rentAdvanceRequest"][i]["fullname"],
+                  // requestedAmount:
+                  //     doc["rentAdvanceRequest"][i]["amount"].toString(),
+                  uid: doc["rentAdvanceRequest"][i]["uid"],
+                  // cashOrBankTransfer: doc["rentAdvanceRequest"][i]
+                  //     ["paymentMethod"],
+                  requestID: doc.id,
+                  requestType: 'Rent Advance Request',
+                  // invoiceNumber: doc["rentAdvanceRequest"][i]["invoiceNumber"],
+                  withinArrayID: doc["rentAdvanceRequest"][i]["requestID"],
+                  // altTenantName: doc["rentAdvanceRequest"][i]["tenantname"],
+                  docTimestamp: doc["rentAdvanceRequest"][i]["timestamp"],
+                ),
+              );
+            }
+          }
+        } catch (e) {
+          if (kDebugMode) {
+            print('Error222: $e');
+          }
+        }
+
+        //try catch for interestFreeLoanRequest
+        try {
+          if (doc["interestFreeLoanRequest"] != null) {
+            for (var i = 0; i < doc["interestFreeLoanRequest"].length; i++) {
+              // add each request to the adminRequests list
+
+              adminRequests.add(
+                AdminRequestData(
+                  name: doc["interestFreeLoanRequest"][i]["fullname"],
+                  // requestedAmount:
+                  //     doc["interestFreeLoanRequest"][i]["amount"].toString(),
+                  uid: doc["interestFreeLoanRequest"][i]["uid"],
+                  // cashOrBankTransfer: doc["interestFreeLoanRequest"][i]
+                  //     ["paymentMethod"],
+                  requestID: doc.id,
+                  requestType: 'Interest Free Loan Request',
+                  // invoiceNumber: doc["interestFreeLoanRequest"][i]["invoiceNumber"],
+                  withinArrayID: doc["interestFreeLoanRequest"][i]["requestID"],
+                  // altTenantName: doc["interestFreeLoanRequest"][i]["tenantname"],
+                  docTimestamp: doc["interestFreeLoanRequest"][i]["timestamp"],
                 ),
               );
             }
@@ -166,6 +232,10 @@ class _AdminRequestsPageState extends State<AdminRequestsPage> {
       }
       setState(() {
         displayedRequests.addAll(adminRequests);
+        displayedRequests
+            .sort((a, b) => b.docTimestamp.compareTo(a.docTimestamp));
+        //reverse to make it descending
+        // displayedRequests = displayedRequests.reversed.toList();
       });
     });
   }
@@ -303,7 +373,7 @@ class _AdminRequestsPageState extends State<AdminRequestsPage> {
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     itemCount: getPaginatedRequests().length,
-                    reverse: true,
+                    // reverse: true,
                     itemBuilder: (context, index) {
                       final request = getPaginatedRequests()[index];
                       return LandlordWithdrawalCard(data: request);
@@ -394,6 +464,7 @@ class AdminRequestData {
   String? invoiceNumber;
   String? altTenantName;
   String? withinArrayID;
+  Timestamp docTimestamp;
 
   AdminRequestData({
     required this.name,
@@ -409,6 +480,7 @@ class AdminRequestData {
     this.invoiceNumber,
     this.altTenantName,
     this.withinArrayID,
+    required this.docTimestamp,
   });
 }
 
@@ -542,7 +614,7 @@ class LandlordWithdrawalCard extends StatelessWidget {
                           .then((snapshot) {
                         if (snapshot.exists) {
                           final List<dynamic> withdrawRequestArray =
-                              snapshot.get('withdrawalRequest') ?? [];
+                              snapshot.get('withdrawRequest') ?? [];
 
                           final updatedArray = List.from(withdrawRequestArray)
                             ..removeWhere((element) =>
@@ -551,7 +623,7 @@ class LandlordWithdrawalCard extends StatelessWidget {
                           FirebaseFirestore.instance
                               .collection('AdminRequests')
                               .doc(data.requestID)
-                              .update({'withdrawalRequest': updatedArray});
+                              .update({'withdrawRequest': updatedArray});
                         }
                       });
                       //send a notification to the landlord by accessing the landlord's uid on Collection 'Notifications'
@@ -860,6 +932,100 @@ class LandlordWithdrawalCard extends StatelessWidget {
                           rentPaymentRef,
                         ])
                       });
+                    } else if (data.requestType == 'Rent Advance Request') {
+                      //rent advance request
+
+                      //remove the withdrawal request
+
+                      FirebaseFirestore.instance
+                          .collection('AdminRequests')
+                          .doc(data.requestID)
+                          .get()
+                          .then((snapshot) {
+                        if (snapshot.exists) {
+                          final List<dynamic> withdrawRequestArray =
+                              snapshot.get('rentAdvanceRequest') ?? [];
+
+                          final updatedArray = List.from(withdrawRequestArray)
+                            ..removeWhere((element) =>
+                                element['requestID'] == data.withinArrayID);
+
+                          FirebaseFirestore.instance
+                              .collection('AdminRequests')
+                              .doc(data.requestID)
+                              .update({'rentAdvanceRequest': updatedArray});
+                        }
+                      });
+                      //send a notification to the tenant
+                      // by accessing the tenant's uid on Collection 'Notifications'
+                      // and appending to the array called 'notifications' which has fields amount and title
+                      FirebaseFirestore.instance
+                          .collection('Notifications')
+                          .doc(data.uid)
+                          .update({
+                        'notifications': FieldValue.arrayUnion([
+                          {
+                            // 'amount': data.requestedAmount,
+                            'title': 'Rent Advance Request Accepted',
+                          }
+                        ])
+                      });
+
+                      //reset the state of the page
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const AdminRequestsPage(),
+                        ),
+                      );
+                    } else if (data.requestType ==
+                        'Interest Free Loan Request') {
+                      //interest free loan request
+
+                      //remove the withdrawal request
+
+                      FirebaseFirestore.instance
+                          .collection('AdminRequests')
+                          .doc(data.requestID)
+                          .get()
+                          .then((snapshot) {
+                        if (snapshot.exists) {
+                          final List<dynamic> withdrawRequestArray =
+                              snapshot.get('interestFreeLoanRequest') ?? [];
+
+                          final updatedArray = List.from(withdrawRequestArray)
+                            ..removeWhere((element) =>
+                                element['requestID'] == data.withinArrayID);
+
+                          FirebaseFirestore.instance
+                              .collection('AdminRequests')
+                              .doc(data.requestID)
+                              .update(
+                                  {'interestFreeLoanRequest': updatedArray});
+                        }
+                      });
+                      //send a notification to the tenant
+                      // by accessing the tenant's uid on Collection 'Notifications'
+                      // and appending to the array called 'notifications' which has fields amount and title
+                      FirebaseFirestore.instance
+                          .collection('Notifications')
+                          .doc(data.uid)
+                          .update({
+                        'notifications': FieldValue.arrayUnion([
+                          {
+                            // 'amount': data.requestedAmount,
+                            'title': 'Interest Free Loan Request Accepted',
+                          }
+                        ])
+                      });
+
+                      //reset the state of the page
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const AdminRequestsPage(),
+                        ),
+                      );
                     }
                   } else if (data.requestType == 'Tenant Rental Request') {
                     //rental request
@@ -1068,6 +1234,7 @@ class LandlordWithdrawalCard extends StatelessWidget {
                   });
 
                   if (data.requestType == 'Landlord Withdraw Request') {
+                    print('data.requestID: ${data.requestID}');
                     await FirebaseFirestore.instance
                         .collection('AdminRequests')
                         .doc(data.requestID)
@@ -1075,7 +1242,7 @@ class LandlordWithdrawalCard extends StatelessWidget {
                         .then((snapshot) {
                       if (snapshot.exists) {
                         final List<dynamic> withdrawRequestArray =
-                            snapshot.get('withdrawalRequest') ?? [];
+                            snapshot.get('withdrawRequest') ?? [];
 
                         final updatedArray = List.from(withdrawRequestArray)
                           ..removeWhere((element) =>
@@ -1084,7 +1251,7 @@ class LandlordWithdrawalCard extends StatelessWidget {
                         FirebaseFirestore.instance
                             .collection('AdminRequests')
                             .doc(data.requestID)
-                            .update({'withdrawalRequest': updatedArray});
+                            .update({'withdrawRequest': updatedArray});
 
                         FirebaseFirestore.instance
                             .collection('Landlords')
@@ -1198,6 +1365,46 @@ class LandlordWithdrawalCard extends StatelessWidget {
                             .update({
                           'isWithdraw': false,
                         });
+                      }
+                    });
+                  } else if (data.requestType == 'Rent Advance Request') {
+                    await FirebaseFirestore.instance
+                        .collection('AdminRequests')
+                        .doc(data.requestID)
+                        .get()
+                        .then((snapshot) {
+                      if (snapshot.exists) {
+                        final List<dynamic> withdrawRequestArray =
+                            snapshot.get('rentAdvanceRequest') ?? [];
+
+                        final updatedArray = List.from(withdrawRequestArray)
+                          ..removeWhere((element) =>
+                              element['requestID'] == data.withinArrayID);
+
+                        FirebaseFirestore.instance
+                            .collection('AdminRequests')
+                            .doc(data.requestID)
+                            .update({'rentAdvanceRequest': updatedArray});
+                      }
+                    });
+                  } else if (data.requestType == 'Interest Free Loan Request') {
+                    await FirebaseFirestore.instance
+                        .collection('AdminRequests')
+                        .doc(data.requestID)
+                        .get()
+                        .then((snapshot) {
+                      if (snapshot.exists) {
+                        final List<dynamic> withdrawRequestArray =
+                            snapshot.get('interestFreeLoanRequest') ?? [];
+
+                        final updatedArray = List.from(withdrawRequestArray)
+                          ..removeWhere((element) =>
+                              element['requestID'] == data.withinArrayID);
+
+                        FirebaseFirestore.instance
+                            .collection('AdminRequests')
+                            .doc(data.requestID)
+                            .update({'interestFreeLoanRequest': updatedArray});
                       }
                     });
                   }

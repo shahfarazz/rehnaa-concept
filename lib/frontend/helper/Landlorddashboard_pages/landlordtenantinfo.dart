@@ -151,15 +151,18 @@ class LandlordTenantInfoPage extends StatelessWidget {
                           const SizedBox(height: 10.0),
                           // Rest of your card's content...
 
-                          Center(
-                            child: WhiteBox(
-                              icon: Icons.star,
-                              iconColor: const Color(0xff33907c),
-                              label: 'Rating',
-                              value: '${tenant.rating}',
-                              points: '${tenant.creditPoints}',
-                            ),
-                          ),
+                          tenant.creditScore != ""
+                              ? Center(
+                                  child: WhiteBox(
+                                    icon: Icons.star,
+                                    iconColor: const Color(0xff33907c),
+                                    label: 'Rating',
+                                    value: '${tenant.creditScore}',
+                                    points: '${tenant.creditPoints}',
+                                    // tenant.credit
+                                  ),
+                                )
+                              : Container(),
 
                           const SizedBox(height: 10.0),
                           tenant.cnicNumber != null

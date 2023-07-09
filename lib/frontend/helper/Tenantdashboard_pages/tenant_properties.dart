@@ -76,7 +76,15 @@ class _TenantPropertiesPageState extends State<TenantPropertiesPage>
       Property property =
           Property.fromJson(documentSnapshot.data() as Map<String, dynamic>);
       property.propertyID = documentSnapshot.id;
-      properties.add(property);
+
+      print(property.tenantRef?.id != null);
+
+      if (property.tenantRef?.id != null ||
+          property.tenantRef?.id == widget.uid) {
+        continue;
+      } else {
+        properties.add(property);
+      }
     }
 
     if (snapshot.docs.isNotEmpty) {

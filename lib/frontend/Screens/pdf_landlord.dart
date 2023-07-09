@@ -231,58 +231,30 @@ class _PDFEditorPageState extends State<PDFEditorPage> {
     // OpenFile.open('$path/Output.pdf');
 
     // upload the pdf to firebase storage
-    try {
-      FirebaseStorage storage = FirebaseStorage.instance;
-      Reference ref = storage.ref().child("invoice_${invoiceNumber}.pdf");
-      UploadTask uploadTask = ref.putFile(outputFile);
-      uploadTask.then((res) {
-        res.ref.getDownloadURL().then((value) {
-          print("Uploaded File URL: $value");
-          FirebaseFirestore.instance
-              .collection('invoices')
-              .doc(invoiceNumber)
-              .set({
-            // 'invoiceNumber': invoiceNumber,
-            // 'landlordName': landlordName,
-            // 'landlordAddress': landlordAddress,
-            // 'tenantName': tenantName,
-            // 'tenantAddress': tenantAddress,
-            // 'amount': amount,
-            // 'paymentMode': paymentMode,
-            // 'date': formatted,
-            'url': value,
-          });
+
+    FirebaseStorage storage = FirebaseStorage.instance;
+    Reference ref = storage.ref().child("invoice_${invoiceNumber}.pdf");
+    UploadTask uploadTask = ref.putFile(outputFile);
+    uploadTask.then((res) {
+      res.ref.getDownloadURL().then((value) {
+        print("Uploaded File URL: $value");
+        FirebaseFirestore.instance
+            .collection('invoices')
+            .doc(invoiceNumber)
+            .set({
+          // 'invoiceNumber': invoiceNumber,
+          // 'landlordName': landlordName,
+          // 'landlordAddress': landlordAddress,
+          // 'tenantName': tenantName,
+          // 'tenantAddress': tenantAddress,
+          // 'amount': amount,
+          // 'paymentMode': paymentMode,
+          // 'date': formatted,
+          'url': value,
         });
       });
-    } catch (e) {
-      try {
-        FirebaseStorage storage = FirebaseStorage.instance;
-        Reference ref = storage.ref().child("invoice_${invoiceNumber}.pdf");
-        UploadTask uploadTask = ref.putFile(outputFile);
-        uploadTask.then((res) {
-          res.ref.getDownloadURL().then((value) {
-            print("Uploaded File URL: $value");
-            FirebaseFirestore.instance
-                .collection('invoices')
-                .doc(invoiceNumber)
-                .set({
-              // 'invoiceNumber': widget.invoiceNumber,
-              // 'landlordName': widget.landlordName,
-              // 'landlordAddress': widget.landlordAddress,
-              // 'tenantName': widget.tenantName,
-              // 'tenantAddress': widget.tenantAddress,
-              // 'amount': widget.amount,
-              // 'paymentMode': widget.paymentMode,
-              // 'date': formatted,
-              'url': value,
-            });
-          });
-        });
-      } catch (e) {
-        print('tried two times error is $e');
-      }
-      // TODO
-    }
+    });
+    // TODO
 
     return outputFile;
   }
@@ -309,6 +281,8 @@ class _PDFEditorPageState extends State<PDFEditorPage> {
 
     //Open the PDF document in mobile
     // OpenFile.open('$path/Output.pdf');
+    //snackbar that pdf has been created
+
     return outputFile;
   }
 

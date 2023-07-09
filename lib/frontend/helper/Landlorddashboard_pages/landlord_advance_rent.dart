@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -132,19 +134,30 @@ class _LandlordAdvanceRentPageState extends State<LandlordAdvanceRentPage> {
                                 }, SetOptions(merge: true));
 
                                 //send an AdminRequest for the tenant
-                                // FirebaseFirestore.instance
-                                //     .collection('AdminRequests')
-                                //     .doc(widget.uid)
-                                //     .set({
-                                //   'rentAccrualRequest': FieldValue.arrayUnion([
-                                //     {
-                                //       'fullname':
-                                //           '${landlord?.firstName} ${landlord?.lastName}',
-                                //       'uid': widget.uid,
-                                //     }
-                                //   ]),
-                                //   'timestamp': Timestamp.now()
-                                // }, SetOptions(merge: true)); //TODO implement this call
+                                final Random random = Random();
+                                final String randomID = random
+                                    .nextInt(999999)
+                                    .toString()
+                                    .padLeft(6, '0');
+                                FirebaseFirestore.instance
+                                    .collection('AdminRequests')
+                                    .doc(widget.uid)
+                                    .set(
+                                        {
+                                      'rentAdvanceRequest':
+                                          FieldValue.arrayUnion([
+                                        {
+                                          'fullname':
+                                              '${landlord?.firstName} ${landlord?.lastName}',
+                                          'uid': widget.uid,
+                                          'timestamp': Timestamp.now(),
+                                          'requestID': randomID,
+                                        }
+                                      ]),
+                                    },
+                                        SetOptions(
+                                            merge:
+                                                true)); //TODO implement this call
 
                                 //send a notification to the tenant that the request has been sent
                                 FirebaseFirestore.instance

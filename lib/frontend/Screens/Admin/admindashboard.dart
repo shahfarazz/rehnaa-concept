@@ -56,43 +56,71 @@ class _AdminDashboardState extends State<AdminDashboard> {
   }
 
   List<Map<String, String>> notifications = [];
+  // List<Map<String, String>> notificationsAlreadyRead = [];
+  //mapping which maps senderid to a list of notifications
+  Map<String, List<Map<String, String>>>
+      notificationsAndAlreadyReadNotifications = {};
 
   Future<void> _getNotifs() async {
-    QuerySnapshot<Map<String, dynamic>> propertiesSnapshot =
-        await FirebaseFirestore.instance
-            .collection('AdminRequests')
-            .orderBy('timestamp', descending: true)
-            .get();
+    QuerySnapshot<Map<String, dynamic>> notificationSnapshots =
+        await FirebaseFirestore.instance.collection('AdminRequests').get();
 
-    if (propertiesSnapshot.size > 0) {
+    if (notificationSnapshots.size > 0) {
       List<Map<String, String>> tempNotifications = [];
-      propertiesSnapshot.docs.forEach((propertysnapshot) {
-        propertysnapshot.data().forEach((key, value) {
+      notificationsAndAlreadyReadNotifications.clear();
+
+      for (var notificationsnapshot in notificationSnapshots.docs) {
+        var notificationData = notificationsnapshot.data();
+
+        // sort notificationData by timestamp descending
+        // but you will have to traverse and collect all the timestamps first
+        // then sort them as they are in arrays called 'withdrawRequest', 'paymentRequest',
+        //'rentAccrualRequest', 'rentalRequest', 'withdrawRequestDealer',
+
+        // Map<String,dynamic> notificationsWithTimestamps = {};
+
+        //the above gives an error no such method sort so we need to find a way to sort the list
+        //manually
+
+        notificationData.forEach((key, value) {
           if (key == 'withdrawRequest' || key == 'paymentRequest') {
             value.forEach((item) {
+              Map<String, String> notification = {
+                'title': key,
+                'amount': item['amount'].toString(),
+                'fullname': item['fullname'],
+                'paymentMethod': item['paymentMethod'],
+                'senderid': notificationsnapshot.id,
+                'requestID': item['requestID'],
+              };
+              notificationsAndAlreadyReadNotifications[
+                      notification['senderid']!] =
+                  List.from(notificationsAndAlreadyReadNotifications[
+                          notification['senderid']!] ??
+                      [])
+                    ..add(notification);
+
               if (!item.containsKey('read') || !item['read']) {
-                Map<String, String> notification = {
-                  'title': key,
-                  'amount': item['amount'].toString(),
-                  'fullname': item['fullname'],
-                  'paymentMethod': item['paymentMethod'],
-                  'senderid': propertysnapshot.id,
-                  'requestID': item['requestID'],
-                };
                 tempNotifications.add(notification);
               }
             });
           } else if (key == 'rentalRequest') {
             value.forEach((item) {
+              Map<String, String> notification = {
+                'title': key,
+                'fullname': item['fullname'],
+                'uid': item['uid'],
+                'property name': item['property']['title'],
+                'senderid': notificationsnapshot.id,
+                'requestID': item['requestID'],
+              };
+              notificationsAndAlreadyReadNotifications[
+                      notification['senderid']!] =
+                  List.from(notificationsAndAlreadyReadNotifications[
+                          notification['senderid']!] ??
+                      [])
+                    ..add(notification);
               if (!item.containsKey('read') || !item['read']) {
-                Map<String, String> notification = {
-                  'title': key,
-                  'fullname': item['fullname'],
-                  'uid': item['uid'],
-                  'property name': item['property']['title'],
-                  'senderid': propertysnapshot.id,
-                  'requestID': item['requestID'],
-                };
                 tempNotifications.add(notification);
               }
             });
@@ -101,14 +129,20 @@ class _AdminDashboardState extends State<AdminDashboard> {
           } else {
             // Leave other cases blank for now
             value.forEach((item) {
+              Map<String, String> notification = {
+                'title': key,
+                'fullname': '',
+                // 'uid': item['uid'],
+                'senderid': notificationsnapshot.id,
+                'requestID': item['requestID'],
+              };
+              notificationsAndAlreadyReadNotifications[
+                      notification['senderid']!] =
+                  List.from(notificationsAndAlreadyReadNotifications[
+                          notification['senderid']!] ??
+                      [])
+                    ..add(notification);
               if (!item.containsKey('read') || !item['read']) {
-                Map<String, String> notification = {
-                  'title': key,
-                  'fullname': '',
-                  // 'uid': item['uid'],
-                  'senderid': propertysnapshot.id,
-                  'requestID': item['requestID'],
-                };
                 tempNotifications.add(notification);
               }
             });
@@ -117,12 +151,12 @@ class _AdminDashboardState extends State<AdminDashboard> {
             //   'amount': '',
             //   'fullname': '',
             //   'paymentMethod': '',
-            //   'senderid': propertysnapshot.id,
+            //   'senderid': notificationsnapshot.id,
             // };
             // tempNotifications.add(notification);
           }
         });
-      });
+      }
       setState(() {
         notifications = tempNotifications;
       });
@@ -160,10 +194,34 @@ class _AdminDashboardState extends State<AdminDashboard> {
                           setState(() {
                             notifications.removeAt(index);
                           });
+
                           String notificationTitle =
                               notification['title'] ?? '';
+                          print(
+                              'notification senderId is ${notification['senderid']}');
+
+                          //find the index of the notification in the list of notificationsAndAlreadyReadNotifications
+                          // however the index of a particular senderid should start when that senderid starts appearing
+                          // and not from the beginning of the list and incremented with every occurence of that senderid
+
+                          int newIndexforSenderID = 0;
                           // print(
-                          //     'notification senderId is ${notification['senderid']}');
+                          //     'notificationsAndAlreadyReadNotifications is $notificationsAndAlreadyReadNotifications');
+                          //use the mapping to find the index of the notification in the list of notificationsAndAlreadyReadNotifications
+
+                          int test = 0;
+                          notificationsAndAlreadyReadNotifications
+                              .forEach((key, value) {
+                            if (key == notification['senderid']) {
+                              newIndexforSenderID = value
+                                  .indexWhere((element) =>
+                                      element['requestID'] ==
+                                      notification['requestID'])
+                                  .toInt();
+                            }
+                          });
+                          print('newIndexforSenderID is $newIndexforSenderID');
+
                           FirebaseFirestore.instance
                               .collection('AdminRequests')
                               .doc(notification['senderid'])
@@ -179,7 +237,12 @@ class _AdminDashboardState extends State<AdminDashboard> {
                                     List.from(data[notificationTitle]);
                                 if (index >= 0 &&
                                     index < notificationList.length) {
-                                  notificationList[index]['read'] = true;
+                                  print('reached here with index $index');
+                                  print(
+                                      'reached here with newIndex $newIndexforSenderID');
+                                  // notificationList[index]['read'] = true;
+                                  notificationList[newIndexforSenderID]
+                                      ['read'] = true;
                                   FirebaseFirestore.instance
                                       .collection('AdminRequests')
                                       .doc(notification['senderid'])

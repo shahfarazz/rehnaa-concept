@@ -7,6 +7,7 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../backend/models/propertymodel.dart';
+import '../Tenantdashboard_pages/tenant_propertyinfo.dart';
 // import 'package:photo_view/photo_view.dart';
 
 class PropertyPage extends StatefulWidget {
@@ -110,9 +111,16 @@ class PropertyCarousel extends StatelessWidget {
               builder: (BuildContext context) {
                 return GestureDetector(
                   onTap: () async {
-                    final imageProvider = CachedNetworkImageProvider(imagePath);
-
-                    await showImageViewer(context, imageProvider);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => FullScreenImagePage(
+                                currentIndex: currentIndex,
+                                imagePaths: imagePaths,
+                                onPageChanged: onPageChanged,
+                                // onClose: _toggleFullScreen,
+                              )),
+                    );
                   },
                   child: Hero(
                     tag: imagePath,

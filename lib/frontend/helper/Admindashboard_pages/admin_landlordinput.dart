@@ -251,6 +251,17 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
     final TextEditingController monthlyProfitController =
         TextEditingController(text: landlord.monthlyProfit?.toString() ?? '');
 
+    //securityDeposit
+    final TextEditingController securityDepositController =
+        TextEditingController(text: landlord.securityDeposit?.toString() ?? '');
+
+    //creditScore
+    final TextEditingController creditScoreController =
+        TextEditingController(text: landlord.creditScore?.toString() ?? '');
+    //creditPoints
+    final TextEditingController creditPointsController =
+        TextEditingController(text: landlord.creditPoints?.toString() ?? '');
+
     showDialog(
       context: context,
       builder: (context) {
@@ -414,6 +425,20 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
                   decoration:
                       const InputDecoration(labelText: 'Monthly Profit'),
                 ),
+                TextField(
+                  controller: securityDepositController,
+                  decoration:
+                      const InputDecoration(labelText: 'Security Deposit'),
+                ),
+                TextField(
+                  controller: creditScoreController,
+                  decoration: const InputDecoration(labelText: 'Credit Score'),
+                ),
+                TextField(
+                  controller: creditPointsController,
+                  decoration: const InputDecoration(labelText: 'Credit Points'),
+                ),
+
                 const SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: () async {
@@ -469,13 +494,42 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
                       'monthlyProfit': monthlyProfitController.text.isNotEmpty
                           ? monthlyProfitController.text ?? 0.0
                           : FieldValue.delete(),
+                      'securityDeposit':
+                          securityDepositController.text.isNotEmpty &&
+                                  securityDepositController.text != 'null'
+                              ? securityDepositController.text
+                              : FieldValue.delete(),
+                      'creditScore': creditScoreController.text.isNotEmpty &&
+                              creditScoreController.text != 'null'
+                          ? creditScoreController.text
+                          : FieldValue.delete(),
+                      'creditPoints': creditPointsController.text.isNotEmpty &&
+                              creditPointsController.text != 'null'
+                          ? creditPointsController.text
+                          : FieldValue.delete(),
                     }, SetOptions(merge: true)).then((_) async {
+                      //if selectedDealers not null set the landlordRef in the dealer
+
+                      try {
+                        for (var dealer in selectedDealers) {
+                          await dealer.set({
+                            'landlordRef': FieldValue.arrayUnion([
+                              FirebaseFirestore.instance
+                                  .collection('Landlords')
+                                  .doc(landlord.tempID)
+                            ])
+                          }, SetOptions(merge: true));
+                        }
+                      } catch (e) {
+                        print('error in setting landlordRef in dealer $e');
+                      }
+
                       if (landlord.balance >
                           (double.tryParse(balanceController.text) ?? 0.0)) {
                         await FirebaseFirestore.instance
                             .collection('rentPayments')
                             .add({
-                          'tenantname': 'Rehnaa App',
+                          'tenantname': 'Rehnaa.pk',
                           'LandlordRef': FirebaseFirestore.instance
                               .collection('Landlords')
                               .doc(landlord.tempID),
@@ -505,7 +559,8 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
                             'notifications': FieldValue.arrayUnion([
                               {
                                 // 'amount': data.requestedAmount,
-                                'title': 'Balance updated by Rehnaa Team Admin',
+                                'title':
+                                    'Your account has been credited by ${-(double.tryParse(balanceController.text) ?? 0.0) + landlord.balance}',
                               }
                             ])
                           });
@@ -515,7 +570,7 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
                         await FirebaseFirestore.instance
                             .collection('rentPayments')
                             .add({
-                          'tenantname': 'Rehnaa App',
+                          'tenantname': 'Rehnaa.pk',
                           'LandlordRef': FirebaseFirestore.instance
                               .collection('Landlords')
                               .doc(landlord.tempID),
@@ -544,7 +599,8 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
                             'notifications': FieldValue.arrayUnion([
                               {
                                 // 'amount': data.requestedAmount,
-                                'title': 'Balance updated by Rehnaa Team Admin',
+                                'title':
+                                    'Your account has been debited by ${((double.tryParse(balanceController.text) ?? 0.0) - landlord.balance)}',
                               }
                             ])
                           });
@@ -587,6 +643,8 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
   }
 
   void _showPropertySelectionDialog(void Function() onSelectionDone) {
+    TextEditingController searchController = TextEditingController();
+
     showDialog(
       context: context,
       builder: (context) {
@@ -595,45 +653,67 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
             return AlertDialog(
               title: const Text('Select Properties'),
               content: SingleChildScrollView(
-                child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-                  stream: FirebaseFirestore.instance
-                      .collection('Properties')
-                      .snapshots(),
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData) {
-                      List<QueryDocumentSnapshot<Map<String, dynamic>>>
-                          propertyDocs = snapshot.data!.docs;
-                      return Column(
-                        children: propertyDocs.map((propertyDoc) {
-                          String propertyName = propertyDoc['title'];
-                          bool isSelected = selectedProperties
-                              .contains(propertyDoc.reference);
-                          return CheckboxListTile(
-                            title: Text(propertyName),
-                            value: isSelected,
-                            onChanged: (value) {
-                              setState(() {
-                                if (value == true) {
-                                  if (!selectedProperties
-                                      .contains(propertyDoc.reference)) {
-                                    selectedProperties
-                                        .add(propertyDoc.reference);
-                                  }
-                                } else {
-                                  selectedProperties
-                                      .remove(propertyDoc.reference);
-                                }
-                              });
-                            },
+                child: Column(
+                  children: [
+                    TextFormField(
+                      controller: searchController,
+                      decoration: InputDecoration(
+                        labelText: 'Search',
+                        prefixIcon: Icon(Icons.search),
+                      ),
+                      onChanged: (value) {
+                        setState(() {});
+                      },
+                    ),
+                    StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                      stream: FirebaseFirestore.instance
+                          .collection('Properties')
+                          .snapshots(),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData) {
+                          List<QueryDocumentSnapshot<Map<String, dynamic>>>
+                              propertyDocs = snapshot.data!.docs;
+
+                          propertyDocs = propertyDocs.where((propertyDoc) {
+                            String propertyName = propertyDoc['title'];
+                            return propertyName
+                                .toLowerCase()
+                                .contains(searchController.text.toLowerCase());
+                          }).toList();
+
+                          return Column(
+                            children: propertyDocs.map((propertyDoc) {
+                              String propertyName = propertyDoc['title'];
+                              bool isSelected = selectedProperties
+                                  .contains(propertyDoc.reference);
+                              return CheckboxListTile(
+                                title: Text(propertyName),
+                                value: isSelected,
+                                onChanged: (value) {
+                                  setState(() {
+                                    if (value == true) {
+                                      if (!selectedProperties
+                                          .contains(propertyDoc.reference)) {
+                                        selectedProperties
+                                            .add(propertyDoc.reference);
+                                      }
+                                    } else {
+                                      selectedProperties
+                                          .remove(propertyDoc.reference);
+                                    }
+                                  });
+                                },
+                              );
+                            }).toList(),
                           );
-                        }).toList(),
-                      );
-                    } else {
-                      return Container(
-                          padding: EdgeInsets.only(left: 150.0),
-                          child: CircularProgressIndicator());
-                    }
-                  },
+                        } else {
+                          return Container(
+                              padding: EdgeInsets.only(left: 150.0),
+                              child: CircularProgressIndicator());
+                        }
+                      },
+                    ),
+                  ],
                 ),
               ),
               actions: [
@@ -661,7 +741,11 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
     );
   }
 
+// Implementing search functionality for Tenant and RentPayment selection dialogs will follow a similar pattern.
+
   void _showTenantSelectionDialog(void Function() onSelectionDone) {
+    TextEditingController searchController = TextEditingController();
+
     showDialog(
       context: context,
       builder: (context) {
@@ -670,47 +754,72 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
             return AlertDialog(
               title: const Text('Select Tenants'),
               content: SingleChildScrollView(
-                child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-                  stream: FirebaseFirestore.instance
-                      .collection('Tenants')
-                      .snapshots(),
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData) {
-                      List<QueryDocumentSnapshot<Map<String, dynamic>>>
-                          tenantDocs = snapshot.data!.docs;
-                      return Column(
-                        children: tenantDocs.map((tenantDoc) {
-                          String tenantName = tenantDoc['firstName'] +
-                              ' ' +
-                              tenantDoc['lastName'];
-                          bool isSelected =
-                              selectedTenants.contains(tenantDoc.reference);
-                          return CheckboxListTile(
-                            title: Text(tenantName),
-                            value: isSelected,
-                            onChanged: (value) {
-                              setState(() {
-                                if (value == true) {
-                                  if (!selectedTenants
-                                      .contains(tenantDoc.reference)) {
-                                    selectedTenants.add(tenantDoc.reference);
-                                  }
-                                } else {
-                                  selectedTenants.remove(tenantDoc.reference);
-                                }
-                              });
-                            },
+                child: Column(
+                  children: [
+                    TextFormField(
+                      controller: searchController,
+                      decoration: InputDecoration(
+                        labelText: 'Search',
+                        prefixIcon: Icon(Icons.search),
+                      ),
+                      onChanged: (value) {
+                        setState(() {});
+                      },
+                    ),
+                    StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                      stream: FirebaseFirestore.instance
+                          .collection('Tenants')
+                          .snapshots(),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData) {
+                          List<QueryDocumentSnapshot<Map<String, dynamic>>>
+                              tenantDocs = snapshot.data!.docs;
+
+                          tenantDocs = tenantDocs.where((tenantDoc) {
+                            String tenantName = tenantDoc['firstName'] +
+                                ' ' +
+                                tenantDoc['lastName'];
+                            return tenantName
+                                .toLowerCase()
+                                .contains(searchController.text.toLowerCase());
+                          }).toList();
+
+                          return Column(
+                            children: tenantDocs.map((tenantDoc) {
+                              String tenantName = tenantDoc['firstName'] +
+                                  ' ' +
+                                  tenantDoc['lastName'];
+                              bool isSelected =
+                                  selectedTenants.contains(tenantDoc.reference);
+                              return CheckboxListTile(
+                                title: Text(tenantName),
+                                value: isSelected,
+                                onChanged: (value) {
+                                  setState(() {
+                                    if (value == true) {
+                                      if (!selectedTenants
+                                          .contains(tenantDoc.reference)) {
+                                        selectedTenants
+                                            .add(tenantDoc.reference);
+                                      }
+                                    } else {
+                                      selectedTenants
+                                          .remove(tenantDoc.reference);
+                                    }
+                                  });
+                                },
+                              );
+                            }).toList(),
                           );
-                        }).toList(),
-                      );
-                    } else {
-                      return Container(
-                        padding: EdgeInsets.only(left: 150.0),
-                        child: CircularProgressIndicator(),
-                      );
-                      // CircularProgressIndicator();
-                    }
-                  },
+                        } else {
+                          return Container(
+                            padding: EdgeInsets.only(left: 150.0),
+                            child: CircularProgressIndicator(),
+                          );
+                        }
+                      },
+                    ),
+                  ],
                 ),
               ),
               actions: [
@@ -722,12 +831,11 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
                 ),
                 TextButton(
                   onPressed: () {
-                    onSelectionDone();
-
                     Navigator.pop(
                       context,
                       List.from(selectedTenants),
                     ); // Pass selected tenants back to the caller
+                    onSelectionDone();
                   },
                   child: const Text('Done'),
                 ),
@@ -817,6 +925,8 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
   }
 
   void _showDealerSelectionDialog(void Function() onSelectionDone) {
+    TextEditingController searchController = TextEditingController();
+
     showDialog(
       context: context,
       builder: (context) {
@@ -825,45 +935,72 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
             return AlertDialog(
               title: const Text('Select Dealers'),
               content: SingleChildScrollView(
-                child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-                  stream: FirebaseFirestore.instance
-                      .collection('Dealers')
-                      .snapshots(),
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData) {
-                      List<QueryDocumentSnapshot<Map<String, dynamic>>>
-                          dealerDocs = snapshot.data!.docs;
-                      return Column(
-                        children: dealerDocs.map((dealerDoc) {
-                          String dealerName = dealerDoc['firstName'] +
-                              ' ' +
-                              dealerDoc['lastName'];
-                          bool isSelected =
-                              selectedDealers.contains(dealerDoc.reference);
-                          return CheckboxListTile(
-                            title: Text(dealerName),
-                            value: isSelected,
-                            onChanged: (value) {
-                              setState(() {
-                                if (value == true) {
-                                  if (!selectedDealers
-                                      .contains(dealerDoc.reference)) {
-                                    selectedDealers.add(dealerDoc.reference);
-                                  }
-                                } else {
-                                  selectedDealers.remove(dealerDoc.reference);
-                                }
-                              });
-                            },
+                child: Column(
+                  children: [
+                    TextFormField(
+                      controller: searchController,
+                      decoration: InputDecoration(
+                        labelText: 'Search',
+                        prefixIcon: Icon(Icons.search),
+                      ),
+                      onChanged: (value) {
+                        setState(() {}); // Refresh the UI
+                      },
+                    ),
+                    StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                      stream: FirebaseFirestore.instance
+                          .collection('Dealers')
+                          .snapshots(),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData) {
+                          List<QueryDocumentSnapshot<Map<String, dynamic>>>
+                              dealerDocs = snapshot.data!.docs;
+
+                          // Filter the dealerDocs list based on the search text
+                          dealerDocs = dealerDocs.where((dealerDoc) {
+                            String dealerName = dealerDoc['firstName'] +
+                                ' ' +
+                                dealerDoc['lastName'];
+                            return dealerName
+                                .toLowerCase()
+                                .contains(searchController.text.toLowerCase());
+                          }).toList();
+
+                          return Column(
+                            children: dealerDocs.map((dealerDoc) {
+                              String dealerName = dealerDoc['firstName'] +
+                                  ' ' +
+                                  dealerDoc['lastName'];
+                              bool isSelected =
+                                  selectedDealers.contains(dealerDoc.reference);
+                              return CheckboxListTile(
+                                title: Text(dealerName),
+                                value: isSelected,
+                                onChanged: (value) {
+                                  setState(() {
+                                    if (value == true) {
+                                      if (!selectedDealers
+                                          .contains(dealerDoc.reference)) {
+                                        selectedDealers
+                                            .add(dealerDoc.reference);
+                                      }
+                                    } else {
+                                      selectedDealers
+                                          .remove(dealerDoc.reference);
+                                    }
+                                  });
+                                },
+                              );
+                            }).toList(),
                           );
-                        }).toList(),
-                      );
-                    } else {
-                      return Container(
-                          padding: EdgeInsets.only(left: 150.0),
-                          child: CircularProgressIndicator());
-                    }
-                  },
+                        } else {
+                          return Container(
+                              padding: EdgeInsets.only(left: 150.0),
+                              child: CircularProgressIndicator());
+                        }
+                      },
+                    ),
+                  ],
                 ),
               ),
               actions: [

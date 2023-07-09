@@ -373,7 +373,7 @@ class _TenantMonthlyRentOffPageState extends State<TenantMonthlyRentOffPage>
                                           value: winnerTenants[index]
                                               .creditPoints
                                               .toString(),
-                                          // points: '120',
+                                          points: '120',
                                         ),
                                       ),
                                     ),

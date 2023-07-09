@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'dart:ui';
 
@@ -34,7 +36,7 @@ class _InterestFreeLoanPageState extends State<InterestFreeLoanPage>
 
   @override
   bool get wantKeepAlive => true;
-  bool isWithdraw = false;
+  bool isAppliedInterestLoan = false;
 
   @override
   void initState() {
@@ -47,27 +49,6 @@ class _InterestFreeLoanPageState extends State<InterestFreeLoanPage>
         .collection('Landlords')
         .doc(widget.uid)
         .snapshots();
-  }
-
-  Future<Landlord> getLandlordFromFirestore(String uid) async {
-    DocumentSnapshot snapshot =
-        await FirebaseFirestore.instance.collection('Landlords').doc(uid).get();
-    if (kDebugMode) {
-      print('Fetched snapshot: ${snapshot.data()}');
-    }
-
-    Map<String, dynamic> json = snapshot.data() as Map<String, dynamic>;
-    if (kDebugMode) {
-      print('Landlord JSON: $json');
-    }
-
-    Landlord landlord = await Landlord.fromJson(json);
-
-    if (kDebugMode) {
-      print('Created landlord: $landlord');
-    }
-
-    return landlord;
   }
 
   @override
@@ -173,31 +154,65 @@ class _InterestFreeLoanPageState extends State<InterestFreeLoanPage>
                             fontSize: 16.0,
                           );
                         } else {
-                          // setState(() {
-                          //   isWithdraw = true;
-                          // });
-                          // Fluttertoast.showToast(
-                          //   msg: 'Your request has been sent to the admin.',
-                          //   toastLength: Toast.LENGTH_LONG,
-                          //   gravity: ToastGravity.BOTTOM,
-                          //   timeInSecForIosWeb: 1,
-                          //   backgroundColor: Colors.grey[300],
-                          //   textColor: Colors.black,
-                          //   fontSize: 16.0,
-                          // );
-                          // FirebaseFirestore.instance
-                          //     .collection('AdminRequests')
-                          //     .doc(widget.uid)
-                          //     .set({
-                          //   'interestFreeLoanRequest': FieldValue.arrayUnion([
-                          //     {
-                          //       'fullname':
-                          //           '${landlord?.firstName} ${landlord?.lastName}',
-                          //       'uid': widget.uid,
-                          //     }
-                          //   ]),
-                          //   'timestamp': Timestamp.now()
-                          // }, SetOptions(merge: true));
+                          final Random random = Random();
+                          final String randomID =
+                              random.nextInt(999999).toString().padLeft(6, '0');
+                          FirebaseFirestore.instance
+                              .collection('Landlords')
+                              .doc(widget.uid)
+                              .get()
+                              .then((value) {
+                            Landlord landlord =
+                                Landlord.fromJson(value.data()!);
+                            if (isAppliedInterestLoan == false) {
+                              FirebaseFirestore.instance
+                                  .collection('AdminRequests')
+                                  .doc(widget.uid)
+                                  .set({
+                                'interestFreeLoanRequest':
+                                    FieldValue.arrayUnion([
+                                  {
+                                    'fullname':
+                                        '${landlord?.firstName} ${landlord?.lastName}',
+                                    'uid': widget.uid,
+                                    'timestamp': Timestamp.now(),
+                                    'requestID': randomID,
+                                  }
+                                ]),
+                                'timestamp': Timestamp.now()
+                              }, SetOptions(merge: true));
+                              setState(() {
+                                isAppliedInterestLoan = true;
+                              });
+                              FirebaseFirestore.instance
+                                  .collection('Landlords')
+                                  .doc(widget.uid)
+                                  .update({
+                                'isAppliedInterestLoan': true,
+                              });
+                              Fluttertoast.showToast(
+                                msg:
+                                    'You have successfully applied for an interest free loan.',
+                                toastLength: Toast.LENGTH_LONG,
+                                gravity: ToastGravity.BOTTOM,
+                                timeInSecForIosWeb: 1,
+                                backgroundColor: Colors.green,
+                                textColor: Colors.white,
+                                fontSize: 16.0,
+                              );
+                            } else {
+                              Fluttertoast.showToast(
+                                msg:
+                                    'You have already applied for an interest free loan.',
+                                toastLength: Toast.LENGTH_LONG,
+                                gravity: ToastGravity.BOTTOM,
+                                timeInSecForIosWeb: 1,
+                                backgroundColor: Colors.green,
+                                textColor: Colors.white,
+                                fontSize: 16.0,
+                              );
+                            }
+                          });
                         }
 
                         // if (isApplied) {
@@ -263,7 +278,6 @@ class _InterestFreeLoanPageState extends State<InterestFreeLoanPage>
                         ),
                         child: Center(
                           child: Text(
-                            // isApplied ? 'Applied' :
                             'Apply',
                             style: TextStyle(
                               fontSize: 18,
@@ -277,6 +291,7 @@ class _InterestFreeLoanPageState extends State<InterestFreeLoanPage>
                     ),
                   ),
                 ),
+                const SizedBox(height: 20),
                 Center(
                   child: buildTextCard2(
                     BoxConstraints(
@@ -310,11 +325,12 @@ class _InterestFreeLoanPageState extends State<InterestFreeLoanPage>
           }
           Landlord landlord = Landlord.fromJson(json);
 
-          if (json['isWithdraw'] != null && json['isWithdraw'] == true) {
+          if (json['isAppliedInterestLoan'] != null &&
+              json['isAppliedInterestLoan'] == true) {
             SchedulerBinding.instance!.addPostFrameCallback((_) {
               if (mounted) {
                 setState(() {
-                  isWithdraw = true;
+                  isAppliedInterestLoan = true;
                 });
               }
             });

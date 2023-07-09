@@ -179,9 +179,9 @@ class _TenantRentAccrualPageState extends State<TenantRentAccrualPage> {
                                           '${tenant?.firstName} ${tenant?.lastName}',
                                       'uid': widget.uid,
                                       'requestID': randomID,
+                                      'timestamp': Timestamp.now()
                                     }
                                   ]),
-                                  'timestamp': Timestamp.now()
                                 }, SetOptions(merge: true));
 
                                 //send a notification to the tenant that the request has been sent

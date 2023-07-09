@@ -47,6 +47,7 @@ class _DealerDashboardPageState extends State<DealerDashboardPage>
   late Stream<DocumentSnapshot<Map<String, dynamic>>> _notificationStream2;
   bool isNewVoucher = false;
   Timer? _timer;
+  bool isNotificationClicked = false;
 
   @override
   void initState() {
@@ -168,73 +169,75 @@ class _DealerDashboardPageState extends State<DealerDashboardPage>
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
     super.build(context);
-    return Scaffold(
-      appBar: _buildAppBar(size),
-      resizeToAvoidBottomInset:
-          false, // Prevent resizing when the keyboard is shown
-      body: GestureDetector(
-        onTap: () {
-          if (_isSidebarOpen) {
-            _closeSidebar();
-          }
-          // Close the keyboard
-          FocusScope.of(context).unfocus();
-        },
-        child: Stack(
-          children: [
-            Transform.translate(
-              offset: Offset(_isSidebarOpen ? size.width * 0.7 : 0, 0),
-              child: Column(
-                children: [
-                  Expanded(
-                    child: PageView.builder(
-                      controller: _pageController,
-                      onPageChanged: (index) {
-                        setState(() {
-                          _currentIndex = index;
-                        });
-                      },
-                      physics: isKeyboardVisible(context)
-                          ? const NeverScrollableScrollPhysics()
-                          : const AlwaysScrollableScrollPhysics(),
-                      itemCount: 4, // Number of pages
-                      itemBuilder: (context, index) {
-                        switch (index) {
-                          case 0:
-                            return DealerDashboardContent(
-                              uid: widget.uid,
-                              isWithdraw: _isWithdraw,
-                              onUpdateWithdrawState: updateWithdrawState,
-                            );
-                          case 1:
-                            return DealerLandlordOnboardedPage(
-                              uid: widget.uid,
-                            );
-                          case 2:
-                            return TenantRentHistoryPage(
-                              uid: widget.uid,
-                              callerType: 'Dealers',
-                            );
-                          case 3:
-                            return LandlordProfilePage(
-                              uid: widget.uid,
-                              callerType: 'Dealers',
-                            );
-                          default:
-                            return Container();
-                        }
-                      },
-                    ),
+    return WillPopScope(
+        onWillPop: () async => false,
+        child: Scaffold(
+          appBar: _buildAppBar(size),
+          resizeToAvoidBottomInset:
+              false, // Prevent resizing when the keyboard is shown
+          body: GestureDetector(
+            onTap: () {
+              if (_isSidebarOpen) {
+                _closeSidebar();
+              }
+              // Close the keyboard
+              FocusScope.of(context).unfocus();
+            },
+            child: Stack(
+              children: [
+                Transform.translate(
+                  offset: Offset(_isSidebarOpen ? size.width * 0.7 : 0, 0),
+                  child: Column(
+                    children: [
+                      Expanded(
+                        child: PageView.builder(
+                          controller: _pageController,
+                          onPageChanged: (index) {
+                            setState(() {
+                              _currentIndex = index;
+                            });
+                          },
+                          physics: isKeyboardVisible(context)
+                              ? const NeverScrollableScrollPhysics()
+                              : const AlwaysScrollableScrollPhysics(),
+                          itemCount: 4, // Number of pages
+                          itemBuilder: (context, index) {
+                            switch (index) {
+                              case 0:
+                                return DealerDashboardContent(
+                                  uid: widget.uid,
+                                  isWithdraw: _isWithdraw,
+                                  onUpdateWithdrawState: updateWithdrawState,
+                                );
+                              case 1:
+                                return DealerLandlordOnboardedPage(
+                                  uid: widget.uid,
+                                );
+                              case 2:
+                                return TenantRentHistoryPage(
+                                  uid: widget.uid,
+                                  callerType: 'Dealers',
+                                );
+                              case 3:
+                                return LandlordProfilePage(
+                                  uid: widget.uid,
+                                  callerType: 'Dealers',
+                                );
+                              default:
+                                return Container();
+                            }
+                          },
+                        ),
+                      ),
+                      _buildBottomNavigationBar(),
+                    ],
                   ),
-                  _buildBottomNavigationBar(),
-                ],
-              ),
+                ),
+                if (_isSidebarOpen) _buildSidebar(size),
+              ],
             ),
-            if (_isSidebarOpen) _buildSidebar(size),
-          ],
-        ),
-      ),
-    );
+          ),
+        ));
   }
 
   PreferredSizeWidget _buildAppBar(Size size) {
@@ -302,7 +305,7 @@ class _DealerDashboardPageState extends State<DealerDashboardPage>
                 onPressed: () {
                   EasyDebounce.debounce(
                     'notifications-debouncer', // Debouncer ID
-                    Duration(milliseconds: 500), // Debounce duration
+                    Duration(seconds: 2), // Debounce duration
                     _handleNotificationsButtonPress, // Wrapped function
                   );
                 },
