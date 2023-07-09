@@ -274,7 +274,9 @@ class _FullScreenImagePageState extends State<FullScreenImagePage> {
                 child: CachedNetworkImage(
                   imageUrl: imagePath,
                   placeholder: (context, url) => const Center(
-                    child: CircularProgressIndicator(),
+                    child: SpinKitFadingCube(
+                      color: Color.fromARGB(255, 30, 197, 83),
+                    ),
                   ),
                   errorWidget: (context, url, error) => const Icon(Icons.error),
                   fit: BoxFit.contain,

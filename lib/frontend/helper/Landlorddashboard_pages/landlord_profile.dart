@@ -1,5 +1,6 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'package:camera/camera.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
@@ -19,6 +20,8 @@ import 'dart:io';
 import '../../Screens/splash.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
+
+import 'landlord_camera_helper.dart';
 
 class LandlordProfilePage extends StatefulWidget {
   final String uid;
@@ -190,17 +193,25 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
   }
 
   Future<bool> openCamera(BuildContext context) async {
-    final picker = ImagePicker();
-    final pickedImage = await picker.pickImage(source: ImageSource.camera);
+// Obtain a list of the available cameras on the device.
+    final cameras = await availableCameras();
 
-    if (pickedImage == null) {
+    final XFile? takenImage = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => TakePictureScreen(cameras: cameras),
+      ),
+    );
+
+    if (takenImage == null) {
+      // Use the image file.
       return false;
     }
 
     // Compress the image
     final Uint8List? compressedImage =
         await FlutterImageCompress.compressWithFile(
-      pickedImage.path,
+      takenImage.path,
       minWidth: 1000, // Adjust parameters as needed
       minHeight: 1000, // Adjust parameters as needed
       quality: 88, // Adjust parameters as needed
@@ -934,70 +945,140 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
                                                                     setState) {
                                                               return AlertDialog(
                                                                 title: Text(
-                                                                    'Change Password'),
+                                                                  'Change Password',
+                                                                  style: TextStyle(
+                                                                      color: Colors
+                                                                          .green,
+                                                                      fontFamily:
+                                                                          GoogleFonts.montserrat()
+                                                                              .fontFamily),
+                                                                ),
                                                                 content: Column(
                                                                   mainAxisSize:
                                                                       MainAxisSize
                                                                           .min,
                                                                   children: [
-                                                                    TextField(
-                                                                      controller:
-                                                                          _oldPasswordController,
-                                                                      obscureText:
-                                                                          _obscurePassword,
-                                                                      decoration:
-                                                                          InputDecoration(
-                                                                        iconColor:
-                                                                            Colors.green,
-                                                                        focusColor:
-                                                                            Colors.green,
-                                                                        hoverColor:
-                                                                            Colors.green,
-                                                                        labelText:
-                                                                            'Old Password',
-                                                                        suffixIcon:
-                                                                            GestureDetector(
-                                                                          onTap:
-                                                                              () {
-                                                                            setState(() {
-                                                                              _obscurePassword = !_obscurePassword;
-                                                                            });
-                                                                          },
-                                                                          child:
-                                                                              Icon(
-                                                                            _obscurePassword
-                                                                                ? Icons.visibility
-                                                                                : Icons.visibility_off,
+                                                                    Container(
+                                                                        width:
+                                                                            300,
+                                                                        height:
+                                                                            40,
+                                                                        alignment:
+                                                                            Alignment
+                                                                                .center,
+                                                                        decoration:
+                                                                            BoxDecoration(
+                                                                          border:
+                                                                              Border.all(
+                                                                            width:
+                                                                                1,
+                                                                            color:
+                                                                                const Color(0xff33907c),
                                                                           ),
+                                                                          borderRadius:
+                                                                              BorderRadius.circular(20),
                                                                         ),
-                                                                      ),
-                                                                    ),
-                                                                    TextField(
-                                                                      controller:
-                                                                          _newPasswordController,
-                                                                      obscureText:
-                                                                          _obscurePassword2,
-                                                                      decoration:
-                                                                          InputDecoration(
-                                                                        labelText:
-                                                                            'New Password',
-                                                                        suffixIcon:
-                                                                            GestureDetector(
-                                                                          onTap:
-                                                                              () {
-                                                                            setState(() {
-                                                                              _obscurePassword2 = !_obscurePassword2;
-                                                                            });
-                                                                          },
-                                                                          child:
-                                                                              Icon(
-                                                                            _obscurePassword2
-                                                                                ? Icons.visibility
-                                                                                : Icons.visibility_off,
+                                                                        child:
+                                                                            TextField(
+                                                                          controller:
+                                                                              _oldPasswordController,
+                                                                          obscureText:
+                                                                              _obscurePassword,
+                                                                          decoration:
+                                                                              InputDecoration(
+                                                                            border:
+                                                                                InputBorder.none,
+                                                                            contentPadding:
+                                                                                EdgeInsets.all(10),
+                                                                            iconColor:
+                                                                                Colors.green,
+                                                                            focusColor:
+                                                                                Colors.green,
+                                                                            hoverColor:
+                                                                                Colors.green,
+                                                                            labelText:
+                                                                                'Old Password',
+                                                                            fillColor:
+                                                                                Colors.green,
+                                                                            labelStyle:
+                                                                                TextStyle(color: Colors.green, fontFamily: GoogleFonts.montserrat().fontFamily),
+                                                                            suffixIcon:
+                                                                                GestureDetector(
+                                                                              onTap: () {
+                                                                                setState(() {
+                                                                                  _obscurePassword = !_obscurePassword;
+                                                                                });
+                                                                              },
+                                                                              child: Icon(
+                                                                                _obscurePassword ? Icons.visibility : Icons.visibility_off,
+                                                                                color: Colors.green,
+                                                                              ),
+                                                                            ),
                                                                           ),
-                                                                        ),
-                                                                      ),
+                                                                        )),
+                                                                    SizedBox(
+                                                                      height: size
+                                                                              .height *
+                                                                          0.01,
                                                                     ),
+                                                                    Container(
+                                                                        width:
+                                                                            300,
+                                                                        height:
+                                                                            40,
+                                                                        alignment:
+                                                                            Alignment
+                                                                                .center,
+                                                                        decoration:
+                                                                            BoxDecoration(
+                                                                          border:
+                                                                              Border.all(
+                                                                            width:
+                                                                                1,
+                                                                            color:
+                                                                                const Color(0xff33907c),
+                                                                          ),
+                                                                          borderRadius:
+                                                                              BorderRadius.circular(20),
+                                                                        ),
+                                                                        child:
+                                                                            TextField(
+                                                                          controller:
+                                                                              _newPasswordController,
+                                                                          obscureText:
+                                                                              _obscurePassword2,
+                                                                          decoration:
+                                                                              InputDecoration(
+                                                                            contentPadding:
+                                                                                EdgeInsets.all(10),
+                                                                            border:
+                                                                                InputBorder.none,
+                                                                            iconColor:
+                                                                                Colors.green,
+                                                                            focusColor:
+                                                                                Colors.green,
+                                                                            hoverColor:
+                                                                                Colors.green,
+                                                                            labelText:
+                                                                                'New Password',
+                                                                            fillColor:
+                                                                                Colors.green,
+                                                                            labelStyle:
+                                                                                TextStyle(color: Colors.green, fontFamily: GoogleFonts.montserrat().fontFamily),
+                                                                            suffixIcon:
+                                                                                GestureDetector(
+                                                                              onTap: () {
+                                                                                setState(() {
+                                                                                  _obscurePassword2 = !_obscurePassword2;
+                                                                                });
+                                                                              },
+                                                                              child: Icon(
+                                                                                _obscurePassword2 ? Icons.visibility : Icons.visibility_off,
+                                                                                color: Colors.green,
+                                                                              ),
+                                                                            ),
+                                                                          ),
+                                                                        )),
                                                                   ],
                                                                 ),
                                                                 actions: [
@@ -1042,30 +1123,30 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
                                                       'Click to delete your account',
                                                   onTap: () async {
                                                     //block the user's screen using a loading screen
-                                                    showDialog(
-                                                      context: context,
-                                                      barrierDismissible:
-                                                          true, // Prevents dismissing the dialog by tapping outside
-                                                      builder: (context) =>
-                                                          //   WillPopScope(
-                                                          // onWillPop: () async =>
-                                                          //     false, // Prevents dismissing the dialog with the back button
-                                                          AlertDialog(
-                                                        title: Text(
-                                                            'Processing',
-                                                            style: TextStyle(
-                                                                color: Colors
-                                                                    .green,
-                                                                fontFamily: GoogleFonts
-                                                                        .montserrat()
-                                                                    .fontFamily),
-                                                            textAlign: TextAlign
-                                                                .center),
-                                                        // content:
-                                                        // CircularProgressIndicator(),
-                                                      ),
-                                                      // ),
-                                                    );
+                                                    // showDialog(
+                                                    //   context: context,
+                                                    //   barrierDismissible:
+                                                    //       true, // Prevents dismissing the dialog by tapping outside
+                                                    //   builder: (context) =>
+                                                    //       //   WillPopScope(
+                                                    //       // onWillPop: () async =>
+                                                    //       //     false, // Prevents dismissing the dialog with the back button
+                                                    //       AlertDialog(
+                                                    //     title: Text(
+                                                    //         'Processing',
+                                                    //         style: TextStyle(
+                                                    //             color: Colors
+                                                    //                 .green,
+                                                    //             fontFamily: GoogleFonts
+                                                    //                     .montserrat()
+                                                    //                 .fontFamily),
+                                                    //         textAlign: TextAlign
+                                                    //             .center),
+                                                    //     // content:
+                                                    //     // CircularProgressIndicator(),
+                                                    //   ),
+                                                    //   // ),
+                                                    // );
 
                                                     User? currentUser =
                                                         FirebaseAuth.instance
@@ -1344,8 +1425,8 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
                                                                 Navigator.of(
                                                                         context)
                                                                     .pop(null);
-                                                                Navigator.pop(
-                                                                    context);
+                                                                // Navigator.pop(
+                                                                //     context);
                                                               },
                                                               child: Text(
                                                                   'Cancel',

@@ -128,7 +128,7 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
               .collection('invoices')
               .doc(rentPayment.invoiceNumber)
               .get()
-              .then((value) => value.data()!['url']);
+              .then((value) => value.data()?['url']);
         }
 
         // if (widget.callerType == 'Landlords') {
@@ -153,10 +153,19 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
 
     // Check for changes in rent payments
     if (!listEquals(_rentPayments, newRentPayments)) {
-      setState(() {
-        _rentPayments = newRentPayments; // Update the rent payments list
-        shouldDisplay = true;
-      });
+      if (mounted) {
+        setState(() {
+          _rentPayments = newRentPayments; // Update the rent payments list
+
+          //reverse the list
+          _rentPayments = _rentPayments.reversed.toList();
+          // for (var rentpayment in _rentPayments) {
+          //   print('rentpayment is ${rentpayment.amount}');
+          // }
+
+          shouldDisplay = true;
+        });
+      }
     }
 
     // if (kDebugMode) {

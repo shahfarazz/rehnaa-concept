@@ -91,7 +91,7 @@ class LandlordsOnboardedInfoPage extends StatelessWidget {
                               SizedBox(height: 20),
                               ContractCard(
                                 icon: Icons.person,
-                                label: 'LandLords Name:',
+                                label: 'LandLord Name:',
                                 data:
                                     "${landlord.firstName} ${landlord.lastName}",
                               ),
@@ -125,21 +125,21 @@ class LandlordsOnboardedInfoPage extends StatelessWidget {
                               ),
                               SizedBox(height: 16),
                               ContractCard(
-                                icon: Icons.money_rounded,
+                                icon: Icons.sell,
                                 label: 'Property rent amount:',
                                 data: dealer?.landlordMap?[landlord.tempID]
                                     ?['eStampPropertyRentAmount'],
                               ),
                               SizedBox(height: 16),
                               ContractCard(
-                                icon: Icons.request_page,
+                                icon: Icons.sell,
                                 label: 'Upfront Bonus:',
                                 data: dealer?.landlordMap?[landlord.tempID]
                                     ?['eStampUpfrontBonus'],
                               ),
                               SizedBox(height: 16),
                               ContractCard(
-                                icon: Icons.request_page,
+                                icon: Icons.sell,
                                 label: 'Monthly Profit:',
                                 data: dealer?.landlordMap?[landlord.tempID]
                                     ?['eStampMonthlyProfit'],

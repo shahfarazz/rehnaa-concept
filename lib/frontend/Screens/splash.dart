@@ -87,6 +87,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
     return Scaffold(
       body: SizedBox(
         width: MediaQuery.of(context).size.width,
@@ -102,18 +103,35 @@ class _SplashScreenState extends State<SplashScreen> {
                 ), // replace this with your actual asset path
               ),
             ),
-            Padding(
-              padding: EdgeInsets.only(bottom: 20.0),
-              child: Text(
-                "@ ${year}, Rehnaa",
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Color(0xff33907c),
-                  fontSize: 15,
-                  fontFamily: "Montserrat",
-                  fontWeight: FontWeight.w500,
+            Column(
+              children: [
+                Padding(
+                  padding: EdgeInsets.only(bottom: size.height * 0.01),
+                  child: Text(
+                    "@ ${year}, Rehnaa",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Color(0xff33907c),
+                      fontSize: 15,
+                      fontFamily: "Montserrat",
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
                 ),
-              ),
+                Padding(
+                  padding: EdgeInsets.only(bottom: size.height * 0.1),
+                  child: Text(
+                    "Registered with SECP",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Color(0xff33907c),
+                      fontSize: 15,
+                      fontFamily: "Montserrat",
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ],
         ),

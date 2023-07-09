@@ -132,19 +132,24 @@ class _LandlordAdvanceRentPageState extends State<LandlordAdvanceRentPage> {
                                 }, SetOptions(merge: true));
 
                                 //send an AdminRequest for the tenant
-                                // FirebaseFirestore.instance
-                                //     .collection('AdminRequests')
-                                //     .doc(widget.uid)
-                                //     .set({
-                                //   'rentAccrualRequest': FieldValue.arrayUnion([
-                                //     {
-                                //       'fullname':
-                                //           '${landlord?.firstName} ${landlord?.lastName}',
-                                //       'uid': widget.uid,
-                                //     }
-                                //   ]),
-                                //   'timestamp': Timestamp.now()
-                                // }, SetOptions(merge: true)); //TODO implement this call
+                                FirebaseFirestore.instance
+                                    .collection('AdminRequests')
+                                    .doc(widget.uid)
+                                    .set(
+                                        {
+                                      'rentAdvanceRequest':
+                                          FieldValue.arrayUnion([
+                                        {
+                                          'fullname':
+                                              '${landlord?.firstName} ${landlord?.lastName}',
+                                          'uid': widget.uid,
+                                          'timestamp': Timestamp.now()
+                                        }
+                                      ]),
+                                    },
+                                        SetOptions(
+                                            merge:
+                                                true)); //TODO implement this call
 
                                 //send a notification to the tenant that the request has been sent
                                 FirebaseFirestore.instance

@@ -133,6 +133,7 @@ class TenantLandlordInfoPage extends StatelessWidget {
                       ),
                     ),
                   ),
+                  const SizedBox(height: 10.0),
                 ],
               ),
             ],
@@ -156,6 +157,18 @@ class TenantLandlordInfoPage extends StatelessWidget {
                         children: [
                           const SizedBox(height: 10.0),
                           // Rest of your card's content...
+                          tenant.landlord?.creditPoints != ""
+                              ? Center(
+                                  child: WhiteBox(
+                                    icon: Icons.star,
+                                    iconColor: const Color(0xff33907c),
+                                    label: 'Rating',
+                                    value: '${tenant.landlord?.creditScore}',
+                                    points: '${tenant.landlord?.creditPoints}',
+                                  ),
+                                )
+                              : const SizedBox.shrink(),
+                          const SizedBox(height: 10.0),
 
                           Center(
                             child: WhiteBox(

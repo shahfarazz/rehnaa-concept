@@ -32,7 +32,9 @@ class Landlord {
   var upfrontBonus;
   var monthlyProfit;
   bool? isGhost;
-
+  var securityDeposit;
+  var creditPoints;
+  var creditScore;
   Landlord({
     required this.firstName,
     required this.lastName,
@@ -61,6 +63,9 @@ class Landlord {
     this.upfrontBonus,
     this.monthlyProfit,
     this.isGhost,
+    this.securityDeposit,
+    this.creditPoints,
+    this.creditScore,
   });
 
   static Landlord fromJson(Map<String, dynamic>? json) {
@@ -95,6 +100,9 @@ class Landlord {
       upfrontBonus: json['upfrontBonus'] ?? '',
       monthlyProfit: json['monthlyProfit'] ?? '',
       isGhost: json['isGhost'] ?? false,
+      securityDeposit: json['securityDeposit'] ?? '',
+      creditPoints: json['creditPoints'] ?? '',
+      creditScore: json['creditScore'] ?? '',
     );
 
     // await landlord.fetchData();

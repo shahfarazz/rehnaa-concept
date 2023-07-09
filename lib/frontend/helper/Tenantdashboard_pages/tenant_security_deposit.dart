@@ -22,7 +22,7 @@ class _TenantSecurityDepositPageState extends State<TenantSecurityDepositPage> {
   Tenant? tenant;
   Landlord? landlord;
   bool isApplySecurity = false;
-  var depositAmount = 100000;
+  var depositAmount = 0;
 
   Future<void> checkisApplySecurity() async {
     var myTenant = await FirebaseFirestore.instance
@@ -43,9 +43,11 @@ class _TenantSecurityDepositPageState extends State<TenantSecurityDepositPage> {
         isApplySecurity = true;
       });
     }
-    if (myTenant.data()?['depositAmount'] != null) {
+    if (myTenant.data()?['securityDeposit'] != null) {
       setState(() {
-        depositAmount = myTenant.data()?['depositAmount'];
+        depositAmount = int.parse(myTenant.data()?['securityDeposit'] != ''
+            ? (myTenant.data()?['securityDeposit'])
+            : 0);
       });
     }
   }

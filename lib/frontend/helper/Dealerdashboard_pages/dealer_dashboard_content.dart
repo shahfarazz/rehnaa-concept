@@ -235,6 +235,11 @@ class _DealerDashboardContentState extends State<DealerDashboardContent>
                                 withdrawalAmount =
                                     double.tryParse(value) ?? 0.0;
                               },
+                              decoration: const InputDecoration(
+                                focusedBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.green),
+                                ),
+                              ),
                             ),
                             actions: <Widget>[
                               TextButton(
@@ -313,10 +318,10 @@ class _DealerDashboardContentState extends State<DealerDashboardContent>
                                           'uid': widget.uid,
                                           'requestID': randomID,
                                           'invoiceNumber': invoiceNumber,
-                                          'tenantname': 'Rehnaa App'
+                                          'tenantname': 'Rehnaa App',
+                                          'timestamp': Timestamp.now(),
                                         }
                                       ]),
-                                      'timestamp': Timestamp.now(),
                                     }, SetOptions(merge: true));
 
                                     PDFDealerPage pdfInstance = PDFDealerPage();

@@ -198,6 +198,13 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
     //monthlyProfit
     final TextEditingController monthlyProfitController =
         TextEditingController(text: tenant.monthlyProfit.toString());
+    //securityDeposit
+    final TextEditingController securityDepositController =
+        TextEditingController(text: tenant.securityDeposit.toString());
+
+    //creditScore
+    final TextEditingController creditScoreController =
+        TextEditingController(text: tenant.creditScore.toString());
 
     final hashedCnic = encryptString(cnicNumberController.text);
 
@@ -285,6 +292,15 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
                   controller: monthlyProfitController,
                   decoration:
                       const InputDecoration(labelText: 'Monthly Profit'),
+                ),
+                TextField(
+                  controller: securityDepositController,
+                  decoration:
+                      const InputDecoration(labelText: 'Security Deposit'),
+                ),
+                TextField(
+                  controller: creditScoreController,
+                  decoration: const InputDecoration(labelText: 'Credit Score'),
                 ),
 
                 //field to ask for bool value from user for police verification
@@ -378,6 +394,8 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
                       'monthlyProfit': monthlyProfitController.text ?? '',
                       'policeVerification': policeVerification,
                       'tasdeeqVerification': tasdeeqVerification,
+                      'securityDeposit': securityDepositController.text ?? '',
+                      'creditScore': creditScoreController.text ?? '',
                     });
 
                     setState(() {
@@ -396,6 +414,20 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
                           int.tryParse(familyMembersController.text) ?? 0;
                       tenant.rating =
                           double.tryParse(ratingController.text) ?? 0.0;
+                      tenant.landlordRef = landlordRef;
+                      tenant.propertyAddress = propertyAddressController.text;
+                      tenant.address = addressController.text;
+                      tenant.contractStartDate =
+                          contractStartDateController.text;
+                      tenant.contractEndDate = contractEndDateController.text;
+                      tenant.monthlyRent = monthlyRentController.text ?? '';
+                      tenant.upfrontBonus = upfrontBonusController.text ?? '';
+                      tenant.monthlyProfit = monthlyProfitController.text ?? '';
+                      tenant.policeVerification = policeVerification;
+                      tenant.tasdeeqVerification = tasdeeqVerification;
+                      tenant.securityDeposit =
+                          securityDepositController.text ?? '';
+                      tenant.creditScore = creditScoreController.text ?? '';
                     });
 
                     if (tenant.balance >
@@ -403,7 +435,7 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
                       await FirebaseFirestore.instance
                           .collection('rentPayments')
                           .add({
-                        'tenantname': 'Rehnaa App',
+                        'tenantname': 'Rehnaa.pk',
                         'tenantRef': FirebaseFirestore.instance
                             .collection('Tenants')
                             .doc(tenant.tempID),
@@ -432,7 +464,8 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
                           'notifications': FieldValue.arrayUnion([
                             {
                               // 'amount': data.requestedAmount,
-                              'title': 'Balance updated by Rehnaa Team Admin',
+                              'title':
+                                  'Your account has been credited by ${-(double.tryParse(rentController.text) ?? 0.0) + (tenant.balance)}',
                             }
                           ])
                         });
@@ -442,12 +475,13 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
                       await FirebaseFirestore.instance
                           .collection('rentPayments')
                           .add({
-                        'tenantname': 'Rehnaa App',
+                        'tenantname': 'Rehnaa.pk',
                         'tenantRef': FirebaseFirestore.instance
                             .collection('Tenants')
                             .doc(tenant.tempID),
-                        'amount': double.tryParse(rentController.text) ??
-                            0.0 - tenant.balance,
+                        'amount':
+                            ((double.tryParse(rentController.text) ?? 0.0) -
+                                tenant.balance),
                         'date': DateTime.now(),
                         'isMinus': false,
                         // 'description': 'Balance updated by landlord',
@@ -468,7 +502,8 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
                           'notifications': FieldValue.arrayUnion([
                             {
                               // 'amount': data.requestedAmount,
-                              'title': 'Balance updated by Rehnaa Team Admin',
+                              'title':
+                                  'Your account has been debited by ${((double.tryParse(rentController.text) ?? 0.0) - tenant.balance)}',
                             }
                           ])
                         });

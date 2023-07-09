@@ -47,6 +47,7 @@ class _DealerDashboardPageState extends State<DealerDashboardPage>
   late Stream<DocumentSnapshot<Map<String, dynamic>>> _notificationStream2;
   bool isNewVoucher = false;
   Timer? _timer;
+  bool isNotificationClicked = false;
 
   @override
   void initState() {
@@ -304,7 +305,7 @@ class _DealerDashboardPageState extends State<DealerDashboardPage>
                 onPressed: () {
                   EasyDebounce.debounce(
                     'notifications-debouncer', // Debouncer ID
-                    Duration(milliseconds: 500), // Debounce duration
+                    Duration(seconds: 2), // Debounce duration
                     _handleNotificationsButtonPress, // Wrapped function
                   );
                 },

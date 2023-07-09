@@ -190,7 +190,7 @@ class DealerEstampInfoPage extends StatelessWidget {
                               ),
                               SizedBox(height: 16),
                               ContractCard(
-                                  icon: Icons.money_rounded,
+                                  icon: Icons.sell,
                                   label: 'Charges:',
                                   data: dealer.landlordMap?[landlord.tempID]
                                       ?['eStampCharges']
@@ -201,7 +201,7 @@ class DealerEstampInfoPage extends StatelessWidget {
                                   ),
                               SizedBox(height: 16),
                               ContractCard(
-                                  icon: Icons.request_page,
+                                  icon: Icons.sell,
                                   label: 'Police Verification:',
                                   data: dealer.landlordMap?[landlord.tempID]
                                       ?['eStampPoliceVerification']

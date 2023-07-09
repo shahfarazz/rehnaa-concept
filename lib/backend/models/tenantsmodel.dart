@@ -7,7 +7,6 @@ class Tenant {
   String? description;
   num rating;
   num balance;
-  num? creditPoints;
   //  String propertyDetails;
   String? cnicNumber;
   String? emailOrPhone;
@@ -32,6 +31,9 @@ class Tenant {
   var monthlyProfit;
   var discount;
   bool? isGhost;
+  var securityDeposit;
+  var creditScore;
+  var creditPoints;
 
   Tenant({
     required this.firstName,
@@ -62,6 +64,8 @@ class Tenant {
     this.monthlyProfit,
     this.discount,
     this.isGhost,
+    this.securityDeposit,
+    this.creditScore,
   });
 
   factory Tenant.fromJson(Map<String, dynamic> json) {
@@ -71,7 +75,7 @@ class Tenant {
       description: json['description'] ?? 'No description',
       rating: json['rating'] ?? 0.0,
       balance: json['balance'] ?? 0.0,
-      creditPoints: json['creditPoints'] ?? 0,
+      creditPoints: json['creditPoints'] ?? "",
       // propertyDetails: json['propertyDetails'] ?? 'No property details',
       cnicNumber: json['cnicNumber'] ?? 'N/A',
       emailOrPhone: json['emailOrPhone'] ?? 'N/A',
@@ -94,6 +98,8 @@ class Tenant {
       monthlyProfit: json['monthlyProfit'] ?? '',
       discount: json['discount'] ?? 0.24234234,
       isGhost: json['isGhost'] ?? false,
+      securityDeposit: json['securityDeposit'] ?? '',
+      creditScore: json['creditScore'] ?? '',
     );
   }
 

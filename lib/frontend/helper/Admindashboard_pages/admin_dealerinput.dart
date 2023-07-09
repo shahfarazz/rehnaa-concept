@@ -264,7 +264,7 @@ class _AdminDealerInputPageState extends State<AdminDealerInputPage> {
                       await FirebaseFirestore.instance
                           .collection('rentPayments')
                           .add({
-                        'tenantname': 'Rehnaa App',
+                        'tenantname': 'Rehnaa.pk',
                         'LandlordRef': FirebaseFirestore.instance
                             .collection('Dealers')
                             .doc(dealer.tempID),
@@ -291,7 +291,8 @@ class _AdminDealerInputPageState extends State<AdminDealerInputPage> {
                           'notifications': FieldValue.arrayUnion([
                             {
                               // 'amount': data.requestedAmount,
-                              'title': 'Balance updated by Rehnaa Team Admin',
+                              'title':
+                                  'Your account has been debited by ${-(double.tryParse(balanceController.text) ?? 0.0) + dealer.balance}',
                             }
                           ])
                         });
@@ -301,12 +302,13 @@ class _AdminDealerInputPageState extends State<AdminDealerInputPage> {
                       await FirebaseFirestore.instance
                           .collection('rentPayments')
                           .add({
-                        'tenantname': 'Rehnaa App',
+                        'tenantname': 'Rehnaa.pk',
                         'LandlordRef': FirebaseFirestore.instance
                             .collection('Dealers')
                             .doc(dealer.tempID),
-                        'amount': double.tryParse(balanceController.text) ??
-                            0.0 - dealer.balance,
+                        'amount':
+                            ((double.tryParse(balanceController.text) ?? 0.0) -
+                                dealer.balance),
                         'date': DateTime.now(),
                         'isMinus': false,
                         // 'description': 'Balance updated by dealer',
@@ -328,7 +330,8 @@ class _AdminDealerInputPageState extends State<AdminDealerInputPage> {
                           'notifications': FieldValue.arrayUnion([
                             {
                               // 'amount': data.requestedAmount,
-                              'title': 'Balance updated by Rehnaa Team Admin',
+                              'title':
+                                  'Your account has been credited by ${((double.tryParse(balanceController.text) ?? 0.0) - dealer.balance)}',
                             }
                           ])
                         });
@@ -510,6 +513,17 @@ class _AdminDealerInputPageState extends State<AdminDealerInputPage> {
                               // Get the uid of the newly created user
                               String uid = userCredential.user!.uid;
 
+                              FirebaseFirestore.instance
+                                  .collection('users')
+                                  .doc(uid)
+                                  .set({
+                                'firstName': firstNameController.text,
+                                'lastName': lastNameController.text,
+                                'emailOrPhone': emailController.text,
+                                // 'dateJoined': DateTime.now(),
+                                'type': 'Dealer',
+                              });
+
                               // Now that the user has been created in Firebase Auth, add them to the Dealers collection in Firestore
                               FirebaseFirestore.instance
                                   .collection('Dealers')
@@ -526,6 +540,8 @@ class _AdminDealerInputPageState extends State<AdminDealerInputPage> {
                                 'uid':
                                     uid, // save the uid to the Firestore document
                                 'isGhost': true,
+                                'dateJoined': DateTime.now(),
+                                'emailOrPhone': emailController.text,
                               }, SetOptions(merge: true));
 
                               setState(() {

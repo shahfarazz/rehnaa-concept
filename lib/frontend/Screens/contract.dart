@@ -146,7 +146,10 @@ class MyScreen extends StatelessWidget {
               children: [
                 (pdfUrl != null)
                     ? Expanded(
-                        child: pdfScreen,
+                        child: InteractiveViewer(
+                          child: pdfScreen,
+                        ),
+                        // pdfScreen,
                       )
                     : Container(),
                 SizedBox(height: size.height * 0.05),

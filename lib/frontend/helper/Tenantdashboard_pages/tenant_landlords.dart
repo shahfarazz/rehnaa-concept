@@ -187,28 +187,40 @@ class _TenantLandlordsPageState extends State<TenantLandlordsPage> {
             if (data?.landlordRef == null) {
               // If no landlord data is available, show a specific message or widget.
               return RefreshIndicator(
-                onRefresh: _refreshLandlords,
-                child: Center(
+                  onRefresh: _refreshLandlords,
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(
-                        Icons.error_outline,
-                        size: 48.0,
-                        color: Color(0xff33907c),
-                      ),
-                      SizedBox(height: 16.0),
-                      Text(
-                        'No landlord found',
-                        style: GoogleFonts.montserrat(
-                          fontSize: 20.0,
-                          color: const Color(0xff33907c),
+                      SingleChildScrollView(
+                        physics: AlwaysScrollableScrollPhysics(),
+                        child: Card(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20.0),
+                          ),
+                          child: Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.error_outline,
+                                  size: 48.0,
+                                  color: Color(0xff33907c),
+                                ),
+                                SizedBox(height: 16.0),
+                                Text(
+                                  'No landlord found',
+                                  style: GoogleFonts.montserrat(
+                                    fontSize: 20.0,
+                                    color: const Color(0xff33907c),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
                       ),
                     ],
-                  ),
-                ),
-              );
+                  ));
             } else {
               // If landlord data is available, display the landlord card.
               return RefreshIndicator(
