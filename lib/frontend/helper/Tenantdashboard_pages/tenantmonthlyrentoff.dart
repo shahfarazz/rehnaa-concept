@@ -26,7 +26,7 @@ class _TenantMonthlyRentOffPageState extends State<TenantMonthlyRentOffPage>
   bool _animationFinished = false; // New state variable
   bool _isPageVisible = false;
   bool _isContentDimensionsEstablished = false;
-  bool _isPageReady = false;
+  bool _emptyContent = false;
 
   final PageController _pageController = PageController();
   final List<String> _userImages = const [
@@ -57,6 +57,9 @@ class _TenantMonthlyRentOffPageState extends State<TenantMonthlyRentOffPage>
         // tempWinner.pathToImage = 'assets/defaulticon.png';
         winnerTenants.add(tempWinner);
       }
+    }
+    if (winnerTenants.length == 0) {
+      _emptyContent = true;
     }
     return winnerTenants;
   }
@@ -133,6 +136,86 @@ class _TenantMonthlyRentOffPageState extends State<TenantMonthlyRentOffPage>
             future: fetchWinnerTenants(),
             builder: (context, snapshot) {
               List<Tenant> winnerTenants = snapshot.data ?? [];
+
+              if (_emptyContent) {
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                        padding: EdgeInsets.only(top: size.height * 0.07),
+                        child: Positioned(
+                          top: 0.0,
+                          left: 0.0,
+                          child: GestureDetector(
+                            onTap: () {
+                              Navigator.pop(context);
+                            },
+                            child: Container(
+                                width: 40,
+                                height: 40,
+                                decoration: const BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Color(0xFF33907C),
+                                  gradient: LinearGradient(
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                    colors: [
+                                      Color(0xff0FA697),
+                                      Color(0xff45BF7A),
+                                      Color(0xff0DF205),
+                                    ],
+                                  ),
+                                ),
+                                child: const Icon(
+                                  Icons.arrow_back,
+                                  size: 20,
+                                  color: Colors.white,
+                                )),
+                          ),
+                        )),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Center(
+                          child: Card(
+                            elevation: 4.0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20.0),
+                            ),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(20.0),
+                                color: Colors.white,
+                              ),
+                              padding: const EdgeInsets.all(16.0),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Icon(
+                                    Icons.error_outline_outlined,
+                                    size: 48.0,
+                                    color: Color(0xff33907c),
+                                  ),
+                                  const SizedBox(height: 16.0),
+                                  Text(
+                                    'No winners yet',
+                                    style: GoogleFonts.montserrat(
+                                      fontSize: 20.0,
+                                      // fontWeight: FontWeight.bold,
+                                      color: const Color(0xff33907c),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                );
+              }
 
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(

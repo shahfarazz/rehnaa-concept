@@ -57,6 +57,8 @@ class AuthenticationService extends ChangeNotifier {
 
       //show error if userDoc is empty
       if (userDoc.size == 0) {
+        Navigator.pop(context);
+
         showToast('Phone number not found. Please register first.', Colors.red);
         return;
       }
@@ -98,6 +100,7 @@ class AuthenticationService extends ChangeNotifier {
     } catch (e) {
       // Error occurred during login process
       print('Login error: $e');
+      return;
     }
   }
 
@@ -126,6 +129,8 @@ class AuthenticationService extends ChangeNotifier {
 
     //show error if userDoc is empty
     if (userDoc.size == 0) {
+      Navigator.pop(context);
+
       showToast('Phone number not found. Please register first.', Colors.red);
       return;
     }
@@ -284,6 +289,7 @@ class AuthenticationService extends ChangeNotifier {
                               Colors.red);
 
                           print('error is $e');
+                          return;
 
                           // Navigator.of(context).pop();
                         }
@@ -430,6 +436,7 @@ class AuthenticationService extends ChangeNotifier {
                     } catch (e) {
                       showToast(
                           'Invalid SMS code. Please try again.', Colors.red);
+                      return;
                       // Navigator.of(context).pop();
                     }
                   },
@@ -474,6 +481,7 @@ class AuthenticationService extends ChangeNotifier {
       if (userDoc.exists) {
         final user = userDoc;
         if (user.data()?['isDisabled'] == true) {
+          Navigator.of(context).pop();
           showToast('Your account is disabled. Please contact admin.',
               Colors.redAccent);
           return;
@@ -512,6 +520,7 @@ class AuthenticationService extends ChangeNotifier {
       print('Error signing in with Email and Password: $e');
       showToast('Failed to sign in with email and password.', Colors.red);
       Navigator.pop(context);
+      return;
     }
   }
 }

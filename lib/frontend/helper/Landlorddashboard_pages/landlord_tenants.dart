@@ -297,7 +297,8 @@ class _LandlordTenantsPageState extends State<LandlordTenantsPage>
                         ],
                       ),
                     ),
-                  )
+                  ),
+                  SizedBox(height: size.height * 0.35),
                 ],
               )),
         );

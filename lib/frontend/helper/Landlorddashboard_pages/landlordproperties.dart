@@ -9,6 +9,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:rehnaa/frontend/helper/Landlorddashboard_pages/skeleton.dart';
 import '../../../backend/models/landlordmodel.dart';
 import '../../../backend/models/propertymodel.dart';
+import 'landlord_property_form.dart';
 import 'landlord_propertyinfo.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -68,9 +69,15 @@ class _LandlordPropertiesPageState extends State<LandlordPropertiesPage>
     if (landlordSnapshot.exists) {
       // print('nahi yahan');
       Map<String, dynamic> data = landlordSnapshot.data()!;
-      List<DocumentReference<Map<String, dynamic>>> propertyDataList2 =
-          (data['propertyRef'] as List<dynamic>)
-              .cast<DocumentReference<Map<String, dynamic>>>();
+      List<DocumentReference<Map<String, dynamic>>> propertyDataList2 = [];
+
+      try {
+        propertyDataList2 = (data['propertyRef'] as List<dynamic>)
+            .cast<DocumentReference<Map<String, dynamic>>>();
+      } catch (e) {
+        print('Error fetching properties: $e');
+        propertyDataList2 = [];
+      }
 
       if (propertyDataList.map((ref) => ref.path).toList().toString() !=
           propertyDataList2.map((ref) => ref.path).toList().toString()) {
@@ -176,13 +183,12 @@ class _LandlordPropertiesPageState extends State<LandlordPropertiesPage>
   @override
   Widget build(BuildContext context) {
     super.build(context); // Necessary for AutomaticKeepAliveClientMixin
-    // print('properties.isEmpty is ${properties.isEmpty}');
 
     return StreamBuilder<List<DocumentSnapshot<Map<String, dynamic>>>>(
       stream: _propertyStream,
       builder: (context, snapshot) {
         Size size = MediaQuery.of(context).size;
-        // print('data is ${snapshot.data?.map((e) => e.data())}');
+
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const LandlordPropertiesSkeleton();
         } else if (isEmptyList || !snapshot.hasData || snapshot.data!.isEmpty) {
@@ -232,48 +238,98 @@ class _LandlordPropertiesPageState extends State<LandlordPropertiesPage>
                     ],
                   ),
                 ),
-              )
+              ),
+              SizedBox(height: size.height * 0.3),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Padding(
+                    padding: EdgeInsets.only(right: size.width * 0.05),
+                    child: Positioned(
+                      bottom: 16.0,
+                      left: 16.0,
+                      child: FloatingActionButton(
+                        backgroundColor: const Color(0xff33907c),
+                        onPressed: () {
+                          // Handle floating action button tap
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) =>
+                                  LandlordPropertyForms(uid: widget.uid),
+                            ),
+                          );
+                        },
+                        child: Icon(Icons.add),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ],
           );
         } else {
-          return Scaffold(
-            backgroundColor: const Color.fromARGB(255, 255, 255, 255),
-            body: ListView(
-              children: snapshot.data!.map((propertySnapshot) {
-                Property property = Property.fromJson(
-                    propertySnapshot.data() as Map<String, dynamic>);
+          return Stack(
+            children: [
+              Scaffold(
+                backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+                body: ListView(
+                  children: snapshot.data!.map((propertySnapshot) {
+                    Property property = Property.fromJson(
+                        propertySnapshot.data() as Map<String, dynamic>);
 
-                return PropertyCard(
-                  property: property,
-                  firstName: firstName ?? '',
-                  lastName: lastName ?? '',
-                  pathToImage:
-                      property.landlord?.pathToImage ?? 'assets/userimage.png',
-                  location: property.location,
-                  address: property.address,
-                  type: property.type,
-                  area: property.area ?? 0,
-                  onTap: () {
+                    return PropertyCard(
+                      property: property,
+                      firstName: firstName ?? '',
+                      lastName: lastName ?? '',
+                      pathToImage: property.landlord?.pathToImage ??
+                          'assets/userimage.png',
+                      location: property.location,
+                      address: property.address,
+                      type: property.type,
+                      area: property.area ?? 0,
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => PropertyPage(
+                              property: property,
+                              firstName: firstName ?? '',
+                              lastName: lastName ?? '',
+                              pathToImage: property.landlord?.pathToImage ??
+                                  'assets/userimage.png',
+                              location: property.location,
+                              address: property.address,
+                              emailOrPhone:
+                                  property.landlord?.emailOrPhone ?? '',
+                              isTenantCall: false,
+                            ),
+                          ),
+                        );
+                      },
+                    );
+                  }).toList(),
+                ),
+              ),
+              Positioned(
+                bottom: 16.0,
+                left: 16.0,
+                child: FloatingActionButton(
+                  backgroundColor: const Color(0xff33907c),
+                  onPressed: () {
+                    // Handle floating action button tap
+                    //LandlordPropertyForms
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => PropertyPage(
-                          property: property,
-                          firstName: firstName ?? '',
-                          lastName: lastName ?? '',
-                          pathToImage: property.landlord?.pathToImage ??
-                              'assets/userimage.png',
-                          location: property.location,
-                          address: property.address,
-                          emailOrPhone: property.landlord?.emailOrPhone ?? '',
-                          isTenantCall: false,
-                        ),
+                        builder: (_) => LandlordPropertyForms(uid: widget.uid),
                       ),
                     );
                   },
-                );
-              }).toList(),
-            ),
+                  child: Icon(Icons.add),
+                ),
+              ),
+            ],
           );
         }
       },

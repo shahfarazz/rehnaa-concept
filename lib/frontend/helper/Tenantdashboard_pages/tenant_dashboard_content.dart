@@ -391,6 +391,11 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
     );
   }
 
+  dispose() {
+    _tenantStream.drain();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     super.build(context); // Ensure the state is kept alive

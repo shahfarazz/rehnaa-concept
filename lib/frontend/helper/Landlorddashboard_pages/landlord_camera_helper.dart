@@ -15,7 +15,8 @@ class TakePictureScreen extends StatefulWidget {
 }
 
 class TakePictureScreenState extends State<TakePictureScreen> {
-  late CameraController _controller;
+  CameraController? _controller;
+
   late Future<void> _initializeControllerFuture;
   int selectedCameraIndex = 0;
 
@@ -26,17 +27,22 @@ class TakePictureScreenState extends State<TakePictureScreen> {
 
   @override
   void initState() {
-    super.initState();
     _initCameraController(widget.cameras.first);
+
+    super.initState();
   }
 
   void _initCameraController(CameraDescription cameraDescription) async {
     if (_controller != null) {
-      await _controller.dispose();
+      await _controller?.dispose();
     }
     _controller = CameraController(cameraDescription, ResolutionPreset.high);
 
-    _initializeControllerFuture = _controller.initialize();
+    _initializeControllerFuture = _controller!.initialize().catchError((error) {
+      print('Error initializing camera: $error');
+    });
+
+    await _initializeControllerFuture;
 
     if (mounted) {
       setState(() {});
@@ -51,7 +57,7 @@ class TakePictureScreenState extends State<TakePictureScreen> {
         future: _initializeControllerFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
-            return CameraPreview(_controller);
+            return CameraPreview(_controller!);
           } else {
             return Center(
               child: SpinKitFadingCube(
@@ -74,7 +80,7 @@ class TakePictureScreenState extends State<TakePictureScreen> {
               icon: Icon(Icons.camera_alt, color: Colors.white),
               onPressed: () async {
                 try {
-                  final XFile image = await _controller.takePicture();
+                  final XFile image = await _controller!.takePicture();
 
                   if (image != null) {
                     if (mounted) {
@@ -94,7 +100,7 @@ class TakePictureScreenState extends State<TakePictureScreen> {
 
   @override
   void dispose() {
-    _controller.dispose();
+    _controller?.dispose();
     super.dispose();
   }
 }

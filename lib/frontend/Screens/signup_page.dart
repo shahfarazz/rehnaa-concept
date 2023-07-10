@@ -45,6 +45,14 @@ class _SignUpPageState extends State<SignUpPage> {
   String? passwordError;
   String? confirmPasswordError;
   String? verificationId;
+  Timer? verificationTimer;
+  Timer? letVerifyTimer;
+
+  dispose() {
+    verificationTimer?.cancel();
+    letVerifyTimer?.cancel();
+    super.dispose();
+  }
 
   bool isEmail(String input) {
     final regex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
@@ -69,7 +77,11 @@ class _SignUpPageState extends State<SignUpPage> {
         'Verification email has been sent. Please check your inbox.',
         Colors.green,
       );
-      Timer.periodic(const Duration(seconds: 5), (timer) async {
+      verificationTimer?.cancel(); // Cancel any existing timer
+      letVerifyTimer?.cancel(); // Cancel any existing timer
+      letVerifyTimer = Timer.periodic(const Duration(seconds: 30), (timer) {});
+      verificationTimer =
+          Timer.periodic(const Duration(seconds: 5), (timer) async {
         await FirebaseAuth.instance.currentUser!.reload();
         if (FirebaseAuth.instance.currentUser!.emailVerified) {
           timer.cancel();
@@ -131,6 +143,7 @@ class _SignUpPageState extends State<SignUpPage> {
     } catch (e) {
       setState(() => isLoading = false);
       _showToast('Sign up failed, please try again', Colors.red);
+      return;
     }
   }
 
@@ -212,6 +225,7 @@ class _SignUpPageState extends State<SignUpPage> {
     } catch (e) {
       _showToast('Failed to Verify Phone Number.', Colors.red);
       print('error that occured: $e');
+      return;
     }
   }
 
@@ -280,6 +294,7 @@ class _SignUpPageState extends State<SignUpPage> {
       }
     } catch (e) {
       _showToast('Failed to verify SMS code.', Colors.red);
+      return;
     }
   }
 
@@ -383,7 +398,7 @@ class _SignUpPageState extends State<SignUpPage> {
   void _showToast(String message, Color backgroundColor) {
     Fluttertoast.showToast(
       msg: message,
-      toastLength: Toast.LENGTH_SHORT,
+      toastLength: Toast.LENGTH_LONG,
       gravity: ToastGravity.BOTTOM,
       backgroundColor: backgroundColor,
       textColor: Colors.white,
@@ -620,12 +635,17 @@ class _SignUpPageState extends State<SignUpPage> {
             ),
             recognizer: TapGestureRecognizer()
               ..onTap = () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => LoginPage(),
-                  ),
-                );
+                // Navigate to the login page and dispose of the sign-up page
+
+                //check if verification timer is running and if so dont let user go back to login page
+                if (letVerifyTimer != null && letVerifyTimer!.isActive) {
+                  _showToast("Please complete verification", Colors.red);
+                } else {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => LoginPage()),
+                  );
+                }
               },
           ),
         ],
