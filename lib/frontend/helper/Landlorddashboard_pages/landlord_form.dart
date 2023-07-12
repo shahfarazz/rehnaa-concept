@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:rehnaa/backend/services/helperfunctions.dart';
 
@@ -26,22 +27,22 @@ class _LandlordFormsState extends State<LandlordForms> {
   final TextEditingController _bankNameController = TextEditingController();
   //raastId
   final TextEditingController _raastIdController = TextEditingController();
-  //accountNumber
-  final TextEditingController _accountNumberController =
-      TextEditingController();
-  //iban
-  final TextEditingController _ibanController = TextEditingController();
+  // //accountNumber
+  // final TextEditingController _accountNumberController =
+  //     TextEditingController();
+  // //iban
+  // final TextEditingController _ibanController = TextEditingController();
+
+  //TODO add a cell phone number;
 
   @override
   void dispose() {
     _addressController.dispose();
     _cnicController.dispose();
     _propertyAddressController.dispose();
-    // _rentDemandController.dispose();
-    _bankNameController.dispose();
+    // _bankNameController.dispose();
     _raastIdController.dispose();
-    _accountNumberController.dispose();
-    _ibanController.dispose();
+    super.dispose();
   }
 
   Future<void> _saveForm() async {
@@ -51,10 +52,10 @@ class _LandlordFormsState extends State<LandlordForms> {
         'cnic': encryptString(_cnicController.text),
         'propertyAddress': _propertyAddressController.text,
         // 'rentDemand': _rentDemandController.text,
-        'bankName': encryptString(_bankNameController.text),
+        // 'bankName': encryptString(_bankNameController.text),
         // 'raastId': _raastIdController.text,
-        'accountNumber': encryptString(_accountNumberController.text),
-        'iban': encryptString(_ibanController.text),
+        // 'accountNumber': encryptString(_accountNumberController.text),
+        // 'iban': encryptString(_ibanController.text),
         // 'rating': _ratingController.text,
         'isDetailsFilled': true,
       };
@@ -116,25 +117,47 @@ class _LandlordFormsState extends State<LandlordForms> {
               ),
               TextFormField(
                 style: TextStyle(
-                    fontSize: 16,
-                    fontFamily: GoogleFonts.montserrat().fontFamily,
-                    color: Colors.green),
+                  fontSize: 16,
+                  fontFamily: GoogleFonts.montserrat().fontFamily,
+                  color: Colors.green,
+                ),
                 controller: _cnicController,
                 decoration: const InputDecoration(
-                    labelText: 'CNIC',
-                    focusColor: Colors.green,
-                    hoverColor: Colors.green,
-                    fillColor: Colors.green,
-                    labelStyle: TextStyle(color: Colors.grey),
-                    focusedBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: Colors.green))),
+                  labelText: 'CNIC Number',
+                  focusColor: Colors.green,
+                  hoverColor: Colors.green,
+                  fillColor: Colors.green,
+                  labelStyle: TextStyle(color: Colors.grey),
+                  focusedBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.green),
+                  ),
+                ),
+                inputFormatters: [
+                  LengthLimitingTextInputFormatter(
+                      13), // Restrict maximum length to 13
+                  // FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+                ],
+                onChanged: (value) {
+                  //if alphabet is entered show an error using toast and clear the field and return
+                  if (value.contains(RegExp(r'[a-zA-Z]'))) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        backgroundColor: Colors.red,
+                        content: Text('Please enter digits only'),
+                      ),
+                    );
+                    _cnicController.clear();
+                    return;
+                  }
+                },
                 validator: (value) {
-                  if (value!.isEmpty && value.length != 13) {
+                  if (value!.isEmpty || value.length != 13) {
                     return 'Please enter a valid CNIC';
                   }
                   return null;
                 },
               ),
+
               const SizedBox(height: 16),
               Text(
                 'Property Details',
@@ -228,65 +251,64 @@ class _LandlordFormsState extends State<LandlordForms> {
               //     return null;
               //   },
               // ),
-              TextFormField(
-                style: TextStyle(
-                    fontSize: 16,
-                    fontFamily: GoogleFonts.montserrat().fontFamily,
-                    color: Colors.green),
-                controller: _accountNumberController,
-                decoration: const InputDecoration(
-                    labelText: 'Account Number',
-                    focusColor: Colors.green,
-                    hoverColor: Colors.green,
-                    fillColor: Colors.green,
-                    labelStyle: TextStyle(color: Colors.grey),
-                    focusedBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: Colors.green))),
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Please enter the account number';
-                  }
-                  return null;
-                },
-              ),
-              TextFormField(
-                style: TextStyle(
-                    fontSize: 16,
-                    fontFamily: GoogleFonts.montserrat().fontFamily,
-                    color: Colors.green),
-                controller: _ibanController,
-                decoration: const InputDecoration(
-                    labelText: 'IBAN',
-                    focusColor: Colors.green,
-                    hoverColor: Colors.green,
-                    fillColor: Colors.green,
-                    labelStyle: TextStyle(color: Colors.grey),
-                    focusedBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: Colors.green))),
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Please enter the IBAN';
-                  }
-                  return null;
-                },
-              ),
+              // TextFormField(
+              //   style: TextStyle(
+              //       fontSize: 16,
+              //       fontFamily: GoogleFonts.montserrat().fontFamily,
+              //       color: Colors.green),
+              //   controller: _ibanController,
+              //   decoration: const InputDecoration(
+              //       labelText: 'IBAN',
+              //       focusColor: Colors.green,
+              //       hoverColor: Colors.green,
+              //       fillColor: Colors.green,
+              //       labelStyle: TextStyle(color: Colors.grey),
+              //       focusedBorder: UnderlineInputBorder(
+              //           borderSide: BorderSide(color: Colors.green))),
+              //   validator: (value) {
+              //     if (value!.isEmpty) {
+              //       return 'Please enter the IBAN';
+              //     }
+              //     return null;
+              //   },
+              // ),
               const SizedBox(height: 16),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  primary: Colors.green,
-                  onPrimary: Colors.white,
-                  shape: RoundedRectangleBorder(
+              Material(
+                elevation: 4.0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(32.0),
+                ),
+                child: Ink(
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [
+                        Color(0xff0FA697),
+                        Color(0xff45BF7A),
+                        Color(0xff0DF205),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
                     borderRadius: BorderRadius.circular(32.0),
                   ),
+                  child: InkWell(
+                    onTap: _saveForm,
+                    borderRadius: BorderRadius.circular(32.0),
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                          vertical: 16.0, horizontal: 24.0),
+                      child: Text(
+                        'Save',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontFamily: GoogleFonts.montserrat().fontFamily,
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
-                onPressed: _saveForm,
-                child: Text(
-                  'Save',
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontFamily: GoogleFonts.montserrat().fontFamily),
-                ),
-              ),
+              )
             ],
           ),
         ),

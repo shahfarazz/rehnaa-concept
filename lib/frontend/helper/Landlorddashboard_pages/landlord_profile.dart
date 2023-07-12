@@ -266,54 +266,6 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
         },
       );
 
-      // Add a showDialog statement to display a message during the upload
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text(
-              'Upload Progress',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.green,
-                fontSize: 20,
-                fontFamily: GoogleFonts.montserrat().fontFamily,
-              ),
-            ),
-            content: StreamBuilder<TaskSnapshot>(
-              stream: uploadTask.snapshotEvents,
-              builder:
-                  (BuildContext context, AsyncSnapshot<TaskSnapshot> snapshot) {
-                try {
-                  double progress = snapshot.data!.bytesTransferred /
-                      snapshot.data!.totalBytes;
-                  String progressText = progress != null
-                      ? (progress * 100).toStringAsFixed(2) + '%'
-                      : '0%';
-                  return Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      const SpinKitFadingCube(
-                        color: Color.fromARGB(255, 30, 197, 83),
-                      ),
-                      SizedBox(height: 16),
-                      Text(
-                        'Upload progress: $progressText',
-                        style: TextStyle(fontSize: 16),
-                      ),
-                    ],
-                  );
-                } catch (e) {
-                  // TODO
-                  return Container();
-                }
-              },
-            ),
-          );
-        },
-      );
-
       final TaskSnapshot taskSnapshot = await uploadTask.whenComplete(() {});
 
       // Dismiss the upload progress dialog
@@ -731,7 +683,7 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
                                                   height: 150,
                                                 )
                                               : Image.network(
-                                                  fit: BoxFit.fill,
+                                                  fit: BoxFit.cover,
                                                   pathToImage!,
                                                   width: 150,
                                                   height: 150,
@@ -828,35 +780,61 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
                                   },
                                 ),
                                 !isDetailsFilled
-                                    ? FloatingActionButton(
-                                        backgroundColor: Color(0xFF45BF7A),
-                                        onPressed: () {
-                                          if (widget.callerType ==
-                                              'Landlords') {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) =>
-                                                    LandlordForms(
-                                                  uid: widget.uid,
+                                    ? Material(
+                                        elevation: 4.0,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(28.0),
+                                        ),
+                                        child: InkWell(
+                                          onTap: () {
+                                            if (widget.callerType ==
+                                                'Landlords') {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      LandlordForms(
+                                                    uid: widget.uid,
+                                                  ),
                                                 ),
-                                              ),
-                                            );
-                                          }
-                                          if (widget.callerType == 'Tenants') {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) =>
-                                                    TenantForms(
-                                                  uid: widget.uid,
+                                              );
+                                            }
+                                            if (widget.callerType ==
+                                                'Tenants') {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      TenantForms(
+                                                    uid: widget.uid,
+                                                  ),
                                                 ),
+                                              );
+                                            }
+                                          },
+                                          borderRadius:
+                                              BorderRadius.circular(28.0),
+                                          child: Container(
+                                            padding: EdgeInsets.all(16.0),
+                                            decoration: BoxDecoration(
+                                              gradient: LinearGradient(
+                                                colors: [
+                                                  const Color(0xff0FA697),
+                                                  const Color(0xff45BF7A),
+                                                  const Color(0xff0DF205),
+                                                ],
+                                                begin: Alignment.topLeft,
+                                                end: Alignment.bottomRight,
                                               ),
-                                            );
-                                          }
-                                        },
-                                        child: const Icon(
-                                          Icons.add,
+                                              borderRadius:
+                                                  BorderRadius.circular(28.0),
+                                            ),
+                                            child: Icon(
+                                              Icons.add,
+                                              color: Colors.white,
+                                            ),
+                                          ),
                                         ),
                                       )
                                     : Container(),
@@ -1025,14 +1003,16 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
                                                                         ),
                                                                         child:
                                                                             TextField(
+                                                                          cursorColor:
+                                                                              Colors.green,
                                                                           controller:
                                                                               _oldPasswordController,
                                                                           obscureText:
                                                                               _obscurePassword,
                                                                           decoration:
                                                                               InputDecoration(
-                                                                            border:
-                                                                                InputBorder.none,
+                                                                            focusedBorder:
+                                                                                UnderlineInputBorder(borderSide: BorderSide(color: Colors.green)),
                                                                             contentPadding:
                                                                                 EdgeInsets.all(10),
                                                                             iconColor:
@@ -1088,6 +1068,8 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
                                                                         ),
                                                                         child:
                                                                             TextField(
+                                                                          cursorColor:
+                                                                              Colors.green,
                                                                           controller:
                                                                               _newPasswordController,
                                                                           obscureText:
@@ -1096,8 +1078,8 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
                                                                               InputDecoration(
                                                                             contentPadding:
                                                                                 EdgeInsets.all(10),
-                                                                            border:
-                                                                                InputBorder.none,
+                                                                            focusedBorder:
+                                                                                UnderlineInputBorder(borderSide: BorderSide(color: Colors.green)),
                                                                             iconColor:
                                                                                 Colors.green,
                                                                             focusColor:
@@ -1167,32 +1149,6 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
                                                   subtitle:
                                                       'Click to delete your account',
                                                   onTap: () async {
-                                                    //block the user's screen using a loading screen
-                                                    // showDialog(
-                                                    //   context: context,
-                                                    //   barrierDismissible:
-                                                    //       true, // Prevents dismissing the dialog by tapping outside
-                                                    //   builder: (context) =>
-                                                    //       //   WillPopScope(
-                                                    //       // onWillPop: () async =>
-                                                    //       //     false, // Prevents dismissing the dialog with the back button
-                                                    //       AlertDialog(
-                                                    //     title: Text(
-                                                    //         'Processing',
-                                                    //         style: TextStyle(
-                                                    //             color: Colors
-                                                    //                 .green,
-                                                    //             fontFamily: GoogleFonts
-                                                    //                     .montserrat()
-                                                    //                 .fontFamily),
-                                                    //         textAlign: TextAlign
-                                                    //             .center),
-                                                    //     // content:
-                                                    //     // CircularProgressIndicator(),
-                                                    //   ),
-                                                    //   // ),
-                                                    // );
-
                                                     User? currentUser =
                                                         FirebaseAuth.instance
                                                             .currentUser;
@@ -1234,6 +1190,8 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
                                                                     .of(context)
                                                                 .showSnackBar(
                                                               SnackBar(
+                                                                backgroundColor:
+                                                                    Colors.red,
                                                                 content: Text(
                                                                     'Account deleted successfully.'),
                                                               ),
@@ -1422,8 +1380,7 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
                                                       String? enteredPassword;
 
                                                       // Show a password prompt dialog to the user
-                                                      enteredPassword =
-                                                          await showDialog(
+                                                      showDialog(
                                                         context: context,
                                                         builder: (context) =>
                                                             AlertDialog(

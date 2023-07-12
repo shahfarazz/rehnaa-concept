@@ -133,6 +133,21 @@ class _AdminVouchersPageState extends State<AdminVouchersPage> {
 
                         WriteBatch batch = FirebaseFirestore.instance.batch();
 
+                        //get all ids in Tenants collection
+                        var allTenantIDs = await FirebaseFirestore.instance
+                            .collection('Tenants')
+                            .get()
+                            .then((value) {
+                          return value.docs.map((e) => e.id).toList();
+                        });
+
+                        var allLandlordIDs = await FirebaseFirestore.instance
+                            .collection('Landlords')
+                            .get()
+                            .then((value) {
+                          return value.docs.map((e) => e.id).toList();
+                        });
+
                         // Update documents in the Tenants collection
                         QuerySnapshot tenantsQuerySnapshot =
                             await FirebaseFirestore.instance
@@ -146,18 +161,45 @@ class _AdminVouchersPageState extends State<AdminVouchersPage> {
                         //in all notification documents append to the notifications array
                         // with a title:"New Voucher has been added".
 
-                        notifsQuerySnapshot.docs.forEach((notifDoc) {
-                          batch.set(
-                              notifDoc.reference,
+                        // notifsQuerySnapshot.docs.forEach((notifDoc) {
+                        //   batch.set(
+                        //       notifDoc.reference,
+                        //       {
+                        //         'notifications': FieldValue.arrayUnion([
+                        //           {
+                        //             'title':
+                        //                 '${nameval} Voucher has been added',
+                        //           }
+                        //         ])
+                        //       },
+                        //       SetOptions(merge: true));
+                        // });
+
+                        //for all tenant ids in Notifications collection add a new notification
+                        for (var myid in allTenantIDs) {
+                          FirebaseFirestore.instance
+                              .collection('Notifications')
+                              .doc(myid)
+                              .set({
+                            'notifications': FieldValue.arrayUnion([
                               {
-                                'notifications': FieldValue.arrayUnion([
-                                  {
-                                    'title': 'New Voucher has been added',
-                                  }
-                                ])
-                              },
-                              SetOptions(merge: true));
-                        });
+                                'title': '${nameval} Voucher has been added',
+                              }
+                            ])
+                          }, SetOptions(merge: true));
+                        }
+                        for (var myid in allLandlordIDs) {
+                          FirebaseFirestore.instance
+                              .collection('Notifications')
+                              .doc(myid)
+                              .set({
+                            'notifications': FieldValue.arrayUnion([
+                              {
+                                'title': '${nameval} Voucher has been added',
+                              }
+                            ])
+                          }, SetOptions(merge: true));
+                        }
 
                         tenantsQuerySnapshot.docs.forEach((tenantDoc) {
                           batch.set(tenantDoc.reference,

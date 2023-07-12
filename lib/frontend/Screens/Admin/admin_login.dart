@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:rehnaa/frontend/Screens/Admin/admindashboard.dart';
 
 class AdminLoginPage extends StatefulWidget {
@@ -11,12 +12,12 @@ class AdminLoginPage extends StatefulWidget {
 }
 
 class _AdminLoginPageState extends State<AdminLoginPage> {
-  TextEditingController _emailController = TextEditingController();
-  TextEditingController _passwordController = TextEditingController();
-  bool _isPasswordVisible =
-      false; // Added variable to track password visibility
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  bool _isPasswordVisible = false;
+  bool _isLoading = true;
 
-  void checkAlreadyLoggedIn() {
+  Future<void> checkAlreadyLoggedIn() {
     try {
       if (FirebaseAuth.instance.currentUser != null) {
         FirebaseFirestore.instance
@@ -29,15 +30,26 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
                 context,
                 MaterialPageRoute(
                     builder: (context) => const AdminDashboard()));
+            return;
           }
         });
       }
     } catch (e) {
       print(e);
+      return Future.error(e);
     }
+
+    setState(() {
+      _isLoading = false;
+    });
+    return Future.value();
   }
 
   void _login() async {
+    setState(() {
+      _isLoading = true;
+    });
+
     try {
       await FirebaseAuth.instance.signInWithEmailAndPassword(
           email: _emailController.text, password: _passwordController.text);
@@ -45,7 +57,6 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
       print(e);
     }
 
-    //check if login is successful
     if (FirebaseAuth.instance.currentUser != null) {
       FirebaseFirestore.instance
           .collection('users')
@@ -76,7 +87,6 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
         }
       });
     } else {
-      //if login is not successful, show error message
       showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -95,6 +105,10 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
         },
       );
     }
+
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   @override
@@ -105,7 +119,7 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    //Textfields to ask for email and password
+    print('reached herereee');
     return Scaffold(
       appBar: AppBar(
         title: const Text('Admin Login'),
@@ -124,41 +138,43 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
         ),
       ),
       body: Center(
-        child: Column(
-          children: [
-            TextField(
-              controller: _emailController,
-              decoration: const InputDecoration(
-                labelText: 'Email',
-              ),
-            ),
-            TextFormField(
-              controller: _passwordController,
-              obscureText:
-                  !_isPasswordVisible, // Set obscureText based on visibility state
-              decoration: InputDecoration(
-                labelText: 'Password',
-                suffixIcon: IconButton(
-                  icon: Icon(
-                    _isPasswordVisible
-                        ? Icons.visibility
-                        : Icons.visibility_off,
+        child: _isLoading
+            ? SpinKitFadingCube(
+                color: Color.fromARGB(255, 30, 197, 83),
+              )
+            : Column(
+                children: [
+                  TextField(
+                    controller: _emailController,
+                    decoration: const InputDecoration(
+                      labelText: 'Email',
+                    ),
                   ),
-                  onPressed: () {
-                    setState(() {
-                      _isPasswordVisible =
-                          !_isPasswordVisible; // Toggle password visibility
-                    });
-                  },
-                ),
+                  TextFormField(
+                    controller: _passwordController,
+                    obscureText: !_isPasswordVisible,
+                    decoration: InputDecoration(
+                      labelText: 'Password',
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _isPasswordVisible
+                              ? Icons.visibility
+                              : Icons.visibility_off,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _isPasswordVisible = !_isPasswordVisible;
+                          });
+                        },
+                      ),
+                    ),
+                  ),
+                  ElevatedButton(
+                    onPressed: _login,
+                    child: const Text('Login'),
+                  ),
+                ],
               ),
-            ),
-            ElevatedButton(
-              onPressed: _login,
-              child: const Text('Login'),
-            ),
-          ],
-        ),
       ),
     );
   }

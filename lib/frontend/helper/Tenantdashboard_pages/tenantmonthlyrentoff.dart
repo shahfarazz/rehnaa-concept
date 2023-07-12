@@ -8,6 +8,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:confetti/confetti.dart';
 
 import '../../../backend/models/tenantsmodel.dart';
+import '../../Screens/Landlord/landlord_dashboard.dart';
 
 class TenantMonthlyRentOffPage extends StatefulWidget {
   final String uid;
@@ -86,8 +87,7 @@ class _TenantMonthlyRentOffPageState extends State<TenantMonthlyRentOffPage>
         });
       }
     });
-
-    // fetchWinnerTenants();
+    fetchWinnerTenants();
   }
 
   @override
@@ -138,82 +138,48 @@ class _TenantMonthlyRentOffPageState extends State<TenantMonthlyRentOffPage>
               List<Tenant> winnerTenants = snapshot.data ?? [];
 
               if (_emptyContent) {
-                return Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                        padding: EdgeInsets.only(top: size.height * 0.07),
-                        child: Positioned(
-                          top: 0.0,
-                          left: 0.0,
-                          child: GestureDetector(
-                            onTap: () {
-                              Navigator.pop(context);
-                            },
-                            child: Container(
-                                width: 40,
-                                height: 40,
-                                decoration: const BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: Color(0xFF33907C),
-                                  gradient: LinearGradient(
-                                    begin: Alignment.topLeft,
-                                    end: Alignment.bottomRight,
-                                    colors: [
-                                      Color(0xff0FA697),
-                                      Color(0xff45BF7A),
-                                      Color(0xff0DF205),
-                                    ],
+                return Scaffold(
+                  appBar: _buildAppBar(size, context),
+                  body: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    // crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Center(
+                        child: Card(
+                          elevation: 4.0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20.0),
+                          ),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20.0),
+                              color: Colors.white,
+                            ),
+                            padding: const EdgeInsets.all(16.0),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(
+                                  Icons.error_outline_outlined,
+                                  size: 48.0,
+                                  color: Color(0xff33907c),
+                                ),
+                                const SizedBox(height: 16.0),
+                                Text(
+                                  'No winners yet',
+                                  style: GoogleFonts.montserrat(
+                                    fontSize: 20.0,
+                                    // fontWeight: FontWeight.bold,
+                                    color: const Color(0xff33907c),
                                   ),
                                 ),
-                                child: const Icon(
-                                  Icons.arrow_back,
-                                  size: 20,
-                                  color: Colors.white,
-                                )),
-                          ),
-                        )),
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Center(
-                          child: Card(
-                            elevation: 4.0,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20.0),
-                            ),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(20.0),
-                                color: Colors.white,
-                              ),
-                              padding: const EdgeInsets.all(16.0),
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  const Icon(
-                                    Icons.error_outline_outlined,
-                                    size: 48.0,
-                                    color: Color(0xff33907c),
-                                  ),
-                                  const SizedBox(height: 16.0),
-                                  Text(
-                                    'No winners yet',
-                                    style: GoogleFonts.montserrat(
-                                      fontSize: 20.0,
-                                      // fontWeight: FontWeight.bold,
-                                      color: const Color(0xff33907c),
-                                    ),
-                                  ),
-                                ],
-                              ),
+                              ],
                             ),
                           ),
                         ),
-                      ],
-                    ),
-                  ],
+                      ),
+                    ],
+                  ),
                 );
               }
 
@@ -619,4 +585,67 @@ class DiagonalClipper extends CustomClipper<Path> {
 
   @override
   bool shouldReclip(CustomClipper<Path> oldClipper) => true;
+}
+
+PreferredSizeWidget _buildAppBar(Size size, context) {
+  return AppBar(
+    toolbarHeight: 70,
+    title: Padding(
+      padding: EdgeInsets.only(
+        right:
+            MediaQuery.of(context).size.width * 0.14, // 55% of the page width
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Stack(
+            children: [
+              ClipPath(
+                clipper: HexagonClipper(),
+                child: Transform.scale(
+                  scale: 0.87,
+                  child: Container(
+                    color: Colors.white,
+                    width: 60,
+                    height: 60,
+                  ),
+                ),
+              ),
+              ClipPath(
+                clipper: HexagonClipper(),
+                child: Image.asset(
+                  'assets/mainlogo.png',
+                  width: 60,
+                  height: 60,
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ],
+          ),
+          // const SizedBox(width: 8),
+        ],
+      ),
+    ),
+    actions: <Widget>[
+      Padding(
+        padding: const EdgeInsets.only(top: 15.0),
+        child: Stack(
+          children: [],
+        ),
+      ),
+    ],
+    flexibleSpace: Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Color(0xff0FA697),
+            Color(0xff45BF7A),
+            Color(0xff0DF205),
+          ],
+        ),
+      ),
+    ),
+  );
 }

@@ -23,6 +23,7 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
     return Consumer<AuthenticationService>(
       builder: (context, authService, _) {
         return WillPopScope(
@@ -34,7 +35,8 @@ class _LoginPageState extends State<LoginPage> {
               child: Scaffold(
                 body: SingleChildScrollView(
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    padding:
+                        EdgeInsets.symmetric(horizontal: size.width * 0.05),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.stretch,

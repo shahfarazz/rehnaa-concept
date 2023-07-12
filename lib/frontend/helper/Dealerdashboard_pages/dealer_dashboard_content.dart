@@ -494,7 +494,7 @@ class _DealerDashboardContentState extends State<DealerDashboardContent>
                                     height: 150,
                                   )
                                 : Image.network(
-                                    fit: BoxFit.fill,
+                                    fit: BoxFit.cover,
                                     dealer.pathToImage!,
                                     width: 150,
                                     height: 150,

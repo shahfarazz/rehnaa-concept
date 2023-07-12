@@ -370,7 +370,7 @@ class _SignUpPageState extends State<SignUpPage> {
     if (!isEmail(emailOrPhone)) {
       final regex = RegExp(r'^(03\d{9}|\+92\d{10})$');
       if (!regex.hasMatch(emailOrPhone)) {
-        return 'Enter a valid Pakistani phone number';
+        return 'Enter a valid Pakistani phone number or email id';
       }
     }
 
