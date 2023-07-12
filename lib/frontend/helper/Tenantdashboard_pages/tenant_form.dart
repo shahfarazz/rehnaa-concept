@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:rehnaa/backend/services/helperfunctions.dart';
 import 'package:rehnaa/frontend/helper/Landlorddashboard_pages/landlord_profile.dart';
@@ -26,15 +27,19 @@ class _TenantFormsState extends State<TenantForms> {
   final TextEditingController _whatAreYouLookingForController =
       TextEditingController();
   //estimatedTimeToShiftBudget
-  final TextEditingController _estimatedTimeToShiftBudgetController =
+  final TextEditingController _estimatedTimeToShiftController =
       TextEditingController();
+  final TextEditingController _estimatedBudgetController =
+      TextEditingController();
+  // String? _cnicError;
 
   @override
   void dispose() {
     _addressController.dispose();
     _cnicController.dispose();
     _whatAreYouLookingForController.dispose();
-    _estimatedTimeToShiftBudgetController.dispose();
+    _estimatedTimeToShiftController.dispose();
+    _estimatedBudgetController.dispose();
     super.dispose();
   }
 
@@ -44,8 +49,8 @@ class _TenantFormsState extends State<TenantForms> {
         'address': _addressController.text,
         'cnic': encryptString(_cnicController.text),
         'whatAreYouLookingFor': _whatAreYouLookingForController.text,
-        'estimatedTimeToShiftBudget':
-            _estimatedTimeToShiftBudgetController.text,
+        'estimatedTimetoShift': _estimatedTimeToShiftController.text,
+        'estimatedBudget': _estimatedBudgetController.text,
         'isDetailsFilled': true,
       };
 
@@ -111,6 +116,11 @@ class _TenantFormsState extends State<TenantForms> {
                     fontFamily: GoogleFonts.montserrat().fontFamily,
                     color: Colors.green),
                 controller: _cnicController,
+                inputFormatters: [
+                  LengthLimitingTextInputFormatter(
+                      13), // Restrict maximum length to 13
+                  FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+                ],
                 decoration: const InputDecoration(
                     labelText: 'CNIC',
                     focusColor: Colors.green,
@@ -124,6 +134,19 @@ class _TenantFormsState extends State<TenantForms> {
                     return 'Please enter a valid CNIC';
                   }
                   return null;
+                },
+                onChanged: (value) {
+                  //if alphabet is entered show an error using toast and clear the field and return
+                  if (value.contains(RegExp(r'[a-zA-Z]'))) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        backgroundColor: Colors.red,
+                        content: Text('Please enter digits only'),
+                      ),
+                    );
+                    _cnicController.clear();
+                    return;
+                  }
                 },
               ),
               const SizedBox(height: 16),
@@ -177,14 +200,48 @@ class _TenantFormsState extends State<TenantForms> {
               //   },
               // ),
 
+              StatefulBuilder(
+                builder: (context, setState) {
+                  return InkWell(
+                    onTap: _openOptionsDialog,
+                    child: Ink(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            Color(0xff0FA697),
+                            Color(0xff45BF7A),
+                            Color(0xff0DF205),
+                          ],
+                        ),
+                      ),
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                          vertical: 10,
+                          horizontal: 20,
+                        ),
+                        child: Text(
+                          _estimatedTimeToShiftController.text == ''
+                              ? 'Estimated Time to Shift'
+                              : _estimatedTimeToShiftController.text,
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontFamily: GoogleFonts.montserrat().fontFamily,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
               TextFormField(
                 style: TextStyle(
                     fontSize: 16,
                     fontFamily: GoogleFonts.montserrat().fontFamily,
                     color: Colors.green),
-                controller: _estimatedTimeToShiftBudgetController,
+                controller: _estimatedBudgetController,
                 decoration: const InputDecoration(
-                    labelText: 'Estimated Time to Shift Budget',
+                    labelText: 'Estimated Rent Budget',
                     focusColor: Colors.green,
                     hoverColor: Colors.green,
                     fillColor: Colors.green,
@@ -193,7 +250,7 @@ class _TenantFormsState extends State<TenantForms> {
                         borderSide: BorderSide(color: Colors.green))),
                 validator: (value) {
                   if (value!.isEmpty) {
-                    return 'Please enter the bank name';
+                    return 'Please enter valid estimated rent budget';
                   }
                   return null;
                 },
@@ -220,23 +277,107 @@ class _TenantFormsState extends State<TenantForms> {
               //   },
               // ),
               const SizedBox(height: 16),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  primary: Colors.green,
-                  onPrimary: Colors.white,
-                  shape: RoundedRectangleBorder(
+              Material(
+                elevation: 4.0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(32.0),
+                ),
+                child: Ink(
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [
+                        Color(0xff0FA697),
+                        Color(0xff45BF7A),
+                        Color(0xff0DF205),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
                     borderRadius: BorderRadius.circular(32.0),
                   ),
-                ),
-                onPressed: _saveForm,
-                child: Text(
-                  'Save',
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontFamily: GoogleFonts.montserrat().fontFamily),
+                  child: InkWell(
+                    onTap: _saveForm,
+                    borderRadius: BorderRadius.circular(32.0),
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                          vertical: 16.0, horizontal: 24.0),
+                      child: Text(
+                        'Save',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontFamily: GoogleFonts.montserrat().fontFamily,
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
               ),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _openOptionsDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: Text(
+                'Select Estimated Time to Shift',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontFamily: GoogleFonts.montserrat().fontFamily,
+                  color: Colors.green,
+                ),
+              ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Divider(),
+                  _buildOption('Time to Shift: 1 month', setState),
+                  Divider(),
+                  _buildOption('Time to Shift: 1-2 months', setState),
+                  Divider(),
+                  _buildOption('Time to Shift: 2-3 months', setState),
+                  Divider(),
+                  _buildOption('Time to Shift: 3-6 months', setState),
+                  Divider(),
+                  _buildOption('Time to Shift: 6+ months', setState),
+                  Divider(),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    ).then((value) {
+      if (value != null) {
+        setState(() {
+          // _selectedOption = value;
+          _estimatedTimeToShiftController.text = value;
+        });
+      }
+    });
+  }
+
+  Widget _buildOption(String option, Function setState) {
+    return InkWell(
+      onTap: () {
+        Navigator.of(context).pop(option);
+      },
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8.0),
+        child: Text(
+          option,
+          style: TextStyle(
+            fontSize: 14,
+            color: Colors.black,
+            fontFamily: GoogleFonts.montserrat().fontFamily,
           ),
         ),
       ),

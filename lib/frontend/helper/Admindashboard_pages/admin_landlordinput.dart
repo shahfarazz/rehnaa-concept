@@ -560,7 +560,7 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
                               {
                                 // 'amount': data.requestedAmount,
                                 'title':
-                                    'Your account has been credited by ${-(double.tryParse(balanceController.text) ?? 0.0) + landlord.balance}',
+                                    'Your account has been debited by ${-(double.tryParse(balanceController.text) ?? 0.0) + landlord.balance}',
                               }
                             ])
                           });
@@ -600,7 +600,7 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
                               {
                                 // 'amount': data.requestedAmount,
                                 'title':
-                                    'Your account has been debited by ${((double.tryParse(balanceController.text) ?? 0.0) - landlord.balance)}',
+                                    'Your account has been credited by ${((double.tryParse(balanceController.text) ?? 0.0) - landlord.balance)}',
                               }
                             ])
                           });

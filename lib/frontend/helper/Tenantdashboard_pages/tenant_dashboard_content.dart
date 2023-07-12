@@ -478,6 +478,7 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                                         )
                                       : Image.network(
                                           tenant.pathToImage!,
+                                          fit: BoxFit.cover,
                                           width: 150,
                                           height: 150,
                                           loadingBuilder: (context, child,

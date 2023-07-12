@@ -648,6 +648,14 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
           String formattedBalance =
               NumberFormat('#,##0').format(landlord.balance);
 
+          // if (formattedBalance == '0') {
+          //   // setState(() {
+          //   // isWithdraw = true;
+          //   // });
+          // }
+
+          // print('idher hon bhai and iswithdraw is $isWithdraw');
+
           // Return the widget tree with the fetched data
           return ResponsiveScaledBox(
               width: size.width,
@@ -688,7 +696,7 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
                                         height: 150,
                                       )
                                     : Image.network(
-                                        fit: BoxFit.fill,
+                                        fit: BoxFit.cover,
                                         landlord.pathToImage!,
                                         width: 150,
                                         height: 150,
@@ -788,6 +796,7 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
                                       child: InkWell(
                                         borderRadius: BorderRadius.circular(20),
                                         onTap: () {
+                                          print('isWithdraw is $isWithdraw');
                                           isWithdraw
                                               ? null
                                               // Navigator.push(

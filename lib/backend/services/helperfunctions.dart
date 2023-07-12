@@ -97,7 +97,7 @@ String decryptString(String input) {
 
     decrypted = encrypter.decrypt64(input, iv: iv);
   } catch (e) {
-    decrypted = "Error with encryption or decryption";
+    decrypted = "No cnic entered yet";
   }
 
   return decrypted;

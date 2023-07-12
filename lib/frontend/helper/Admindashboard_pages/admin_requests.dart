@@ -3,8 +3,11 @@ import 'dart:js_interop';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:rehnaa/frontend/helper/Admindashboard_pages/admin_requests_property_contracts.dart';
+
+import '../../Screens/Admin/admindashboard.dart';
 
 class AdminRequestsPage extends StatefulWidget {
   const AdminRequestsPage({super.key});
@@ -309,174 +312,206 @@ class _AdminRequestsPageState extends State<AdminRequestsPage> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Admin Requests'),
-        flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            // borderRadius: BorderRadius.circular(24),
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Color(0xff0FA697),
-                Color(0xff45BF7A),
-                Color(0xff0DF205),
-              ],
-            ),
-          ),
-        ),
-      ),
-      body: SingleChildScrollView(
-        // child: Padding(
-        // padding: EdgeInsets.fromLTRB(
-        //   // size.width * 0.0,
-        //   // size.height * 0.1,
-        //   0,
-        //   0,
-        // ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Row(
-            //   children: [
-            //     IconButton(
-            //       icon: Icon(
-            //         Icons.arrow_back,
-            //         color: Colors.green,
-            //       ),
-            //       onPressed: () {
-            //         Navigator.pop(context);
-            //       },
-            //     ),
-            //   ],
-            // ),
-            // Padding(
-            //   padding: EdgeInsets.fromLTRB(
-            //     size.width * 0.1,
-            //     size.height * 0.0,
-            //     0,
-            //     0,
-            //   ),
-            //   child: Text(
-            //     'Requests',
-            //     style: TextStyle(
-            //       fontSize: 34,
-            //       fontWeight: FontWeight.bold,
-            //       fontFamily: 'Montserrat',
-            //       color: Colors.green,*
-            //     ),
-            //   ),
-            // ),
-            // SizedBox(height: size.height * 0.07),
-            // Padding(
-            //   padding: EdgeInsets.fromLTRB(
-            //     size.width * 0.1,
-            //     size.height * 0.0,
-            //     0,
-            //     0,
-            //   ),
-            //   child: Text(
-            //     'Withdrawal Requests:',
-            //     style: TextStyle(
-            //       fontSize: 20,
-            //       fontFamily: 'Montserrat',
-            //       fontWeight: FontWeight.bold,
-            //       color: Colors.black,
-            //     ),
-            //   ),
-            // ),
-            const SizedBox(height: 10),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: TextField(
-                controller: searchController,
-                onChanged: filterRequests,
-                decoration: const InputDecoration(
-                  labelText: 'Search(name)',
-                  prefixIcon: Icon(Icons.search),
+
+    return FutureBuilder(
+        future: _getRequests(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(
+              child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(
+                  Color(0xff0FA697),
                 ),
               ),
-            ),
-            const SizedBox(height: 10),
-            getPaginatedRequests().isNotEmpty
-                ? ListView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: getPaginatedRequests().length,
-                    // reverse: true,
-                    itemBuilder: (context, index) {
-                      final request = getPaginatedRequests()[index];
-                      return LandlordWithdrawalCard(data: request);
-                    },
-                  )
-                : Card(
-                    child: Center(
-                        child: Column(
-                    children: [
-                      SizedBox(
-                        height: 20,
-                      ),
-                      Icon(
-                        Icons.warning,
-                        size: 50,
-                        color: Colors.red,
-                      ),
-                      Text(
-                        'No requests found',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: GoogleFonts.montserrat().fontFamily,
-                        ),
-                      ),
-                      SizedBox(
-                        height: 20,
-                      ),
-                    ],
-                  ))),
-            SizedBox(height: size.height * 0.05),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.arrow_back),
-                  onPressed: () {
-                    setState(() {
-                      if (currentPage > 1) {
-                        currentPage--;
-                      }
-                    });
-                  },
-                ),
-                Text(
-                  'Page $currentPage',
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontFamily: 'Montserrat',
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
+            );
+          } else {
+            return Scaffold(
+              appBar: AppBar(
+                title: const Text('Admin Requests'),
+                flexibleSpace: Container(
+                  decoration: const BoxDecoration(
+                    // borderRadius: BorderRadius.circular(24),
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        Color(0xff0FA697),
+                        Color(0xff45BF7A),
+                        Color(0xff0DF205),
+                      ],
+                    ),
                   ),
                 ),
-                IconButton(
-                  icon: const Icon(Icons.arrow_forward),
+                leading: IconButton(
+                  icon: Icon(
+                    Icons.arrow_back,
+                    color: Colors.white,
+                  ),
                   onPressed: () {
-                    setState(() {
-                      final maxPage =
-                          (displayedRequests.length / itemsPerPage).ceil();
-                      if (currentPage < maxPage) {
-                        currentPage++;
-                      }
-                    });
+                    // Navigator.pop(context);
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => AdminDashboard(),
+                      ),
+                    );
                   },
                 ),
-              ],
-            ),
-          ],
-        ),
-      ),
-      // ),
-    );
+              ),
+              body: SingleChildScrollView(
+                // child: Padding(
+                // padding: EdgeInsets.fromLTRB(
+                //   // size.width * 0.0,
+                //   // size.height * 0.1,
+                //   0,
+                //   0,
+                // ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Row(
+                    //   children: [
+                    //     IconButton(
+                    //       icon: Icon(
+                    //         Icons.arrow_back,
+                    //         color: Colors.green,
+                    //       ),
+                    //       onPressed: () {
+                    //         Navigator.pop(context);
+                    //       },
+                    //     ),
+                    //   ],
+                    // ),
+                    // Padding(
+                    //   padding: EdgeInsets.fromLTRB(
+                    //     size.width * 0.1,
+                    //     size.height * 0.0,
+                    //     0,
+                    //     0,
+                    //   ),
+                    //   child: Text(
+                    //     'Requests',
+                    //     style: TextStyle(
+                    //       fontSize: 34,
+                    //       fontWeight: FontWeight.bold,
+                    //       fontFamily: 'Montserrat',
+                    //       color: Colors.green,*
+                    //     ),
+                    //   ),
+                    // ),
+                    // SizedBox(height: size.height * 0.07),
+                    // Padding(
+                    //   padding: EdgeInsets.fromLTRB(
+                    //     size.width * 0.1,
+                    //     size.height * 0.0,
+                    //     0,
+                    //     0,
+                    //   ),
+                    //   child: Text(
+                    //     'Withdrawal Requests:',
+                    //     style: TextStyle(
+                    //       fontSize: 20,
+                    //       fontFamily: 'Montserrat',
+                    //       fontWeight: FontWeight.bold,
+                    //       color: Colors.black,
+                    //     ),
+                    //   ),
+                    // ),
+                    const SizedBox(height: 10),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: TextField(
+                        controller: searchController,
+                        onChanged: filterRequests,
+                        decoration: const InputDecoration(
+                          labelText: 'Search(name)',
+                          prefixIcon: Icon(Icons.search),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    getPaginatedRequests().isNotEmpty
+                        ? ListView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount: getPaginatedRequests().length,
+                            // reverse: true,
+                            itemBuilder: (context, index) {
+                              final request = getPaginatedRequests()[index];
+                              return LandlordWithdrawalCard(data: request);
+                            },
+                          )
+                        : Card(
+                            child: Center(
+                                child: Column(
+                            children: [
+                              SizedBox(
+                                height: 20,
+                              ),
+                              Icon(
+                                Icons.warning,
+                                size: 50,
+                                color: Colors.red,
+                              ),
+                              Text(
+                                'No requests found',
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  fontFamily:
+                                      GoogleFonts.montserrat().fontFamily,
+                                ),
+                              ),
+                              SizedBox(
+                                height: 20,
+                              ),
+                            ],
+                          ))),
+                    SizedBox(height: size.height * 0.05),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.arrow_back),
+                          onPressed: () {
+                            setState(() {
+                              if (currentPage > 1) {
+                                currentPage--;
+                              }
+                            });
+                          },
+                        ),
+                        Text(
+                          'Page $currentPage',
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontFamily: 'Montserrat',
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.arrow_forward),
+                          onPressed: () {
+                            setState(() {
+                              final maxPage =
+                                  (displayedRequests.length / itemsPerPage)
+                                      .ceil();
+                              if (currentPage < maxPage) {
+                                currentPage++;
+                              }
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              // ),
+            );
+          }
+        });
   }
 }
 
@@ -623,6 +658,18 @@ class LandlordWithdrawalCard extends StatelessWidget {
                 onPressed: () async {
                   print('data.uid: ${data.uid}');
                   print('data.requestType: ${data.requestType}');
+
+                  //showdialog with a circular progress indicator
+                  showDialog(
+                    context: context,
+                    builder: (context) {
+                      return const Center(
+                        child: SpinKitFadingCube(
+                          color: Color.fromARGB(255, 30, 197, 83),
+                        ),
+                      );
+                    },
+                  );
 
                   // Handle accept button press
                   //check if i can access the data here by printing all the data
@@ -1172,8 +1219,7 @@ class LandlordWithdrawalCard extends StatelessWidget {
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
-                              builder: (context) =>
-                                  const AdminRequestsPage(), // Return to the admin requests page
+                              builder: (context) => const AdminRequestsPage(),
                             ),
                           );
 
@@ -1183,8 +1229,7 @@ class LandlordWithdrawalCard extends StatelessWidget {
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
-                              builder: (context) =>
-                                  const AdminRequestsPage(), // Return to the admin requests page
+                              builder: (context) => const AdminRequestsPage(),
                             ),
                           );
                         }
@@ -1365,6 +1410,8 @@ class LandlordWithdrawalCard extends StatelessWidget {
                       ),
                     );
                   }
+
+                  // Navigator.pop(context);
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.green,

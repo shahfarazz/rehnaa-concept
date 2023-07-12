@@ -3,7 +3,9 @@ import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as path;
@@ -207,6 +209,22 @@ class _LandlordPropertyFormsState extends State<LandlordPropertyForms> {
               ),
               const SizedBox(height: 16),
               TextFormField(
+                // inputFormatters: [
+                //   FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+                // ],
+                onChanged: (value) {
+                  //if alphabet is entered show an error using toast and clear the field and return
+                  if (value.contains(RegExp(r'[a-zA-Z]'))) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        backgroundColor: Colors.red,
+                        content: Text('Please enter digits only'),
+                      ),
+                    );
+                    _bedsController.clear();
+                    return;
+                  }
+                },
                 cursorColor: Colors.green,
                 style: TextStyle(
                     fontSize: 16,
@@ -244,6 +262,22 @@ class _LandlordPropertyFormsState extends State<LandlordPropertyForms> {
                     fontFamily: GoogleFonts.montserrat().fontFamily,
                     color: Colors.green),
                 controller: _bathsController,
+                // inputFormatters: [
+                //   FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+                // ],
+                onChanged: (value) {
+                  //if alphabet is entered show an error using toast and clear the field and return
+                  if (value.contains(RegExp(r'[a-zA-Z]'))) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        backgroundColor: Colors.red,
+                        content: Text('Please enter digits only'),
+                      ),
+                    );
+                    _bathsController.clear();
+                    return;
+                  }
+                },
                 decoration: const InputDecoration(
                     labelText: 'Number of Bathrooms',
                     focusColor: Colors.green,
@@ -292,6 +326,22 @@ class _LandlordPropertyFormsState extends State<LandlordPropertyForms> {
                     fontFamily: GoogleFonts.montserrat().fontFamily,
                     color: Colors.green),
                 controller: _livingController,
+                // inputFormatters: [
+                //   FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+                // ],
+                onChanged: (value) {
+                  //if alphabet is entered show an error using toast and clear the field and return
+                  if (value.contains(RegExp(r'[a-zA-Z]'))) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        backgroundColor: Colors.red,
+                        content: Text('Please enter digits only'),
+                      ),
+                    );
+                    _livingController.clear();
+                    return;
+                  }
+                },
                 decoration: const InputDecoration(
                     labelText: 'Number of Living Rooms',
                     focusColor: Colors.green,
@@ -318,6 +368,22 @@ class _LandlordPropertyFormsState extends State<LandlordPropertyForms> {
               //number of floors
               TextFormField(
                 cursorColor: Colors.green,
+                // inputFormatters: [
+                //   FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+                // ],
+                onChanged: (value) {
+                  //if alphabet is entered show an error using toast and clear the field and return
+                  if (value.contains(RegExp(r'[a-zA-Z]'))) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        backgroundColor: Colors.red,
+                        content: Text('Please enter digits only'),
+                      ),
+                    );
+                    _floorsController.clear();
+                    return;
+                  }
+                },
                 style: TextStyle(
                     fontSize: 16,
                     fontFamily: GoogleFonts.montserrat().fontFamily,
@@ -354,6 +420,22 @@ class _LandlordPropertyFormsState extends State<LandlordPropertyForms> {
                     fontFamily: GoogleFonts.montserrat().fontFamily,
                     color: Colors.green),
                 controller: _carspaceController,
+                // inputFormatters: [
+                //   FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+                // ],
+                onChanged: (value) {
+                  //if alphabet is entered show an error using toast and clear the field and return
+                  if (value.contains(RegExp(r'[a-zA-Z]'))) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        backgroundColor: Colors.red,
+                        content: Text('Please enter digits only'),
+                      ),
+                    );
+                    _carspaceController.clear();
+                    return;
+                  }
+                },
                 decoration: const InputDecoration(
                     labelText: 'Number of Parking Spaces',
                     focusColor: Colors.green,
@@ -394,13 +476,6 @@ class _LandlordPropertyFormsState extends State<LandlordPropertyForms> {
                     focusedBorder: UnderlineInputBorder(
                         borderSide: BorderSide(color: Colors.green))),
                 validator: (value) {
-                  try {
-                    if (int.tryParse(value!) == null) {
-                      return 'Please enter a valid number';
-                    }
-                  } catch (e) {
-                    return 'Please enter a valid number';
-                  }
                   if (value!.isEmpty) {
                     return 'Please enter a description of the property';
                   }
@@ -439,8 +514,24 @@ class _LandlordPropertyFormsState extends State<LandlordPropertyForms> {
                     fontFamily: GoogleFonts.montserrat().fontFamily,
                     color: Colors.green),
                 controller: _priceController,
+                // inputFormatters: [
+                //   FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+                // ],
+                onChanged: (value) {
+                  //if alphabet is entered show an error using toast and clear the field and return
+                  if (value.contains(RegExp(r'[a-zA-Z]'))) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        backgroundColor: Colors.red,
+                        content: Text('Please enter digits only'),
+                      ),
+                    );
+                    _priceController.clear();
+                    return;
+                  }
+                },
                 decoration: const InputDecoration(
-                    labelText: 'Property Price',
+                    labelText: 'Property Rent Demand',
                     focusColor: Colors.green,
                     hoverColor: Colors.green,
                     fillColor: Colors.green,
@@ -464,12 +555,28 @@ class _LandlordPropertyFormsState extends State<LandlordPropertyForms> {
               const SizedBox(height: 16),
               //area in Marlas
               TextFormField(
+                onChanged: (value) {
+                  //if alphabet is entered show an error using toast and clear the field and return
+                  if (value.contains(RegExp(r'[a-zA-Z]'))) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        backgroundColor: Colors.red,
+                        content: Text('Please enter digits only'),
+                      ),
+                    );
+                    _areaController.clear();
+                    return;
+                  }
+                },
                 cursorColor: Colors.green,
                 style: TextStyle(
                     fontSize: 16,
                     fontFamily: GoogleFonts.montserrat().fontFamily,
                     color: Colors.green),
                 controller: _areaController,
+                // inputFormatters: [
+                //   FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+                // ],
                 decoration: const InputDecoration(
                     labelText: 'Area in Marlas',
                     focusColor: Colors.green,
@@ -501,42 +608,61 @@ class _LandlordPropertyFormsState extends State<LandlordPropertyForms> {
                 builder: (BuildContext context, StateSetter setState) {
                   return Column(
                     children: [
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          primary: Colors.green,
-                          onPrimary: Colors.white,
-                          shape: RoundedRectangleBorder(
+                      Material(
+                        elevation: 4.0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(32.0),
+                        ),
+                        child: Ink(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                const Color(0xff0FA697),
+                                const Color(0xff45BF7A),
+                                const Color(0xff0DF205),
+                              ],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
                             borderRadius: BorderRadius.circular(32.0),
                           ),
-                        ),
-                        onPressed: () {
-                          showDialog(
-                              context: context,
-                              builder: (context2) {
-                                return const SpinKitFadingCube(
-                                  color: Color.fromARGB(255, 30, 197, 83),
+                          child: InkWell(
+                            onTap: () {
+                              showDialog(
+                                context: context,
+                                builder: (context2) {
+                                  return const SpinKitFadingCube(
+                                    color: Color.fromARGB(255, 30, 197, 83),
+                                  );
+                                },
+                              );
+                              uploadImages().then((success) {
+                                Navigator.pop(context);
+                                final message = success
+                                    ? 'Images uploaded successfully'
+                                    : 'Failed to upload images';
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(message),
+                                    backgroundColor: Colors.green,
+                                  ),
                                 );
+                                return;
                               });
-                          uploadImages().then((success) {
-                            Navigator.pop(context);
-                            final message = success
-                                ? 'Images uploaded successfully'
-                                : 'Failed to upload images';
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(message),
-                                backgroundColor: Colors.green,
+                            },
+                            borderRadius: BorderRadius.circular(32.0),
+                            child: Container(
+                              padding: EdgeInsets.symmetric(
+                                  vertical: 16.0, horizontal: 24.0),
+                              child: Text(
+                                'Select Image',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontFamily:
+                                      GoogleFonts.montserrat().fontFamily,
+                                ),
                               ),
-                            );
-
-                            return;
-                          });
-                        },
-                        child: Text(
-                          'Select Image',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontFamily: GoogleFonts.montserrat().fontFamily,
+                            ),
                           ),
                         ),
                       )
@@ -544,23 +670,44 @@ class _LandlordPropertyFormsState extends State<LandlordPropertyForms> {
                   );
                 },
               ),
+              SizedBox(height: size.height * 0.02),
 
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  primary: Colors.green,
-                  onPrimary: Colors.white,
-                  shape: RoundedRectangleBorder(
+              Material(
+                elevation: 4.0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(32.0),
+                ),
+                child: Ink(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        const Color(0xff0FA697),
+                        const Color(0xff45BF7A),
+                        const Color(0xff0DF205),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
                     borderRadius: BorderRadius.circular(32.0),
                   ),
+                  child: InkWell(
+                    onTap: _saveForm,
+                    borderRadius: BorderRadius.circular(32.0),
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                          vertical: 16.0, horizontal: 24.0),
+                      child: Text(
+                        'Save',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontFamily: GoogleFonts.montserrat().fontFamily,
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
-                onPressed: _saveForm,
-                child: Text(
-                  'Save',
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontFamily: GoogleFonts.montserrat().fontFamily),
-                ),
-              ),
+              )
             ],
           ),
         ),
@@ -576,6 +723,15 @@ class _LandlordPropertyFormsState extends State<LandlordPropertyForms> {
       final List<XFile>? selectedImages = await picker.pickMultiImage();
 
       if (selectedImages != null && selectedImages.isNotEmpty) {
+        if (selectedImages.length > 10) {
+          Fluttertoast.showToast(
+            msg: 'You can select up to 10 images',
+            gravity: ToastGravity.BOTTOM,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+          );
+          return false;
+        }
         for (var imageFile in selectedImages) {
           String fileName = path.basename(imageFile.path);
 
