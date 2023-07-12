@@ -82,7 +82,7 @@ class Tenant {
       tasdeeqVerification: json['tasdeeqVerification'] ?? null,
       familyMembers: json['familyMembers'] ?? 0,
       landlordRef: json['landlordRef'],
-      pathToImage: json['pathToImage'] ?? 'assets/defaultimage.png',
+      pathToImage: json['pathToImage'] ?? 'assets/defaulticon.png',
       policeVerification: json['policeVerification'] ?? null,
       dateJoined: json['dateJoined'],
       rentpaymentRef: json['rentpaymentRef'] != null

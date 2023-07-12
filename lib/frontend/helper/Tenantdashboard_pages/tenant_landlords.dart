@@ -194,6 +194,8 @@ class _TenantLandlordsPageState extends State<TenantLandlordsPage> {
                       SingleChildScrollView(
                         physics: AlwaysScrollableScrollPhysics(),
                         child: Card(
+                          margin: const EdgeInsets.all(16.0),
+                          elevation: 4.0,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(20.0),
                           ),

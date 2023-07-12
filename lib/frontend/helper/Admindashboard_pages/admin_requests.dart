@@ -228,6 +228,37 @@ class _AdminRequestsPageState extends State<AdminRequestsPage> {
           }
         }
 
+        //try catch for propertyApprovalRequest
+        try {
+          if (doc["propertyApprovalRequest"] != null) {
+            for (var i = 0; i < doc["propertyApprovalRequest"].length; i++) {
+              // add each request to the adminRequests list
+
+              adminRequests.add(
+                AdminRequestData(
+                  name: doc["propertyApprovalRequest"][i]["fullname"],
+                  // requestedAmount:
+                  //     doc["propertyApprovalRequest"][i]["amount"].toString(),
+                  uid: doc["propertyApprovalRequest"][i]["uid"],
+                  // cashOrBankTransfer: doc["propertyApprovalRequest"][i]
+                  //     ["paymentMethod"],
+                  requestID: doc.id,
+                  requestType: 'Property Approval Request',
+                  // invoiceNumber: doc["propertyApprovalRequest"][i]["invoiceNumber"],
+                  withinArrayID: doc["propertyApprovalRequest"][i]["requestID"],
+                  // altTenantName: doc["propertyApprovalRequest"][i]["tenantname"],
+                  docTimestamp: doc["propertyApprovalRequest"][i]["timestamp"],
+                  dataFields: doc["propertyApprovalRequest"][i]["dataFields"],
+                ),
+              );
+            }
+          }
+        } catch (e) {
+          if (kDebugMode) {
+            print('Error222: $e');
+          }
+        }
+
         //TODO add other states of requests if needed
       }
       setState(() {
@@ -465,6 +496,7 @@ class AdminRequestData {
   String? altTenantName;
   String? withinArrayID;
   Timestamp docTimestamp;
+  var dataFields;
 
   AdminRequestData({
     required this.name,
@@ -481,6 +513,7 @@ class AdminRequestData {
     this.altTenantName,
     this.withinArrayID,
     required this.docTimestamp,
+    this.dataFields,
   });
 }
 
@@ -590,6 +623,7 @@ class LandlordWithdrawalCard extends StatelessWidget {
                 onPressed: () async {
                   print('data.uid: ${data.uid}');
                   print('data.requestType: ${data.requestType}');
+
                   // Handle accept button press
                   //check if i can access the data here by printing all the data
                   // print all possible fields in the data object
@@ -980,8 +1014,6 @@ class LandlordWithdrawalCard extends StatelessWidget {
                       );
                     } else if (data.requestType ==
                         'Interest Free Loan Request') {
-                      //interest free loan request
-
                       //remove the withdrawal request
 
                       FirebaseFirestore.instance
@@ -1026,7 +1058,139 @@ class LandlordWithdrawalCard extends StatelessWidget {
                           builder: (context) => const AdminRequestsPage(),
                         ),
                       );
+                    } else if (data.requestType ==
+                        'Property Approval Request') {
+                      //property approval request
+
+                      print('reached here222');
+
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: Text('Admin Approval'),
+                            content: SizedBox(
+                              width: double.maxFinite,
+                              child: ListView.builder(
+                                shrinkWrap: true,
+                                itemCount: data.dataFields.length,
+                                itemBuilder: (BuildContext context, int index) {
+                                  String key =
+                                      data.dataFields.keys.elementAt(index);
+                                  dynamic value =
+                                      data.dataFields.values.elementAt(index);
+
+                                  return ListTile(
+                                    title: Text(key),
+                                    subtitle: Text(value.toString()),
+                                  );
+                                },
+                              ),
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.of(context)
+                                      .pop(false); // Return false if rejected
+                                },
+                                child: Text('Reject'),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.of(context)
+                                      .pop(true); // Return true if approved
+                                },
+                                child: Text('Approve'),
+                              ),
+                            ],
+                          );
+                        },
+                      ).then((value) {
+                        if (value == true) {
+                          // Continue with the code below
+                          //remove the withdrawal request
+
+                          FirebaseFirestore.instance
+                              .collection('AdminRequests')
+                              .doc(data.requestID)
+                              .get()
+                              .then((snapshot) {
+                            if (snapshot.exists) {
+                              final List<dynamic> withdrawRequestArray =
+                                  snapshot.get('propertyApprovalRequest') ?? [];
+
+                              final updatedArray = List.from(
+                                  withdrawRequestArray)
+                                ..removeWhere((element) =>
+                                    element['requestID'] == data.withinArrayID);
+
+                              FirebaseFirestore.instance
+                                  .collection('AdminRequests')
+                                  .doc(data.requestID)
+                                  .update({
+                                'propertyApprovalRequest': updatedArray
+                              });
+                            }
+                          });
+                          //send a notification to the landlord
+                          // by accessing the landlord's uid on Collection 'Notifications'
+                          // and appending to the array called 'notifications' which has fields amount and title
+                          FirebaseFirestore.instance
+                              .collection('Notifications')
+                              .doc(data.uid)
+                              .update({
+                            'notifications': FieldValue.arrayUnion([
+                              {
+                                // 'amount': data.requestedAmount,
+                                'title': 'Property Approval Request Accepted',
+                              }
+                            ])
+                          });
+                          //create document of property in the Properties collection
+                          //with the dataFields of the request
+
+                          //create a new doc in the properties collection
+                          //and save its uid and then save the dataFields in it
+                          var docRef = FirebaseFirestore.instance
+                              .collection('Properties')
+                              .doc();
+
+                          var landlordRef = FirebaseFirestore.instance
+                              .collection('Landlords')
+                              .doc(data.uid);
+
+                          docRef.set(data.dataFields);
+                          docRef.update({
+                            'landlordRef': landlordRef,
+                            'imagePath': data.dataFields['pathToImage']
+                          });
+                          landlordRef.update({
+                            'propertyRef': FieldValue.arrayUnion([docRef]),
+                          });
+
+                          //reset the state of the page
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  const AdminRequestsPage(), // Return to the admin requests page
+                            ),
+                          );
+
+                          //
+                        } else {
+                          // Return to the admin requests page
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  const AdminRequestsPage(), // Return to the admin requests page
+                            ),
+                          );
+                        }
+                      });
                     }
+                    print('property.requestType is ${data.requestType}');
                   } else if (data.requestType == 'Tenant Rental Request') {
                     //rental request
 

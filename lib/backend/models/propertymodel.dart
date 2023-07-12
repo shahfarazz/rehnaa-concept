@@ -66,9 +66,11 @@ class Property {
       location: json['location'],
       price: json['price'].toDouble() ?? 0.0,
       landlordRef: json['landlordRef'],
-      rehnaaRating: json['rehnaaRating'].toDouble(),
-      tenantRating: json['tenantRating'].toDouble(),
-      tenantReview: json['tenantReview'],
+      rehnaaRating:
+          json['rehnaaRating'] == null ? 0.0 : json['rehnaaRating'].toDouble(),
+      tenantRating:
+          json['tenantRating'] == null ? 0.0 : json['tenantRating'].toDouble(),
+      tenantReview: json['tenantReview'] ?? 'No review provided',
       address: json['address'] ?? 'No address provided',
       tenantRef: json['tenantRef'],
       area: json['area'] ?? 0.0,

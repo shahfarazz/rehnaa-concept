@@ -21,7 +21,9 @@ import '../../Screens/splash.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 
+import '../Tenantdashboard_pages/tenant_form.dart';
 import 'landlord_camera_helper.dart';
+import 'landlord_form.dart';
 
 class LandlordProfilePage extends StatefulWidget {
   final String uid;
@@ -226,7 +228,7 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
     final String fileName = 'users/${widget.uid}/profile_image.jpg';
 
     try {
-      // Upload the image to Firebase Storage
+      // Upload the image to Firebase Storage in the users folder with uid as the name
       final Reference storageReference =
           FirebaseStorage.instance.ref().child(fileName);
       final UploadTask uploadTask =
@@ -514,11 +516,11 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
                 onTap: () async {
                   showDialog(
                     context: context,
-                    barrierDismissible: false,
+                    barrierDismissible: true,
                     builder: (BuildContext context) {
                       return WillPopScope(
                         onWillPop: () async => Future.value(
-                            false), // Disable back button during upload
+                            true), // Disable back button during upload
                         child: AlertDialog(
                           title: Text(
                             'Uploading Image',
@@ -679,11 +681,12 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
           final description = docData['description'] as String? ?? '';
 
           final isEmail = authService.isEmail(emailOrPhone);
+          var isDetailsFilled = docData['isDetailsFilled'] as bool? ?? false;
           // final isPhoneNumber = authService.isPhoneNumber(emailOrPhone);
           String contactInfo = '';
 
           if (isEmail) {
-            contactInfo = 'Email: $emailOrPhone';
+            contactInfo = '$emailOrPhone';
           } else {
             contactInfo = 'Phone: $emailOrPhone';
           }
@@ -772,6 +775,7 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
                               ),
                             ),
                             const SizedBox(height: 20),
+
                             Text(
                               '$firstName $lastName',
                               style: TextStyle(
@@ -788,34 +792,75 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
                                   fontFamily:
                                       GoogleFonts.montserrat().fontFamily),
                             ),
-                            const SizedBox(height: 20),
+
+                            // const SizedBox(height: 20),
+                            //add a dummy floating action button for now
+
                             const Divider(),
                             ProfileInfoItem(
                               icon: Icons.email,
                               title: isEmail ? 'Email' : 'Contact',
                               subtitle: contactInfo,
                             ),
-                            FutureBuilder<String>(
-                              future: _getLocation(),
-                              builder: (BuildContext context,
-                                  AsyncSnapshot<String> snapshot) {
-                                if (snapshot.connectionState ==
-                                    ConnectionState.waiting) {
-                                  return const SpinKitFadingCube(
-                                    color: Color.fromARGB(255, 30, 197, 83),
-                                  );
-                                } else if (snapshot.hasError ||
-                                    snapshot.data == null) {
-                                  return Container(); // Empty container, the item will not be shown
-                                } else {
-                                  return ProfileInfoItem(
-                                    icon: Icons.location_on,
-                                    title: 'Location',
-                                    subtitle:
-                                        snapshot.data ?? '', // The location
-                                  );
-                                }
-                              },
+                            Stack(
+                              alignment: Alignment.centerRight,
+                              children: [
+                                FutureBuilder<String>(
+                                  future: _getLocation(),
+                                  builder: (BuildContext context,
+                                      AsyncSnapshot<String> snapshot) {
+                                    if (snapshot.connectionState ==
+                                        ConnectionState.waiting) {
+                                      return const SpinKitFadingCube(
+                                        color: Color.fromARGB(255, 30, 197, 83),
+                                      );
+                                    } else if (snapshot.hasError ||
+                                        snapshot.data == null) {
+                                      return Container(); // Empty container, the item will not be shown
+                                    } else {
+                                      return ProfileInfoItem(
+                                        icon: Icons.location_on,
+                                        title: 'Location',
+                                        subtitle:
+                                            snapshot.data ?? '', // The location
+                                      );
+                                    }
+                                  },
+                                ),
+                                !isDetailsFilled
+                                    ? FloatingActionButton(
+                                        backgroundColor: Color(0xFF45BF7A),
+                                        onPressed: () {
+                                          if (widget.callerType ==
+                                              'Landlords') {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    LandlordForms(
+                                                  uid: widget.uid,
+                                                ),
+                                              ),
+                                            );
+                                          }
+                                          if (widget.callerType == 'Tenants') {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    TenantForms(
+                                                  uid: widget.uid,
+                                                ),
+                                              ),
+                                            );
+                                          }
+                                        },
+                                        child: const Icon(
+                                          Icons.add,
+                                        ),
+                                      )
+                                    : Container(),
+                              ],
                             ),
                             StatefulBuilder(
                               builder:

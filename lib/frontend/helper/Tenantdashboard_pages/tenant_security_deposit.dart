@@ -180,7 +180,22 @@ class _TenantSecurityDepositPageState extends State<TenantSecurityDepositPage> {
                             child: InkWell(
                               borderRadius: BorderRadius.circular(30.0),
                               onTap: () {
-                                if (isApplySecurity) {
+                                if (isApplySecurity || depositAmount == 0) {
+                                  //show snackbar that either already applied or deposit amount is 0
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        'Either you have already applied or your deposit amount is 0',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontFamily: GoogleFonts.montserrat()
+                                              .fontFamily,
+                                        ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                      backgroundColor: Colors.red,
+                                    ),
+                                  );
                                   return;
                                 }
                                 // Handle button press

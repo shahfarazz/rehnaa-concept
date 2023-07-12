@@ -35,8 +35,8 @@ class _NewVouchersPageState extends State<NewVouchersPage> {
         .get()
         .then((value) {
       setState(() {
-        images = value.data()?['urls'];
-        imageNames = value.data()?['names'];
+        images = value.data()?['urls'] ?? [];
+        imageNames = value.data()?['names'] ?? [];
         isLoading = false;
       });
     });
@@ -80,7 +80,47 @@ class _NewVouchersPageState extends State<NewVouchersPage> {
               ],
             )
           : images.length == 0
-              ? Center(child: Text('No Vouchers Available Yet'))
+              ? Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Card(
+                          elevation: 4.0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20.0),
+                          ),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20.0),
+                              color: Colors.white,
+                            ),
+                            padding: const EdgeInsets.all(16.0),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(
+                                  Icons.error_outline,
+                                  size: 48.0,
+                                  color: Color(0xff33907c),
+                                ),
+                                const SizedBox(height: 16.0),
+                                Text(
+                                  'No Vouchers available yet',
+                                  style: GoogleFonts.montserrat(
+                                    fontSize: 20.0,
+                                    color: const Color(0xff33907c),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                )
               : Column(
                   children: [
                     Padding(
