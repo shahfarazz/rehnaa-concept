@@ -374,7 +374,10 @@ class PropertyDetails extends StatelessWidget {
                     Text(
                       property.description,
                       style: GoogleFonts.montserrat(),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 3,
                     ),
+
                     SizedBox(height: screenHeight * 0.03),
                     Text(
                       property.location,

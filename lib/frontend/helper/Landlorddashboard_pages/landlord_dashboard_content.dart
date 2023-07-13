@@ -737,7 +737,7 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
                           ),
                         ),
                       ),
-                      SizedBox(height: size.height * 0.02),
+                      // SizedBox(height: size.height * 0.02),
                     ],
                   ),
                   Center(

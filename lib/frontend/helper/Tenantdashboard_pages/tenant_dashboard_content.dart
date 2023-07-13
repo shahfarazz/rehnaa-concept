@@ -517,7 +517,7 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                             ),
                           ),
                         ),
-                        SizedBox(height: size.height * 0.02),
+                        // SizedBox(height: size.height * 0.02),
                       ],
                     ),
                     Center(
