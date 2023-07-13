@@ -503,7 +503,7 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
                             {
                               // 'amount': data.requestedAmount,
                               'title':
-                                  'Your account has been debited by ${((double.tryParse(rentController.text) ?? 0.0) - tenant.balance)}',
+                                  '${tenant.firstName}, you owe PKR${((double.tryParse(rentController.text) ?? 0.0) - tenant.balance)} to ${tenant.landlord?.firstName}. Thanks!',
                             }
                           ])
                         });

@@ -468,7 +468,7 @@ class PropertyDetails extends StatelessWidget {
                           const Icon(Icons.star, color: Colors.amber),
                           const SizedBox(width: 8),
                           Text(
-                            'Rehnaa Rating: ${property.rehnaaRating}',
+                            'Rehnaa Rating: ${property.rehnaaRating}/10',
                             style: GoogleFonts.montserrat(
                               fontSize: 14,
                             ),
@@ -481,7 +481,7 @@ class PropertyDetails extends StatelessWidget {
                           const Icon(Icons.star, color: Colors.amber),
                           const SizedBox(width: 8),
                           Text(
-                            'Past Tenant Rating: ${property.tenantRating}',
+                            'Past Tenant Rating: ${property.tenantRating}/10',
                             style: GoogleFonts.montserrat(
                               // fontStyle: FontStyle.italic,
                               fontSize: 14,
@@ -525,7 +525,7 @@ class PropertyDetails extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Text(
-                    property.price.toString(),
+                    "PKR.${property.price.toString()}",
                     style: GoogleFonts.montserrat(),
                   ),
                 ),

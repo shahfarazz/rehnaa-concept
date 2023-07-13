@@ -313,205 +313,203 @@ class _AdminRequestsPageState extends State<AdminRequestsPage> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
 
-    return FutureBuilder(
-        future: _getRequests(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(
-              child: CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(
-                  Color(0xff0FA697),
-                ),
+    // return FutureBuilder(
+    //     future: _getRequests(),
+    //     builder: (context, snapshot) {
+    //       if (snapshot.connectionState == ConnectionState.waiting) {
+    //         return Center(
+    //           child: CircularProgressIndicator(
+    //             valueColor: AlwaysStoppedAnimation<Color>(
+    //               Color(0xff0FA697),
+    //             ),
+    //           ),
+    //         );
+    //       } else {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Admin Requests'),
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            // borderRadius: BorderRadius.circular(24),
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Color(0xff0FA697),
+                Color(0xff45BF7A),
+                Color(0xff0DF205),
+              ],
+            ),
+          ),
+        ),
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back,
+            color: Colors.white,
+          ),
+          onPressed: () {
+            // Navigator.pop(context);
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => AdminDashboard(),
               ),
             );
-          } else {
-            return Scaffold(
-              appBar: AppBar(
-                title: const Text('Admin Requests'),
-                flexibleSpace: Container(
-                  decoration: const BoxDecoration(
-                    // borderRadius: BorderRadius.circular(24),
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        Color(0xff0FA697),
-                        Color(0xff45BF7A),
-                        Color(0xff0DF205),
-                      ],
-                    ),
-                  ),
+          },
+        ),
+      ),
+      body: SingleChildScrollView(
+        // child: Padding(
+        // padding: EdgeInsets.fromLTRB(
+        //   // size.width * 0.0,
+        //   // size.height * 0.1,
+        //   0,
+        //   0,
+        // ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Row(
+            //   children: [
+            //     IconButton(
+            //       icon: Icon(
+            //         Icons.arrow_back,
+            //         color: Colors.green,
+            //       ),
+            //       onPressed: () {
+            //         Navigator.pop(context);
+            //       },
+            //     ),
+            //   ],
+            // ),
+            // Padding(
+            //   padding: EdgeInsets.fromLTRB(
+            //     size.width * 0.1,
+            //     size.height * 0.0,
+            //     0,
+            //     0,
+            //   ),
+            //   child: Text(
+            //     'Requests',
+            //     style: TextStyle(
+            //       fontSize: 34,
+            //       fontWeight: FontWeight.bold,
+            //       fontFamily: 'Montserrat',
+            //       color: Colors.green,*
+            //     ),
+            //   ),
+            // ),
+            // SizedBox(height: size.height * 0.07),
+            // Padding(
+            //   padding: EdgeInsets.fromLTRB(
+            //     size.width * 0.1,
+            //     size.height * 0.0,
+            //     0,
+            //     0,
+            //   ),
+            //   child: Text(
+            //     'Withdrawal Requests:',
+            //     style: TextStyle(
+            //       fontSize: 20,
+            //       fontFamily: 'Montserrat',
+            //       fontWeight: FontWeight.bold,
+            //       color: Colors.black,
+            //     ),
+            //   ),
+            // ),
+            const SizedBox(height: 10),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: TextField(
+                controller: searchController,
+                onChanged: filterRequests,
+                decoration: const InputDecoration(
+                  labelText: 'Search(name)',
+                  prefixIcon: Icon(Icons.search),
                 ),
-                leading: IconButton(
-                  icon: Icon(
-                    Icons.arrow_back,
-                    color: Colors.white,
-                  ),
-                  onPressed: () {
-                    // Navigator.pop(context);
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => AdminDashboard(),
+              ),
+            ),
+            const SizedBox(height: 10),
+            getPaginatedRequests().isNotEmpty
+                ? ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: getPaginatedRequests().length,
+                    // reverse: true,
+                    itemBuilder: (context, index) {
+                      final request = getPaginatedRequests()[index];
+                      return LandlordWithdrawalCard(data: request);
+                    },
+                  )
+                : Card(
+                    child: Center(
+                        child: Column(
+                    children: [
+                      SizedBox(
+                        height: 20,
                       ),
-                    );
+                      Icon(
+                        Icons.warning,
+                        size: 50,
+                        color: Colors.red,
+                      ),
+                      Text(
+                        'No requests found',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: GoogleFonts.montserrat().fontFamily,
+                        ),
+                      ),
+                      SizedBox(
+                        height: 20,
+                      ),
+                    ],
+                  ))),
+            SizedBox(height: size.height * 0.05),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.arrow_back),
+                  onPressed: () {
+                    setState(() {
+                      if (currentPage > 1) {
+                        currentPage--;
+                      }
+                    });
                   },
                 ),
-              ),
-              body: SingleChildScrollView(
-                // child: Padding(
-                // padding: EdgeInsets.fromLTRB(
-                //   // size.width * 0.0,
-                //   // size.height * 0.1,
-                //   0,
-                //   0,
-                // ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Row(
-                    //   children: [
-                    //     IconButton(
-                    //       icon: Icon(
-                    //         Icons.arrow_back,
-                    //         color: Colors.green,
-                    //       ),
-                    //       onPressed: () {
-                    //         Navigator.pop(context);
-                    //       },
-                    //     ),
-                    //   ],
-                    // ),
-                    // Padding(
-                    //   padding: EdgeInsets.fromLTRB(
-                    //     size.width * 0.1,
-                    //     size.height * 0.0,
-                    //     0,
-                    //     0,
-                    //   ),
-                    //   child: Text(
-                    //     'Requests',
-                    //     style: TextStyle(
-                    //       fontSize: 34,
-                    //       fontWeight: FontWeight.bold,
-                    //       fontFamily: 'Montserrat',
-                    //       color: Colors.green,*
-                    //     ),
-                    //   ),
-                    // ),
-                    // SizedBox(height: size.height * 0.07),
-                    // Padding(
-                    //   padding: EdgeInsets.fromLTRB(
-                    //     size.width * 0.1,
-                    //     size.height * 0.0,
-                    //     0,
-                    //     0,
-                    //   ),
-                    //   child: Text(
-                    //     'Withdrawal Requests:',
-                    //     style: TextStyle(
-                    //       fontSize: 20,
-                    //       fontFamily: 'Montserrat',
-                    //       fontWeight: FontWeight.bold,
-                    //       color: Colors.black,
-                    //     ),
-                    //   ),
-                    // ),
-                    const SizedBox(height: 10),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: TextField(
-                        controller: searchController,
-                        onChanged: filterRequests,
-                        decoration: const InputDecoration(
-                          labelText: 'Search(name)',
-                          prefixIcon: Icon(Icons.search),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    getPaginatedRequests().isNotEmpty
-                        ? ListView.builder(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            itemCount: getPaginatedRequests().length,
-                            // reverse: true,
-                            itemBuilder: (context, index) {
-                              final request = getPaginatedRequests()[index];
-                              return LandlordWithdrawalCard(data: request);
-                            },
-                          )
-                        : Card(
-                            child: Center(
-                                child: Column(
-                            children: [
-                              SizedBox(
-                                height: 20,
-                              ),
-                              Icon(
-                                Icons.warning,
-                                size: 50,
-                                color: Colors.red,
-                              ),
-                              Text(
-                                'No requests found',
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                  fontFamily:
-                                      GoogleFonts.montserrat().fontFamily,
-                                ),
-                              ),
-                              SizedBox(
-                                height: 20,
-                              ),
-                            ],
-                          ))),
-                    SizedBox(height: size.height * 0.05),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.arrow_back),
-                          onPressed: () {
-                            setState(() {
-                              if (currentPage > 1) {
-                                currentPage--;
-                              }
-                            });
-                          },
-                        ),
-                        Text(
-                          'Page $currentPage',
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontFamily: 'Montserrat',
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
-                          ),
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.arrow_forward),
-                          onPressed: () {
-                            setState(() {
-                              final maxPage =
-                                  (displayedRequests.length / itemsPerPage)
-                                      .ceil();
-                              if (currentPage < maxPage) {
-                                currentPage++;
-                              }
-                            });
-                          },
-                        ),
-                      ],
-                    ),
-                  ],
+                Text(
+                  'Page $currentPage',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontFamily: 'Montserrat',
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
                 ),
-              ),
-              // ),
-            );
-          }
-        });
+                IconButton(
+                  icon: const Icon(Icons.arrow_forward),
+                  onPressed: () {
+                    setState(() {
+                      final maxPage =
+                          (displayedRequests.length / itemsPerPage).ceil();
+                      if (currentPage < maxPage) {
+                        currentPage++;
+                      }
+                    });
+                  },
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+      // ),
+    );
+    //   }
+    // });
   }
 }
 

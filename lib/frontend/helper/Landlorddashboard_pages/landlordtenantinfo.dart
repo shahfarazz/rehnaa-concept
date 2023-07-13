@@ -86,7 +86,7 @@ class LandlordTenantInfoPage extends StatelessWidget {
                                   height: 150,
                                 )
                               : Image.network(
-                                  fit: BoxFit.fill,
+                                  fit: BoxFit.cover,
                                   tenant.pathToImage!,
                                   width: 150,
                                   height: 150,
@@ -180,7 +180,7 @@ class LandlordTenantInfoPage extends StatelessWidget {
                             child: WhiteBox(
                               icon: Icons.email,
                               iconColor: const Color(0xff33907c),
-                              label: 'Contact Number',
+                              label: 'Email/Phone Number',
                               value: tenant.emailOrPhone!,
                             ),
                           ),

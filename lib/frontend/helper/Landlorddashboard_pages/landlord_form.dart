@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:rehnaa/backend/services/helperfunctions.dart';
 
@@ -20,13 +21,13 @@ class _LandlordFormsState extends State<LandlordForms> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _addressController = TextEditingController();
   final TextEditingController _cnicController = TextEditingController();
-  final TextEditingController _propertyAddressController =
-      TextEditingController();
+  // final TextEditingController _propertyAddressController =
+  //     TextEditingController();
   // final TextEditingController _rentDemandController = TextEditingController();
   // //bankName
-  final TextEditingController _bankNameController = TextEditingController();
+  final TextEditingController _phoneNumberController = TextEditingController();
   //raastId
-  final TextEditingController _raastIdController = TextEditingController();
+  // final TextEditingController _raastIdController = TextEditingController();
   // //accountNumber
   // final TextEditingController _accountNumberController =
   //     TextEditingController();
@@ -39,9 +40,9 @@ class _LandlordFormsState extends State<LandlordForms> {
   void dispose() {
     _addressController.dispose();
     _cnicController.dispose();
-    _propertyAddressController.dispose();
-    // _bankNameController.dispose();
-    _raastIdController.dispose();
+    _phoneNumberController.dispose();
+    // _phoneNumberController.dispose();
+    // _raastIdController.dispose();
     super.dispose();
   }
 
@@ -50,13 +51,14 @@ class _LandlordFormsState extends State<LandlordForms> {
       final data = {
         'address': _addressController.text,
         'cnic': encryptString(_cnicController.text),
-        'propertyAddress': _propertyAddressController.text,
+        // 'propertyAddress': _propertyAddressController.text,
         // 'rentDemand': _rentDemandController.text,
-        // 'bankName': encryptString(_bankNameController.text),
+        // 'bankName': encryptString(_phoneNumberController.text),
         // 'raastId': _raastIdController.text,
         // 'accountNumber': encryptString(_accountNumberController.text),
         // 'iban': encryptString(_ibanController.text),
         // 'rating': _ratingController.text,
+        'phoneNumber': _phoneNumberController.text,
         'isDetailsFilled': true,
       };
 
@@ -71,13 +73,34 @@ class _LandlordFormsState extends State<LandlordForms> {
             MaterialPageRoute(
                 builder: (context) => LandlordDashboardPage(uid: widget.uid)));
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Data saved successfully')),
-        );
+        // ScaffoldMessenger.of(context).showSnackBar(
+        //   SnackBar(content: Text('Data saved successfully')),
+        // );
+
+        //replace with a green flutter toast
+        Fluttertoast.showToast(
+            msg: "Data saved successfully",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            backgroundColor: Colors.green,
+            textColor: Colors.white,
+            fontSize: 16.0);
+
+        return;
       } catch (error) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('An error occurred while saving data')),
-        );
+        // ScaffoldMessenger.of(context).showSnackBar(
+        //   SnackBar(content: Text('An error occurred while saving data')),
+        // );
+        //replace with a red flutter toast
+        Fluttertoast.showToast(
+            msg: "An error occurred while saving data",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 16.0);
+
+        return;
       }
     }
   }
@@ -93,6 +116,7 @@ class _LandlordFormsState extends State<LandlordForms> {
           key: _formKey,
           child: ListView(
             children: [
+              const SizedBox(height: 16),
               TextFormField(
                 cursorColor: Colors.green,
                 style: TextStyle(
@@ -115,6 +139,7 @@ class _LandlordFormsState extends State<LandlordForms> {
                   return null;
                 },
               ),
+              const SizedBox(height: 16),
               TextFormField(
                 style: TextStyle(
                   fontSize: 16,
@@ -140,12 +165,23 @@ class _LandlordFormsState extends State<LandlordForms> {
                 onChanged: (value) {
                   //if alphabet is entered show an error using toast and clear the field and return
                   if (value.contains(RegExp(r'[a-zA-Z]'))) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
+                    // ScaffoldMessenger.of(context).showSnackBar(
+                    //   SnackBar(
+                    //     backgroundColor: Colors.red,
+                    //     content: Text(
+                    //       'Please enter digits only',
+                    //       textAlign: TextAlign.center,
+                    //     ),
+                    //   ),
+                    // );
+                    //replace with a red flutter toast
+                    Fluttertoast.showToast(
+                        msg: "Please enter digits only",
+                        toastLength: Toast.LENGTH_SHORT,
+                        gravity: ToastGravity.BOTTOM,
                         backgroundColor: Colors.red,
-                        content: Text('Please enter digits only'),
-                      ),
-                    );
+                        textColor: Colors.white,
+                        fontSize: 16.0);
                     _cnicController.clear();
                     return;
                   }
@@ -157,23 +193,30 @@ class _LandlordFormsState extends State<LandlordForms> {
                   return null;
                 },
               ),
-
               const SizedBox(height: 16),
-              Text(
-                'Property Details',
-                style: TextStyle(
-                    fontSize: 16,
-                    fontFamily: GoogleFonts.montserrat().fontFamily,
-                    color: Colors.green),
-              ),
               TextFormField(
                 style: TextStyle(
                     fontSize: 16,
                     fontFamily: GoogleFonts.montserrat().fontFamily,
                     color: Colors.green),
-                controller: _propertyAddressController,
+                controller: _phoneNumberController,
+                onChanged: (value) {
+                  //if alphabet is entered show an error using toast and clear the field and return
+                  if (value.contains(RegExp(r'[a-zA-Z]'))) {
+                    // replace with a red flutter toast
+                    Fluttertoast.showToast(
+                        msg: "Please enter digits only",
+                        toastLength: Toast.LENGTH_SHORT,
+                        gravity: ToastGravity.BOTTOM,
+                        backgroundColor: Colors.red,
+                        textColor: Colors.white,
+                        fontSize: 16.0);
+                    _phoneNumberController.clear();
+                    return;
+                  }
+                },
                 decoration: const InputDecoration(
-                    labelText: 'Property Address',
+                    labelText: 'Phone number',
                     focusColor: Colors.green,
                     hoverColor: Colors.green,
                     fillColor: Colors.green,
@@ -182,96 +225,11 @@ class _LandlordFormsState extends State<LandlordForms> {
                         borderSide: BorderSide(color: Colors.green))),
                 validator: (value) {
                   if (value!.isEmpty) {
-                    return 'Please enter a property address';
+                    return 'Please enter the phone number';
                   }
                   return null;
                 },
               ),
-              // TextFormField(
-              //   style: TextStyle(
-              //       fontSize: 16,
-              //       fontFamily: GoogleFonts.montserrat().fontFamily,
-              //       color: Colors.green),
-              //   controller: _rentDemandController,
-              //   decoration: const InputDecoration(
-              //       labelText: 'Rent Demand for the Property',
-              //       focusColor: Colors.green,
-              //       hoverColor: Colors.green,
-              //       fillColor: Colors.green,
-              //       labelStyle: TextStyle(color: Colors.grey),
-              //       focusedBorder: UnderlineInputBorder(
-              //           borderSide: BorderSide(color: Colors.green))),
-              //   validator: (value) {
-              //     if (value!.isEmpty) {
-              //       return 'Please enter the rent demand for the property';
-              //     }
-              //     return null;
-              //   },
-              // ),
-
-              TextFormField(
-                style: TextStyle(
-                    fontSize: 16,
-                    fontFamily: GoogleFonts.montserrat().fontFamily,
-                    color: Colors.green),
-                controller: _bankNameController,
-                decoration: const InputDecoration(
-                    labelText: 'Bank Name',
-                    focusColor: Colors.green,
-                    hoverColor: Colors.green,
-                    fillColor: Colors.green,
-                    labelStyle: TextStyle(color: Colors.grey),
-                    focusedBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: Colors.green))),
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Please enter the bank name';
-                  }
-                  return null;
-                },
-              ),
-              // TextFormField(
-              //   style: TextStyle(
-              //       fontSize: 16,
-              //       fontFamily: GoogleFonts.montserrat().fontFamily,
-              //       color: Colors.green),
-              //   controller: _raastIdController,
-              //   decoration: const InputDecoration(
-              //       labelText: 'Raast ID',
-              //       focusColor: Colors.green,
-              //       hoverColor: Colors.green,
-              //       fillColor: Colors.green,
-              //       labelStyle: TextStyle(color: Colors.grey),
-              //       focusedBorder: UnderlineInputBorder(
-              //           borderSide: BorderSide(color: Colors.green))),
-              //   validator: (value) {
-              //     if (value!.isEmpty) {
-              //       return 'Please enter the Raast ID';
-              //     }
-              //     return null;
-              //   },
-              // ),
-              // TextFormField(
-              //   style: TextStyle(
-              //       fontSize: 16,
-              //       fontFamily: GoogleFonts.montserrat().fontFamily,
-              //       color: Colors.green),
-              //   controller: _ibanController,
-              //   decoration: const InputDecoration(
-              //       labelText: 'IBAN',
-              //       focusColor: Colors.green,
-              //       hoverColor: Colors.green,
-              //       fillColor: Colors.green,
-              //       labelStyle: TextStyle(color: Colors.grey),
-              //       focusedBorder: UnderlineInputBorder(
-              //           borderSide: BorderSide(color: Colors.green))),
-              //   validator: (value) {
-              //     if (value!.isEmpty) {
-              //       return 'Please enter the IBAN';
-              //     }
-              //     return null;
-              //   },
-              // ),
               const SizedBox(height: 16),
               Material(
                 elevation: 4.0,

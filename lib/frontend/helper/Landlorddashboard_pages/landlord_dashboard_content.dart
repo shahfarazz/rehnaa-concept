@@ -14,6 +14,7 @@ import 'package:rehnaa/frontend/helper/Landlorddashboard_pages/landlordinvoice.d
 import 'package:responsive_framework/responsive_scaled_box.dart';
 import '../../../backend/models/tenantsmodel.dart';
 import '../../Screens/pdf_landlord.dart';
+import 'landlord_form.dart';
 import 'skeleton.dart';
 
 class LandlordDashboardContent extends StatefulWidget {
@@ -647,6 +648,22 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
           // Format the balance for display
           String formattedBalance =
               NumberFormat('#,##0').format(landlord.balance);
+          var isDetailsFilled = json['isDetailsFilled'] as bool? ?? false;
+
+          // if (isDetailsFilled) {
+          //   WidgetsBinding.instance?.addPostFrameCallback((_) {
+          //     //show Fluttertoast saying 'How can we help you?'
+          //     Fluttertoast.showToast(
+          //       msg: 'How can we help you?',
+          //       toastLength: Toast.LENGTH_LONG,
+          //       gravity: ToastGravity.BOTTOM,
+          //       timeInSecForIosWeb: 2,
+          //       backgroundColor: Colors.green,
+          //       textColor: Colors.white,
+          //       fontSize: 16.0,
+          //     );
+          //   });
+          // }
 
           // if (formattedBalance == '0') {
           //   // setState(() {
@@ -720,7 +737,7 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
                           ),
                         ),
                       ),
-                      SizedBox(height: size.height * 0.05),
+                      SizedBox(height: size.height * 0.02),
                     ],
                   ),
                   Center(
@@ -829,6 +846,55 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
                       ),
                     ),
                   ),
+                  !isDetailsFilled
+                      ? Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            //show tooltip that "How can we help you?"
+                            Tooltip(
+                              message: 'How can we help you?',
+                              child: Material(
+                                elevation: 4.0,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(28.0),
+                                ),
+                                child: InkWell(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => LandlordForms(
+                                          uid: widget.uid,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  borderRadius: BorderRadius.circular(28.0),
+                                  child: Container(
+                                    padding: EdgeInsets.all(16.0),
+                                    decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        colors: [
+                                          const Color(0xff0FA697),
+                                          const Color(0xff45BF7A),
+                                          const Color(0xff0DF205),
+                                        ],
+                                        begin: Alignment.topLeft,
+                                        end: Alignment.bottomRight,
+                                      ),
+                                      borderRadius: BorderRadius.circular(28.0),
+                                    ),
+                                    child: Icon(
+                                      Icons.add,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        )
+                      : Container(),
                 ],
               )));
           // )));

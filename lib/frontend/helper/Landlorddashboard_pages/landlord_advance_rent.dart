@@ -36,6 +36,21 @@ class _LandlordAdvanceRentPageState extends State<LandlordAdvanceRentPage> {
         isApplied = true;
       });
     }
+
+    if (myLandlord.data()?['whenApplied'] != null) {
+      final Timestamp timestamp = myLandlord.data()?['whenApplied'];
+
+      //check if 90 days have passed
+      final DateTime whenApplied = timestamp.toDate();
+      final DateTime now = DateTime.now();
+      final difference = now.difference(whenApplied).inDays;
+
+      if (difference >= 90) {
+        setState(() {
+          isApplied = false;
+        });
+      }
+    }
   }
 
   @override
@@ -131,6 +146,7 @@ class _LandlordAdvanceRentPageState extends State<LandlordAdvanceRentPage> {
                                     .doc(widget.uid)
                                     .set({
                                   'isApplied': true,
+                                  'whenApplied': Timestamp.now(),
                                 }, SetOptions(merge: true));
 
                                 //send an AdminRequest for the tenant

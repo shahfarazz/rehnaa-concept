@@ -342,42 +342,46 @@ class _LandlordPropertiesPageState extends State<LandlordPropertiesPage>
                     }).toList(),
                   ),
                 ),
-                Visibility(
-                  visible: true, // Ensure the "+" button is always visible
-                  child: Material(
-                    elevation: 4.0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(28.0),
-                    ),
-                    child: InkWell(
-                      onTap: () {
-                        // Handle floating action button tap
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) =>
-                                LandlordPropertyForms(uid: widget.uid),
+                Positioned(
+                  top: size.height * 0.70,
+                  left: size.width * 0.8,
+                  child: Visibility(
+                    visible: true, // Ensure the "+" button is always visible
+                    child: Material(
+                      elevation: 4.0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(28.0),
+                      ),
+                      child: InkWell(
+                        onTap: () {
+                          // Handle floating action button tap
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) =>
+                                  LandlordPropertyForms(uid: widget.uid),
+                            ),
+                          );
+                        },
+                        borderRadius: BorderRadius.circular(28.0),
+                        child: Container(
+                          padding: EdgeInsets.all(16.0),
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                const Color(0xff0FA697),
+                                const Color(0xff45BF7A),
+                                const Color(0xff0DF205),
+                              ],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                            borderRadius: BorderRadius.circular(28.0),
                           ),
-                        );
-                      },
-                      borderRadius: BorderRadius.circular(28.0),
-                      child: Container(
-                        padding: EdgeInsets.all(16.0),
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              const Color(0xff0FA697),
-                              const Color(0xff45BF7A),
-                              const Color(0xff0DF205),
-                            ],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
+                          child: Icon(
+                            Icons.add,
+                            color: Colors.white,
                           ),
-                          borderRadius: BorderRadius.circular(28.0),
-                        ),
-                        child: Icon(
-                          Icons.add,
-                          color: Colors.white,
                         ),
                       ),
                     ),
