@@ -81,8 +81,9 @@ class _NewVouchersPageState extends State<NewVouchersPage> {
             )
           : images.length == 0
               ? Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
+                    Padding(padding: EdgeInsets.only(top: size.height * 0.1)),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [

@@ -779,65 +779,6 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
                                     }
                                   },
                                 ),
-                                !isDetailsFilled
-                                    ? Material(
-                                        elevation: 4.0,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(28.0),
-                                        ),
-                                        child: InkWell(
-                                          onTap: () {
-                                            if (widget.callerType ==
-                                                'Landlords') {
-                                              Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      LandlordForms(
-                                                    uid: widget.uid,
-                                                  ),
-                                                ),
-                                              );
-                                            }
-                                            if (widget.callerType ==
-                                                'Tenants') {
-                                              Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      TenantForms(
-                                                    uid: widget.uid,
-                                                  ),
-                                                ),
-                                              );
-                                            }
-                                          },
-                                          borderRadius:
-                                              BorderRadius.circular(28.0),
-                                          child: Container(
-                                            padding: EdgeInsets.all(16.0),
-                                            decoration: BoxDecoration(
-                                              gradient: LinearGradient(
-                                                colors: [
-                                                  const Color(0xff0FA697),
-                                                  const Color(0xff45BF7A),
-                                                  const Color(0xff0DF205),
-                                                ],
-                                                begin: Alignment.topLeft,
-                                                end: Alignment.bottomRight,
-                                              ),
-                                              borderRadius:
-                                                  BorderRadius.circular(28.0),
-                                            ),
-                                            child: Icon(
-                                              Icons.add,
-                                              color: Colors.white,
-                                            ),
-                                          ),
-                                        ),
-                                      )
-                                    : Container(),
                               ],
                             ),
                             StatefulBuilder(
@@ -989,18 +930,6 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
                                                                         alignment:
                                                                             Alignment
                                                                                 .center,
-                                                                        decoration:
-                                                                            BoxDecoration(
-                                                                          border:
-                                                                              Border.all(
-                                                                            width:
-                                                                                1,
-                                                                            color:
-                                                                                const Color(0xff33907c),
-                                                                          ),
-                                                                          borderRadius:
-                                                                              BorderRadius.circular(20),
-                                                                        ),
                                                                         child:
                                                                             TextField(
                                                                           cursorColor:
@@ -1025,8 +954,10 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
                                                                                 'Old Password',
                                                                             fillColor:
                                                                                 Colors.green,
-                                                                            labelStyle:
-                                                                                TextStyle(color: Colors.green, fontFamily: GoogleFonts.montserrat().fontFamily),
+                                                                            labelStyle: TextStyle(
+                                                                                color: Colors.green,
+                                                                                fontFamily: GoogleFonts.montserrat().fontFamily,
+                                                                                fontSize: 10),
                                                                             suffixIcon:
                                                                                 GestureDetector(
                                                                               onTap: () {
@@ -1054,18 +985,6 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
                                                                         alignment:
                                                                             Alignment
                                                                                 .center,
-                                                                        decoration:
-                                                                            BoxDecoration(
-                                                                          border:
-                                                                              Border.all(
-                                                                            width:
-                                                                                1,
-                                                                            color:
-                                                                                const Color(0xff33907c),
-                                                                          ),
-                                                                          borderRadius:
-                                                                              BorderRadius.circular(20),
-                                                                        ),
                                                                         child:
                                                                             TextField(
                                                                           cursorColor:
@@ -1090,8 +1009,10 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
                                                                                 'New Password',
                                                                             fillColor:
                                                                                 Colors.green,
-                                                                            labelStyle:
-                                                                                TextStyle(color: Colors.green, fontFamily: GoogleFonts.montserrat().fontFamily),
+                                                                            labelStyle: TextStyle(
+                                                                                color: Colors.green,
+                                                                                fontFamily: GoogleFonts.montserrat().fontFamily,
+                                                                                fontSize: 10),
                                                                             suffixIcon:
                                                                                 GestureDetector(
                                                                               onTap: () {
@@ -1118,7 +1039,12 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
                                                                       child: Text(
                                                                           'Cancel',
                                                                           style:
-                                                                              TextStyle(color: Colors.green))),
+                                                                              TextStyle(
+                                                                            color:
+                                                                                Colors.green,
+                                                                            fontFamily:
+                                                                                GoogleFonts.montserrat().fontFamily,
+                                                                          ))),
                                                                   TextButton(
                                                                       onPressed:
                                                                           () {
@@ -1127,15 +1053,15 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
                                                                             _newPasswordController.text);
                                                                         // Navigator.pop(context);
                                                                       },
-                                                                      child:
-                                                                          Text(
-                                                                        'Change',
-                                                                        style:
-                                                                            TextStyle(
-                                                                          color:
-                                                                              Colors.green,
-                                                                        ),
-                                                                      ))
+                                                                      child: Text(
+                                                                          'Change',
+                                                                          style:
+                                                                              TextStyle(
+                                                                            color:
+                                                                                Colors.green,
+                                                                            fontFamily:
+                                                                                GoogleFonts.montserrat().fontFamily,
+                                                                          )))
                                                                 ],
                                                               );
                                                             },
@@ -1152,24 +1078,44 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
                                                     User? currentUser =
                                                         FirebaseAuth.instance
                                                             .currentUser;
-                                                    String? phoneNumber =
-                                                        currentUser
-                                                            ?.phoneNumber;
-                                                    bool isPhoneNumberLogin =
-                                                        phoneNumber != null;
+
+                                                    var isPhoneNumberLogin =
+                                                        false;
+                                                    var emailOrPhone;
+
+                                                    FirebaseFirestore.instance
+                                                        .collection('users')
+                                                        .doc(currentUser!.uid)
+                                                        .get()
+                                                        .then((value) {
+                                                      if (value.data() !=
+                                                          null) {
+                                                        var emailOrPhone =
+                                                            value.data()?[
+                                                                'emailOrPhone'];
+                                                        if (emailOrPhone ==
+                                                            'email') {
+                                                          isPhoneNumberLogin =
+                                                              false;
+                                                        } else {
+                                                          isPhoneNumberLogin =
+                                                              true;
+                                                        }
+                                                      }
+                                                    });
 
                                                     if (isPhoneNumberLogin) {
                                                       String?
                                                           enteredVerificationCode;
-                                                      print(
-                                                          'phone number is $phoneNumber');
+                                                      // print(
+                                                      //     'phone number is $phoneNumber');
 
                                                       // Send verification code via SMS
                                                       await FirebaseAuth
                                                           .instance
                                                           .verifyPhoneNumber(
                                                         phoneNumber:
-                                                            phoneNumber!,
+                                                            emailOrPhone!,
                                                         verificationCompleted:
                                                             (PhoneAuthCredential
                                                                 credential) async {
@@ -1180,10 +1126,6 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
                                                             await currentUser
                                                                 ?.reauthenticateWithCredential(
                                                                     credential);
-
-                                                            // Delete the user account
-                                                            await currentUser
-                                                                ?.delete();
 
                                                             // Show a success message to the user
                                                             ScaffoldMessenger
@@ -1395,11 +1337,20 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
                                                               )),
                                                           content:
                                                               TextFormField(
+                                                            cursorColor:
+                                                                Colors.green,
                                                             controller:
                                                                 _enterPasswordController,
                                                             obscureText: true,
                                                             decoration:
                                                                 InputDecoration(
+                                                              focusedBorder:
+                                                                  UnderlineInputBorder(
+                                                                      borderSide:
+                                                                          BorderSide(
+                                                                color: Colors
+                                                                    .green,
+                                                              )),
                                                               labelText:
                                                                   'Enter your password',
                                                               labelStyle:

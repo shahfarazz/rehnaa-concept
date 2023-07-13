@@ -4,6 +4,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 // import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 // import 'package:image_picker/image_picker.dart';
 // import 'package:firebase_storage/firebase_storage.dart';
@@ -39,6 +40,8 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
   List<DocumentReference<Map<String, dynamic>>> selectedRentPayments = [];
   List<DocumentReference<Map<String, dynamic>>> selectedDealers = [];
 
+  bool _isLoading = true;
+
   @override
   void initState() {
     super.initState();
@@ -60,6 +63,7 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
     setState(() {
       landlords = landlordList;
       filteredLandlords = List.from(landlords);
+      _isLoading = false;
     });
     return landlords;
   }
@@ -152,7 +156,7 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
                     ListTile(
                       leading: const Icon(Icons.home),
                       title: Text(
-                        'Address: ${landlord.address}',
+                        'Address: ${landlord.address == '' ? 'No' : 'Yes'}',
                         style: const TextStyle(
                           fontSize: 16,
                         ),
@@ -229,8 +233,8 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
         TextEditingController(text: landlord.accountNumber ?? '');
     final TextEditingController ibanController =
         TextEditingController(text: landlord.iban ?? '');
-    final TextEditingController addressController =
-        TextEditingController(text: landlord.address ?? '');
+    final TextEditingController addressController = TextEditingController(
+        text: landlord.address == '' ? '' : decryptString(landlord.address!));
 
     final hashedCnic = encryptString(cnicController.text);
     final hashedBankName = encryptString(bankNameController.text);
@@ -442,14 +446,7 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
                 const SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: () async {
-                    // Update the landlord details in Firebase
-
-                    print('landlord id is ${landlord.tempID}');
-
-                    FirebaseFirestore.instance
-                        .collection('Landlords')
-                        .doc(landlord.tempID)
-                        .set({
+                    var package = {
                       'firstName': firstNameController.text,
                       'lastName': lastNameController.text,
                       'balance': double.tryParse(balanceController.text) ?? 0.0,
@@ -507,130 +504,208 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
                               creditPointsController.text != 'null'
                           ? creditPointsController.text
                           : FieldValue.delete(),
-                    }, SetOptions(merge: true)).then((_) async {
-                      //if selectedDealers not null set the landlordRef in the dealer
+                    };
 
-                      try {
-                        for (var dealer in selectedDealers) {
-                          await dealer.set({
-                            'landlordRef': FieldValue.arrayUnion([
-                              FirebaseFirestore.instance
-                                  .collection('Landlords')
-                                  .doc(landlord.tempID)
-                            ])
-                          }, SetOptions(merge: true));
-                        }
-                      } catch (e) {
-                        print('error in setting landlordRef in dealer $e');
-                      }
+                    //show contents of package in a dialog and ask if you are sure about this
 
-                      if (landlord.balance >
-                          (double.tryParse(balanceController.text) ?? 0.0)) {
-                        await FirebaseFirestore.instance
-                            .collection('rentPayments')
-                            .add({
-                          'tenantname': 'Rehnaa.pk',
-                          'LandlordRef': FirebaseFirestore.instance
-                              .collection('Landlords')
-                              .doc(landlord.tempID),
-                          'amount': -(double.tryParse(balanceController.text) ??
-                                  0.0) +
-                              landlord.balance,
-                          'date': DateTime.now(),
-                          'isMinus': true,
-                          // 'description': 'Balance updated by landlord',
-                          'paymentType': '',
-                        }).then((value) {
-                          //add the rentpayment document reference to the tenant's
-                          // rentpayment array
-                          FirebaseFirestore.instance
-                              .collection('Landlords')
-                              .doc(landlord.tempID)
-                              .update({
-                            'rentpaymentRef': FieldValue.arrayUnion([value])
-                          });
+                    showDialog(
+                      context: context,
+                      builder: (context) {
+                        return Dialog(
+                          child: SingleChildScrollView(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Column(
+                                  children: package.keys.map((key) {
+                                    return ListTile(
+                                      title: Text(key),
+                                      subtitle: Text(package[key].toString()),
+                                    );
+                                  }).toList(),
+                                ),
+                                ButtonBar(
+                                  children: [
+                                    ElevatedButton(
+                                      onPressed: () {
+                                        // Continue with the code
+                                        print('User confirmed');
 
-                          //send a notification to the Landlord
+                                        FirebaseFirestore.instance
+                                            .collection('Landlords')
+                                            .doc(landlord.tempID)
+                                            .set(package,
+                                                SetOptions(merge: true))
+                                            .then((_) async {
+                                          //if selectedDealers not null set the landlordRef in the dealer
 
-                          FirebaseFirestore.instance
-                              .collection('Notifications')
-                              .doc(landlord.tempID)
-                              .update({
-                            'notifications': FieldValue.arrayUnion([
-                              {
-                                // 'amount': data.requestedAmount,
-                                'title':
-                                    'Your account has been debited by ${-(double.tryParse(balanceController.text) ?? 0.0) + landlord.balance}',
-                              }
-                            ])
-                          });
-                        });
-                      } else if (landlord.balance <
-                          (double.tryParse(balanceController.text) ?? 0.0)) {
-                        await FirebaseFirestore.instance
-                            .collection('rentPayments')
-                            .add({
-                          'tenantname': 'Rehnaa.pk',
-                          'LandlordRef': FirebaseFirestore.instance
-                              .collection('Landlords')
-                              .doc(landlord.tempID),
-                          'amount': ((double.tryParse(balanceController.text) ??
-                                  0.0) -
-                              landlord.balance),
-                          'date': DateTime.now(),
-                          'isMinus': false,
-                          // 'description': 'Balance updated by landlord',
-                          'paymentType': '',
-                        }).then((value) {
-                          //add the rentpayment document reference to the tenant's
-                          // rentpayment array
-                          // print('reached hrere 222');
-                          FirebaseFirestore.instance
-                              .collection('Landlords')
-                              .doc(landlord.tempID)
-                              .update({
-                            'rentpaymentRef': FieldValue.arrayUnion([value])
-                          });
+                                          try {
+                                            for (var dealer
+                                                in selectedDealers) {
+                                              await dealer.set({
+                                                'landlordRef':
+                                                    FieldValue.arrayUnion([
+                                                  FirebaseFirestore.instance
+                                                      .collection('Landlords')
+                                                      .doc(landlord.tempID)
+                                                ])
+                                              }, SetOptions(merge: true));
+                                            }
+                                          } catch (e) {
+                                            print(
+                                                'error in setting landlordRef in dealer $e');
+                                          }
 
-                          FirebaseFirestore.instance
-                              .collection('Notifications')
-                              .doc(landlord.tempID)
-                              .update({
-                            'notifications': FieldValue.arrayUnion([
-                              {
-                                // 'amount': data.requestedAmount,
-                                'title':
-                                    'Your account has been credited by ${((double.tryParse(balanceController.text) ?? 0.0) - landlord.balance)}',
-                              }
-                            ])
-                          });
-                        });
-                      }
+                                          if (landlord.balance >
+                                              (double.tryParse(
+                                                      balanceController.text) ??
+                                                  0.0)) {
+                                            await FirebaseFirestore.instance
+                                                .collection('rentPayments')
+                                                .add({
+                                              'tenantname': 'Rehnaa.pk',
+                                              'LandlordRef': FirebaseFirestore
+                                                  .instance
+                                                  .collection('Landlords')
+                                                  .doc(landlord.tempID),
+                                              'amount': -(double.tryParse(
+                                                          balanceController
+                                                              .text) ??
+                                                      0.0) +
+                                                  landlord.balance,
+                                              'date': DateTime.now(),
+                                              'isMinus': true,
+                                              // 'description': 'Balance updated by landlord',
+                                              'paymentType': '',
+                                            }).then((value) {
+                                              //add the rentpayment document reference to the tenant's
+                                              // rentpayment array
+                                              FirebaseFirestore.instance
+                                                  .collection('Landlords')
+                                                  .doc(landlord.tempID)
+                                                  .update({
+                                                'rentpaymentRef':
+                                                    FieldValue.arrayUnion(
+                                                        [value])
+                                              });
 
-                      Fluttertoast.showToast(
-                        msg: 'Landlord details updated successfully!',
-                        toastLength: Toast.LENGTH_SHORT,
-                        gravity: ToastGravity.CENTER,
-                        backgroundColor: Colors.green,
-                        textColor: Colors.white,
-                      );
-                      // Navigator.pop(context); // Close the edit dialog
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (context) {
-                        return AdminLandlordInputPage();
-                      }));
-                    }).catchError((error) {
-                      print('error is $error');
-                      Fluttertoast.showToast(
-                        msg:
-                            'Failed to update landlord details. Please try again.',
-                        toastLength: Toast.LENGTH_SHORT,
-                        gravity: ToastGravity.CENTER,
-                        backgroundColor: Colors.red,
-                        textColor: Colors.white,
-                      );
-                      throw error;
-                    });
+                                              //send a notification to the Landlord
+
+                                              FirebaseFirestore.instance
+                                                  .collection('Notifications')
+                                                  .doc(landlord.tempID)
+                                                  .update({
+                                                'notifications':
+                                                    FieldValue.arrayUnion([
+                                                  {
+                                                    // 'amount': data.requestedAmount,
+                                                    'title':
+                                                        'Your account has been debited by ${-(double.tryParse(balanceController.text) ?? 0.0) + landlord.balance}',
+                                                  }
+                                                ])
+                                              });
+                                            });
+                                          } else if (landlord.balance <
+                                              (double.tryParse(
+                                                      balanceController.text) ??
+                                                  0.0)) {
+                                            await FirebaseFirestore.instance
+                                                .collection('rentPayments')
+                                                .add({
+                                              'tenantname': 'Rehnaa.pk',
+                                              'LandlordRef': FirebaseFirestore
+                                                  .instance
+                                                  .collection('Landlords')
+                                                  .doc(landlord.tempID),
+                                              'amount': ((double.tryParse(
+                                                          balanceController
+                                                              .text) ??
+                                                      0.0) -
+                                                  landlord.balance),
+                                              'date': DateTime.now(),
+                                              'isMinus': false,
+                                              // 'description': 'Balance updated by landlord',
+                                              'paymentType': '',
+                                            }).then((value) {
+                                              //add the rentpayment document reference to the tenant's
+                                              // rentpayment array
+                                              // print('reached hrere 222');
+                                              FirebaseFirestore.instance
+                                                  .collection('Landlords')
+                                                  .doc(landlord.tempID)
+                                                  .update({
+                                                'rentpaymentRef':
+                                                    FieldValue.arrayUnion(
+                                                        [value])
+                                              });
+
+                                              FirebaseFirestore.instance
+                                                  .collection('Notifications')
+                                                  .doc(landlord.tempID)
+                                                  .update({
+                                                'notifications':
+                                                    FieldValue.arrayUnion([
+                                                  {
+                                                    // 'amount': data.requestedAmount,
+                                                    'title':
+                                                        'Your account has been credited by ${((double.tryParse(balanceController.text) ?? 0.0) - landlord.balance)}',
+                                                  }
+                                                ])
+                                              });
+                                            });
+                                          }
+
+                                          Fluttertoast.showToast(
+                                            msg:
+                                                'Landlord details updated successfully!',
+                                            toastLength: Toast.LENGTH_SHORT,
+                                            gravity: ToastGravity.CENTER,
+                                            backgroundColor: Colors.green,
+                                            textColor: Colors.white,
+                                          );
+                                          // Navigator.pop(context); // Close the edit dialog
+                                          Navigator.push(context,
+                                              MaterialPageRoute(
+                                                  builder: (context) {
+                                            return AdminLandlordInputPage();
+                                          }));
+                                        }).catchError((error) {
+                                          print('error is $error');
+                                          Fluttertoast.showToast(
+                                            msg:
+                                                'Failed to update landlord details. Please try again.',
+                                            toastLength: Toast.LENGTH_SHORT,
+                                            gravity: ToastGravity.CENTER,
+                                            backgroundColor: Colors.red,
+                                            textColor: Colors.white,
+                                          );
+                                          throw error;
+                                        });
+                                      },
+                                      child: Text('Yes'),
+                                    ),
+                                    ElevatedButton(
+                                      onPressed: () {
+                                        // Do nothing and navigate back or close the dialog
+                                        print('User canceled');
+                                        Navigator.of(context).pop();
+                                        // Navigator.pop(context); // Close the edit dialog
+                                        Navigator.push(context,
+                                            MaterialPageRoute(
+                                                builder: (context) {
+                                          return AdminLandlordInputPage();
+                                        }));
+                                      },
+                                      child: Text('No'),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    );
                   },
                   child: const Text('Save'),
                 ),
@@ -708,8 +783,11 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
                           );
                         } else {
                           return Container(
-                              padding: EdgeInsets.only(left: 150.0),
-                              child: CircularProgressIndicator());
+                            padding: EdgeInsets.only(left: 150.0),
+                            child: SpinKitFadingCube(
+                              color: Color.fromARGB(255, 30, 197, 83),
+                            ),
+                          );
                         }
                       },
                     ),
@@ -814,7 +892,9 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
                         } else {
                           return Container(
                             padding: EdgeInsets.only(left: 150.0),
-                            child: CircularProgressIndicator(),
+                            child: SpinKitFadingCube(
+                              color: Color.fromARGB(255, 30, 197, 83),
+                            ),
                           );
                         }
                       },
@@ -892,8 +972,11 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
                       );
                     } else {
                       return Container(
-                          padding: EdgeInsets.only(left: 150.0),
-                          child: CircularProgressIndicator());
+                        padding: EdgeInsets.only(left: 150.0),
+                        child: SpinKitFadingCube(
+                          color: Color.fromARGB(255, 30, 197, 83),
+                        ),
+                      );
                     }
                   },
                 ),
@@ -995,8 +1078,11 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
                           );
                         } else {
                           return Container(
-                              padding: EdgeInsets.only(left: 150.0),
-                              child: CircularProgressIndicator());
+                            padding: EdgeInsets.only(left: 150.0),
+                            child: SpinKitFadingCube(
+                              color: Color.fromARGB(255, 30, 197, 83),
+                            ),
+                          );
                         }
                       },
                     ),
@@ -1075,24 +1161,30 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
                 ),
               ),
             ),
-            Expanded(
-              child: ListView.builder(
-                itemCount: getPaginatedLandlords().length,
-                itemBuilder: (context, index) {
-                  Landlord landlord = getPaginatedLandlords()[index];
+            _isLoading
+                ? const SpinKitFadingCube(
+                    color: Color.fromARGB(255, 30, 197, 83),
+                  )
+                : Expanded(
+                    child: ListView.builder(
+                      itemCount: getPaginatedLandlords().length,
+                      itemBuilder: (context, index) {
+                        Landlord landlord = getPaginatedLandlords()[index];
 
-                  return ListTile(
-                    title: Text('${landlord.firstName} ${landlord.lastName}'),
-                    subtitle: Text(landlord.balance.toString()),
-                    leading: const Icon(Icons.person),
-                    trailing: landlord.isGhost != null && landlord.isGhost!
-                        ? const Text('Ghost User')
-                        : SizedBox(),
-                    onTap: () => openLandlordDetailsDialog(landlord),
-                  );
-                },
-              ),
-            ),
+                        return ListTile(
+                          title: Text(
+                              '${landlord.firstName} ${landlord.lastName}'),
+                          subtitle: Text(landlord.balance.toString()),
+                          leading: const Icon(Icons.person),
+                          trailing:
+                              landlord.isGhost != null && landlord.isGhost!
+                                  ? const Text('Ghost User')
+                                  : SizedBox(),
+                          onTap: () => openLandlordDetailsDialog(landlord),
+                        );
+                      },
+                    ),
+                  ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [

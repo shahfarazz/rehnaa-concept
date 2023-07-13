@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../Screens/Admin/admindashboard.dart';
@@ -51,7 +52,9 @@ class _AdminContractsEditPageState extends State<AdminContractsViewPage> {
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(
-              child: CircularProgressIndicator(),
+              child: SpinKitFadingCube(
+                color: Color.fromARGB(255, 30, 197, 83),
+              ),
             );
           } else if (snapshot.hasError) {
             return Center(
@@ -59,6 +62,17 @@ class _AdminContractsEditPageState extends State<AdminContractsViewPage> {
             );
           } else {
             final contracts = snapshot.data;
+            if (contracts?.isEmpty ?? true) {
+              return Center(
+                child: Text(
+                  'No Contracts Found',
+                  style: TextStyle(
+                    fontFamily: GoogleFonts.montserrat().fontFamily,
+                    fontSize: 20,
+                  ),
+                ),
+              );
+            }
             return ListView.builder(
               itemCount: contracts?.length,
               itemBuilder: (context, index) {

@@ -21,19 +21,20 @@ class Tenant {
   String? tempID;
   Timestamp? dateJoined;
   String? address;
-  String? contractStartDate;
-  String? contractEndDate;
+  Timestamp? contractStartDate;
+  Timestamp? contractEndDate;
   String? propertyAddress;
   String? monthlyRent;
   // ignore: prefer_typing_uninitialized_variables
-  var upfrontBonus;
+  // var upfrontBonus;
   // ignore: prefer_typing_uninitialized_variables
-  var monthlyProfit;
+  // var monthlyProfit;
   var discount;
   bool? isGhost;
   var securityDeposit;
   var creditScore;
   var creditPoints;
+  var otherInfo;
 
   Tenant({
     required this.firstName,
@@ -60,12 +61,13 @@ class Tenant {
     this.contractEndDate,
     this.propertyAddress,
     this.monthlyRent,
-    this.upfrontBonus,
-    this.monthlyProfit,
+    // this.upfrontBonus,
+    // this.monthlyProfit,
     this.discount,
     this.isGhost,
     this.securityDeposit,
     this.creditScore,
+    this.otherInfo,
   });
 
   factory Tenant.fromJson(Map<String, dynamic> json) {
@@ -90,16 +92,17 @@ class Tenant {
               json['rentpaymentRef'].map((ref) => ref as DocumentReference))
           : null,
       address: json['address'] ?? '',
-      contractStartDate: json['contractStartDate'] ?? '',
-      contractEndDate: json['contractEndDate'] ?? '',
+      contractStartDate: json['contractStartDate'],
+      contractEndDate: json['contractEndDate'],
       propertyAddress: json['propertyAddress'] ?? 'No address found',
       monthlyRent: json['monthlyRent'] ?? '',
-      upfrontBonus: json['upfrontBonus'] ?? '',
-      monthlyProfit: json['monthlyProfit'] ?? '',
+      // upfrontBonus: json['upfrontBonus'] ?? '',
+      // monthlyProfit: json['monthlyProfit'] ?? '',
       discount: json['discount'] ?? 0.24234234,
       isGhost: json['isGhost'] ?? false,
       securityDeposit: json['securityDeposit'] ?? '',
       creditScore: json['creditScore'] ?? '',
+      otherInfo: json['otherInfo'] ?? '',
     );
   }
 

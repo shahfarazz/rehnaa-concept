@@ -86,7 +86,7 @@ class LandlordTenantInfoPage extends StatelessWidget {
                                   height: 150,
                                 )
                               : Image.network(
-                                  fit: BoxFit.fill,
+                                  fit: BoxFit.cover,
                                   tenant.pathToImage!,
                                   width: 150,
                                   height: 150,
@@ -125,6 +125,8 @@ class LandlordTenantInfoPage extends StatelessWidget {
                         fontSize: 16.0,
                         color: const Color(0xff33907c),
                       ),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 2,
                     ),
                   ),
                 ],
@@ -159,10 +161,22 @@ class LandlordTenantInfoPage extends StatelessWidget {
                                     label: 'Rating',
                                     value: '${tenant.creditScore}',
                                     points: '${tenant.creditPoints}',
+                                    pointsIcon: Icons.star,
                                     // tenant.credit
                                   ),
                                 )
                               : Container(),
+
+                          tenant.address == ''
+                              ? Container()
+                              : Center(
+                                  child: WhiteBox(
+                                      icon: Icons.email,
+                                      iconColor: const Color(0xff33907c),
+                                      label: 'Personal Address',
+                                      value: tenant.address!),
+                                ),
+                          const SizedBox(height: 10.0),
 
                           const SizedBox(height: 10.0),
                           tenant.cnicNumber != null
@@ -176,15 +190,57 @@ class LandlordTenantInfoPage extends StatelessWidget {
                                 )
                               : Container(),
                           const SizedBox(height: 10.0),
-                          Center(
-                            child: WhiteBox(
-                              icon: Icons.email,
-                              iconColor: const Color(0xff33907c),
-                              label: 'Contact Number',
-                              value: tenant.emailOrPhone!,
-                            ),
-                          ),
+                          tenant.emailOrPhone != ''
+                              ? Center(
+                                  child: WhiteBox(
+                                    icon: Icons.email,
+                                    iconColor: const Color(0xff33907c),
+                                    label: 'Email/Phone Number',
+                                    value: tenant.emailOrPhone!,
+                                  ),
+                                )
+                              : Container(),
                           const SizedBox(height: 10.0),
+                          tenant.contractStartDate == null
+                              ? Container()
+                              : Center(
+                                  child: WhiteBox(
+                                    icon: Icons.email,
+                                    iconColor: const Color(0xff33907c),
+                                    label: 'Contract Start Date',
+                                    value: tenant.contractStartDate!
+                                        .toDate()
+                                        .toString()
+                                        .substring(0, 10),
+                                  ),
+                                ),
+                          const SizedBox(height: 10.0),
+                          tenant.contractEndDate == null
+                              ? Container()
+                              : Center(
+                                  child: WhiteBox(
+                                    icon: Icons.email,
+                                    iconColor: const Color(0xff33907c),
+                                    label: 'Contract End Date',
+                                    value: tenant.contractEndDate!
+                                        .toDate()
+                                        .toString()
+                                        .substring(0, 10),
+                                  ),
+                                ),
+                          const SizedBox(height: 10.0),
+                          tenant.propertyAddress == 'No address found'
+                              ? Container()
+                              : Center(
+                                  child: WhiteBox(
+                                    icon: Icons.email,
+                                    iconColor: const Color(0xff33907c),
+                                    label: 'Rented Property Address',
+                                    value: tenant.propertyAddress!,
+                                  ),
+                                ),
+                          const SizedBox(height: 10.0),
+
                           tenant.tasdeeqVerification != null
                               ? Center(
                                   child: WhiteBox(
@@ -225,7 +281,7 @@ class LandlordTenantInfoPage extends StatelessWidget {
                               icon: Icons.info,
                               iconColor: const Color(0xff33907c),
                               label: 'Other Information',
-                              value: 'N/A',
+                              value: tenant.otherInfo ?? 'N/A',
                             ),
                           ),
                         ],
@@ -248,6 +304,7 @@ class WhiteBox extends StatelessWidget {
   final String? points;
   final IconData? icon;
   final Color? iconColor;
+  final IconData? pointsIcon;
 
   const WhiteBox({
     Key? key,
@@ -256,6 +313,7 @@ class WhiteBox extends StatelessWidget {
     this.points,
     this.icon,
     this.iconColor,
+    this.pointsIcon,
   }) : super(key: key);
 
   @override
@@ -297,12 +355,22 @@ class WhiteBox extends StatelessWidget {
                       ],
                     ),
                     if (points != null)
-                      Text(
-                        'Points',
-                        style: GoogleFonts.montserrat(
-                          fontSize: 16.0,
-                          color: const Color(0xff33907c),
-                        ),
+                      Row(
+                        children: [
+                          if (icon != null)
+                            Icon(
+                              icon,
+                              color: iconColor,
+                            ),
+                          const SizedBox(width: 8.0),
+                          Text(
+                            'Points',
+                            style: GoogleFonts.montserrat(
+                              fontSize: 16.0,
+                              color: const Color(0xff33907c),
+                            ),
+                          ),
+                        ],
                       ),
                   ],
                 ),

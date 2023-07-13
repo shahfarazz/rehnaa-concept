@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
@@ -182,19 +183,31 @@ class _TenantSecurityDepositPageState extends State<TenantSecurityDepositPage> {
                               onTap: () {
                                 if (isApplySecurity || depositAmount == 0) {
                                   //show snackbar that either already applied or deposit amount is 0
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(
+                                  // ScaffoldMessenger.of(context).showSnackBar(
+                                  //   SnackBar(
+                                  //     content: Text(
+                                  //       'Either you have already applied or your deposit amount is 0',
+                                  //       style: TextStyle(
+                                  //         fontSize: 16,
+                                  //         fontFamily: GoogleFonts.montserrat()
+                                  //             .fontFamily,
+                                  //       ),
+                                  //       textAlign: TextAlign.center,
+                                  //     ),
+                                  //     backgroundColor: Colors.red,
+                                  //   ),
+                                  // );
+
+                                  //replace above with red flutter toast
+                                  Fluttertoast.showToast(
+                                    msg:
                                         'Either you have already applied or your deposit amount is 0',
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          fontFamily: GoogleFonts.montserrat()
-                                              .fontFamily,
-                                        ),
-                                        textAlign: TextAlign.center,
-                                      ),
-                                      backgroundColor: Colors.red,
-                                    ),
+                                    toastLength: Toast.LENGTH_LONG,
+                                    gravity: ToastGravity.CENTER,
+                                    timeInSecForIosWeb: 1,
+                                    backgroundColor: Colors.red,
+                                    textColor: Colors.white,
+                                    fontSize: 16.0,
                                   );
                                   return;
                                 }

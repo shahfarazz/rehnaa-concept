@@ -18,6 +18,7 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
   bool _isLoading = true;
 
   Future<void> checkAlreadyLoggedIn() {
+    _isLoading = true;
     try {
       if (FirebaseAuth.instance.currentUser != null) {
         FirebaseFirestore.instance
@@ -119,7 +120,8 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    print('reached herereee');
+    _isLoading = true;
+    // print('reached herereee');
     return Scaffold(
       appBar: AppBar(
         title: const Text('Admin Login'),

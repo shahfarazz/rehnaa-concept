@@ -4,6 +4,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -28,6 +29,7 @@ class _AdminPropertyInputPageState extends State<AdminPropertyInputPage> {
   TextEditingController searchController = TextEditingController();
   int currentPage = 1;
   int itemsPerPage = 10;
+  bool _isLoading = true;
 
   @override
   void initState() {
@@ -50,7 +52,9 @@ class _AdminPropertyInputPageState extends State<AdminPropertyInputPage> {
     setState(() {
       properties = propertyList;
       filteredProperties = List.from(properties);
+      _isLoading = false;
     });
+    return;
   }
 
   Future<String> getLandlordName(
@@ -110,7 +114,7 @@ class _AdminPropertyInputPageState extends State<AdminPropertyInputPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Property Images'),
+        title: const Text('Property Input'),
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
@@ -152,21 +156,27 @@ class _AdminPropertyInputPageState extends State<AdminPropertyInputPage> {
                 ),
               ),
             ),
-            Expanded(
-              child: ListView.builder(
-                itemCount: getPaginatedProperties().length,
-                itemBuilder: (context, index) {
-                  Property property = getPaginatedProperties()[index];
+            _isLoading
+                ? const Center(
+                    child: SpinKitFadingCube(
+                      color: Color.fromARGB(255, 30, 197, 83),
+                    ),
+                  )
+                : Expanded(
+                    child: ListView.builder(
+                      itemCount: getPaginatedProperties().length,
+                      itemBuilder: (context, index) {
+                        Property property = getPaginatedProperties()[index];
 
-                  return ListTile(
-                    title: Text(property.title),
-                    subtitle: Text(property.location),
-                    leading: const Icon(Icons.home),
-                    onTap: () => openPropertyDetailsPage(property),
-                  );
-                },
-              ),
-            ),
+                        return ListTile(
+                          title: Text(property.title),
+                          subtitle: Text(property.location),
+                          leading: const Icon(Icons.home),
+                          onTap: () => openPropertyDetailsPage(property),
+                        );
+                      },
+                    ),
+                  ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [

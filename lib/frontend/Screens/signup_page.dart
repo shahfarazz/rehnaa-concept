@@ -367,6 +367,10 @@ class _SignUpPageState extends State<SignUpPage> {
     if (!noSpaces.hasMatch(lastName)) return 'Last name cannot contain spaces';
 
     if (emailOrPhone.isEmpty) return 'Email/Phone cannot be empty';
+
+    //if there are spaces at the end of the email, remove them
+    emailOrPhone = emailOrPhone.trim();
+
     if (!isEmail(emailOrPhone)) {
       final regex = RegExp(r'^(03\d{9}|\+92\d{10})$');
       if (!regex.hasMatch(emailOrPhone)) {
@@ -433,6 +437,7 @@ class _SignUpPageState extends State<SignUpPage> {
   Widget buildInputField(String label,
       {required Function(String) onChanged, String? errorText}) {
     return TextField(
+      cursorColor: Colors.green,
       onChanged: onChanged,
       style: TextStyle(
         color: Color(0xff33907c),
@@ -592,6 +597,8 @@ class _SignUpPageState extends State<SignUpPage> {
             if (selectedOption == '') {
               _showToast("Please select Landlord or Tenant", Colors.red);
             } else {
+              // remove leading and trailing spaces
+              emailOrPhone = emailOrPhone.trim();
               if (isEmail(emailOrPhone)) {
                 signUpWithEmailAndPassword();
               } else {

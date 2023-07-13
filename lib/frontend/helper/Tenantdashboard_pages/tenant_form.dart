@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:rehnaa/backend/services/helperfunctions.dart';
 import 'package:rehnaa/frontend/helper/Landlorddashboard_pages/landlord_profile.dart';
@@ -60,18 +61,34 @@ class _TenantFormsState extends State<TenantForms> {
             .doc(widget.uid)
             .update(data);
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Data saved successfully')),
-        );
+        // ScaffoldMessenger.of(context).showSnackBar(
+        //   SnackBar(content: Text('Data saved successfully')),
+        // );
+        //replace with a green flutter toast
+        Fluttertoast.showToast(
+            msg: "Data saved successfully",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            backgroundColor: Colors.green,
+            textColor: Colors.white,
+            fontSize: 16.0);
         Navigator.pushReplacement(
             context,
             MaterialPageRoute(
                 builder: (context) => TenantDashboardPage(uid: widget.uid)));
         return;
       } catch (error) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('An error occurred while saving data')),
-        );
+        // ScaffoldMessenger.of(context).showSnackBar(
+        //   SnackBar(content: Text('An error occurred while saving data')),
+        // );
+        //replace with a red flutter toast
+        Fluttertoast.showToast(
+            msg: "An error occurred while saving data",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 16.0);
         return;
       }
     }
@@ -88,6 +105,7 @@ class _TenantFormsState extends State<TenantForms> {
           key: _formKey,
           child: ListView(
             children: [
+              const SizedBox(height: 16),
               TextFormField(
                 cursorColor: Colors.green,
                 style: TextStyle(
@@ -110,6 +128,7 @@ class _TenantFormsState extends State<TenantForms> {
                   return null;
                 },
               ),
+              const SizedBox(height: 16),
               TextFormField(
                 style: TextStyle(
                     fontSize: 16,
@@ -119,7 +138,7 @@ class _TenantFormsState extends State<TenantForms> {
                 inputFormatters: [
                   LengthLimitingTextInputFormatter(
                       13), // Restrict maximum length to 13
-                  FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+                  // FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
                 ],
                 decoration: const InputDecoration(
                     labelText: 'CNIC',
@@ -138,25 +157,33 @@ class _TenantFormsState extends State<TenantForms> {
                 onChanged: (value) {
                   //if alphabet is entered show an error using toast and clear the field and return
                   if (value.contains(RegExp(r'[a-zA-Z]'))) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
+                    // ScaffoldMessenger.of(context).showSnackBar(
+                    //   SnackBar(
+                    //     backgroundColor: Colors.red,
+                    //     content: Text('Please enter digits only'),
+                    //   ),
+                    // );
+                    //replace with a red flutter toast
+                    Fluttertoast.showToast(
+                        msg: "Please enter digits only",
+                        toastLength: Toast.LENGTH_SHORT,
+                        gravity: ToastGravity.BOTTOM,
                         backgroundColor: Colors.red,
-                        content: Text('Please enter digits only'),
-                      ),
-                    );
+                        textColor: Colors.white,
+                        fontSize: 16.0);
                     _cnicController.clear();
                     return;
                   }
                 },
               ),
               const SizedBox(height: 16),
-              Text(
-                'Property Details',
-                style: TextStyle(
-                    fontSize: 16,
-                    fontFamily: GoogleFonts.montserrat().fontFamily,
-                    color: Colors.green),
-              ),
+              // Text(
+              //   'Property Details',
+              //   style: TextStyle(
+              //       fontSize: 16,
+              //       fontFamily: GoogleFonts.montserrat().fontFamily,
+              //       color: Colors.green),
+              // ),
               TextFormField(
                 style: TextStyle(
                     fontSize: 16,
@@ -178,28 +205,7 @@ class _TenantFormsState extends State<TenantForms> {
                   return null;
                 },
               ),
-              // TextFormField(
-              //   style: TextStyle(
-              //       fontSize: 16,
-              //       fontFamily: GoogleFonts.montserrat().fontFamily,
-              //       color: Colors.green),
-              //   controller: _rentDemandController,
-              //   decoration: const InputDecoration(
-              //       labelText: 'Rent Demand for the Property',
-              //       focusColor: Colors.green,
-              //       hoverColor: Colors.green,
-              //       fillColor: Colors.green,
-              //       labelStyle: TextStyle(color: Colors.grey),
-              //       focusedBorder: UnderlineInputBorder(
-              //           borderSide: BorderSide(color: Colors.green))),
-              //   validator: (value) {
-              //     if (value!.isEmpty) {
-              //       return 'Please enter the rent demand for the property';
-              //     }
-              //     return null;
-              //   },
-              // ),
-
+              const SizedBox(height: 16),
               StatefulBuilder(
                 builder: (context, setState) {
                   return InkWell(
@@ -228,12 +234,14 @@ class _TenantFormsState extends State<TenantForms> {
                             fontFamily: GoogleFonts.montserrat().fontFamily,
                             color: Colors.white,
                           ),
+                          textAlign: TextAlign.center,
                         ),
                       ),
                     ),
                   );
                 },
               ),
+              const SizedBox(height: 16),
               TextFormField(
                 style: TextStyle(
                     fontSize: 16,
@@ -255,27 +263,7 @@ class _TenantFormsState extends State<TenantForms> {
                   return null;
                 },
               ),
-              // TextFormField(
-              //   style: TextStyle(
-              //       fontSize: 16,
-              //       fontFamily: GoogleFonts.montserrat().fontFamily,
-              //       color: Colors.green),
-              //   controller: _raastIdController,
-              //   decoration: const InputDecoration(
-              //       labelText: 'Raast ID',
-              //       focusColor: Colors.green,
-              //       hoverColor: Colors.green,
-              //       fillColor: Colors.green,
-              //       labelStyle: TextStyle(color: Colors.grey),
-              //       focusedBorder: UnderlineInputBorder(
-              //           borderSide: BorderSide(color: Colors.green))),
-              //   validator: (value) {
-              //     if (value!.isEmpty) {
-              //       return 'Please enter the Raast ID';
-              //     }
-              //     return null;
-              //   },
-              // ),
+
               const SizedBox(height: 16),
               Material(
                 elevation: 4.0,

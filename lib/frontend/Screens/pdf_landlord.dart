@@ -9,6 +9,7 @@ import 'package:pdf/widgets.dart' as pdfWidget;
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:open_file/open_file.dart';
+import 'package:rehnaa/backend/services/helperfunctions.dart';
 import 'package:rehnaa/frontend/Screens/Landlord/landlord_dashboard.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
@@ -128,7 +129,7 @@ class _PDFEditorPageState extends State<PDFEditorPage> {
         format: PdfStringFormat(alignment: PdfTextAlignment.left));
 
     //Address of paid to
-    graphics.drawString(landlordAddress ?? '', font_small,
+    graphics.drawString(decryptString(landlordAddress!) ?? '', font_small,
         brush: PdfBrushes.black,
         bounds: Rect.fromLTWH(
             60, 215, page.getClientSize().width, page.getClientSize().height),

@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:html' as html;
 
@@ -28,7 +29,7 @@ class _AdminVouchersPageState extends State<AdminVouchersPage> {
 
   List<html.File>? selectedImages = [];
   double uploadProgress = 0.0;
-  bool isLoading = false;
+  bool _isLoading = true;
   String? urls;
   List<String>? names = [];
   String? nameval;
@@ -41,11 +42,6 @@ class _AdminVouchersPageState extends State<AdminVouchersPage> {
   }
 
   Future<void> addVoucher() async {
-    setState(() {
-      uploadProgress = 0.0;
-      isLoading = true;
-    });
-
     final html.FileUploadInputElement input = html.FileUploadInputElement()
       ..multiple = true;
     input.click();
@@ -97,6 +93,17 @@ class _AdminVouchersPageState extends State<AdminVouchersPage> {
                     ),
                     TextButton(
                       onPressed: () async {
+                        showDialog(
+                            context: context,
+                            builder: (context) {
+                              return AlertDialog(
+                                title: Text('Uploading...'),
+                                content: SpinKitFadingCube(
+                                  color: Color.fromARGB(255, 30, 197, 83),
+                                ),
+                              );
+                            });
+
                         try {
                           names?.add(nameval!);
                         } catch (e) {
@@ -122,7 +129,6 @@ class _AdminVouchersPageState extends State<AdminVouchersPage> {
                         }, SetOptions(merge: true));
 
                         setState(() {
-                          isLoading = false;
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
@@ -157,23 +163,6 @@ class _AdminVouchersPageState extends State<AdminVouchersPage> {
                             await FirebaseFirestore.instance
                                 .collection('Notifications')
                                 .get();
-
-                        //in all notification documents append to the notifications array
-                        // with a title:"New Voucher has been added".
-
-                        // notifsQuerySnapshot.docs.forEach((notifDoc) {
-                        //   batch.set(
-                        //       notifDoc.reference,
-                        //       {
-                        //         'notifications': FieldValue.arrayUnion([
-                        //           {
-                        //             'title':
-                        //                 '${nameval} Voucher has been added',
-                        //           }
-                        //         ])
-                        //       },
-                        //       SetOptions(merge: true));
-                        // });
 
                         //for all tenant ids in Notifications collection add a new notification
                         for (var myid in allTenantIDs) {
@@ -224,68 +213,10 @@ class _AdminVouchersPageState extends State<AdminVouchersPage> {
                     ),
                   ],
                 ));
-
-        // await FirebaseFirestore.instance
-        //     .collection('Vouchers')
-        //     .doc('voucherkey')
-        //     .set({
-        //   //add the url to a list of urls
-        //   'urls': FieldValue.arrayUnion([imageUrl])
-        // }, SetOptions(merge: true));
-
-        // setState(() {
-        //   isLoading = false;
-        //   Navigator.pushReplacement(
-        //     context,
-        //     MaterialPageRoute(
-        //       builder: (context) => const AdminVouchersPage(),
-        //     ),
-        //   );
-        // });
-
-        // WriteBatch batch = FirebaseFirestore.instance.batch();
-
-        // // Update documents in the Tenants collection
-        // QuerySnapshot tenantsQuerySnapshot =
-        //     await FirebaseFirestore.instance.collection('Tenants').get();
-        // QuerySnapshot notifsQuerySnapshot =
-        //     await FirebaseFirestore.instance.collection('Notifications').get();
-
-        // //in all notification documents append to the notifications array
-        // // with a title:"New Voucher has been added".
-
-        // notifsQuerySnapshot.docs.forEach((notifDoc) {
-        //   batch.set(
-        //       notifDoc.reference,
-        //       {
-        //         'notifications': FieldValue.arrayUnion([
-        //           {
-        //             'title': 'New Voucher has been added',
-        //           }
-        //         ])
-        //       },
-        //       SetOptions(merge: true));
-        // });
-
-        // tenantsQuerySnapshot.docs.forEach((tenantDoc) {
-        //   batch.set(tenantDoc.reference, {'isNewVouchers': true},
-        //       SetOptions(merge: true));
-        // });
-
-        // // Update documents in the Landlords collection
-        // QuerySnapshot landlordsQuerySnapshot =
-        //     await FirebaseFirestore.instance.collection('Landlords').get();
-        // landlordsQuerySnapshot.docs.forEach((landlordDoc) {
-        //   batch.set(landlordDoc.reference, {'isNewVouchers': true},
-        //       SetOptions(merge: true));
-        // });
-
-        // // Commit the batched write operation
-        // await batch.commit();
       }
     } else {
       setState(() {
-        isLoading = false;
+        _isLoading = false;
       });
     }
   }
@@ -302,19 +233,32 @@ class _AdminVouchersPageState extends State<AdminVouchersPage> {
         vouchersList.add(Voucher(url, ref));
       }
 
+      // print('reached here');
       FirebaseFirestore.instance
           .collection('Vouchers')
           .doc('voucherkey')
           .get()
           .then((value) {
-        for (var name in value.data()!['names']) {
-          names?.add(name);
+        try {
+          for (var name in value.data()?['names']) {
+            names?.add(name);
+          }
+        } catch (e) {
+          // TODO
+          return;
         }
       });
+      // print('reached here2');
 
+      // setState(() {
+      _isLoading = false;
+      // });
       return vouchersList;
     } catch (error) {
       print('Error fetching vouchers: $error');
+      // setState(() {
+      _isLoading = false;
+      // });
       return [];
     }
   }
@@ -349,7 +293,7 @@ class _AdminVouchersPageState extends State<AdminVouchersPage> {
 
   Future<void> reloadVouchers() async {
     setState(() {
-      isLoading = true;
+      _isLoading = true;
       vouchers.clear();
     });
 
@@ -367,12 +311,12 @@ class _AdminVouchersPageState extends State<AdminVouchersPage> {
 
       setState(() {
         vouchers = newVouchers;
-        isLoading = false;
+        _isLoading = false;
       });
     } catch (error) {
       print('Error fetching vouchers: $error');
       setState(() {
-        isLoading = false;
+        _isLoading = false;
       });
     }
   }
@@ -415,7 +359,9 @@ class _AdminVouchersPageState extends State<AdminVouchersPage> {
                       AsyncSnapshot<List<Voucher>> snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return Center(
-                        child: CircularProgressIndicator(color: Colors.green),
+                        child: SpinKitFadingCube(
+                          color: Color.fromARGB(255, 30, 197, 83),
+                        ),
                       );
                     } else if (snapshot.hasError) {
                       return Center(child: Text('Error: ${snapshot.error}'));
