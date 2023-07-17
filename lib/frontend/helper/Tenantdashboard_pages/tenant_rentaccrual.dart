@@ -179,7 +179,7 @@ class _TenantRentAccrualPageState extends State<TenantRentAccrualPage> {
                                           '${tenant?.firstName} ${tenant?.lastName}',
                                       'uid': widget.uid,
                                       'requestID': randomID,
-                                      'timestamp': Timestamp.now()
+                                      'timestamp': FieldValue.serverTimestamp()
                                     }
                                   ]),
                                 }, SetOptions(merge: true));

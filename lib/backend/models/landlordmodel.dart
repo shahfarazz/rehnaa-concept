@@ -13,7 +13,7 @@ class Landlord {
   final List<DocumentReference<Map<String, dynamic>>> propertyRef;
   final List<DocumentReference<Map<String, dynamic>>>? rentpaymentRef;
   List<Tenant>? tenant = [];
-  List<Property> property = [];
+  List<Property>? property = [];
   List<RentPayment>? rentpayment = [];
   String tempID;
   List<DocumentReference<Map<String, dynamic>>>? dealerRef;
@@ -26,8 +26,8 @@ class Landlord {
   Timestamp? dateJoined;
   String? address;
   String? rating;
-  String? contractStartDate;
-  String? contractEndDate;
+  var contractStartDate;
+  var contractEndDate;
   var monthlyRent;
   var upfrontBonus;
   var monthlyProfit;
@@ -94,8 +94,12 @@ class Landlord {
       dateJoined: json['dateJoined'],
       address: json['address'] ?? '',
       rating: json['rating'] ?? '0.0',
-      contractStartDate: json['contractStartDate'] ?? '',
-      contractEndDate: json['contractEndDate'] ?? '',
+      contractStartDate: json['contractStartDate'] != null
+          ? json['contractStartDate'].toDate()
+          : null,
+      contractEndDate: json['contractEndDate'] != null
+          ? json['contractEndDate'].toDate()
+          : null,
       monthlyRent: json['monthlyRent'] ?? '',
       upfrontBonus: json['upfrontBonus'] ?? '',
       monthlyProfit: json['monthlyProfit'] ?? '',
@@ -103,6 +107,7 @@ class Landlord {
       securityDeposit: json['securityDeposit'] ?? '',
       creditPoints: json['creditPoints'] ?? '',
       creditScore: json['creditScore'] ?? '',
+      cnic: json['cnic'] ?? '',
     );
 
     // await landlord.fetchData();

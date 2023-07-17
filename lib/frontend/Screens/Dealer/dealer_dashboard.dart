@@ -269,30 +269,41 @@ class _DealerDashboardPageState extends State<DealerDashboardPage>
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Stack(
-              children: [
-                ClipPath(
-                  clipper: HexagonClipper(),
-                  child: Transform.scale(
-                    scale: 0.87,
-                    child: Container(
-                      color: Colors.white,
-                      width: 60,
-                      height: 60,
+            GestureDetector(
+                onTap: () {
+                  // Add your desired logic here
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => DealerDashboardPage(
+                              uid: widget.uid,
+                            )),
+                  );
+                },
+                child: Stack(
+                  children: [
+                    ClipPath(
+                      clipper: HexagonClipper(),
+                      child: Transform.scale(
+                        scale: 0.87,
+                        child: Container(
+                          color: Colors.white,
+                          width: 60,
+                          height: 60,
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-                ClipPath(
-                  clipper: HexagonClipper(),
-                  child: Image.asset(
-                    'assets/mainlogo.png',
-                    width: 60,
-                    height: 60,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              ],
-            ),
+                    ClipPath(
+                      clipper: HexagonClipper(),
+                      child: Image.asset(
+                        'assets/mainlogo.png',
+                        width: 60,
+                        height: 60,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ],
+                )),
             const SizedBox(width: 8),
           ],
         ),

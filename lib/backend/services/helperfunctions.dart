@@ -1,6 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:encrypt/encrypt.dart' as encrypt;
+
+import '../models/tenantsmodel.dart';
 
 String formatNumber(double num) {
   if (num >= 1000000000000) {
@@ -14,6 +17,9 @@ String formatNumber(double num) {
   }
   if (num >= 1000) {
     return '${(num / 1000).toStringAsFixed(1)}K';
+  }
+  if (num % 1 != 0) {
+    return num.floor().toString();
   }
   return num.toString();
 }
@@ -73,7 +79,8 @@ class CustomButton extends StatelessWidget {
 String encryptString(String input) {
   try {
     final key = encrypt.Key.fromUtf8("aixgru@@djnjd#%d");
-    final iv = encrypt.IV.fromLength(16);
+    final iv =
+        encrypt.IV.fromUtf8('abcdefghijklmnop'); // Example 16-character IV
 
     final encrypter = encrypt.Encrypter(encrypt.AES(key));
 
@@ -91,14 +98,24 @@ String decryptString(String input) {
   String decrypted = "";
   try {
     final key = encrypt.Key.fromUtf8("aixgru@@djnjd#%d");
-    final iv = encrypt.IV.fromLength(16);
+    final iv =
+        encrypt.IV.fromUtf8('abcdefghijklmnop'); // Example 16-character IV
 
     final encrypter = encrypt.Encrypter(encrypt.AES(key));
 
     decrypted = encrypter.decrypt64(input, iv: iv);
   } catch (e) {
-    decrypted = "No cnic entered yet";
+    print('error with decrypting string is $e');
+    decrypted = "";
   }
 
   return decrypted;
+}
+
+Future<Tenant> getTenantFromUid(String uid) async {
+  return FirebaseFirestore.instance.collection('Tenants').doc(uid).get().then(
+    (value) {
+      return Tenant.fromJson(value.data()!);
+    },
+  );
 }

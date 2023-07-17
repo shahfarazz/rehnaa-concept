@@ -174,7 +174,7 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
     final TextEditingController creditPointsController =
         TextEditingController(text: tenant.creditPoints.toString());
     final TextEditingController cnicNumberController =
-        TextEditingController(text: decryptString(tenant.cnicNumber ?? ''));
+        TextEditingController(text: decryptString(tenant.cnic ?? ''));
     final TextEditingController emailOrPhoneController =
         TextEditingController(text: tenant.emailOrPhone);
     final TextEditingController familyMembersController =
@@ -412,12 +412,9 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
                       'landlordRef': landlordRef,
                       'propertyAddress': propertyAddressController.text,
                       'address': addressController.text,
-                      'contractStartDate': contractStartDate != null
-                          ? Timestamp.fromDate(contractStartDate!)
-                          : null,
-                      'contractEndDate': contractEndDate != null
-                          ? Timestamp.fromDate(contractEndDate!)
-                          : null,
+                      'contractStartDate':
+                          Timestamp.fromDate(contractStartDate!),
+                      'contractEndDate': Timestamp.fromDate(contractEndDate!),
                       'monthlyRent': monthlyRentController.text ?? '',
                       'policeVerification': policeVerification,
                       'tasdeeqVerification': tasdeeqVerification,
@@ -468,11 +465,10 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
                                                   creditPointsController
                                                       .text) ??
                                               0;
-                                          tenant.cnicNumber =
-                                              cnicNumberController
-                                                      .text.isNotEmpty
-                                                  ? hashedCnic
-                                                  : '';
+                                          tenant.cnic = cnicNumberController
+                                                  .text.isNotEmpty
+                                              ? hashedCnic
+                                              : '';
                                           tenant.emailOrPhone =
                                               emailOrPhoneController.text;
                                           tenant.familyMembers = int.tryParse(
@@ -488,17 +484,10 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
                                           tenant.address =
                                               addressController.text;
                                           tenant.contractStartDate =
-                                              contractStartDate != null
-                                                  ? Timestamp.fromDate(
-                                                      contractStartDate!)
-                                                  : null;
+                                              contractStartDate;
                                           tenant.contractEndDate =
-                                              contractEndDate != null
-                                                  ? Timestamp.fromDate(
-                                                      contractEndDate!)
-                                                  : null;
-                                          tenant.monthlyRent =
-                                              monthlyRentController.text ?? '';
+                                              contractEndDate;
+                                          monthlyRentController.text ?? '';
                                           tenant.policeVerification =
                                               policeVerification;
                                           tenant.tasdeeqVerification =
@@ -589,7 +578,7 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
                                             FirebaseFirestore.instance
                                                 .collection('Notifications')
                                                 .doc(tenant.tempID)
-                                                .update({
+                                                .set({
                                               'notifications':
                                                   FieldValue.arrayUnion([
                                                 {
@@ -598,7 +587,7 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
                                                       '${tenant.firstName}, you owe PKR${((double.tryParse(rentController.text) ?? 0.0) - tenant.balance)} to ${tenant.landlord?.firstName}. Thanks!',
                                                 }
                                               ])
-                                            });
+                                            }, SetOptions(merge: true));
                                           });
                                         }
 

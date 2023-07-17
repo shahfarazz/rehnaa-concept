@@ -282,7 +282,8 @@ class _AdminDealerInputPageState extends State<AdminDealerInputPage> {
                             .collection('Dealers')
                             .doc(dealer.tempID)
                             .update({
-                          'rentpaymentRef': FieldValue.arrayUnion([value])
+                          'rentpaymentRef': FieldValue.arrayUnion(
+                              [value]) // key - value pairs Ali Ahmed
                         });
                         FirebaseFirestore.instance
                             .collection('Notifications')

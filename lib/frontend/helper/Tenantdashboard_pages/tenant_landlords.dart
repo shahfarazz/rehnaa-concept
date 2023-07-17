@@ -131,25 +131,34 @@ class _TenantLandlordsPageState extends State<TenantLandlordsPage> {
                       color: Colors.black,
                     ),
                   ),
-                  Wrap(
-                    direction: Axis.horizontal,
-                    spacing: 8.0,
-                    children: landlord.property.map((property) {
-                      return Row(
-                        children: [
-                          // SizedBox()
-                          Text(
-                            property.title,
-                            style: TextStyle(
-                              fontSize: 14.0,
-                              fontWeight: FontWeight.bold,
-                              color: const Color(0xff33907c),
-                            ),
+                  landlord.property != null
+                      ? Wrap(
+                          direction: Axis.horizontal,
+                          spacing: 8.0,
+                          children: landlord.property!.map((property) {
+                            return Row(
+                              children: [
+                                // SizedBox()
+                                Text(
+                                  property.title,
+                                  style: TextStyle(
+                                    fontSize: 14.0,
+                                    fontWeight: FontWeight.bold,
+                                    color: const Color(0xff33907c),
+                                  ),
+                                ),
+                              ],
+                            );
+                          }).toList(),
+                        )
+                      : Text(
+                          'No properties',
+                          style: TextStyle(
+                            fontSize: 14.0,
+                            fontWeight: FontWeight.bold,
+                            color: const Color(0xff33907c),
                           ),
-                        ],
-                      );
-                    }).toList(),
-                  ),
+                        ),
                 ],
               )
             ],

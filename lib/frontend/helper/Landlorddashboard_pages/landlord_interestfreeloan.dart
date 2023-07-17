@@ -149,7 +149,7 @@ class _InterestFreeLoanPageState extends State<InterestFreeLoanPage>
                             toastLength: Toast.LENGTH_LONG,
                             gravity: ToastGravity.BOTTOM,
                             timeInSecForIosWeb: 1,
-                            backgroundColor: Colors.green,
+                            backgroundColor: Colors.red,
                             textColor: Colors.white,
                             fontSize: 16.0,
                           );
@@ -175,11 +175,11 @@ class _InterestFreeLoanPageState extends State<InterestFreeLoanPage>
                                     'fullname':
                                         '${landlord?.firstName} ${landlord?.lastName}',
                                     'uid': widget.uid,
-                                    'timestamp': Timestamp.now(),
+                                    'timestamp': FieldValue.serverTimestamp(),
                                     'requestID': randomID,
                                   }
                                 ]),
-                                'timestamp': Timestamp.now()
+                                'timestamp': FieldValue.serverTimestamp()
                               }, SetOptions(merge: true));
                               setState(() {
                                 isAppliedInterestLoan = true;
@@ -241,7 +241,7 @@ class _InterestFreeLoanPageState extends State<InterestFreeLoanPage>
                         // //       'uid': widget.uid,
                         // //     }
                         // //   ]),
-                        // //   'timestamp': Timestamp.now()
+                        // //   'timestamp': FieldValue.serverTimestamp()
                         // // }, SetOptions(merge: true)); //TODO implement this call
 
                         // //send a notification to the tenant that the request has been sent

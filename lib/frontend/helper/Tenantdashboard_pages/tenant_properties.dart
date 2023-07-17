@@ -30,7 +30,7 @@ class _TenantPropertiesPageState extends State<TenantPropertiesPage>
   bool _isLoading = false;
   List<Property> _properties = [];
   DocumentSnapshot? _lastDocument;
-  ScrollController _scrollController = ScrollController();
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {

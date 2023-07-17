@@ -89,7 +89,9 @@ class _LandlordPropertyFormsState extends State<LandlordPropertyForms> {
         'price': double.parse(_priceController.text),
         'area': double.parse(_areaController.text),
         'isDetailsFilled': true,
-        'pathToImage': pathToImage,
+        'pathToImage': pathToImage.isNotEmpty
+            ? 'there are ${pathToImage.length} images'
+            : 'no images',
       };
 
       try {
@@ -912,9 +914,17 @@ class _LandlordPropertyFormsState extends State<LandlordPropertyForms> {
   }
 }
 
-PreferredSizeWidget _buildAppBar(Size size, context) {
+PreferredSizeWidget _buildAppBar(Size size, BuildContext context) {
   return AppBar(
     toolbarHeight: 70,
+    leading: IconButton(
+      icon: Icon(Icons.arrow_back),
+      onPressed: () {
+        closeKeyboard(
+            context); // Close the keyboard when the back icon is pressed
+        Navigator.of(context).pop(); // You may also want to navigate back
+      },
+    ),
     title: Padding(
       padding: EdgeInsets.only(
         right:
@@ -973,4 +983,9 @@ PreferredSizeWidget _buildAppBar(Size size, context) {
       ),
     ),
   );
+}
+
+void closeKeyboard(BuildContext context) {
+  FocusScope.of(context).unfocus();
+  SystemChannels.textInput.invokeMethod('TextInput.hide');
 }

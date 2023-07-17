@@ -203,7 +203,7 @@ class _TenantSecurityDepositPageState extends State<TenantSecurityDepositPage> {
                                     msg:
                                         'Either you have already applied or your deposit amount is 0',
                                     toastLength: Toast.LENGTH_LONG,
-                                    gravity: ToastGravity.CENTER,
+                                    gravity: ToastGravity.BOTTOM,
                                     timeInSecForIosWeb: 1,
                                     backgroundColor: Colors.red,
                                     textColor: Colors.white,
@@ -236,7 +236,7 @@ class _TenantSecurityDepositPageState extends State<TenantSecurityDepositPage> {
                                 //           'uid': widget.uid,
                                 //         }
                                 //       ]),
-                                //       'timestamp': Timestamp.now()
+                                //       'timestamp': FieldValue.serverTimestamp()
                                 //     },
                                 //         SetOptions(
                                 //             merge:

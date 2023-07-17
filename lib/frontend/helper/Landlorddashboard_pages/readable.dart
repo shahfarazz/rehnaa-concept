@@ -32,7 +32,7 @@
 //           'invoiceNumber': invoiceNumber,
 //           'tenantname': '${tenant.firstName} ${tenant.lastName}',
 //           'requestID': randomID,
-//           'timestamp': Timestamp.now(),
+//           'timestamp': FieldValue.serverTimestamp(),
 //         }
 //       ]),
 //     }, SetOptions(merge: true));

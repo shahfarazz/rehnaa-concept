@@ -47,6 +47,7 @@ class _SignUpPageState extends State<SignUpPage> {
   String? verificationId;
   Timer? verificationTimer;
   Timer? letVerifyTimer;
+  int _secondsRemaining = 30;
 
   dispose() {
     verificationTimer?.cancel();
@@ -55,7 +56,9 @@ class _SignUpPageState extends State<SignUpPage> {
   }
 
   bool isEmail(String input) {
-    final regex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+    final regex = RegExp(
+        r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*\.[a-zA-Z]{2,}$');
+
     return regex.hasMatch(input);
   }
 
@@ -79,9 +82,26 @@ class _SignUpPageState extends State<SignUpPage> {
       );
       verificationTimer?.cancel(); // Cancel any existing timer
       letVerifyTimer?.cancel(); // Cancel any existing timer
-      letVerifyTimer = Timer.periodic(const Duration(seconds: 30), (timer) {});
-      verificationTimer =
-          Timer.periodic(const Duration(seconds: 5), (timer) async {
+      letVerifyTimer = verificationTimer =
+          Timer.periodic(Duration(seconds: 1), (Timer timer) async {
+        if (_secondsRemaining > 0) {
+          setState(() {
+            _secondsRemaining--;
+          });
+        } else {
+          // Timer has completed, perform any desired actions here
+          _showToast(
+              'Verification time has expired refreshing the page', Colors.red);
+          await Future.delayed(const Duration(seconds: 2)).then((value) => {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => SignUpPage()),
+                )
+              });
+          timer.cancel(); // Cancel the timer
+        }
+      });
+      Timer.periodic(const Duration(seconds: 5), (timer) async {
         await FirebaseAuth.instance.currentUser!.reload();
         if (FirebaseAuth.instance.currentUser!.emailVerified) {
           timer.cancel();
@@ -108,7 +128,7 @@ class _SignUpPageState extends State<SignUpPage> {
               'type': selectedOption,
               'balance': 0,
               'pathToImage': 'assets/defaulticon.png',
-              'dateJoined': Timestamp.now(),
+              'dateJoined': FieldValue.serverTimestamp(),
             });
             Navigator.push(
               context,
@@ -127,7 +147,7 @@ class _SignUpPageState extends State<SignUpPage> {
               'type': selectedOption,
               'balance': 0,
               'pathToImage': 'assets/defaulticon.png',
-              'dateJoined': Timestamp.now(),
+              'dateJoined': FieldValue.serverTimestamp(),
             });
             Navigator.push(
               context,
@@ -250,7 +270,7 @@ class _SignUpPageState extends State<SignUpPage> {
         'emailOrPhone': emailOrPhone,
         'type': selectedOption,
         'password': hashString(password),
-        'dateJoined': Timestamp.now(),
+        'dateJoined': FieldValue.serverTimestamp(),
       });
 
       if (selectedOption == 'Landlord') {
@@ -264,7 +284,7 @@ class _SignUpPageState extends State<SignUpPage> {
           'type': selectedOption,
           'balance': 0,
           'pathToImage': 'assets/defaulticon.png',
-          'dateJoined': Timestamp.now(),
+          'dateJoined': FieldValue.serverTimestamp(),
         });
         Navigator.push(
           context,
@@ -283,7 +303,7 @@ class _SignUpPageState extends State<SignUpPage> {
           'type': selectedOption,
           'balance': 0,
           'pathToImage': 'assets/defaulticon.png',
-          'dateJoined': Timestamp.now(),
+          'dateJoined': FieldValue.serverTimestamp(),
         });
         Navigator.push(
           context,
@@ -437,6 +457,7 @@ class _SignUpPageState extends State<SignUpPage> {
   Widget buildInputField(String label,
       {required Function(String) onChanged, String? errorText}) {
     return TextField(
+      enabled: isLoading ? false : true,
       cursorColor: Colors.green,
       onChanged: onChanged,
       style: TextStyle(
@@ -477,6 +498,7 @@ class _SignUpPageState extends State<SignUpPage> {
     required Function() onToggle,
   }) {
     return TextField(
+      enabled: isLoading ? false : true,
       onChanged: onChanged,
       obscureText: !showPassword,
       style: TextStyle(
@@ -537,7 +559,11 @@ class _SignUpPageState extends State<SignUpPage> {
 
   Widget buildOptionButton(String text) {
     return InkWell(
-      onTap: () => setState(() => selectedOption = text),
+      onTap: () {
+        if (!isLoading) {
+          setState(() => selectedOption = text);
+        }
+      },
       child: Container(
         width: 100,
         height: 40,
@@ -646,11 +672,14 @@ class _SignUpPageState extends State<SignUpPage> {
 
                 //check if verification timer is running and if so dont let user go back to login page
                 if (letVerifyTimer != null && letVerifyTimer!.isActive) {
-                  _showToast("Please complete verification", Colors.red);
+                  _showToast(
+                      "Please complete verification, timer is ${_secondsRemaining.toString()}",
+                      Colors.red);
                 } else {
+                  //reload sign up page
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (context) => LoginPage()),
+                    MaterialPageRoute(builder: (context) => SignUpPage()),
                   );
                 }
               },

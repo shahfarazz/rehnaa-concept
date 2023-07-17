@@ -181,35 +181,40 @@ class TenantLandlordInfoPage extends StatelessWidget {
                           ),
 
                           const SizedBox(height: 10.0),
-                          landlord.contractStartDate != ''
-                              ? Center(
+                          landlord.contractStartDate == null
+                              ? Container()
+                              : Center(
                                   child: WhiteBox(
-                                    icon: Icons.numbers,
+                                    icon: Icons.email,
                                     iconColor: const Color(0xff33907c),
                                     label: 'Contract Start Date',
-                                    value: landlord.contractStartDate!,
+                                    value: landlord.contractStartDate!
+                                        .toString()
+                                        .substring(0, 10),
                                   ),
-                                )
-                              : const SizedBox.shrink(),
+                                ),
                           const SizedBox(height: 10.0),
-                          landlord.contractEndDate != ''
-                              ? Center(
+                          landlord.contractEndDate == null
+                              ? Container()
+                              : Center(
                                   child: WhiteBox(
-                                    icon: Icons.numbers,
+                                    icon: Icons.email,
                                     iconColor: const Color(0xff33907c),
                                     label: 'Contract End Date',
-                                    value: landlord.contractEndDate!,
+                                    value: landlord.contractEndDate!
+                                        .toString()
+                                        .substring(0, 10),
                                   ),
-                                )
-                              : const SizedBox.shrink(),
+                                ),
                           const SizedBox(height: 10.0),
-                          landlord.property[0].address != ''
+                          landlord.property!.length != 0 &&
+                                  landlord.property?[0].address != ''
                               ? Center(
                                   child: WhiteBox(
                                     icon: Icons.home,
                                     iconColor: const Color(0xff33907c),
                                     label: 'Property Address',
-                                    value: landlord.property[0].address,
+                                    value: landlord.property![0].address,
                                   ),
                                 )
                               : const SizedBox.shrink(),
@@ -264,6 +269,7 @@ class WhiteBox extends StatelessWidget {
   final String? points;
   final IconData? icon;
   final Color? iconColor;
+  final IconData? pointsIcon;
 
   const WhiteBox({
     Key? key,
@@ -272,6 +278,7 @@ class WhiteBox extends StatelessWidget {
     this.points,
     this.icon,
     this.iconColor,
+    this.pointsIcon,
   }) : super(key: key);
 
   @override
@@ -313,12 +320,23 @@ class WhiteBox extends StatelessWidget {
                       ],
                     ),
                     if (points != null)
-                      Text(
-                        'Points',
-                        style: GoogleFonts.montserrat(
-                          fontSize: 16.0,
-                          color: const Color(0xff33907c),
-                        ),
+                      Row(
+                        children: [
+                          if (icon != null)
+                            Icon(
+                              icon,
+                              color: iconColor,
+                            ),
+                          const SizedBox(width: 8.0),
+                          Text(
+                            'Points',
+                            style: GoogleFonts.montserrat(
+                              fontSize: 16.0,
+                              color: const Color(0xff33907c),
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
                       ),
                   ],
                 ),

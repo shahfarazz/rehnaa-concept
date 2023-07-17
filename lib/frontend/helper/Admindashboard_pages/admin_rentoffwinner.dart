@@ -42,7 +42,7 @@ class _AdminRentOffWinnerPageState extends State<AdminRentOffWinnerPage> {
             familyMembers: doc['familyMembers'] ?? 0,
             pathToImage: doc['pathToImage'] ?? '',
             tempID: doc1.id,
-            cnicNumber: '',
+            cnic: '',
             creditPoints: 0,
             description: '',
             tasdeeqVerification: true,

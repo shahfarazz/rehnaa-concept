@@ -1,11 +1,12 @@
 import 'dart:async';
 
+// import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:easy_image_viewer/easy_image_viewer.dart';
+// import 'package:easy_image_viewer/easy_image_viewer.dart';
 
 import '../helper/Tenantdashboard_pages/tenant_propertyinfo.dart';
 
@@ -186,19 +187,18 @@ class _NewVouchersPageState extends State<NewVouchersPage> {
                                     child: SizedBox(
                                       width: 200,
                                       height: 200,
-                                      child: Image.network(
-                                          images[reversedIndex],
-                                          fit: BoxFit.cover,
-                                          loadingBuilder: (context, child,
-                                                  loadingProgress) =>
-                                              Center(
-                                                child: loadingProgress == null
-                                                    ? child
-                                                    : const SpinKitFadingCube(
-                                                        color: Color.fromARGB(
-                                                            255, 30, 197, 83),
-                                                      ),
-                                              )),
+                                      child: CachedNetworkImage(
+                                        imageUrl: images[reversedIndex],
+                                        fit: BoxFit.cover,
+                                        placeholder: (context, url) => Center(
+                                          child: const SpinKitFadingCube(
+                                            color: Color.fromARGB(
+                                                255, 30, 197, 83),
+                                          ),
+                                        ),
+                                        errorWidget: (context, url, error) =>
+                                            Icon(Icons.error),
+                                      ),
                                     ),
                                   ),
                                 ),

@@ -308,17 +308,17 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                                               'uid': widget.uid,
                                               'invoiceNumber': invoiceNumber,
                                               'requestID': randomID,
-                                              'timestamp': Timestamp.now()
+                                              'timestamp':
+                                                  FieldValue.serverTimestamp()
                                             }
                                           ]),
                                         }, SetOptions(merge: true));
 
                                         // print(
                                         // 'reached here landlord is ${landlord.firstName} ${landlord.lastName}}');
-
-                                        Navigator.pop(context);
-                                        Navigator.pop(context);
                                       }
+                                      Navigator.pop(context);
+                                      Navigator.pop(context);
                                     });
                                   } else {
                                     Fluttertoast.showToast(
@@ -351,6 +351,16 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
   }
 
   void someFunction(Tenant tenant) {
+    if (tenant.landlordRef == null) {
+      Fluttertoast.showToast(
+        msg: 'No landlord found',
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 3,
+        backgroundColor: Colors.red,
+      );
+      return;
+    }
     showOptionDialog(() {
       // setState(() {
       isWithdraw = true;

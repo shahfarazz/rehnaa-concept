@@ -72,6 +72,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
       for (var notificationsnapshot in notificationSnapshots.docs) {
         var notificationData = notificationsnapshot.data();
 
+        // print('notificationData is $notificationData');
+
         // sort notificationData by timestamp descending
         // but you will have to traverse and collect all the timestamps first
         // then sort them as they are in arrays called 'withdrawRequest', 'paymentRequest',
@@ -82,80 +84,76 @@ class _AdminDashboardState extends State<AdminDashboard> {
         //the above gives an error no such method sort so we need to find a way to sort the list
         //manually
 
-        notificationData.forEach((key, value) {
-          if (key == 'withdrawRequest' || key == 'paymentRequest') {
-            value.forEach((item) {
-              Map<String, String> notification = {
-                'title': key,
-                'amount': item['amount'].toString(),
-                'fullname': item['fullname'],
-                'paymentMethod': item['paymentMethod'],
-                'senderid': notificationsnapshot.id,
-                'requestID': item['requestID'],
-              };
-              notificationsAndAlreadyReadNotifications[
-                      notification['senderid']!] =
-                  List.from(notificationsAndAlreadyReadNotifications[
-                          notification['senderid']!] ??
-                      [])
-                    ..add(notification);
+        try {
+          notificationData.forEach((key, value) {
+            if (key == 'withdrawRequest' || key == 'paymentRequest') {
+              value.forEach((item) {
+                Map<String, String> notification = {
+                  'title': key,
+                  'amount': item['amount'].toString(),
+                  'fullname': item['fullname'],
+                  'paymentMethod': item['paymentMethod'],
+                  'senderid': notificationsnapshot.id,
+                  'requestID': item['requestID'],
+                };
+                notificationsAndAlreadyReadNotifications[
+                        notification['senderid']!] =
+                    List.from(notificationsAndAlreadyReadNotifications[
+                            notification['senderid']!] ??
+                        [])
+                      ..add(notification);
 
-              if (!item.containsKey('read') || !item['read']) {
-                tempNotifications.add(notification);
-              }
-            });
-          } else if (key == 'rentalRequest') {
-            value.forEach((item) {
-              Map<String, String> notification = {
-                'title': key,
-                'fullname': item['fullname'],
-                'uid': item['uid'],
-                'property name': item['property']['title'],
-                'senderid': notificationsnapshot.id,
-                'requestID': item['requestID'],
-              };
-              notificationsAndAlreadyReadNotifications[
-                      notification['senderid']!] =
-                  List.from(notificationsAndAlreadyReadNotifications[
-                          notification['senderid']!] ??
-                      [])
-                    ..add(notification);
-              if (!item.containsKey('read') || !item['read']) {
-                tempNotifications.add(notification);
-              }
-            });
-          } else if (key == 'timestamp') {
-            // Do nothing
-          } else {
-            // Leave other cases blank for now
-            value.forEach((item) {
-              Map<String, String> notification = {
-                'title': key,
-                'fullname': '',
-                // 'uid': item['uid'],
-                'senderid': notificationsnapshot.id,
-                'requestID': item['requestID'],
-              };
-              notificationsAndAlreadyReadNotifications[
-                      notification['senderid']!] =
-                  List.from(notificationsAndAlreadyReadNotifications[
-                          notification['senderid']!] ??
-                      [])
-                    ..add(notification);
-              if (!item.containsKey('read') || !item['read']) {
-                tempNotifications.add(notification);
-              }
-            });
-            // Map<String, String> notification = {
-            //   'title': key,
-            //   'amount': '',
-            //   'fullname': '',
-            //   'paymentMethod': '',
-            //   'senderid': notificationsnapshot.id,
-            // };
-            // tempNotifications.add(notification);
-          }
-        });
+                if (!item.containsKey('read') || !item['read']) {
+                  tempNotifications.add(notification);
+                }
+              });
+            } else if (key == 'rentalRequest') {
+              value.forEach((item) {
+                Map<String, String> notification = {
+                  'title': key,
+                  'fullname': item['fullname'],
+                  'uid': item['uid'],
+                  'property name': item['property']['title'],
+                  'senderid': notificationsnapshot.id,
+                  'requestID': item['requestID'],
+                };
+                notificationsAndAlreadyReadNotifications[
+                        notification['senderid']!] =
+                    List.from(notificationsAndAlreadyReadNotifications[
+                            notification['senderid']!] ??
+                        [])
+                      ..add(notification);
+                if (!item.containsKey('read') || !item['read']) {
+                  tempNotifications.add(notification);
+                }
+              });
+            } else if (key == 'timestamp') {
+              // Do nothing
+            } else {
+              // Leave other cases blank for now
+              value.forEach((item) {
+                Map<String, String> notification = {
+                  'title': key,
+                  'fullname': '',
+                  // 'uid': item['uid'],
+                  'senderid': notificationsnapshot.id,
+                  'requestID': item['requestID'],
+                };
+                notificationsAndAlreadyReadNotifications[
+                        notification['senderid']!] =
+                    List.from(notificationsAndAlreadyReadNotifications[
+                            notification['senderid']!] ??
+                        [])
+                      ..add(notification);
+                if (!item.containsKey('read') || !item['read']) {
+                  tempNotifications.add(notification);
+                }
+              });
+            }
+          });
+        } catch (e) {
+          // print('error is $e');
+        }
       }
       setState(() {
         notifications = tempNotifications;
@@ -332,13 +330,38 @@ class _AdminDashboardState extends State<AdminDashboard> {
                 const SizedBox(height: 16.0),
                 Align(
                   alignment: Alignment.centerRight,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    child: const Text('Close'),
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      onTap: () {
+                        Navigator.pop(context);
+                      },
+                      child: Ink(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight,
+                            colors: [
+                              Color(0xff0FA697),
+                              Color(0xff45BF7A),
+                              Color(0xff0DF205),
+                            ],
+                          ),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            'Close',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16.0,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
-                ),
+                )
               ],
             ),
           );

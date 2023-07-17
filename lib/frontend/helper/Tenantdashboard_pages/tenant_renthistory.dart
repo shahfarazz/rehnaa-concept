@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
@@ -96,72 +97,62 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
     // Fetch each rent payment document using the document references
     // try {
     // int count = 0;
-    for (DocumentReference<Map<String, dynamic>> rentPaymentRef
-        in rentPaymentRefs) {
-      // count++;
 
-      DocumentSnapshot<Map<String, dynamic>> rentPaymentSnapshot =
-          await rentPaymentRef.get();
+    // Create a list of Futures
+    List<Future<DocumentSnapshot<Map<String, dynamic>>>> futures =
+        rentPaymentRefs
+            .map((dynamic rentPaymentRef) =>
+                (rentPaymentRef as DocumentReference<Map<String, dynamic>>)
+                    .get())
+            .toList();
 
-      Map<String, dynamic>? data = rentPaymentSnapshot.data();
-      // if (count == 2) {
-      // print('rentpayment ref  $rentPaymentRef');
-      //   // print('reached here with rent payments as $data');
-      // }
-      if (data != null) {
-        RentPayment rentPayment = await RentPayment.fromJson(data);
-        // print('rentpayment ref is $rentPaymentRef')
-        // print('rentpayment found and is ${data}');
+// Wait for all Futures to complete
+    List<DocumentSnapshot<Map<String, dynamic>>> snapshots =
+        await Future.wait(futures);
 
-        // if(rentPayment.pdfUrl != null){
+    var datas = snapshots.map((e) => e.data()).toList();
+    var rentPaymentsFutures =
+        datas.map((e) => RentPayment.fromJson(e ?? {})).toList();
 
-        // }
+    var rentPayments = await Future.wait(rentPaymentsFutures);
+    var url_futures = rentPayments.map((e) {
+      var url = FirebaseFirestore.instance
+          .collection('invoices')
+          .doc(e.invoiceNumber)
+          .get();
+      return url;
+    }).toList();
 
-        if (rentPayment.isMinus != null) {
-          // print('idher rehnaa');
-          isMinus = rentPayment.isMinus!;
-        } else {
-          rentPayment.isMinus =
-              data['landlordRef'] != null || data['dealerRef'] != null;
-          // print('bhai idher mat ajanan');
-          rentPayment.pdfUrl = await FirebaseFirestore.instance
-              .collection('invoices')
-              .doc(rentPayment.invoiceNumber)
-              .get()
-              .then((value) => value.data()?['url']);
-        }
+    var urls = await Future.wait(url_futures);
+    rentPayments = rentPayments.asMap().entries.map<RentPayment>((entry) {
+      int i = entry.key;
+      RentPayment e = entry.value;
+      e.pdfUrl = urls[i].data()?['url'];
+      e.isMinus = e.landlordRef != null || e.dealerRef != null;
 
-        // if (widget.callerType == 'Landlords') {
-        //   // firstName = data['tenantname'] ?? 'Old doc no tenantname';
-        // }
+      return e;
+    }).toList();
 
-        // print('rentpayment found and is ${rentPayment}');
-        // setState(() {
-        //   shouldDisplay = true;
-        // });
+    newRentPayments = rentPayments;
 
-        // print('now adding $count to new rent payments');
+    // print('newrentpayments length is ${newRentPayments.length}');
+    // print("_rentPayments length is ${_rentPayments.length}");
 
-        newRentPayments.add(rentPayment); // Add the new rent payment
-      }
-    }
-    // print('count after loop: $count');
-
-    // for (var e in _rentPayments) {
-    //   print('e.amount is ${e.amount}');
-    // }
+    _rentPayments.forEach((element) {
+      print('element amount: ${element.tenantname}');
+    });
 
     // Check for changes in rent payments
-    if (!listEquals(_rentPayments, newRentPayments)) {
+    if (_rentPayments.length != newRentPayments.length) {
+      // print('reached here as _rentpayments.length is ${_rentPayments.length}');
+      // print(
+      //     'reached here as newrentpayments.length is ${newRentPayments.length}');
       if (mounted) {
         setState(() {
           _rentPayments = newRentPayments; // Update the rent payments list
 
           //reverse the list
           _rentPayments = _rentPayments.reversed.toList();
-          // for (var rentpayment in _rentPayments) {
-          //   print('rentpayment is ${rentpayment.amount}');
-          // }
 
           shouldDisplay = true;
         });
@@ -191,7 +182,7 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
   String? previousMonth;
 
   Widget _buildRentPaymentCard(RentPayment rentPayment) {
-    // print('called with amount ${rentPayment.amount}');
+    print('called with amount ${rentPayment.amount}');
     final Size size = MediaQuery.of(context).size;
     final double whiteBoxHeight = size.height * 0.17;
     final double whiteBoxWidth = size.width * 0.75;
@@ -343,13 +334,13 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
     );
   }
 
-  List<Widget> _buildRentPaymentCards(int startIndex) {
+  Future<List<Widget>> _buildRentPaymentCards(int startIndex) async {
     // print('called with start index $startIndex');
     final List<RentPayment> filteredRentPayments = _filteredRentPayments();
 
-    // filteredRentPayments.forEach((element) {
-    //   // print('element amount: ${element.amount}');
-    // });
+    filteredRentPayments.forEach((element) {
+      print('element38476287436 amount: ${element.amount}');
+    });
 
     return filteredRentPayments
         .skip(startIndex)
@@ -361,11 +352,19 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
   List<RentPayment> _filteredRentPayments() {
     // Filter rent payments based on search query
 
-    return _rentPayments
-        .where((rentPayment) => '${firstName} ${lastName}'
-            .toLowerCase()
-            .contains(searchText.toLowerCase()))
-        .toList();
+    // var name2 = searchText.toLowerCase();
+
+    // print('name1: $name1');
+    // print('name2: $name2');
+
+    return searchText.isEmpty
+        ? _rentPayments
+            .toList() // Return all rent payments when search text is empty
+        : _rentPayments
+            .where((rentPayment) => (rentPayment.tenantname ?? '')
+                .toLowerCase()
+                .contains(searchText.toLowerCase()))
+            .toList();
   }
 
   // Widget _buildLatestMonthWidget() {
@@ -491,6 +490,7 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: TextFormField(
+                      cursorColor: Colors.green,
                       decoration: const InputDecoration(
                         labelText: "Search",
                         labelStyle: TextStyle(color: Colors.green),
@@ -530,9 +530,23 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
                               // print('page count is $pageCount');
 
                               return SingleChildScrollView(
-                                child: Column(
-                                  children:
+                                child: FutureBuilder(
+                                  future:
                                       _buildRentPaymentCards(index * _pageSize),
+                                  builder: (context, snapshot) {
+                                    if (snapshot.connectionState ==
+                                        ConnectionState.waiting) {
+                                      return const TenantRentSkeleton();
+                                    } else if (snapshot.hasError) {
+                                      return Text('Error: ${snapshot.error}');
+                                    } else {
+                                      List<Widget> rentPaymentCards =
+                                          snapshot.data as List<Widget>;
+                                      return Column(
+                                        children: rentPaymentCards,
+                                      );
+                                    }
+                                  },
                                 ),
                               );
                             },
@@ -542,18 +556,49 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            SmoothPageIndicator(
-                              controller: _pageController,
-                              count: _filteredRentPayments().isEmpty
-                                  ? 1
-                                  : (_filteredRentPayments().length / _pageSize)
-                                      .ceil(),
-                              effect: const WormEffect(
-                                dotColor: Colors.grey,
-                                activeDotColor: Color(0xff33907c),
-                                dotHeight: 10.0,
-                                dotWidth: 10.0,
-                                spacing: 8.0,
+                            Expanded(
+                              child: LayoutBuilder(
+                                builder: (context, constraints) {
+                                  final screenWidth = constraints.maxWidth;
+                                  final dotSize = 10.0;
+                                  final spacing = 8.0;
+                                  final maxDots = ((screenWidth - dotSize) /
+                                          (dotSize + spacing))
+                                      .floor();
+                                  final totalPages =
+                                      (_filteredRentPayments().length /
+                                              _pageSize)
+                                          .ceil();
+                                  final visibleDots = min(maxDots, totalPages);
+
+                                  return Stack(
+                                    alignment: Alignment.center,
+                                    children: [
+                                      SmoothPageIndicator(
+                                        controller: _pageController,
+                                        count: visibleDots,
+                                        effect: const WormEffect(
+                                          dotColor: Colors.grey,
+                                          activeDotColor: Color(0xff33907c),
+                                          dotHeight: 10.0,
+                                          dotWidth: 10.0,
+                                          spacing: 8.0,
+                                        ),
+                                      ),
+                                      // if (visibleDots < totalPages)
+                                      //   Positioned(
+                                      //     right: dotSize + spacing,
+                                      //     child: Text(
+                                      //       '+${totalPages - visibleDots}',
+                                      //       style: TextStyle(
+                                      //         color: Colors.grey,
+                                      //         fontSize: 12.0,
+                                      //       ),
+                                      //     ),
+                                      //   ),
+                                    ],
+                                  );
+                                },
                               ),
                             ),
                           ],

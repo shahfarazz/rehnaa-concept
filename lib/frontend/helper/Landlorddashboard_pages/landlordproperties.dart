@@ -447,7 +447,7 @@ class PropertyCard extends StatelessWidget {
           width: screenWidth *
               0.4, // Adjust the width as a fraction of the screen width
           height: screenHeight *
-              0.37, // Adjust the height as a fraction of the screen height
+              0.38, // Adjust the height as a fraction of the screen height
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -477,7 +477,7 @@ class PropertyCard extends StatelessWidget {
                         color: const Color(0xFF33907C),
                       ),
                     ),
-                    SizedBox(height: screenHeight * 0.005),
+                    // SizedBox(height: screenHeight * 0.005),
                     Text(
                       '$location\n$address',
                       style: TextStyle(fontSize: screenWidth * 0.035),
@@ -487,24 +487,40 @@ class PropertyCard extends StatelessWidget {
                       children: [
                         Icon(Icons.area_chart, size: screenWidth * 0.035),
                         SizedBox(width: screenWidth * 0.01),
-                        Text(
-                          '${property.area?.round()} Marlas / ${(property.area! * 272).round()} Sqft',
-                          style: TextStyle(fontSize: screenWidth * 0.035),
-                        ),
-                        SizedBox(width: screenWidth * 0.01),
-                        Icon(Icons.king_bed_outlined,
-                            size: screenWidth * 0.035),
-                        SizedBox(width: screenWidth * 0.01),
-                        Text(
-                          '${property.beds} Bed',
-                          style: TextStyle(fontSize: screenWidth * 0.035),
-                        ),
-                        SizedBox(width: screenWidth * 0.02),
-                        Icon(Icons.bathtub_outlined, size: screenWidth * 0.035),
-                        SizedBox(width: screenWidth * 0.01),
-                        Text(
-                          '${property.baths} Bath',
-                          style: TextStyle(fontSize: screenWidth * 0.035),
+                        Flexible(
+                          child: Wrap(
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            children: [
+                              Text(
+                                '${property.area?.round()} Marlas',
+                                style: TextStyle(fontSize: screenWidth * 0.035),
+                              ),
+                              Text(
+                                ' / ',
+                                style: TextStyle(fontSize: screenWidth * 0.035),
+                              ),
+                              Text(
+                                '${(property.area! * 272).round()} Sqft',
+                                style: TextStyle(fontSize: screenWidth * 0.035),
+                              ),
+                              SizedBox(width: screenWidth * 0.01),
+                              Icon(Icons.king_bed_outlined,
+                                  size: screenWidth * 0.035),
+                              SizedBox(width: screenWidth * 0.01),
+                              Text(
+                                '${property.beds} Bed',
+                                style: TextStyle(fontSize: screenWidth * 0.035),
+                              ),
+                              SizedBox(width: screenWidth * 0.02),
+                              Icon(Icons.bathtub_outlined,
+                                  size: screenWidth * 0.035),
+                              SizedBox(width: screenWidth * 0.01),
+                              Text(
+                                '${property.baths} Bath',
+                                style: TextStyle(fontSize: screenWidth * 0.035),
+                              ),
+                            ],
+                          ),
                         ),
                       ],
                     ),

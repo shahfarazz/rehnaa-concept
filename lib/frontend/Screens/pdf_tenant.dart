@@ -124,7 +124,7 @@ class _PDFEditorTenantPageState extends State<PDFEditorTenantPage> {
         PdfTrueTypeFont(fontData.buffer.asByteData().buffer.asUint8List(), 18);
 
     //Billing To
-    graphics.drawString(landlordName, font_main,
+    graphics.drawString(tenantName, font_main,
         brush: PdfBrushes.black,
         pen: PdfPen(PdfColor(0, 0, 0), width: 0.5),
         bounds: Rect.fromLTWH(
@@ -192,8 +192,8 @@ class _PDFEditorTenantPageState extends State<PDFEditorTenantPage> {
             200, 315, page.getClientSize().width, page.getClientSize().height),
         format: PdfStringFormat(alignment: PdfTextAlignment.left));
 
-    //Tenant Name
-    graphics.drawString(tenantName, font_medium,
+    //landlord Name
+    graphics.drawString(landlordName, font_medium,
         brush: PdfBrushes.black,
         // pen: PdfPen(PdfColor(0, 0, 0), width: 0.5),
         bounds: Rect.fromLTWH(

@@ -42,6 +42,7 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
   bool showChangePassword = false;
   bool _obscurePassword = true; // Track whether the password is obscured or not
   bool _obscurePassword2 = true;
+  bool _obscurePassword3 = true;
   bool deleteCall = false;
 
   //define two new controllers for the password fields
@@ -1324,156 +1325,174 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
                                                       // Show a password prompt dialog to the user
                                                       showDialog(
                                                         context: context,
-                                                        builder: (context) =>
-                                                            AlertDialog(
-                                                          title: Text(
-                                                              'Password Confirmation',
-                                                              style: TextStyle(
-                                                                color: Colors
-                                                                    .green,
-                                                                fontFamily: GoogleFonts
-                                                                        .montserrat()
-                                                                    .fontFamily,
-                                                              )),
-                                                          content:
-                                                              TextFormField(
-                                                            cursorColor:
-                                                                Colors.green,
-                                                            controller:
-                                                                _enterPasswordController,
-                                                            obscureText: true,
-                                                            decoration:
-                                                                InputDecoration(
-                                                              focusedBorder:
-                                                                  UnderlineInputBorder(
-                                                                      borderSide:
-                                                                          BorderSide(
-                                                                color: Colors
-                                                                    .green,
-                                                              )),
-                                                              labelText:
-                                                                  'Enter your password',
-                                                              labelStyle:
-                                                                  TextStyle(
-                                                                color:
-                                                                    Colors.grey,
-                                                                fontFamily: GoogleFonts
-                                                                        .montserrat()
-                                                                    .fontFamily,
-                                                              ),
-                                                            ),
-                                                            validator: (value) {
-                                                              if (value ==
-                                                                      null ||
-                                                                  value
-                                                                      .isEmpty) {
-                                                                return 'Please enter your password';
-                                                              }
-                                                              return null;
+                                                        builder: (context) {
+                                                          return StatefulBuilder(
+                                                            builder:
+                                                                (BuildContext
+                                                                        context,
+                                                                    setState) {
+                                                              return AlertDialog(
+                                                                title: Text(
+                                                                    'Password Confirmation',
+                                                                    style:
+                                                                        TextStyle(
+                                                                      color: Colors
+                                                                          .green,
+                                                                      fontFamily:
+                                                                          GoogleFonts.montserrat()
+                                                                              .fontFamily,
+                                                                    )),
+                                                                content:
+                                                                    TextFormField(
+                                                                  cursorColor:
+                                                                      Colors
+                                                                          .green,
+                                                                  controller:
+                                                                      _enterPasswordController,
+                                                                  obscureText:
+                                                                      _obscurePassword3,
+                                                                  decoration:
+                                                                      InputDecoration(
+                                                                    focusedBorder:
+                                                                        UnderlineInputBorder(
+                                                                            borderSide:
+                                                                                BorderSide(
+                                                                      color: Colors
+                                                                          .green,
+                                                                    )),
+                                                                    labelText:
+                                                                        'Enter your password',
+                                                                    suffixIcon:
+                                                                        GestureDetector(
+                                                                      onTap:
+                                                                          () {
+                                                                        setState(
+                                                                            () {
+                                                                          _obscurePassword3 =
+                                                                              !_obscurePassword3;
+                                                                        });
+                                                                      },
+                                                                      child:
+                                                                          Icon(
+                                                                        _obscurePassword3
+                                                                            ? Icons.visibility
+                                                                            : Icons.visibility_off,
+                                                                        color: Colors
+                                                                            .green,
+                                                                      ),
+                                                                    ),
+                                                                    labelStyle:
+                                                                        TextStyle(
+                                                                      color: Colors
+                                                                          .grey,
+                                                                      fontFamily:
+                                                                          GoogleFonts.montserrat()
+                                                                              .fontFamily,
+                                                                    ),
+                                                                  ),
+                                                                  validator:
+                                                                      (value) {
+                                                                    if (value ==
+                                                                            null ||
+                                                                        value
+                                                                            .isEmpty) {
+                                                                      return 'Please enter your password';
+                                                                    }
+                                                                    return null;
+                                                                  },
+                                                                ),
+                                                                actions: [
+                                                                  TextButton(
+                                                                    onPressed:
+                                                                        () {
+                                                                      Navigator.of(
+                                                                              context)
+                                                                          .pop(
+                                                                              null);
+                                                                      // Navigator.pop(
+                                                                      //     context);
+                                                                    },
+                                                                    child: Text(
+                                                                        'Cancel',
+                                                                        style:
+                                                                            TextStyle(
+                                                                          color:
+                                                                              Colors.green,
+                                                                          fontFamily:
+                                                                              GoogleFonts.montserrat().fontFamily,
+                                                                        )),
+                                                                  ),
+                                                                  TextButton(
+                                                                    onPressed:
+                                                                        () async {
+                                                                      enteredPassword =
+                                                                          _enterPasswordController
+                                                                              .text;
+                                                                      if (enteredPassword !=
+                                                                          null) {
+                                                                        // Reauthenticate the user with the entered password
+                                                                        AuthCredential
+                                                                            credential =
+                                                                            EmailAuthProvider.credential(
+                                                                          email:
+                                                                              currentUser?.email ?? '',
+                                                                          password:
+                                                                              enteredPassword!,
+                                                                        );
+
+                                                                        // Delete the user account
+                                                                        try {
+                                                                          await currentUser
+                                                                              ?.reauthenticateWithCredential(credential);
+
+                                                                          //navigate to splash screen with root context
+                                                                          Navigator.of(context, rootNavigator: true)
+                                                                              .pushReplacement(
+                                                                            MaterialPageRoute(
+                                                                              builder: (context) => LoginPage(),
+                                                                            ),
+                                                                          );
+                                                                        } catch (e) {
+                                                                          ScaffoldMessenger.of(context)
+                                                                              .showSnackBar(
+                                                                            SnackBar(
+                                                                              content: Text(e.toString().substring(30)),
+                                                                            ),
+                                                                          );
+                                                                          print(
+                                                                              'Error: $e');
+                                                                        }
+
+                                                                        // firebase isDisabled true
+                                                                        await FirebaseFirestore
+                                                                            .instance
+                                                                            .collection('users')
+                                                                            .doc(currentUser?.uid)
+                                                                            .set({
+                                                                          'isDisabled':
+                                                                              true,
+                                                                        }, SetOptions(merge: true));
+
+                                                                        // // Sign out the user
+                                                                        // await FirebaseAuth.instance
+                                                                        //     .signOut();
+                                                                      }
+                                                                    },
+                                                                    child: Text(
+                                                                        'Confirm',
+                                                                        style:
+                                                                            TextStyle(
+                                                                          color:
+                                                                              Colors.green,
+                                                                          fontFamily:
+                                                                              GoogleFonts.montserrat().fontFamily,
+                                                                        )),
+                                                                  ),
+                                                                ],
+                                                              );
                                                             },
-                                                          ),
-                                                          actions: [
-                                                            TextButton(
-                                                              onPressed: () {
-                                                                Navigator.of(
-                                                                        context)
-                                                                    .pop(null);
-                                                                // Navigator.pop(
-                                                                //     context);
-                                                              },
-                                                              child: Text(
-                                                                  'Cancel',
-                                                                  style:
-                                                                      TextStyle(
-                                                                    color: Colors
-                                                                        .green,
-                                                                    fontFamily:
-                                                                        GoogleFonts.montserrat()
-                                                                            .fontFamily,
-                                                                  )),
-                                                            ),
-                                                            TextButton(
-                                                              onPressed:
-                                                                  () async {
-                                                                enteredPassword =
-                                                                    _enterPasswordController
-                                                                        .text;
-                                                                if (enteredPassword !=
-                                                                    null) {
-                                                                  // Reauthenticate the user with the entered password
-                                                                  AuthCredential
-                                                                      credential =
-                                                                      EmailAuthProvider
-                                                                          .credential(
-                                                                    email: currentUser
-                                                                            ?.email ??
-                                                                        '',
-                                                                    password:
-                                                                        enteredPassword!,
-                                                                  );
-
-                                                                  // Delete the user account
-                                                                  try {
-                                                                    await currentUser
-                                                                        ?.reauthenticateWithCredential(
-                                                                            credential);
-
-                                                                    //navigate to splash screen with root context
-                                                                    Navigator.of(
-                                                                            context,
-                                                                            rootNavigator:
-                                                                                true)
-                                                                        .pushReplacement(
-                                                                      MaterialPageRoute(
-                                                                        builder:
-                                                                            (context) =>
-                                                                                LoginPage(),
-                                                                      ),
-                                                                    );
-                                                                  } catch (e) {
-                                                                    ScaffoldMessenger.of(
-                                                                            context)
-                                                                        .showSnackBar(
-                                                                      SnackBar(
-                                                                        content: Text(e
-                                                                            .toString()
-                                                                            .substring(30)),
-                                                                      ),
-                                                                    );
-                                                                    print(
-                                                                        'Error: $e');
-                                                                  }
-
-                                                                  // firebase isDisabled true
-                                                                  await FirebaseFirestore
-                                                                      .instance
-                                                                      .collection(
-                                                                          'users')
-                                                                      .doc(currentUser
-                                                                          ?.uid)
-                                                                      .set({
-                                                                    'isDisabled':
-                                                                        true,
-                                                                  }, SetOptions(merge: true));
-
-                                                                  // // Sign out the user
-                                                                  // await FirebaseAuth.instance
-                                                                  //     .signOut();
-                                                                }
-                                                              },
-                                                              child: Text(
-                                                                  'Confirm',
-                                                                  style:
-                                                                      TextStyle(
-                                                                    color: Colors
-                                                                        .green,
-                                                                    fontFamily:
-                                                                        GoogleFonts.montserrat()
-                                                                            .fontFamily,
-                                                                  )),
-                                                            ),
-                                                          ],
-                                                        ),
+                                                          );
+                                                        },
                                                       );
                                                     }
                                                   },
