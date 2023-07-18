@@ -412,9 +412,12 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
                       'landlordRef': landlordRef,
                       'propertyAddress': propertyAddressController.text,
                       'address': addressController.text,
-                      'contractStartDate':
-                          Timestamp.fromDate(contractStartDate!),
-                      'contractEndDate': Timestamp.fromDate(contractEndDate!),
+                      'contractStartDate': contractStartDate != null
+                          ? Timestamp.fromDate(contractStartDate!)
+                          : FieldValue.delete(),
+                      'contractEndDate': contractEndDate != null
+                          ? Timestamp.fromDate(contractEndDate!)
+                          : FieldValue.delete(),
                       'monthlyRent': monthlyRentController.text ?? '',
                       'policeVerification': policeVerification,
                       'tasdeeqVerification': tasdeeqVerification,

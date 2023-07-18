@@ -10,6 +10,7 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:rehnaa/backend/services/authentication_service.dart';
+import 'package:rehnaa/backend/services/helperfunctions.dart';
 
 import '../../Screens/login_page.dart';
 import '../../Screens/signup_page.dart';
@@ -739,6 +740,8 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
                             ),
                             Text(
                               description,
+                              maxLines: 4,
+                              overflow: TextOverflow.ellipsis,
                               style: TextStyle(
                                   fontSize: 18,
                                   color: Colors.grey,
@@ -755,6 +758,24 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
                               title: isEmail ? 'Email' : 'Contact',
                               subtitle: contactInfo,
                             ),
+                            docData['cnic'] != null
+                                ? ProfileInfoItem(
+                                    icon: Icons.perm_identity_rounded,
+                                    title: 'CNIC Number',
+                                    subtitle: decryptString(docData['cnic']))
+                                : Container(),
+                            docData['address'] != null
+                                ? ProfileInfoItem(
+                                    icon: Icons.home,
+                                    title: 'Address',
+                                    subtitle: docData['address'])
+                                : Container(),
+                            docData['phoneNumber'] != null
+                                ? ProfileInfoItem(
+                                    icon: Icons.phone,
+                                    title: 'Phone Number',
+                                    subtitle: docData['phoneNumber'])
+                                : Container(),
                             Stack(
                               alignment: Alignment.centerRight,
                               children: [

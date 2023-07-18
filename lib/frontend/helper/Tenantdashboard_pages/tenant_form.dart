@@ -32,6 +32,9 @@ class _TenantFormsState extends State<TenantForms> {
       TextEditingController();
   final TextEditingController _estimatedBudgetController =
       TextEditingController();
+
+  final TextEditingController _phoneNumberController = TextEditingController();
+
   // String? _cnicError;
 
   @override
@@ -41,6 +44,7 @@ class _TenantFormsState extends State<TenantForms> {
     _whatAreYouLookingForController.dispose();
     _estimatedTimeToShiftController.dispose();
     _estimatedBudgetController.dispose();
+    _phoneNumberController.dispose();
     super.dispose();
   }
 
@@ -52,6 +56,7 @@ class _TenantFormsState extends State<TenantForms> {
         'whatAreYouLookingFor': _whatAreYouLookingForController.text,
         'estimatedTimetoShift': _estimatedTimeToShiftController.text,
         'estimatedBudget': _estimatedBudgetController.text,
+        'phoneNumber': _phoneNumberController.text,
         'isDetailsFilled': true,
       };
 
@@ -184,6 +189,44 @@ class _TenantFormsState extends State<TenantForms> {
               //       fontFamily: GoogleFonts.montserrat().fontFamily,
               //       color: Colors.green),
               // ),
+              TextFormField(
+                style: TextStyle(
+                    fontSize: 16,
+                    fontFamily: GoogleFonts.montserrat().fontFamily,
+                    color: Colors.green),
+                controller: _phoneNumberController,
+                onChanged: (value) {
+                  //if alphabet is entered show an error using toast and clear the field and return
+                  if (value.contains(RegExp(r'[a-zA-Z]'))) {
+                    // replace with a red flutter toast
+                    Fluttertoast.showToast(
+                        msg: "Please enter digits only",
+                        toastLength: Toast.LENGTH_SHORT,
+                        gravity: ToastGravity.BOTTOM,
+                        backgroundColor: Colors.red,
+                        textColor: Colors.white,
+                        fontSize: 16.0);
+                    _phoneNumberController.clear();
+                    return;
+                  }
+                },
+                decoration: const InputDecoration(
+                    labelText: 'Phone number',
+                    focusColor: Colors.green,
+                    hoverColor: Colors.green,
+                    fillColor: Colors.green,
+                    labelStyle: TextStyle(color: Colors.grey),
+                    focusedBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(color: Colors.green))),
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return 'Please enter the phone number';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 16),
+
               TextFormField(
                 style: TextStyle(
                     fontSize: 16,
