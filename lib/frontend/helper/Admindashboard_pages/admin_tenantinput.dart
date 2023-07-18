@@ -186,8 +186,8 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
     final TextEditingController addressController =
         TextEditingController(text: tenant.address ?? '');
 
-    DateTime? contractStartDate;
-    DateTime? contractEndDate;
+    DateTime? contractStartDate = tenant.contractStartDate;
+    DateTime? contractEndDate = tenant.contractEndDate;
 
     Future<void> _selectDate(bool isStartDate, StateSetter setState1) async {
       final DateTime? picked = await showDatePicker(
@@ -228,414 +228,477 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
         TextEditingController(text: tenant.otherInfo.toString());
 
     final hashedCnic = encryptString(cnicNumberController.text);
+    GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
     showDialog(
       context: context,
       builder: (context) {
         return Dialog(
           child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const ListTile(
-                  title: Text('Edit Tenant Details'),
-                ),
-                TextField(
-                  controller: firstNameController,
-                  decoration: const InputDecoration(labelText: 'First Name'),
-                ),
-                TextField(
-                  controller: lastNameController,
-                  decoration: const InputDecoration(labelText: 'Last Name'),
-                ),
-                TextField(
-                  controller: descriptionController,
-                  decoration: const InputDecoration(labelText: 'Description'),
-                ),
-                TextField(
-                  controller: rentController,
-                  decoration: const InputDecoration(labelText: 'Rent'),
-                  keyboardType: TextInputType.number,
-                ),
-                TextField(
-                  controller: creditPointsController,
-                  decoration: const InputDecoration(labelText: 'Credit Points'),
-                  keyboardType: TextInputType.number,
-                ),
-                TextField(
-                  controller: cnicNumberController,
-                  decoration: const InputDecoration(labelText: 'CNIC Number'),
-                ),
-                TextField(
-                  controller: emailOrPhoneController,
-                  decoration:
-                      const InputDecoration(labelText: 'Email or Phone'),
-                ),
-                TextField(
-                  controller: familyMembersController,
-                  decoration:
-                      const InputDecoration(labelText: 'Family Members'),
-                  keyboardType: TextInputType.number,
-                ),
-                TextField(
-                  controller: ratingController,
-                  decoration: const InputDecoration(labelText: 'Rating'),
-                  keyboardType: TextInputType.number,
-                ),
-                TextField(
-                  controller: addressController,
-                  decoration: const InputDecoration(labelText: 'Address'),
-                ),
-                StatefulBuilder(builder: (context, setState) {
-                  return TextButton(
-                    onPressed: () => _selectDate(true, setState),
-                    child: Text(
-                      contractStartDate != null
-                          ? 'Contract Start Date: ${contractStartDate.toString()}'
-                          : 'Select Contract Start Date',
-                    ),
-                  );
-                }),
-                StatefulBuilder(builder: (context, setState) {
-                  return TextButton(
-                    onPressed: () => _selectDate(false, setState),
-                    child: Text(
-                      contractEndDate != null
-                          ? 'Contract End Date: ${contractEndDate.toString()}'
-                          : 'Select Contract End Date',
-                    ),
-                  );
-                }),
-                TextField(
-                  controller: propertyAddressController,
-                  decoration:
-                      const InputDecoration(labelText: 'Property Address'),
-                ),
-                TextField(
-                  controller: monthlyRentController,
-                  decoration: const InputDecoration(labelText: 'Monthly Rent'),
-                ),
-                TextField(
-                  controller: otherInfoController,
-                  decoration:
-                      const InputDecoration(labelText: 'Other Information'),
-                ),
-
-                TextField(
-                  controller: securityDepositController,
-                  decoration:
-                      const InputDecoration(labelText: 'Security Deposit'),
-                ),
-                TextField(
-                  controller: creditScoreController,
-                  decoration: const InputDecoration(labelText: 'Credit Score'),
-                ),
-
-                //field to ask for bool value from user for police verification
-                //give options yes / no
-                StatefulBuilder(
-                  builder: (BuildContext context, StateSetter setState) {
-                    return CheckboxListTile(
-                      title: const Text('Police Verification'),
-                      value: policeVerification,
-                      onChanged: (bool? value) {
-                        setState(() {
-                          policeVerification = value ?? false;
-                        });
-                      },
-                    );
-                  },
-                ),
-                //field to ask for bool value from user for tasdeeq verification
-                //give options yes / no
-                StatefulBuilder(
-                  builder: (BuildContext context, StateSetter setState) {
-                    return CheckboxListTile(
-                      title: const Text('Tasdeeq Verification'),
-                      value: tasdeeqVerification,
-                      onChanged: (bool? value) {
-                        setState(() {
-                          tasdeeqVerification = value ?? false;
-                        });
-                      },
-                    );
-                  },
-                ),
-                const SizedBox(height: 20),
-                StatefulBuilder(
-                  builder: (BuildContext context, StateSetter setState) {
-                    return ListTile(
-                      title: const Text('Select Landlord'),
-                      subtitle: Text(
-                        tenant.landlordRef != null
-                            ? 'Selected landlord: ${tenant.landlordRef?.id}'
-                            : 'Not selected',
-                        style: const TextStyle(
-                          color: Colors.grey,
-                        ),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const ListTile(
+                    title: Text('Edit Tenant Details'),
+                  ),
+                  TextFormField(
+                    controller: firstNameController,
+                    decoration: const InputDecoration(labelText: 'First Name'),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter first name';
+                      }
+                      return null;
+                    },
+                  ),
+                  TextFormField(
+                    controller: lastNameController,
+                    decoration: const InputDecoration(labelText: 'Last Name'),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter last name';
+                      }
+                      return null;
+                    },
+                  ),
+                  TextFormField(
+                    controller: descriptionController,
+                    decoration: const InputDecoration(labelText: 'Description'),
+                  ),
+                  TextFormField(
+                    controller: rentController,
+                    decoration: const InputDecoration(labelText: 'Rent'),
+                    keyboardType: TextInputType.number,
+                  ),
+                  TextFormField(
+                    controller: creditPointsController,
+                    decoration:
+                        const InputDecoration(labelText: 'Credit Points'),
+                    keyboardType: TextInputType.number,
+                  ),
+                  TextFormField(
+                    controller: cnicNumberController,
+                    decoration: const InputDecoration(labelText: 'CNIC Number'),
+                    validator: (value) {
+                      //can be null if not has to be 13 digits
+                      //check if value can be parsed
+                      if (value != null && value.length != 13) {
+                        if (int.tryParse(value) == null) {
+                          return 'Please enter a valid CNIC';
+                        }
+                        return 'please enter a valid CNIC';
+                      }
+                    },
+                  ),
+                  TextFormField(
+                    controller: emailOrPhoneController,
+                    decoration:
+                        const InputDecoration(labelText: 'Email or Phone'),
+                  ),
+                  TextFormField(
+                    controller: familyMembersController,
+                    decoration:
+                        const InputDecoration(labelText: 'Family Members'),
+                    keyboardType: TextInputType.number,
+                  ),
+                  TextFormField(
+                    controller: ratingController,
+                    decoration: const InputDecoration(labelText: 'Rating'),
+                    keyboardType: TextInputType.number,
+                  ),
+                  TextFormField(
+                    controller: addressController,
+                    decoration: const InputDecoration(labelText: 'Address'),
+                  ),
+                  StatefulBuilder(builder: (context, setState) {
+                    return TextButton(
+                      onPressed: () => _selectDate(true, setState),
+                      child: Text(
+                        contractStartDate != null
+                            ? 'Contract Start Date: ${contractStartDate.toString()}'
+                            : 'Select Contract Start Date',
                       ),
-                      onTap: () {
-                        setState(() {
-                          _showLandlordSelectionDialog(() {
-                            setState(() {
-                              // Update the tenant's landlordRef directly
-                              tenant.landlordRef = landlordRef;
+                    );
+                  }),
+                  StatefulBuilder(builder: (context, setState) {
+                    return TextButton(
+                      onPressed: () => _selectDate(false, setState),
+                      child: Text(
+                        contractEndDate != null
+                            ? 'Contract End Date: ${contractEndDate.toString()}'
+                            : 'Select Contract End Date',
+                      ),
+                    );
+                  }),
+                  TextFormField(
+                    controller: propertyAddressController,
+                    decoration:
+                        const InputDecoration(labelText: 'Property Address'),
+                  ),
+                  TextFormField(
+                    controller: monthlyRentController,
+                    decoration:
+                        const InputDecoration(labelText: 'Monthly Rent'),
+                    validator: (value) {
+                      //check if value can be parsed
+                      if (value != null && int.tryParse(value) == null) {
+                        return 'Please enter a valid monthly rent';
+                      }
+                    },
+                  ),
+                  TextFormField(
+                    controller: otherInfoController,
+                    decoration:
+                        const InputDecoration(labelText: 'Other Information'),
+                  ),
+                  TextFormField(
+                    controller: securityDepositController,
+                    decoration:
+                        const InputDecoration(labelText: 'Security Deposit'),
+                    validator: (value) {
+                      //check if value can be parsed
+                      if (value != null && int.tryParse(value) == null) {
+                        return 'Please enter a valid security deposit';
+                      }
+                    },
+                  ),
+                  TextFormField(
+                    controller: creditScoreController,
+                    decoration:
+                        const InputDecoration(labelText: 'Credit Score'),
+                    validator: (value) {
+                      //check if value can be parsed
+                      if (value != null && int.tryParse(value) == null) {
+                        return 'Please enter a valid credit score';
+                      }
+                    },
+                  ),
+                  // Field to ask for bool value from user for police verification
+                  // Give options yes / no
+                  StatefulBuilder(
+                    builder: (BuildContext context, StateSetter setState) {
+                      return CheckboxListTile(
+                        title: const Text('Police Verification'),
+                        value: policeVerification,
+                        onChanged: (bool? value) {
+                          setState(() {
+                            policeVerification = value ?? false;
+                          });
+                        },
+                      );
+                    },
+                  ),
+                  // Field to ask for bool value from user for tasdeeq verification
+                  // Give options yes / no
+                  StatefulBuilder(
+                    builder: (BuildContext context, StateSetter setState) {
+                      return CheckboxListTile(
+                        title: const Text('Tasdeeq Verification'),
+                        value: tasdeeqVerification,
+                        onChanged: (bool? value) {
+                          setState(() {
+                            tasdeeqVerification = value ?? false;
+                          });
+                        },
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 20),
+                  StatefulBuilder(
+                    builder: (BuildContext context, StateSetter setState) {
+                      return ListTile(
+                        title: const Text('Select Landlord'),
+                        subtitle: Text(
+                          tenant.landlordRef != null
+                              ? 'Selected landlord: ${tenant.landlordRef?.id}'
+                              : 'Not selected',
+                          style: const TextStyle(
+                            color: Colors.grey,
+                          ),
+                        ),
+                        onTap: () {
+                          setState(() {
+                            _showLandlordSelectionDialog(() {
+                              setState(() {
+                                // Update the tenant's landlordRef directly
+                                tenant.landlordRef = landlordRef;
+                              });
                             });
                           });
-                        });
-                      },
-                    );
-                  },
-                ),
-                ElevatedButton(
-                  onPressed: () async {
-                    // Update the tenant details in Firebase
+                        },
+                      );
+                    },
+                  ),
+                  ElevatedButton(
+                    onPressed: () async {
+                      if (_formKey.currentState!.validate()) {
+                        // Update the tenant details in Firebase
 
-                    //if the balance has been updated we need to create a rentPayments
-                    // document and set tenantname to "Rehnaa App"
-                    // and tenantRef to the tenant's tempID's document reference
+                        //if the balance has been updated we need to create a rentPayments
+                        // document and set tenantname to "Rehnaa App"
+                        // and tenantRef to the tenant's tempID's document reference
 
-                    var package = {
-                      'firstName': firstNameController.text,
-                      'lastName': lastNameController.text,
-                      'description': descriptionController.text,
-                      'balance': double.tryParse(rentController.text) ?? 0.0,
-                      'creditPoints':
-                          int.tryParse(creditPointsController.text) ?? 0,
-                      'cnicNumber': cnicNumberController.text.isNotEmpty
-                          ? encryptString(cnicNumberController.text)
-                          : '',
-                      'emailOrPhone': emailOrPhoneController.text,
-                      'familyMembers':
-                          int.tryParse(familyMembersController.text) ?? 0,
-                      'rating': double.tryParse(ratingController.text) ?? 0.0,
-                      'landlordRef': landlordRef,
-                      'propertyAddress': propertyAddressController.text,
-                      'address': addressController.text,
-                      'contractStartDate': contractStartDate != null
-                          ? Timestamp.fromDate(contractStartDate!)
-                          : FieldValue.delete(),
-                      'contractEndDate': contractEndDate != null
-                          ? Timestamp.fromDate(contractEndDate!)
-                          : FieldValue.delete(),
-                      'monthlyRent': monthlyRentController.text ?? '',
-                      'policeVerification': policeVerification,
-                      'tasdeeqVerification': tasdeeqVerification,
-                      'securityDeposit': securityDepositController.text ?? '',
-                      'creditScore': creditScoreController.text ?? '',
-                    };
+                        var package = {
+                          'firstName': firstNameController.text,
+                          'lastName': lastNameController.text,
+                          'description': descriptionController.text,
+                          'balance':
+                              double.tryParse(rentController.text) ?? 0.0,
+                          'creditPoints':
+                              int.tryParse(creditPointsController.text) ?? 0,
+                          'cnic': cnicNumberController.text.isNotEmpty
+                              ? encryptString(cnicNumberController.text)
+                              : '',
+                          'emailOrPhone': emailOrPhoneController.text,
+                          'familyMembers':
+                              int.tryParse(familyMembersController.text) ?? 0,
+                          'rating':
+                              double.tryParse(ratingController.text) ?? 0.0,
+                          'landlordRef': tenant.landlordRef,
+                          'propertyAddress': propertyAddressController.text,
+                          'address': addressController.text,
+                          if (contractStartDate != null)
+                            'contractStartDate':
+                                Timestamp.fromDate(contractStartDate!),
+                          if (contractEndDate != null)
+                            'contractEndDate':
+                                Timestamp.fromDate(contractEndDate!),
+                          'monthlyRent': monthlyRentController.text ?? '',
+                          'policeVerification': policeVerification,
+                          'tasdeeqVerification': tasdeeqVerification,
+                          'securityDeposit':
+                              securityDepositController.text ?? '',
+                          'creditScore': creditScoreController.text ?? '',
+                        };
 
-                    showDialog(
-                      context: context,
-                      builder: (context) {
-                        return Dialog(
-                          child: SingleChildScrollView(
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Column(
-                                  children: package.keys.map((key) {
-                                    return ListTile(
-                                      title: Text(key),
-                                      subtitle: Text(package[key].toString()),
-                                    );
-                                  }).toList(),
-                                ),
-                                ButtonBar(
+                        //create a checkpackage that discludes all the document references.
+                        var checkpackage = {
+                          'firstName': firstNameController.text,
+                          'lastName': lastNameController.text,
+                          'balance':
+                              double.tryParse(rentController.text) ?? 0.0,
+                          'cnic': cnicNumberController.text.isNotEmpty
+                              ? cnicNumberController.text
+                              : 'empty',
+                          'address': addressController.text.isNotEmpty
+                              ? addressController.text
+                              : 'empty',
+                          if (contractStartDate != null)
+                            'contractStartDate':
+                                Timestamp.fromDate(contractStartDate!),
+                          if (contractEndDate != null)
+                            'contractEndDate':
+                                Timestamp.fromDate(contractEndDate!),
+                          'monthlyRent': monthlyRentController.text.isNotEmpty
+                              ? monthlyRentController.text ?? 0.0
+                              : 'empty',
+                          'securityDeposit':
+                              securityDepositController.text.isNotEmpty &&
+                                      securityDepositController.text != 'null'
+                                  ? securityDepositController.text
+                                  : 'empty',
+                          'creditScore':
+                              creditScoreController.text.isNotEmpty &&
+                                      creditScoreController.text != 'null'
+                                  ? creditScoreController.text
+                                  : 'empty',
+                          'creditPoints':
+                              creditPointsController.text.isNotEmpty &&
+                                      creditPointsController.text != 'null'
+                                  ? creditPointsController.text
+                                  : 'empty',
+                        };
+
+                        showDialog(
+                          context: context,
+                          builder: (context) {
+                            return Dialog(
+                              child: SingleChildScrollView(
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    ElevatedButton(
-                                      onPressed: () async {
-                                        // Continue with the code
-                                        print('User confirmed');
-
-                                        await FirebaseFirestore.instance
-                                            .collection('Tenants')
-                                            .doc(tenant.tempID)
-                                            .update(package);
-
-                                        setState(() {
-                                          // Update the tenant details in the local list
-                                          tenant.firstName =
-                                              firstNameController.text;
-                                          tenant.lastName =
-                                              lastNameController.text;
-                                          tenant.description =
-                                              descriptionController.text;
-                                          tenant.balance = int.tryParse(
-                                                  rentController.text) ??
-                                              0;
-                                          tenant.creditPoints = int.tryParse(
-                                                  creditPointsController
-                                                      .text) ??
-                                              0;
-                                          tenant.cnic = cnicNumberController
-                                                  .text.isNotEmpty
-                                              ? hashedCnic
-                                              : '';
-                                          tenant.emailOrPhone =
-                                              emailOrPhoneController.text;
-                                          tenant.familyMembers = int.tryParse(
-                                                  familyMembersController
-                                                      .text) ??
-                                              0;
-                                          tenant.rating = double.tryParse(
-                                                  ratingController.text) ??
-                                              0.0;
-                                          tenant.landlordRef = landlordRef;
-                                          tenant.propertyAddress =
-                                              propertyAddressController.text;
-                                          tenant.address =
-                                              addressController.text;
-                                          tenant.contractStartDate =
-                                              contractStartDate;
-                                          tenant.contractEndDate =
-                                              contractEndDate;
-                                          monthlyRentController.text ?? '';
-                                          tenant.policeVerification =
-                                              policeVerification;
-                                          tenant.tasdeeqVerification =
-                                              tasdeeqVerification;
-                                          tenant.securityDeposit =
-                                              securityDepositController.text ??
-                                                  '';
-                                          tenant.creditScore =
-                                              creditScoreController.text ?? '';
-                                        });
-
-                                        if (tenant.balance >
-                                            (double.tryParse(
-                                                    rentController.text) ??
-                                                0.0)) {
-                                          await FirebaseFirestore.instance
-                                              .collection('rentPayments')
-                                              .add({
-                                            'tenantname': 'Rehnaa.pk',
-                                            'tenantRef': FirebaseFirestore
-                                                .instance
-                                                .collection('Tenants')
-                                                .doc(tenant.tempID),
-                                            'amount': -(double.tryParse(
-                                                        rentController.text) ??
-                                                    0.0) +
-                                                (tenant.balance),
-                                            'date': DateTime.now(),
-                                            'isMinus': true,
-                                            'paymentType': '',
-                                            // 'description': 'Balance updated by landlord',
-                                            // 'paymentType': 'Bank Transfer',
-                                          }).then((value) {
-                                            //add the rentpayment document reference to the tenant's
-                                            // rentpayment array
-                                            FirebaseFirestore.instance
-                                                .collection('Tenants')
-                                                .doc(tenant.tempID)
-                                                .update({
-                                              'rentpaymentRef':
-                                                  FieldValue.arrayUnion([value])
-                                            });
-
-                                            FirebaseFirestore.instance
-                                                .collection('Notifications')
-                                                .doc(tenant.tempID)
-                                                .update({
-                                              'notifications':
-                                                  FieldValue.arrayUnion([
-                                                {
-                                                  // 'amount': data.requestedAmount,
-                                                  'title':
-                                                      'Your account has been credited by ${-(double.tryParse(rentController.text) ?? 0.0) + (tenant.balance)}',
-                                                }
-                                              ])
-                                            });
-                                          });
-                                        } else if (tenant.balance <
-                                            (double.tryParse(
-                                                    rentController.text) ??
-                                                0.0)) {
-                                          await FirebaseFirestore.instance
-                                              .collection('rentPayments')
-                                              .add({
-                                            'tenantname': 'Rehnaa.pk',
-                                            'tenantRef': FirebaseFirestore
-                                                .instance
-                                                .collection('Tenants')
-                                                .doc(tenant.tempID),
-                                            'amount': ((double.tryParse(
-                                                        rentController.text) ??
-                                                    0.0) -
-                                                tenant.balance),
-                                            'date': DateTime.now(),
-                                            'isMinus': false,
-                                            // 'description': 'Balance updated by landlord',
-                                            'paymentType': '',
-                                          }).then((value) {
-                                            //add the rentpayment document reference to the tenant's
-                                            // rentpayment array
-                                            FirebaseFirestore.instance
-                                                .collection('Tenants')
-                                                .doc(tenant.tempID)
-                                                .update({
-                                              'rentpaymentRef':
-                                                  FieldValue.arrayUnion([value])
-                                            });
-                                            FirebaseFirestore.instance
-                                                .collection('Notifications')
-                                                .doc(tenant.tempID)
-                                                .set({
-                                              'notifications':
-                                                  FieldValue.arrayUnion([
-                                                {
-                                                  // 'amount': data.requestedAmount,
-                                                  'title':
-                                                      '${tenant.firstName}, you owe PKR${((double.tryParse(rentController.text) ?? 0.0) - tenant.balance)} to ${tenant.landlord?.firstName}. Thanks!',
-                                                }
-                                              ])
-                                            }, SetOptions(merge: true));
-                                          });
-                                        }
-
-                                        //snackbar to show that tenant has been updated
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          const SnackBar(
-                                            content: Text(
-                                                'Tenant updated successfully'),
-                                          ),
+                                    Column(
+                                      children: checkpackage.keys.map((key) {
+                                        return ListTile(
+                                          title: Text(key),
+                                          subtitle: Text(
+                                              checkpackage[key].toString()),
                                         );
-
-                                        Navigator.of(context)
-                                            .pop(); // Close the dialog
-                                        Navigator.of(context)
-                                            .pop(); // Close the dialog
-                                      },
-                                      child: Text('Yes'),
+                                      }).toList(),
                                     ),
-                                    ElevatedButton(
-                                      onPressed: () {
-                                        // Do nothing and navigate back or close the dialog
-                                        print('User canceled');
-                                        Navigator.of(context).pop();
-                                        // Navigator.pop(context); // Close the edit dialog
-                                        Navigator.push(context,
-                                            MaterialPageRoute(
-                                                builder: (context) {
-                                          return AdminTenantsInputPage();
-                                        }));
-                                      },
-                                      child: Text('No'),
+                                    ButtonBar(
+                                      children: [
+                                        ElevatedButton(
+                                          onPressed: () async {
+                                            // Continue with the code
+                                            // print('User confirmed');
+                                            //showdialog with a circular progress indicator
+                                            showDialog(
+                                              context: context,
+                                              builder: (context) {
+                                                return const Center(
+                                                  child: SpinKitFadingCube(
+                                                    color: Color.fromARGB(
+                                                        255, 30, 197, 83),
+                                                  ),
+                                                );
+                                              },
+                                            );
+
+                                            await FirebaseFirestore.instance
+                                                .collection('Tenants')
+                                                .doc(tenant.tempID)
+                                                .update(package);
+
+                                            if (tenant.balance >
+                                                (double.tryParse(
+                                                        rentController.text) ??
+                                                    0.0)) {
+                                              await FirebaseFirestore.instance
+                                                  .collection('rentPayments')
+                                                  .add({
+                                                'tenantname': 'Rehnaa.pk',
+                                                'tenantRef': FirebaseFirestore
+                                                    .instance
+                                                    .collection('Tenants')
+                                                    .doc(tenant.tempID),
+                                                'amount': -(double.tryParse(
+                                                            rentController
+                                                                .text) ??
+                                                        0.0) +
+                                                    (tenant.balance),
+                                                'date': DateTime.now(),
+                                                'isMinus': true,
+                                                'paymentType': '',
+                                                // 'description': 'Balance updated by landlord',
+                                                // 'paymentType': 'Bank Transfer',
+                                              }).then((value) {
+                                                //add the rentpayment document reference to the tenant's
+                                                // rentpayment array
+                                                FirebaseFirestore.instance
+                                                    .collection('Tenants')
+                                                    .doc(tenant.tempID)
+                                                    .update({
+                                                  'rentpaymentRef':
+                                                      FieldValue.arrayUnion(
+                                                          [value])
+                                                });
+
+                                                FirebaseFirestore.instance
+                                                    .collection('Notifications')
+                                                    .doc(tenant.tempID)
+                                                    .update({
+                                                  'notifications':
+                                                      FieldValue.arrayUnion([
+                                                    {
+                                                      // 'amount': data.requestedAmount,
+                                                      'title':
+                                                          'Your account has been credited by ${-(double.tryParse(rentController.text) ?? 0.0) + (tenant.balance)}',
+                                                    }
+                                                  ])
+                                                });
+                                              });
+                                            } else if (tenant.balance <
+                                                (double.tryParse(
+                                                        rentController.text) ??
+                                                    0.0)) {
+                                              await FirebaseFirestore.instance
+                                                  .collection('rentPayments')
+                                                  .add({
+                                                'tenantname': 'Rehnaa.pk',
+                                                'tenantRef': FirebaseFirestore
+                                                    .instance
+                                                    .collection('Tenants')
+                                                    .doc(tenant.tempID),
+                                                'amount': ((double.tryParse(
+                                                            rentController
+                                                                .text) ??
+                                                        0.0) -
+                                                    tenant.balance),
+                                                'date': DateTime.now(),
+                                                'isMinus': false,
+                                                // 'description': 'Balance updated by landlord',
+                                                'paymentType': '',
+                                              }).then((value) async {
+                                                //add the rentpayment document reference to the tenant's
+                                                // rentpayment array
+                                                FirebaseFirestore.instance
+                                                    .collection('Tenants')
+                                                    .doc(tenant.tempID)
+                                                    .update({
+                                                  'rentpaymentRef':
+                                                      FieldValue.arrayUnion(
+                                                          [value])
+                                                });
+                                                tenant.landlord =
+                                                    await tenant.getLandlord();
+                                                FirebaseFirestore.instance
+                                                    .collection('Notifications')
+                                                    .doc(tenant.tempID)
+                                                    .set({
+                                                  'notifications':
+                                                      FieldValue.arrayUnion([
+                                                    {
+                                                      // 'amount': data.requestedAmount,
+                                                      'title': tenant.landlord
+                                                                  ?.firstName !=
+                                                              null
+                                                          ? '${tenant.firstName}, you owe\n PKR${((double.tryParse(rentController.text) ?? 0.0) - tenant.balance)} to ${tenant.landlord?.firstName}. Thanks!'
+                                                          : '${tenant.firstName}, you owe\n PKR${((double.tryParse(rentController.text) ?? 0.0) - tenant.balance)}, Thanks!',
+                                                    }
+                                                  ])
+                                                }, SetOptions(merge: true));
+                                              });
+                                            }
+
+                                            //snackbar to show that tenant has been updated
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              const SnackBar(
+                                                content: Text(
+                                                    'Tenant updated successfully'),
+                                              ),
+                                            );
+
+                                            Navigator.of(context)
+                                                .pop(); // Close the dialog
+                                            Navigator.of(context)
+                                                .pop(); // Close the dialog
+                                            Navigator.of(context)
+                                                .pop(); // Close the dialog
+                                          },
+                                          child: Text('Yes'),
+                                        ),
+                                        ElevatedButton(
+                                          onPressed: () {
+                                            // Do nothing and navigate back or close the dialog
+                                            print('User canceled');
+                                            Navigator.of(context).pop();
+                                            // Navigator.pop(context); // Close the edit dialog
+                                            Navigator.push(context,
+                                                MaterialPageRoute(
+                                                    builder: (context) {
+                                              return AdminTenantsInputPage();
+                                            }));
+                                          },
+                                          child: Text('No'),
+                                        ),
+                                      ],
                                     ),
                                   ],
                                 ),
-                              ],
-                            ),
-                          ),
+                              ),
+                            );
+                          },
                         );
-                      },
-                    );
-                  },
-                  child: const Text('Save'),
-                ),
-              ],
+                      }
+                    },
+                    child: const Text('Save'),
+                  ),
+                ],
+              ),
             ),
           ),
         );
@@ -648,8 +711,8 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
     showDialog(
       context: context,
       builder: (context) {
-        int selectedLandlordIndex =
-            -1; // Declare the selectedLandlordIndex variable inside the builder function
+        int? selectedLandlordIndex;
+        // Declare the selectedLandlordIndex variable inside the builder function
 
         List<QueryDocumentSnapshot<Map<String, dynamic>>> landlordDocs =
             []; // Declare the landlordDocs list outside the builder function
@@ -709,14 +772,14 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
                 ),
                 TextButton(
                   onPressed: () {
-                    if (selectedLandlordIndex != -1) {
+                    if (selectedLandlordIndex != null) {
                       QueryDocumentSnapshot<Map<String, dynamic>>
                           selectedLandlordDoc =
-                          landlordDocs[selectedLandlordIndex];
-                      Map<String, dynamic> landlordData =
-                          selectedLandlordDoc.data();
-                      Landlord selectedLandlord =
-                          Landlord.fromJson(landlordData);
+                          landlordDocs[selectedLandlordIndex!];
+                      // Map<String, dynamic> landlordData =
+                      //     selectedLandlordDoc.data();
+                      // // Landlord selectedLandlord =
+                      // //     Landlord.fromJson(landlordData);
 
                       setState(() {
                         landlordRef = FirebaseFirestore.instance
@@ -726,10 +789,8 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
                       onSelectionDone();
                       Navigator.pop(context); // Close the dialog
                     } else {
-                      Fluttertoast.showToast(
-                        msg: 'Please select a landlord',
-                        toastLength: Toast.LENGTH_SHORT,
-                      );
+                      onSelectionDone();
+                      Navigator.pop(context); // Close the dialog
                     }
                   },
                   child: const Text('Done'),

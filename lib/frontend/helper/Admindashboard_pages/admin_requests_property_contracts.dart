@@ -36,10 +36,27 @@ class _AdminPropertyContractsPageState
       TextEditingController();
 
   final TextEditingController _monthlyRentController = TextEditingController();
-  final TextEditingController _contractStartDateController =
-      TextEditingController();
-  final TextEditingController _contractEndDateController =
-      TextEditingController();
+  DateTime? contractStartDate;
+  DateTime? contractEndDate;
+  Future<void> _selectDate(bool isStartDate, StateSetter setState1) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2020),
+      lastDate: DateTime(2025),
+    );
+
+    if (picked != null) {
+      setState1(() {
+        if (isStartDate) {
+          contractStartDate = picked;
+        } else {
+          contractEndDate = picked;
+        }
+      });
+    }
+  }
+
   final TextEditingController _usePurposeController = TextEditingController();
   final TextEditingController _subletOptionController = TextEditingController();
   final TextEditingController _utilitiesIncludedController =
@@ -75,8 +92,7 @@ class _AdminPropertyContractsPageState
     final String propertyAddress = _propertyAddressController.text;
     // final String securityAmount = _securityAmountController.text;
     final String monthlyRent = _monthlyRentController.text;
-    final String contractStartDate = _contractStartDateController.text;
-    final String contractEndDate = _contractEndDateController.text;
+
     final String usePurpose = _usePurposeController.text;
     final String subletOption = _subletOptionController.text;
     final String utilitiesIncluded = _utilitiesIncludedController.text;
@@ -107,8 +123,12 @@ class _AdminPropertyContractsPageState
       'secondWitnessContact': secondWitnessContact,
       'propertyAddress': propertyAddress,
       'monthlyRent': monthlyRent,
-      'contractStartDate': contractStartDate,
-      'contractEndDate': contractEndDate,
+      'contractStartDate': contractStartDate != null
+          ? Timestamp.fromDate(contractStartDate!)
+          : 'empty',
+      'contractEndDate': contractEndDate != null
+          ? Timestamp.fromDate(contractEndDate!)
+          : 'empty',
       'usePurpose': usePurpose,
       'subletOption': subletOption,
       'utilitiesIncluded': utilitiesIncluded,
@@ -128,8 +148,12 @@ class _AdminPropertyContractsPageState
         .collection('Tenants')
         .doc(widget.tenantID)
         .update({
-      'contractStartDate': contractStartDate,
-      'contractEndDate': contractEndDate,
+      'contractStartDate': contractStartDate != null
+          ? Timestamp.fromDate(contractStartDate!)
+          : 'empty',
+      'contractEndDate': contractEndDate != null
+          ? Timestamp.fromDate(contractEndDate!)
+          : 'empty',
       'propertyAddress': propertyAddress,
       'monthlyRent': monthlyRent,
     });
@@ -138,8 +162,12 @@ class _AdminPropertyContractsPageState
         .collection('Landlords')
         .doc(widget.landlordID)
         .update({
-      'contractStartDate': contractStartDate,
-      'contractEndDate': contractEndDate,
+      'contractStartDate': contractStartDate != null
+          ? Timestamp.fromDate(contractStartDate!)
+          : 'empty',
+      'contractEndDate': contractEndDate != null
+          ? Timestamp.fromDate(contractEndDate!)
+          : 'empty',
       'propertyAddress': propertyAddress,
       'monthlyRent': monthlyRent,
     });
@@ -266,15 +294,26 @@ class _AdminPropertyContractsPageState
               labelText: 'Monthly Rent',
             ),
             const SizedBox(height: 16.0),
-            _buildTextField(
-              controller: _contractStartDateController,
-              labelText: 'Contract Start Date',
-            ),
-            const SizedBox(height: 16.0),
-            _buildTextField(
-              controller: _contractEndDateController,
-              labelText: 'Contract End Date',
-            ),
+            StatefulBuilder(builder: (context, setState) {
+              return TextButton(
+                onPressed: () => _selectDate(true, setState),
+                child: Text(
+                  contractStartDate != null
+                      ? 'Contract Start Date: ${contractStartDate.toString()}'
+                      : 'Select Contract Start Date',
+                ),
+              );
+            }),
+            StatefulBuilder(builder: (context, setState) {
+              return TextButton(
+                onPressed: () => _selectDate(false, setState),
+                child: Text(
+                  contractEndDate != null
+                      ? 'Contract End Date: ${contractEndDate.toString()}'
+                      : 'Select Contract End Date',
+                ),
+              );
+            }),
             const SizedBox(height: 16.0),
             _buildTextField(
               controller: _usePurposeController,

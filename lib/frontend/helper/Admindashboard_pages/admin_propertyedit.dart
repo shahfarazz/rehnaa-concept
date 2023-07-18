@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 import '../../../backend/models/propertymodel.dart';
+import '../../../backend/models/tenantsmodel.dart';
 
 class PropertyEditPage extends StatefulWidget {
   final Property property;
@@ -21,6 +23,7 @@ class _PropertyEditPageState extends State<PropertyEditPage> {
   TextEditingController bathsController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
   TextEditingController areaController = TextEditingController();
+  DocumentReference<Map<String, dynamic>>? tenantRef;
 
   bool isLoading = false;
 
@@ -74,6 +77,7 @@ class _PropertyEditPageState extends State<PropertyEditPage> {
         'baths': int.tryParse(bathsController.text) ?? 0,
         'description': descriptionController.text,
         'area': int.tryParse(areaController.text) ?? 0,
+        'tenantRef': tenantRef,
       }, SetOptions(merge: true));
 
       // Update property object with edited values
@@ -92,6 +96,7 @@ class _PropertyEditPageState extends State<PropertyEditPage> {
         backgroundColor: Colors.green,
         textColor: Colors.white,
       );
+      Navigator.pop(context);
     } catch (error) {
       Fluttertoast.showToast(
         msg: 'Failed to save changes. Please try again.',
@@ -105,6 +110,101 @@ class _PropertyEditPageState extends State<PropertyEditPage> {
     setState(() {
       isLoading = false;
     });
+  }
+
+  Future<void> _showTenantSelectionDialog(VoidCallback onSelectionDone) async {
+    showDialog(
+      context: context,
+      builder: (context) {
+        int? selectedTenantIndex;
+        // Declare the selectedTenantIndex variable inside the builder function
+
+        List<QueryDocumentSnapshot<Map<String, dynamic>>> tenantDocs =
+            []; // Declare the tenantDocs list outside the builder function
+
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Text('Select a property'),
+              content: Container(
+                constraints: BoxConstraints(maxHeight: 300),
+                child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                  stream: FirebaseFirestore.instance
+                      .collection('Tenants')
+                      .snapshots(),
+                  builder: (context, snapshot) {
+                    if (!snapshot.hasData) {
+                      return const SpinKitFadingCube(
+                        color: Color.fromARGB(255, 30, 197, 83),
+                      );
+                    }
+
+                    tenantDocs =
+                        snapshot.data!.docs; // Assign value to tenantDocs
+
+                    return SingleChildScrollView(
+                      child: Column(
+                        children: tenantDocs.map((doc) {
+                          Map<String, dynamic>? tenantData = doc.data();
+                          Tenant tenant = Tenant.fromJson(tenantData);
+                          bool isSelected =
+                              selectedTenantIndex == tenantDocs.indexOf(doc);
+
+                          return RadioListTile<int>(
+                            title:
+                                Text('${tenant.firstName} ${tenant.lastName}'),
+                            value: tenantDocs.indexOf(doc),
+                            groupValue: selectedTenantIndex,
+                            onChanged: (value) {
+                              setState(() {
+                                selectedTenantIndex = value!;
+                              });
+                            },
+                            selected: isSelected,
+                          );
+                        }).toList(),
+                      ),
+                    );
+                  },
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context); // Close the dialog
+                  },
+                  child: const Text('Cancel'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    if (selectedTenantIndex != null) {
+                      QueryDocumentSnapshot<Map<String, dynamic>>
+                          selectedTenantDoc = tenantDocs[selectedTenantIndex!];
+                      // Map<String, dynamic> propertyData =
+                      //     selectedTenantDoc.data();
+                      // // Property selectedproperty =
+                      // //     Property.fromJson(propertyData);
+
+                      setState(() {
+                        tenantRef = FirebaseFirestore.instance
+                            .collection('Tenants')
+                            .doc(selectedTenantDoc.id);
+                      });
+                      onSelectionDone();
+                      Navigator.pop(context); // Close the dialog
+                    } else {
+                      onSelectionDone();
+                      Navigator.pop(context); // Close the dialog
+                    }
+                  },
+                  child: const Text('Done'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
   }
 
   @override
@@ -176,6 +276,31 @@ class _PropertyEditPageState extends State<PropertyEditPage> {
               controller: descriptionController,
               maxLines: 3,
               decoration: InputDecoration(labelText: 'Description'),
+            ),
+            StatefulBuilder(
+              builder: (BuildContext context, StateSetter setState) {
+                return ListTile(
+                  title: const Text('Select Tenant'),
+                  subtitle: Text(
+                    widget.property.tenantRef != null
+                        ? 'Selected Tenant: ${widget.property.tenantRef?.id}'
+                        : 'Not selected',
+                    style: const TextStyle(
+                      color: Colors.grey,
+                    ),
+                  ),
+                  onTap: () {
+                    setState(() {
+                      _showTenantSelectionDialog(() {
+                        setState(() {
+                          // Update the tenant's propertyRef directly
+                          widget.property.tenantRef = tenantRef;
+                        });
+                      });
+                    });
+                  },
+                );
+              },
             ),
             isLoading
                 ? LinearProgressIndicator(

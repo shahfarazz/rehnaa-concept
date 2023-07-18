@@ -1244,8 +1244,7 @@ class LandlordWithdrawalCard extends StatelessWidget {
                               .collection('Tenants')
                               .doc(data.uid),
                           {
-                            'balance':
-                                FieldValue.increment(int.parse(newBalance)),
+                            'balance': FieldValue.increment(newBalance),
                           },
                         );
 
@@ -1343,6 +1342,7 @@ class LandlordWithdrawalCard extends StatelessWidget {
                   } catch (e) {
                     // Handle any errors that occurred during the await transaction
                     //show a snackbar
+                    print('actual error is $e');
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content:
@@ -1358,15 +1358,17 @@ class LandlordWithdrawalCard extends StatelessWidget {
                       ),
                     );
                   } finally {
-                    //close the dialog
-                    Navigator.pop(context);
-                    //reload the page
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const AdminRequestsPage(),
-                      ),
-                    );
+                    if (data.requestType != 'Tenant Rental Request') {
+                      //close the dialog
+                      Navigator.pop(context);
+                      //reload the page
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const AdminRequestsPage(),
+                        ),
+                      );
+                    }
                   }
 
                   // print('data.uid: ${data.uid}');

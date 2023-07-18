@@ -240,6 +240,8 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
     final TextEditingController addressController = TextEditingController(
         text: landlord.address == '' ? '' : landlord.address!);
 
+    // print('landlord address is ${landlord.address}');
+
     // final hashedCnic = encryptString(cnicController.text);
     // final hashedBankName = encryptString(bankNameController.text);
     // final hashedRaastId = encryptString(raastIdController.text);
@@ -249,8 +251,8 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
     // final TextEditingController contractStartDateController =
     //     TextEditingController(
     //         text: landlord.contractStartDate?.toString() ?? '');
-    DateTime? contractStartDate;
-    DateTime? contractEndDate;
+    DateTime? contractStartDate = landlord.contractStartDate;
+    DateTime? contractEndDate = landlord.contractEndDate;
 
     Future<void> _selectDate(bool isStartDate, StateSetter setState1) async {
       final DateTime? picked = await showDatePicker(
@@ -584,14 +586,14 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
                                   ? encryptString(ibanController.text)
                                   : FieldValue.delete(),
                               'address': addressController.text.isNotEmpty
-                                  ? encryptString(addressController.text)
+                                  ? addressController.text
                                   : FieldValue.delete(),
-                              'contractStartDate': contractStartDate != null
-                                  ? Timestamp.fromDate(contractStartDate!)
-                                  : FieldValue.delete(),
-                              'contractEndDate': contractEndDate != null
-                                  ? Timestamp.fromDate(contractEndDate!)
-                                  : FieldValue.delete(),
+                              if (contractStartDate != null)
+                                'contractStartDate':
+                                    Timestamp.fromDate(contractStartDate!),
+                              if (contractEndDate != null)
+                                'contractEndDate':
+                                    Timestamp.fromDate(contractEndDate!),
                               'monthlyRent':
                                   monthlyRentController.text.isNotEmpty
                                       ? monthlyRentController.text ?? 0.0
@@ -647,12 +649,12 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
                               'address': addressController.text.isNotEmpty
                                   ? addressController.text
                                   : 'empty',
-                              'contractStartDate': contractStartDate != null
-                                  ? Timestamp.fromDate(contractStartDate!)
-                                  : 'empty',
-                              'contractEndDate': contractEndDate != null
-                                  ? Timestamp.fromDate(contractEndDate!)
-                                  : 'empty',
+                              if (contractStartDate != null)
+                                'contractStartDate':
+                                    Timestamp.fromDate(contractStartDate!),
+                              if (contractEndDate != null)
+                                'contractEndDate':
+                                    Timestamp.fromDate(contractEndDate!),
                               'monthlyRent':
                                   monthlyRentController.text.isNotEmpty
                                       ? monthlyRentController.text ?? 0.0
@@ -707,15 +709,141 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
                                               onPressed: () async {
                                                 // Continue with the code
                                                 print('User confirmed');
+                                                showDialog(
+                                                  context: context,
+                                                  builder: (context) {
+                                                    return const Center(
+                                                      child: SpinKitFadingCube(
+                                                        color: Color.fromARGB(
+                                                            255, 30, 197, 83),
+                                                      ),
+                                                    );
+                                                  },
+                                                );
                                                 // Your save logic goes here
                                                 await FirebaseFirestore.instance
                                                     .collection('Landlords')
                                                     .doc(landlord.tempID)
                                                     .update(package);
 
+                                                if (landlord.balance >
+                                                    (double.tryParse(
+                                                            balanceController
+                                                                .text) ??
+                                                        0.0)) {
+                                                  await FirebaseFirestore
+                                                      .instance
+                                                      .collection(
+                                                          'rentPayments')
+                                                      .add({
+                                                    'tenantname': 'Rehnaa.pk',
+                                                    'tenantRef':
+                                                        FirebaseFirestore
+                                                            .instance
+                                                            .collection(
+                                                                'Landlords')
+                                                            .doc(landlord
+                                                                .tempID),
+                                                    'amount': -(double.tryParse(
+                                                                balanceController
+                                                                    .text) ??
+                                                            0.0) +
+                                                        (landlord.balance),
+                                                    'date': DateTime.now(),
+                                                    'isMinus': true,
+                                                    'paymentType': '',
+                                                    // 'description': 'Balance updated by landlord',
+                                                    // 'paymentType': 'Bank Transfer',
+                                                  }).then((value) {
+                                                    //add the rentpayment document reference to the tenant's
+                                                    // rentpayment array
+                                                    FirebaseFirestore.instance
+                                                        .collection('Landlords')
+                                                        .doc(landlord.tempID)
+                                                        .update({
+                                                      'rentpaymentRef':
+                                                          FieldValue.arrayUnion(
+                                                              [value])
+                                                    });
+
+                                                    FirebaseFirestore.instance
+                                                        .collection(
+                                                            'Notifications')
+                                                        .doc(landlord.tempID)
+                                                        .update({
+                                                      'notifications':
+                                                          FieldValue
+                                                              .arrayUnion([
+                                                        {
+                                                          // 'amount': data.requestedAmount,
+                                                          'title':
+                                                              'Your account has been credited by ${-(double.tryParse(balanceController.text) ?? 0.0) + (landlord.balance)}',
+                                                        }
+                                                      ])
+                                                    });
+                                                  });
+                                                } else if (landlord.balance <
+                                                    (double.tryParse(
+                                                            balanceController
+                                                                .text) ??
+                                                        0.0)) {
+                                                  await FirebaseFirestore
+                                                      .instance
+                                                      .collection(
+                                                          'rentPayments')
+                                                      .add({
+                                                    'tenantname': 'Rehnaa.pk',
+                                                    'tenantRef':
+                                                        FirebaseFirestore
+                                                            .instance
+                                                            .collection(
+                                                                'Landlords')
+                                                            .doc(landlord
+                                                                .tempID),
+                                                    'amount': ((double.tryParse(
+                                                                balanceController
+                                                                    .text) ??
+                                                            0.0) -
+                                                        landlord.balance),
+                                                    'date': DateTime.now(),
+                                                    'isMinus': false,
+                                                    // 'description': 'Balance updated by landlord',
+                                                    'paymentType': '',
+                                                  }).then((value) async {
+                                                    //add the rentpayment document reference to the tenant's
+                                                    // rentpayment array
+                                                    FirebaseFirestore.instance
+                                                        .collection('Landlords')
+                                                        .doc(landlord.tempID)
+                                                        .update({
+                                                      'rentpaymentRef':
+                                                          FieldValue.arrayUnion(
+                                                              [value])
+                                                    });
+
+                                                    FirebaseFirestore.instance
+                                                        .collection(
+                                                            'Notifications')
+                                                        .doc(landlord.tempID)
+                                                        .set({
+                                                      'notifications':
+                                                          FieldValue
+                                                              .arrayUnion([
+                                                        {
+                                                          // 'amount': data.requestedAmount,
+                                                          'title':
+                                                              'Your account has been debited by PKR${((double.tryParse(balanceController.text) ?? 0.0) - landlord.balance)}'
+                                                        }
+                                                      ])
+                                                    }, SetOptions(merge: true));
+                                                  });
+                                                }
+
                                                 Navigator.of(context)
                                                     .pop(); // Close the dialog
                                                 Navigator.of(context).pop();
+                                                Navigator.of(context).pop();
+
                                                 //snackbar
                                                 Fluttertoast.showToast(
                                                     msg:

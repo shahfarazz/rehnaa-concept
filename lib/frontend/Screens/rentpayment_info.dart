@@ -128,7 +128,9 @@ class RentPaymentInfoPage extends StatelessWidget {
                           icon: _getPaymentIcon(rentPayment.paymentType),
                           iconColor: const Color(0xff33907c),
                           label: 'Payment Type',
-                          value: rentPayment.paymentType,
+                          value: firstName == 'Rehnaa.pk'
+                              ? 'N/A'
+                              : rentPayment.paymentType,
                         ),
                       ),
                       const SizedBox(height: 10.0),
@@ -153,29 +155,31 @@ class RentPaymentInfoPage extends StatelessWidget {
                       const SizedBox(height: 10.0),
 
                       // make a box where pdf will be shown
-                      GestureDetector(
-                          onTap: () {
-                            // print('receiptUrl: $receiptUrl');
-                            if (receiptUrl != 'No pdf') {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => PDFScreen(
-                                    path: receiptUrl,
-                                    displayAppBar: true,
-                                  ),
+                      firstName == 'Rehnaa.pk'
+                          ? Container()
+                          : GestureDetector(
+                              onTap: () {
+                                // print('receiptUrl: $receiptUrl');
+                                if (receiptUrl != 'No pdf') {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => PDFScreen(
+                                        path: receiptUrl,
+                                        displayAppBar: true,
+                                      ),
+                                    ),
+                                  );
+                                }
+                              },
+                              child: Center(
+                                child: WhiteBox(
+                                  icon: Icons.picture_as_pdf,
+                                  iconColor: const Color(0xff33907c),
+                                  label: 'Payment Receipt',
+                                  value: 'Click to view',
                                 ),
-                              );
-                            }
-                          },
-                          child: Center(
-                            child: WhiteBox(
-                              icon: Icons.picture_as_pdf,
-                              iconColor: const Color(0xff33907c),
-                              label: 'Payment Receipt',
-                              value: 'Click to view',
-                            ),
-                          ))
+                              ))
                     ],
                   ),
                 ),

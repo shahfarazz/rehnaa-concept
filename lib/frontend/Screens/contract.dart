@@ -146,11 +146,23 @@ class MyScreen extends StatelessWidget {
               children: [
                 (pdfUrl != null)
                     ? Expanded(
+                        child: GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => PDFScreen(
+                                path: pdfUrl,
+                                displayAppBar: true,
+                              ),
+                            ),
+                          );
+                        },
                         child: InteractiveViewer(
                           child: pdfScreen,
                         ),
                         // pdfScreen,
-                      )
+                      ))
                     : Container(),
                 SizedBox(height: size.height * 0.05),
                 Expanded(
@@ -237,15 +249,15 @@ class MyScreen extends StatelessWidget {
                                 ContractCard(
                                   icon: Icons.credit_card,
                                   label: 'Second Witness CNIC:',
-                                  data: contractFields?['secondWitnessCnic'] ??
-                                      '',
+                                  data: decryptString(
+                                      contractFields?['secondWitnessCnic'] ??
+                                          ''),
                                 ),
                                 SizedBox(height: 16),
                                 ContractCard(
                                   icon: Icons.phone,
                                   label: 'Second Witness Contact Number:',
-                                  data: decryptString(
-                                      contractFields['secondWitnessContact']),
+                                  data: contractFields['secondWitnessContact'],
                                 ),
                                 SizedBox(height: 16),
                                 ContractCard(
@@ -264,15 +276,19 @@ class MyScreen extends StatelessWidget {
                                 ContractCard(
                                   icon: Icons.calendar_today,
                                   label: 'Contract Start Date:',
-                                  data: contractFields?['contractStartDate'] ??
+                                  data: contractFields?['contractStartDate']
+                                          .toDate()
+                                          .toString() ??
                                       '',
                                 ),
                                 SizedBox(height: 16),
                                 ContractCard(
                                   icon: Icons.calendar_today,
                                   label: 'Contract End Date:',
-                                  data:
-                                      contractFields?['contractEndDate'] ?? '',
+                                  data: contractFields?['contractEndDate']
+                                          .toDate()
+                                          .toString() ??
+                                      '',
                                 ),
                                 // Rest of the ContractCard widgets...
                               ],

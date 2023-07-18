@@ -72,6 +72,7 @@ class _LandlordTenantsPageState extends State<LandlordTenantsPage>
     _loadTenantsCompleter
         .complete(); // Complete the Completer to cancel the Future.delayed() call
     _pageController.dispose(); // Dispose the PageController
+    _tenants.clear();
     super.dispose();
     // _stopPeriodicFetching();
   }
@@ -79,6 +80,7 @@ class _LandlordTenantsPageState extends State<LandlordTenantsPage>
   // Fetch tenant data from Firestore
   Future<void> _loadTenants() async {
     // print('called');
+
     DocumentSnapshot<Map<String, dynamic>> landlordSnapshot =
         await FirebaseFirestore.instance
             .collection('Landlords')
@@ -89,6 +91,7 @@ class _LandlordTenantsPageState extends State<LandlordTenantsPage>
       setState(() {
         shouldDisplayContent = true;
       });
+
       // print('reached here');
       Map<String, dynamic>? landlordData = landlordSnapshot.data();
       if (landlordData != null && landlordData['tenantRef'] != null) {
@@ -139,8 +142,13 @@ class _LandlordTenantsPageState extends State<LandlordTenantsPage>
         if (mounted) {
           setState(() {
             _tenants = fetchedTenants;
+            _isLoading = false;
           });
         }
+      } else {
+        setState(() {
+          _isLoading = false;
+        });
       }
     }
   }
@@ -259,6 +267,8 @@ class _LandlordTenantsPageState extends State<LandlordTenantsPage>
     final int pageCount = (_tenants.length / _pageSize).ceil();
 
     Widget buildTenantsList() {
+      print(
+          '_tenants length is ${_tenants.isEmpty} & shouldDisplayContent is $shouldDisplayContent');
       if (_tenants.isEmpty && !shouldDisplayContent) {
         return const LandlordTenantSkeleton();
       } else if (_tenants.isEmpty && shouldDisplayContent) {

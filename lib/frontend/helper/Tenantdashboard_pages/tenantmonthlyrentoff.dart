@@ -87,7 +87,7 @@ class _TenantMonthlyRentOffPageState extends State<TenantMonthlyRentOffPage>
         });
       }
     });
-    fetchWinnerTenants();
+    // fetchWinnerTenants();
   }
 
   @override
