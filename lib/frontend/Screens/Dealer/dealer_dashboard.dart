@@ -66,8 +66,7 @@ class _DealerDashboardPageState extends State<DealerDashboardPage>
         .collection('Notifications')
         .doc(widget.uid)
         .snapshots();
-    isNewVouchers();
-    _startPeriodicFetch();
+    _startDealerVoucherStream();
   }
 
   @override
@@ -76,20 +75,8 @@ class _DealerDashboardPageState extends State<DealerDashboardPage>
     _sidebarController.dispose();
     _notificationStream.drain();
     _notificationStream2.drain();
-    _stopPeriodicFetch();
+    _dealerVouchersSubscription?.cancel();
     super.dispose();
-  }
-
-  // Periodically fetch new data every 15 seconds
-  void _startPeriodicFetch() {
-    _timer = Timer.periodic(const Duration(seconds: 15), (_) {
-      isNewVouchers();
-    });
-  }
-
-  // Stop periodic fetching
-  void _stopPeriodicFetch() {
-    _timer?.cancel();
   }
 
   void _handleNotificationsButtonPress() async {
@@ -132,33 +119,25 @@ class _DealerDashboardPageState extends State<DealerDashboardPage>
     });
   }
 
-  Future<void> isNewVouchers() async {
-    //check for isNew varialbe in the user document
-    // and set the isNewVoucher variable accordingly
-    // also after setting isNewVoucher to true or false, update the isNew variable in the user document
-    // which should now be false
+  StreamSubscription<DocumentSnapshot<Map<String, dynamic>>>?
+      _dealerVouchersSubscription;
 
-    try {
-      FirebaseFirestore.instance
-          .collection('Dealers')
-          .doc(widget.uid)
-          .get()
-          .then((value) {
-        if (value.exists) {
-          if (value.data()!['isNewVouchers'] == true && isNewVoucher == false) {
-            setState(() {
-              isNewVoucher = true;
-            });
-          } else if (value.data()!['isNewVouchers'] == false &&
-              isNewVoucher == true) {
-            setState(() {
-              isNewVoucher = false;
-            });
-          }
-        }
-      });
-    } on Exception catch (e) {
-      print('Error is $e');
+  void _startDealerVoucherStream() {
+    _dealerVouchersSubscription = FirebaseFirestore.instance
+        .collection('Dealers')
+        .doc(widget.uid)
+        .snapshots()
+        .listen(_dealerVoucherUpdate);
+  }
+
+  void _dealerVoucherUpdate(DocumentSnapshot<Map<String, dynamic>> snapshot) {
+    if (snapshot.exists) {
+      bool? isNew = snapshot.data()?['isNewVouchers'];
+      if (isNew != null && isNew != isNewVoucher) {
+        setState(() {
+          isNewVoucher = isNew;
+        });
+      }
     }
   }
 

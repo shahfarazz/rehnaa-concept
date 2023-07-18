@@ -34,8 +34,8 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
   String searchText = ''; // Variable to store the search query
   String invoiceNumber = '';
   String pdfUrl = '';
-  Timer? _timer;
   bool isMinus = false;
+  StreamSubscription<DocumentSnapshot>? _rentPaymentsSubscription;
 
   @override
   bool get wantKeepAlive => true;
@@ -44,136 +44,111 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
   void initState() {
     super.initState();
     _tenantRentPayments(); // Call method to load rent payments when the state is initialized
-    _startPeriodicFetch(); // Start periodic fetching of new data
+    // _startPeriodicFetch(); // Start periodic fetching of new data
   }
 
   @override
   void dispose() {
-    _stopPeriodicFetch(); // Stop periodic fetching when the widget is disposed
+    // _stopPeriodicFetch(); // Stop periodic fetching when the widget is disposed
     super.dispose();
+    _rentPaymentsSubscription?.cancel();
   }
 
-  // Periodically fetch new data every 5 seconds
-  void _startPeriodicFetch() {
-    _timer = Timer.periodic(const Duration(seconds: 5), (_) {
-      _tenantRentPayments();
-    });
-  }
+  void _tenantRentPayments() {
+    _rentPaymentsSubscription
+        ?.cancel(); // Cancel the previous subscription if any
 
-  // Stop periodic fetching
-  void _stopPeriodicFetch() {
-    _timer?.cancel();
-  }
+    _rentPaymentsSubscription = FirebaseFirestore.instance
+        .collection(widget.callerType)
+        .doc(widget.uid)
+        .snapshots()
+        .listen((DocumentSnapshot snapshot) async {
+      Map<String, dynamic>? data = snapshot.data() as Map<String, dynamic>?;
 
-  Future<void> _tenantRentPayments() async {
-    // Fetch landlord data from Firestore
-    DocumentSnapshot<Map<String, dynamic>> landlordSnapshot =
-        await FirebaseFirestore.instance
-            .collection(widget.callerType)
-            .doc(widget.uid)
-            .get();
+      List<dynamic> rentPaymentRefs = data!['rentpaymentRef'] ?? [];
+      if (widget.callerType == "Tenants") {
+        firstName = data['firstName'];
+        lastName = data['lastName'];
+      } else {
+        lastName = '';
+      }
 
-    Map<String, dynamic>? data = landlordSnapshot.data();
-    List<dynamic> rentPaymentRefs = data!['rentpaymentRef'] ?? [];
-    if (widget.callerType == "Tenants") {
-      firstName = data['firstName'];
-      lastName = data['lastName'];
-    } else {
-      // firstName = data['tenantname'] ?? 'Old doc no tenantname';
-      lastName = '';
-    }
-
-    if (rentPaymentRefs.isEmpty) {
-      setState(() {
-        shouldDisplay = true;
-      });
-      // shouldDisplay = true;
-    }
-
-    // print('reached here with landlord data as $data');
-
-    List<RentPayment> newRentPayments = []; // Store the new rent payments
-
-    // Fetch each rent payment document using the document references
-    // try {
-    // int count = 0;
-
-    // Create a list of Futures
-    List<Future<DocumentSnapshot<Map<String, dynamic>>>> futures =
-        rentPaymentRefs
-            .map((dynamic rentPaymentRef) =>
-                (rentPaymentRef as DocumentReference<Map<String, dynamic>>)
-                    .get())
-            .toList();
-
-// Wait for all Futures to complete
-    List<DocumentSnapshot<Map<String, dynamic>>> snapshots =
-        await Future.wait(futures);
-
-    var datas = snapshots.map((e) => e.data()).toList();
-    var rentPaymentsFutures =
-        datas.map((e) => RentPayment.fromJson(e ?? {})).toList();
-
-    var rentPayments = await Future.wait(rentPaymentsFutures);
-    var url_futures = rentPayments.map((e) {
-      var url = FirebaseFirestore.instance
-          .collection('invoices')
-          .doc(e.invoiceNumber)
-          .get();
-      return url;
-    }).toList();
-
-    var urls = await Future.wait(url_futures);
-    rentPayments = rentPayments.asMap().entries.map<RentPayment>((entry) {
-      int i = entry.key;
-      RentPayment e = entry.value;
-      e.pdfUrl = urls[i].data()?['url'];
-      e.isMinus = e.landlordRef != null || e.dealerRef != null;
-
-      return e;
-    }).toList();
-
-    newRentPayments = rentPayments;
-
-    // print('newrentpayments length is ${newRentPayments.length}');
-    // print("_rentPayments length is ${_rentPayments.length}");
-
-    _rentPayments.forEach((element) {
-      print('element amount: ${element.tenantname}');
-    });
-
-    // Check for changes in rent payments
-    if (_rentPayments.length != newRentPayments.length) {
-      // print('reached here as _rentpayments.length is ${_rentPayments.length}');
-      // print(
-      //     'reached here as newrentpayments.length is ${newRentPayments.length}');
-      if (mounted) {
+      if (rentPaymentRefs.isEmpty) {
         setState(() {
-          _rentPayments = newRentPayments; // Update the rent payments list
-
-          //reverse the list
-          _rentPayments = _rentPayments.reversed.toList();
-
           shouldDisplay = true;
         });
+        // shouldDisplay = true;
       }
-    }
 
-    // if (kDebugMode) {
-    //   print('Rent payments: $_rentPayments');
-    // }
-    // }
-    // catch (e) {
-    //   if (mounted) {
-    //     setState(() {
-    //       shouldDisplay = false;
-    //     });
-    //   }
+      // print('reached here with landlord data as $data');
 
-    //   if (kDebugMode) {
-    //     print('Error fetching rent payments: $e');
-    //   }
-    // }
+      List<RentPayment> newRentPayments = []; // Store the new rent payments
+
+      // Fetch each rent payment document using the document references
+      // try {
+      // int count = 0;
+
+      // Create a list of Futures
+      List<Future<DocumentSnapshot<Map<String, dynamic>>>> futures =
+          rentPaymentRefs
+              .map((dynamic rentPaymentRef) =>
+                  (rentPaymentRef as DocumentReference<Map<String, dynamic>>)
+                      .get())
+              .toList();
+
+// Wait for all Futures to complete
+      List<DocumentSnapshot<Map<String, dynamic>>> snapshots =
+          await Future.wait(futures);
+
+      var datas = snapshots.map((e) => e.data()).toList();
+      var rentPaymentsFutures =
+          datas.map((e) => RentPayment.fromJson(e ?? {})).toList();
+
+      var rentPayments = await Future.wait(rentPaymentsFutures);
+      var url_futures = rentPayments.map((e) {
+        var url = FirebaseFirestore.instance
+            .collection('invoices')
+            .doc(e.invoiceNumber)
+            .get();
+        return url;
+      }).toList();
+
+      var urls = await Future.wait(url_futures);
+      rentPayments = rentPayments.asMap().entries.map<RentPayment>((entry) {
+        int i = entry.key;
+        RentPayment e = entry.value;
+        e.pdfUrl = urls[i].data()?['url'];
+        e.isMinus = e.landlordRef != null || e.dealerRef != null;
+
+        return e;
+      }).toList();
+
+      newRentPayments = rentPayments;
+
+      // print('newrentpayments length is ${newRentPayments.length}');
+      // print("_rentPayments length is ${_rentPayments.length}");
+
+      _rentPayments.forEach((element) {
+        print('element amount: ${element.tenantname}');
+      });
+
+      // Check for changes in rent payments
+      if (_rentPayments.length != newRentPayments.length) {
+        // print('reached here as _rentpayments.length is ${_rentPayments.length}');
+        // print(
+        //     'reached here as newrentpayments.length is ${newRentPayments.length}');
+        if (mounted) {
+          setState(() {
+            _rentPayments = newRentPayments; // Update the rent payments list
+
+            //reverse the list
+            _rentPayments = _rentPayments.reversed.toList();
+
+            shouldDisplay = true;
+          });
+        }
+      }
+    });
   }
 
   final PageController _pageController = PageController(initialPage: 0);

@@ -551,8 +551,7 @@ class PropertyDetails extends StatelessWidget {
                                           'property': propertyMap,
                                           'propertyID': propertyID,
                                           'requestID': randomID,
-                                          'timestamp':
-                                              FieldValue.serverTimestamp(),
+                                          'timestamp': Timestamp.now(),
                                         }
                                       ]),
                                     }, SetOptions(merge: true));

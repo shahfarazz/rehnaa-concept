@@ -26,7 +26,7 @@ class _NewVouchersPageState extends State<NewVouchersPage> {
   var imageNames = [];
   double loadingProgress = 0.0;
   bool isLoading = true;
-  Timer? loadingTimer;
+  // Timer? loadingTimer;
   String? searchQuery = '';
 
   void _loadImages() {
@@ -43,11 +43,11 @@ class _NewVouchersPageState extends State<NewVouchersPage> {
     });
 
     // Start the loading timer
-    loadingTimer = Timer.periodic(const Duration(milliseconds: 100), (_) {
-      setState(() {
-        loadingProgress += 0.1;
-      });
-    });
+    // loadingTimer = Timer.periodic(const Duration(milliseconds: 100), (_) {
+    //   setState(() {
+    //     loadingProgress += 0.1;
+    //   });
+    // });
   }
 
   @override
@@ -58,8 +58,8 @@ class _NewVouchersPageState extends State<NewVouchersPage> {
 
   @override
   void dispose() {
-    loadingTimer
-        ?.cancel(); // Cancel the loading timer when the widget is disposed
+    // loadingTimer
+    // ?.cancel(); // Cancel the loading timer when the widget is disposed
     super.dispose();
   }
 
@@ -128,6 +128,7 @@ class _NewVouchersPageState extends State<NewVouchersPage> {
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: TextField(
+                        cursorColor: Colors.green,
                         onChanged: (value) {
                           setState(() {
                             searchQuery = value.toLowerCase();

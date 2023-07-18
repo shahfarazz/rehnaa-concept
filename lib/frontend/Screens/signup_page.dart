@@ -47,7 +47,7 @@ class _SignUpPageState extends State<SignUpPage> {
   String? verificationId;
   Timer? verificationTimer;
   Timer? letVerifyTimer;
-  int _secondsRemaining = 30;
+  int _secondsRemaining = 60;
 
   dispose() {
     verificationTimer?.cancel();
@@ -91,11 +91,12 @@ class _SignUpPageState extends State<SignUpPage> {
         } else {
           // Timer has completed, perform any desired actions here
           _showToast(
-              'Verification time has expired refreshing the page', Colors.red);
+              'Verification time has expired use login page to sign in after verifying',
+              Colors.red);
           await Future.delayed(const Duration(seconds: 2)).then((value) => {
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) => SignUpPage()),
+                  MaterialPageRoute(builder: (context) => const LoginPage()),
                 )
               });
           timer.cancel(); // Cancel the timer
@@ -128,7 +129,7 @@ class _SignUpPageState extends State<SignUpPage> {
               'type': selectedOption,
               'balance': 0,
               'pathToImage': 'assets/defaulticon.png',
-              'dateJoined': FieldValue.serverTimestamp(),
+              'dateJoined': Timestamp.now(),
             });
             Navigator.push(
               context,
@@ -147,7 +148,7 @@ class _SignUpPageState extends State<SignUpPage> {
               'type': selectedOption,
               'balance': 0,
               'pathToImage': 'assets/defaulticon.png',
-              'dateJoined': FieldValue.serverTimestamp(),
+              'dateJoined': Timestamp.now(),
             });
             Navigator.push(
               context,
@@ -270,7 +271,7 @@ class _SignUpPageState extends State<SignUpPage> {
         'emailOrPhone': emailOrPhone,
         'type': selectedOption,
         'password': hashString(password),
-        'dateJoined': FieldValue.serverTimestamp(),
+        'dateJoined': Timestamp.now(),
       });
 
       if (selectedOption == 'Landlord') {
@@ -284,7 +285,7 @@ class _SignUpPageState extends State<SignUpPage> {
           'type': selectedOption,
           'balance': 0,
           'pathToImage': 'assets/defaulticon.png',
-          'dateJoined': FieldValue.serverTimestamp(),
+          'dateJoined': Timestamp.now(),
         });
         Navigator.push(
           context,
@@ -303,7 +304,7 @@ class _SignUpPageState extends State<SignUpPage> {
           'type': selectedOption,
           'balance': 0,
           'pathToImage': 'assets/defaulticon.png',
-          'dateJoined': FieldValue.serverTimestamp(),
+          'dateJoined': Timestamp.now(),
         });
         Navigator.push(
           context,

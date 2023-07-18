@@ -89,9 +89,7 @@ class _LandlordPropertyFormsState extends State<LandlordPropertyForms> {
         'price': double.parse(_priceController.text),
         'area': double.parse(_areaController.text),
         'isDetailsFilled': true,
-        'pathToImage': pathToImage.isNotEmpty
-            ? 'there are ${pathToImage.length} images'
-            : 'no images',
+        'pathToImage': pathToImage.isNotEmpty ? pathToImage : [''],
       };
 
       try {

@@ -28,31 +28,20 @@ class AdminDashboard extends StatefulWidget {
 }
 
 class _AdminDashboardState extends State<AdminDashboard> {
-  Timer? _timer;
+  // Timer? _timer;
+  StreamSubscription<QuerySnapshot>? _notifsSubscription;
 
   @override
   void initState() {
     super.initState();
     _getNotifs();
-    _startPeriodicFetch();
-  }
-
-  // Periodically fetch new data every 5 seconds
-  void _startPeriodicFetch() {
-    _timer = Timer.periodic(const Duration(seconds: 5), (_) {
-      _getNotifs();
-    });
-  }
-
-  // Stop periodic fetching
-  void _stopPeriodicFetch() {
-    _timer?.cancel();
+    // _startPeriodicFetch();
   }
 
   @override
   void dispose() {
-    _stopPeriodicFetch();
     super.dispose();
+    _notifsSubscription?.cancel();
   }
 
   List<Map<String, String>> notifications = [];
@@ -61,104 +50,97 @@ class _AdminDashboardState extends State<AdminDashboard> {
   Map<String, List<Map<String, String>>>
       notificationsAndAlreadyReadNotifications = {};
 
-  Future<void> _getNotifs() async {
-    QuerySnapshot<Map<String, dynamic>> notificationSnapshots =
-        await FirebaseFirestore.instance.collection('AdminRequests').get();
+  void _getNotifs() {
+    _notifsSubscription?.cancel(); // Cancel the previous subscription if any
 
-    if (notificationSnapshots.size > 0) {
-      List<Map<String, String>> tempNotifications = [];
-      notificationsAndAlreadyReadNotifications.clear();
+    _notifsSubscription = FirebaseFirestore.instance
+        .collection('AdminRequests')
+        .snapshots()
+        .listen((QuerySnapshot snapshot) {
+      if (snapshot.size > 0) {
+        List<Map<String, String>> tempNotifications = [];
+        notificationsAndAlreadyReadNotifications.clear();
 
-      for (var notificationsnapshot in notificationSnapshots.docs) {
-        var notificationData = notificationsnapshot.data();
+        for (var notificationsnapshot in snapshot.docs) {
+          var notificationData =
+              notificationsnapshot.data() as Map<String, dynamic>;
 
-        // print('notificationData is $notificationData');
+          try {
+            notificationData.forEach((key, value) {
+              if (key == 'withdrawRequest' || key == 'paymentRequest') {
+                value.forEach((item) {
+                  Map<String, String> notification = {
+                    'title': key,
+                    'amount': item['amount'].toString(),
+                    'fullname': item['fullname'],
+                    'paymentMethod': item['paymentMethod'],
+                    'senderid': notificationsnapshot.id,
+                    'requestID': item['requestID'],
+                  };
+                  notificationsAndAlreadyReadNotifications[
+                          notification['senderid']!] =
+                      List.from(notificationsAndAlreadyReadNotifications[
+                              notification['senderid']!] ??
+                          [])
+                        ..add(notification);
 
-        // sort notificationData by timestamp descending
-        // but you will have to traverse and collect all the timestamps first
-        // then sort them as they are in arrays called 'withdrawRequest', 'paymentRequest',
-        //'rentAccrualRequest', 'rentalRequest', 'withdrawRequestDealer',
-
-        // Map<String,dynamic> notificationsWithTimestamps = {};
-
-        //the above gives an error no such method sort so we need to find a way to sort the list
-        //manually
-
-        try {
-          notificationData.forEach((key, value) {
-            if (key == 'withdrawRequest' || key == 'paymentRequest') {
-              value.forEach((item) {
-                Map<String, String> notification = {
-                  'title': key,
-                  'amount': item['amount'].toString(),
-                  'fullname': item['fullname'],
-                  'paymentMethod': item['paymentMethod'],
-                  'senderid': notificationsnapshot.id,
-                  'requestID': item['requestID'],
-                };
-                notificationsAndAlreadyReadNotifications[
-                        notification['senderid']!] =
-                    List.from(notificationsAndAlreadyReadNotifications[
-                            notification['senderid']!] ??
-                        [])
-                      ..add(notification);
-
-                if (!item.containsKey('read') || !item['read']) {
-                  tempNotifications.add(notification);
-                }
-              });
-            } else if (key == 'rentalRequest') {
-              value.forEach((item) {
-                Map<String, String> notification = {
-                  'title': key,
-                  'fullname': item['fullname'],
-                  'uid': item['uid'],
-                  'property name': item['property']['title'],
-                  'senderid': notificationsnapshot.id,
-                  'requestID': item['requestID'],
-                };
-                notificationsAndAlreadyReadNotifications[
-                        notification['senderid']!] =
-                    List.from(notificationsAndAlreadyReadNotifications[
-                            notification['senderid']!] ??
-                        [])
-                      ..add(notification);
-                if (!item.containsKey('read') || !item['read']) {
-                  tempNotifications.add(notification);
-                }
-              });
-            } else if (key == 'timestamp') {
-              // Do nothing
-            } else {
-              // Leave other cases blank for now
-              value.forEach((item) {
-                Map<String, String> notification = {
-                  'title': key,
-                  'fullname': '',
-                  // 'uid': item['uid'],
-                  'senderid': notificationsnapshot.id,
-                  'requestID': item['requestID'],
-                };
-                notificationsAndAlreadyReadNotifications[
-                        notification['senderid']!] =
-                    List.from(notificationsAndAlreadyReadNotifications[
-                            notification['senderid']!] ??
-                        [])
-                      ..add(notification);
-                if (!item.containsKey('read') || !item['read']) {
-                  tempNotifications.add(notification);
-                }
-              });
-            }
-          });
-        } catch (e) {
-          // print('error is $e');
+                  if (!item.containsKey('read') || !item['read']) {
+                    tempNotifications.add(notification);
+                  }
+                });
+              } else if (key == 'rentalRequest') {
+                value.forEach((item) {
+                  Map<String, String> notification = {
+                    'title': key,
+                    'fullname': item['fullname'],
+                    'uid': item['uid'],
+                    'property name': item['property']['title'],
+                    'senderid': notificationsnapshot.id,
+                    'requestID': item['requestID'],
+                  };
+                  notificationsAndAlreadyReadNotifications[
+                          notification['senderid']!] =
+                      List.from(notificationsAndAlreadyReadNotifications[
+                              notification['senderid']!] ??
+                          [])
+                        ..add(notification);
+                  if (!item.containsKey('read') || !item['read']) {
+                    tempNotifications.add(notification);
+                  }
+                });
+              } else if (key == 'timestamp') {
+                // Do nothing
+              } else {
+                // Leave other cases blank for now
+                value.forEach((item) {
+                  Map<String, String> notification = {
+                    'title': key,
+                    'fullname': '',
+                    // 'uid': item['uid'],
+                    'senderid': notificationsnapshot.id,
+                    'requestID': item['requestID'],
+                  };
+                  notificationsAndAlreadyReadNotifications[
+                          notification['senderid']!] =
+                      List.from(notificationsAndAlreadyReadNotifications[
+                              notification['senderid']!] ??
+                          [])
+                        ..add(notification);
+                  if (!item.containsKey('read') || !item['read']) {
+                    tempNotifications.add(notification);
+                  }
+                });
+              }
+            });
+          } catch (e) {
+            // print('error is $e');
+          }
         }
+        setState(() {
+          notifications = tempNotifications;
+        });
       }
-      setState(() {
-        notifications = tempNotifications;
-      });
-    }
+    });
   }
 
   @override

@@ -146,7 +146,7 @@ class _LandlordAdvanceRentPageState extends State<LandlordAdvanceRentPage> {
                                     .doc(widget.uid)
                                     .set({
                                   'isApplied': true,
-                                  'whenApplied': FieldValue.serverTimestamp(),
+                                  'whenApplied': Timestamp.now(),
                                 }, SetOptions(merge: true));
 
                                 //send an AdminRequest for the tenant
@@ -166,8 +166,7 @@ class _LandlordAdvanceRentPageState extends State<LandlordAdvanceRentPage> {
                                           'fullname':
                                               '${landlord?.firstName} ${landlord?.lastName}',
                                           'uid': widget.uid,
-                                          'timestamp':
-                                              FieldValue.serverTimestamp(),
+                                          'timestamp': Timestamp.now(),
                                           'requestID': randomID,
                                         }
                                       ]),

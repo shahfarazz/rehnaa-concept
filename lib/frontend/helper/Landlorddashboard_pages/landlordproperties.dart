@@ -35,7 +35,7 @@ class _LandlordPropertiesPageState extends State<LandlordPropertiesPage>
   @override
   Stream<List<DocumentSnapshot<Map<String, dynamic>>>> _propertyStream =
       const Stream.empty();
-  Timer? _propertyStreamTimer;
+  // Timer? _propertyStreamTimer;
   List<DocumentReference<Map<String, dynamic>>> propertyDataList = [];
 
   void initState() {
@@ -44,7 +44,7 @@ class _LandlordPropertiesPageState extends State<LandlordPropertiesPage>
   }
 
   void dispose() {
-    _cancelPropertyStreamTimer();
+    // _cancelPropertyStreamTimer();
     super.dispose();
   }
 
@@ -53,12 +53,12 @@ class _LandlordPropertiesPageState extends State<LandlordPropertiesPage>
       setState(() {
         _propertyStream = stream;
       });
-      _startPropertyStreamTimer(); // Start the timer to periodically update the property stream
+      //_startPropertyStreamTimer(); // Start the timer to periodically update the property stream
     });
   }
 
   Future<void> _updatePropertyStream() async {
-    _cancelPropertyStreamTimer(); // Cancel the timer before updating the stream
+    // _cancelPropertyStreamTimer(); // Cancel the timer before updating the stream
 
     // Fetch the latest property references from the Landlords collection
     final landlordSnapshot = await FirebaseFirestore.instance
@@ -130,17 +130,7 @@ class _LandlordPropertiesPageState extends State<LandlordPropertiesPage>
       });
     }
 
-    _startPropertyStreamTimer(); // Restart the timer for periodic updates
-  }
-
-  void _startPropertyStreamTimer() {
-    _propertyStreamTimer = Timer.periodic(const Duration(seconds: 5), (_) {
-      _updatePropertyStream();
-    });
-  }
-
-  void _cancelPropertyStreamTimer() {
-    _propertyStreamTimer?.cancel();
+    // _startPropertyStreamTimer(); // Restart the timer for periodic updates
   }
 
   Future<Stream<List<DocumentSnapshot<Map<String, dynamic>>>>>
@@ -196,200 +186,211 @@ class _LandlordPropertiesPageState extends State<LandlordPropertiesPage>
   @override
   Widget build(BuildContext context) {
     super.build(context); // Necessary for AutomaticKeepAliveClientMixin
-
     try {
       return StreamBuilder<List<DocumentSnapshot<Map<String, dynamic>>>>(
         stream: _propertyStream,
         builder: (context, snapshot) {
           Size size = MediaQuery.of(context).size;
-
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const LandlordPropertiesSkeleton();
-          } else if (isEmptyList ||
-              !snapshot.hasData ||
-              snapshot.data!.isEmpty) {
-            return Column(
+          return RefreshIndicator(
+            onRefresh: _getPropertyStream,
+            child: ListView(
+              physics:
+                  AlwaysScrollableScrollPhysics(), // Ensures the page is always scrollable
               children: [
-                SizedBox(height: size.height * 0.03),
-                Container(
-                  padding: const EdgeInsets.symmetric(vertical: 16.0),
-                  alignment: Alignment.center,
-                  child: Text(
-                    'Properties',
-                    style: GoogleFonts.montserrat(
-                      fontSize: 24.0,
-                      fontWeight: FontWeight.bold,
-                      color: const Color(0xff33907c),
-                    ),
-                  ),
-                ),
-                SizedBox(height: size.height * 0.03),
-                Card(
-                  elevation: 4.0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20.0),
-                  ),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20.0),
-                      color: Colors.white,
-                    ),
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(
-                          Icons.house,
-                          size: 48.0,
-                          color: Color(0xff33907c),
-                        ),
-                        const SizedBox(height: 16.0),
-                        Text(
-                          'No properties to show',
+                if (snapshot.connectionState == ConnectionState.waiting)
+                  const LandlordPropertiesSkeleton()
+                else if (isEmptyList ||
+                    !snapshot.hasData ||
+                    snapshot.data!.isEmpty)
+                  Column(
+                    children: [
+                      SizedBox(height: size.height * 0.03),
+                      Container(
+                        padding: const EdgeInsets.symmetric(vertical: 16.0),
+                        alignment: Alignment.center,
+                        child: Text(
+                          'Properties',
                           style: GoogleFonts.montserrat(
-                            fontSize: 20.0,
+                            fontSize: 24.0,
+                            fontWeight: FontWeight.bold,
                             color: const Color(0xff33907c),
                           ),
                         ),
-                      ],
-                    ),
-                  ),
-                ),
-                SizedBox(height: size.height * 0.3),
-                Visibility(
-                  visible: true, // Ensure the "+" button is always visible
-                  child: Material(
-                    elevation: 4.0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(28.0),
-                    ),
-                    child: InkWell(
-                      onTap: () {
-                        // Handle floating action button tap
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) =>
-                                LandlordPropertyForms(uid: widget.uid),
-                          ),
-                        );
-                      },
-                      borderRadius: BorderRadius.circular(28.0),
-                      child: Container(
-                        padding: EdgeInsets.all(16.0),
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              const Color(0xff0FA697),
-                              const Color(0xff45BF7A),
-                              const Color(0xff0DF205),
-                            ],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
-                          borderRadius: BorderRadius.circular(28.0),
-                        ),
-                        child: Icon(
-                          Icons.add,
-                          color: Colors.white,
-                        ),
                       ),
-                    ),
-                  ),
-                ),
-              ],
-            );
-          } else {
-            return Stack(
-              children: [
-                Scaffold(
-                  backgroundColor: const Color.fromARGB(255, 255, 255, 255),
-                  body: ListView(
-                    children: snapshot.data!.map((propertySnapshot) {
-                      Property property = Property.fromJson(
-                          propertySnapshot.data() as Map<String, dynamic>);
-
-                      return PropertyCard(
-                        property: property,
-                        firstName: firstName ?? '',
-                        lastName: lastName ?? '',
-                        pathToImage: property.landlord?.pathToImage ??
-                            'assets/userimage.png',
-                        location: property.location,
-                        address: property.address,
-                        type: property.type,
-                        area: property.area ?? 0,
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => PropertyPage(
-                                property: property,
-                                firstName: firstName ?? '',
-                                lastName: lastName ?? '',
-                                pathToImage: property.landlord?.pathToImage ??
-                                    'assets/userimage.png',
-                                location: property.location,
-                                address: property.address,
-                                emailOrPhone:
-                                    property.landlord?.emailOrPhone ?? '',
-                                isTenantCall: false,
-                              ),
-                            ),
-                          );
-                        },
-                      );
-                    }).toList(),
-                  ),
-                ),
-                Positioned(
-                  top: size.height * 0.70,
-                  left: size.width * 0.8,
-                  child: Visibility(
-                    visible: true, // Ensure the "+" button is always visible
-                    child: Material(
-                      elevation: 4.0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(28.0),
-                      ),
-                      child: InkWell(
-                        onTap: () {
-                          // Handle floating action button tap
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) =>
-                                  LandlordPropertyForms(uid: widget.uid),
-                            ),
-                          );
-                        },
-                        borderRadius: BorderRadius.circular(28.0),
+                      SizedBox(height: size.height * 0.03),
+                      Card(
+                        elevation: 4.0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20.0),
+                        ),
                         child: Container(
-                          padding: EdgeInsets.all(16.0),
                           decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [
-                                const Color(0xff0FA697),
-                                const Color(0xff45BF7A),
-                                const Color(0xff0DF205),
-                              ],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                            ),
-                            borderRadius: BorderRadius.circular(28.0),
-                          ),
-                          child: Icon(
-                            Icons.add,
+                            borderRadius: BorderRadius.circular(20.0),
                             color: Colors.white,
                           ),
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(
+                                Icons.house,
+                                size: 48.0,
+                                color: Color(0xff33907c),
+                              ),
+                              const SizedBox(height: 16.0),
+                              Text(
+                                'No properties to show',
+                                style: GoogleFonts.montserrat(
+                                  fontSize: 20.0,
+                                  color: const Color(0xff33907c),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                  ),
-                ),
+                      SizedBox(height: size.height * 0.3),
+                      Visibility(
+                        visible:
+                            true, // Ensure the "+" button is always visible
+                        child: Material(
+                          elevation: 4.0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(28.0),
+                          ),
+                          child: InkWell(
+                            onTap: () {
+                              // Handle floating action button tap
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) =>
+                                      LandlordPropertyForms(uid: widget.uid),
+                                ),
+                              );
+                            },
+                            borderRadius: BorderRadius.circular(28.0),
+                            child: Container(
+                              padding: EdgeInsets.all(16.0),
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    const Color(0xff0FA697),
+                                    const Color(0xff45BF7A),
+                                    const Color(0xff0DF205),
+                                  ],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                ),
+                                borderRadius: BorderRadius.circular(28.0),
+                              ),
+                              child: Icon(
+                                Icons.add,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  )
+                else
+                  Stack(
+                    children: [
+                      Scaffold(
+                        backgroundColor:
+                            const Color.fromARGB(255, 255, 255, 255),
+                        body: ListView(
+                          children: snapshot.data!.map((propertySnapshot) {
+                            Property property = Property.fromJson(
+                                propertySnapshot.data()
+                                    as Map<String, dynamic>);
+
+                            return PropertyCard(
+                              property: property,
+                              firstName: firstName ?? '',
+                              lastName: lastName ?? '',
+                              pathToImage: property.landlord?.pathToImage ??
+                                  'assets/userimage.png',
+                              location: property.location,
+                              address: property.address,
+                              type: property.type,
+                              area: property.area ?? 0,
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => PropertyPage(
+                                      property: property,
+                                      firstName: firstName ?? '',
+                                      lastName: lastName ?? '',
+                                      pathToImage:
+                                          property.landlord?.pathToImage ??
+                                              'assets/userimage.png',
+                                      location: property.location,
+                                      address: property.address,
+                                      emailOrPhone:
+                                          property.landlord?.emailOrPhone ?? '',
+                                      isTenantCall: false,
+                                    ),
+                                  ),
+                                );
+                              },
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                      Positioned(
+                        top: size.height * 0.70,
+                        left: size.width * 0.8,
+                        child: Visibility(
+                          visible:
+                              true, // Ensure the "+" button is always visible
+                          child: Material(
+                            elevation: 4.0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(28.0),
+                            ),
+                            child: InkWell(
+                              onTap: () {
+                                // Handle floating action button tap
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) =>
+                                        LandlordPropertyForms(uid: widget.uid),
+                                  ),
+                                );
+                              },
+                              borderRadius: BorderRadius.circular(28.0),
+                              child: Container(
+                                padding: EdgeInsets.all(16.0),
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      const Color(0xff0FA697),
+                                      const Color(0xff45BF7A),
+                                      const Color(0xff0DF205),
+                                    ],
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                  ),
+                                  borderRadius: BorderRadius.circular(28.0),
+                                ),
+                                child: Icon(
+                                  Icons.add,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  )
               ],
-            );
-          }
+            ),
+          );
         },
       );
     } catch (e) {

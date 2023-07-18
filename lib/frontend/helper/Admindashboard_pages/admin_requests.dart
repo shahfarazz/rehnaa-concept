@@ -1,13 +1,11 @@
 import 'dart:async';
 import 'dart:js_interop';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:rehnaa/frontend/helper/Admindashboard_pages/admin_requests_property_contracts.dart';
-
 import '../../Screens/Admin/admindashboard.dart';
 
 class AdminRequestsPage extends StatefulWidget {
@@ -708,6 +706,17 @@ class LandlordWithdrawalCard extends StatelessWidget {
                         .runTransaction((transaction) async {
                       //pause the timer until the transaction is complete
                       // timer.cancel();
+                      //showdialog with a circular progress indicator
+                      showDialog(
+                        context: context,
+                        builder: (context) {
+                          return const Center(
+                            child: SpinKitFadingCube(
+                              color: Color.fromARGB(255, 30, 197, 83),
+                            ),
+                          );
+                        },
+                      );
 
                       DocumentSnapshot requestSnapshot = await transaction.get(
                           FirebaseFirestore.instance
@@ -809,18 +818,6 @@ class LandlordWithdrawalCard extends StatelessWidget {
                       // Update the request as handled
                       await transaction.update(
                           requestSnapshot.reference, {'isHandled': true});
-
-                      //showdialog with a circular progress indicator
-                      showDialog(
-                        context: context,
-                        builder: (context) {
-                          return const Center(
-                            child: SpinKitFadingCube(
-                              color: Color.fromARGB(255, 30, 197, 83),
-                            ),
-                          );
-                        },
-                      );
 
                       // Handle accept button press
                       //check if i can access the data here by printing all the data

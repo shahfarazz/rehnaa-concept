@@ -37,7 +37,6 @@ class _LandlordTenantsPageState extends State<LandlordTenantsPage>
   @override
   bool get wantKeepAlive => true;
 
-  Timer? _timer;
   bool firstCall = true;
 
   @override

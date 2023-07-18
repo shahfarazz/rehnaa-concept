@@ -328,8 +328,7 @@ class _DealerDashboardContentState extends State<DealerDashboardContent>
                                           'requestID': randomID,
                                           'invoiceNumber': invoiceNumber,
                                           'tenantname': 'Rehnaa App',
-                                          'timestamp':
-                                              FieldValue.serverTimestamp(),
+                                          'timestamp': Timestamp.now(),
                                         }
                                       ]),
                                     }, SetOptions(merge: true));

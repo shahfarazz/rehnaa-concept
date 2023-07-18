@@ -69,26 +69,14 @@ class _DashboardPageState extends State<TenantDashboardPage>
         .collection('Notifications')
         .doc(widget.uid)
         .snapshots();
-    isNewVouchers();
-    _startPeriodicFetch();
-  }
+    _startVoucherStream();
 
-  // Periodically fetch new data every 16 seconds
-  void _startPeriodicFetch() {
-    // print('start periodic fetch');
-    _timer = Timer.periodic(const Duration(seconds: 15), (_) {
-      isNewVouchers();
-    });
+    // _startPeriodicFetch();
   }
 
   void _handleNotificationsButtonPress() async {
     await _markNotificationsAsRead();
     _showNotificationsDialog();
-  }
-
-  // Stop periodic fetching
-  void _stopPeriodicFetch() {
-    _timer?.cancel();
   }
 
   @override
@@ -97,7 +85,9 @@ class _DashboardPageState extends State<TenantDashboardPage>
     _sidebarController.dispose(); // Dispose the AnimationController
     super.dispose();
     // _getNotifs();
-    _stopPeriodicFetch();
+    // _stopPeriodicFetch();
+    _vouchersSubscription?.cancel();
+
     _notificationStream.drain();
     _notificationStream2.drain();
   }
@@ -113,34 +103,25 @@ class _DashboardPageState extends State<TenantDashboardPage>
     );
   }
 
-  Future<void> isNewVouchers() async {
-    //check for isNew varialbe in the user document
-    // and set the isNewVoucher variable accordingly
-    // also after setting isNewVoucher to true or false, update the isNew variable in the user document
-    // which should now be false
+  StreamSubscription<DocumentSnapshot<Map<String, dynamic>>>?
+      _vouchersSubscription;
 
-    try {
-      FirebaseFirestore.instance
-          .collection('Tenants')
-          .doc(widget.uid)
-          .get()
-          .then((value) {
-        if (value.exists) {
-          if (value.data()!['isNewVouchers'] == true && isNewVoucher == false) {
-            setState(() {
-              isNewVoucher = true;
-            });
-          } else if (value.data()!['isNewVouchers'] == false &&
-              isNewVoucher == true) {
-            setState(() {
-              isNewVoucher = false;
-            });
-          }
-        }
-      });
-      // print('isNewVoucher is $isNewVoucher');
-    } catch (e) {
-      print('error is $e');
+  void _startVoucherStream() {
+    _vouchersSubscription = FirebaseFirestore.instance
+        .collection('Tenants')
+        .doc(widget.uid)
+        .snapshots()
+        .listen(_voucherUpdate);
+  }
+
+  void _voucherUpdate(DocumentSnapshot<Map<String, dynamic>> snapshot) {
+    if (snapshot.exists) {
+      bool? isNew = snapshot.data()?['isNewVouchers'];
+      if (isNew != null && isNew != isNewVoucher) {
+        setState(() {
+          isNewVoucher = isNew;
+        });
+      }
     }
   }
 
