@@ -462,10 +462,17 @@ class AuthenticationService extends ChangeNotifier {
       if (kDebugMode) {
         print('Signing in with Email and Password...');
       }
+
       await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
+      //check if email is verified
+      if (FirebaseAuth.instance.currentUser!.emailVerified == false) {
+        showToast('Please verify your email first.', Colors.red);
+        Navigator.pop(context);
+        return;
+      }
       if (kDebugMode) {
         print('Signed in with Email and Password.');
       }

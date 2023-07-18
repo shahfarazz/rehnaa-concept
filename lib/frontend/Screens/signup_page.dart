@@ -65,7 +65,14 @@ class _SignUpPageState extends State<SignUpPage> {
   Future<void> signUpWithEmailAndPassword() async {
     String? formError = _validateForm();
     if (formError != null) {
-      _showToast(formError, Colors.red);
+      // _showToast(formError, Colors.red);
+      //snackbar form error
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: Colors.red,
+          content: Text(formError),
+        ),
+      );
       return;
     }
     try {
@@ -76,94 +83,70 @@ class _SignUpPageState extends State<SignUpPage> {
         password: password,
       );
       await userCredential.user!.sendEmailVerification();
+      //sign out user
       _showToast(
         'Verification email has been sent. Please check your inbox.',
         Colors.green,
       );
       verificationTimer?.cancel(); // Cancel any existing timer
       letVerifyTimer?.cancel(); // Cancel any existing timer
-      letVerifyTimer = verificationTimer =
-          Timer.periodic(Duration(seconds: 1), (Timer timer) async {
-        if (_secondsRemaining > 0) {
-          setState(() {
-            _secondsRemaining--;
-          });
-        } else {
-          // Timer has completed, perform any desired actions here
-          _showToast(
-              'Verification time has expired use login page to sign in after verifying',
-              Colors.red);
-          await Future.delayed(const Duration(seconds: 2)).then((value) => {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => const LoginPage()),
-                )
-              });
-          timer.cancel(); // Cancel the timer
-        }
-      });
-      Timer.periodic(const Duration(seconds: 5), (timer) async {
-        await FirebaseAuth.instance.currentUser!.reload();
-        if (FirebaseAuth.instance.currentUser!.emailVerified) {
-          timer.cancel();
-          setState(() => isLoading = false);
-          // ignore: use_build_context_synchronously
-          FirebaseFirestore.instance
-              .collection('users')
-              .doc(FirebaseAuth.instance.currentUser!.uid)
-              .set({
-            'firstName': firstName,
-            'lastName': lastName,
-            'emailOrPhone': emailOrPhone,
-            'type': selectedOption,
-          });
 
-          if (selectedOption == 'Landlord') {
-            await FirebaseFirestore.instance
-                .collection('Landlords')
-                .doc(FirebaseAuth.instance.currentUser!.uid)
-                .set({
-              'firstName': firstName,
-              'lastName': lastName,
-              'emailOrPhone': emailOrPhone,
-              'type': selectedOption,
-              'balance': 0,
-              'pathToImage': 'assets/defaulticon.png',
-              'dateJoined': Timestamp.now(),
-            });
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => LandlordDashboardPage(
-                      uid: FirebaseAuth.instance.currentUser!.uid)),
-            );
-          } else if (selectedOption == 'Tenant') {
-            await FirebaseFirestore.instance
-                .collection('Tenants')
-                .doc(FirebaseAuth.instance.currentUser!.uid)
-                .set({
-              'firstName': firstName,
-              'lastName': lastName,
-              'emailOrPhone': emailOrPhone,
-              'type': selectedOption,
-              'balance': 0,
-              'pathToImage': 'assets/defaulticon.png',
-              'dateJoined': Timestamp.now(),
-            });
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => TenantDashboardPage(
-                      uid: FirebaseAuth.instance.currentUser!.uid)),
-            );
-          }
-
-          _showToast('Sign up successful.', Colors.green);
-        }
+      // if (FirebaseAuth.instance.currentUser!.emailVerified) {
+      // timer.cancel();
+      setState(() => isLoading = false);
+      // ignore: use_build_context_synchronously
+      FirebaseFirestore.instance
+          .collection('users')
+          .doc(FirebaseAuth.instance.currentUser!.uid)
+          .set({
+        'firstName': firstName,
+        'lastName': lastName,
+        'emailOrPhone': emailOrPhone,
+        'type': selectedOption,
       });
+
+      if (selectedOption == 'Landlord') {
+        await FirebaseFirestore.instance
+            .collection('Landlords')
+            .doc(FirebaseAuth.instance.currentUser!.uid)
+            .set({
+          'firstName': firstName,
+          'lastName': lastName,
+          'emailOrPhone': emailOrPhone,
+          'type': selectedOption,
+          'balance': 0,
+          'pathToImage': 'assets/defaulticon.png',
+          'dateJoined': Timestamp.now(),
+        });
+      } else if (selectedOption == 'Tenant') {
+        await FirebaseFirestore.instance
+            .collection('Tenants')
+            .doc(FirebaseAuth.instance.currentUser!.uid)
+            .set({
+          'firstName': firstName,
+          'lastName': lastName,
+          'emailOrPhone': emailOrPhone,
+          'type': selectedOption,
+          'balance': 0,
+          'pathToImage': 'assets/defaulticon.png',
+          'dateJoined': Timestamp.now(),
+        });
+      }
+
+      _showToast('Sign in via the login page.', Colors.green);
+
+      await FirebaseAuth.instance.signOut();
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const LoginPage()),
+      );
+
+      // }
     } catch (e) {
       setState(() => isLoading = false);
       _showToast('Sign up failed, please try again', Colors.red);
+      print('error occured: $e');
       return;
     }
   }
@@ -670,19 +653,10 @@ class _SignUpPageState extends State<SignUpPage> {
             recognizer: TapGestureRecognizer()
               ..onTap = () {
                 // Navigate to the login page and dispose of the sign-up page
-
-                //check if verification timer is running and if so dont let user go back to login page
-                if (letVerifyTimer != null && letVerifyTimer!.isActive) {
-                  _showToast(
-                      "Please complete verification, timer is ${_secondsRemaining.toString()}",
-                      Colors.red);
-                } else {
-                  //reload sign up page
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (context) => SignUpPage()),
-                  );
-                }
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const LoginPage()),
+                );
               },
           ),
         ],
