@@ -35,6 +35,8 @@ class Landlord {
   var securityDeposit;
   var creditPoints;
   var creditScore;
+  var hasEstamp;
+
   Landlord({
     required this.firstName,
     required this.lastName,
@@ -66,6 +68,7 @@ class Landlord {
     this.securityDeposit,
     this.creditPoints,
     this.creditScore,
+    this.hasEstamp,
   });
 
   static Landlord fromJson(Map<String, dynamic>? json) {
@@ -76,6 +79,10 @@ class Landlord {
       tenantRef: json['tenantRef'] != null
           ? List<DocumentReference<Map<String, dynamic>>>.from(
               json['tenantRef'].map((ref) => ref as DocumentReference))
+          : null,
+      dealerRef: json['dealerRef'] != null
+          ? List<DocumentReference<Map<String, dynamic>>>.from(
+              json['dealerRef'].map((ref) => ref as DocumentReference))
           : null,
       property: json['property'] != null
           ? List<Property>.from(

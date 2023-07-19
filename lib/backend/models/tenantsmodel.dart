@@ -93,7 +93,7 @@ class Tenant {
           ? List<DocumentReference<Map<String, dynamic>>>.from(
               json['rentpaymentRef'].map((ref) => ref as DocumentReference))
           : null,
-      address: json['address'] ?? '',
+      address: json['address'],
       contractStartDate: json['contractStartDate'] != null
           ? json['contractStartDate'].toDate()
           : null,

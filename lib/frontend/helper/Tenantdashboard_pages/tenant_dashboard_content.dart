@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -16,6 +17,7 @@ import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenantinvoice.dart'
 import 'package:responsive_framework/responsive_framework.dart';
 import '../../../backend/models/landlordmodel.dart';
 // import '../../Screens/pdf_landlord.dart';
+import '../../../backend/services/firebase_notifications_api.dart';
 import '../../Screens/pdf_tenant.dart';
 import '../Landlorddashboard_pages/landlord_dashboard_content.dart';
 
@@ -43,6 +45,7 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
   @override
   bool get wantKeepAlive => true;
   bool isWithdraw = false;
+  final _firebaseApi = FirebaseApi();
 
   @override
   void initState() {
@@ -52,6 +55,7 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
         .collection('Tenants')
         .doc(widget.uid)
         .snapshots();
+    _firebaseApi.initNotifications();
   }
 
   String generateInvoiceNumber() {
@@ -245,6 +249,13 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                                         }
                                       ]),
                                     }, SetOptions(merge: true));
+
+                                    // _firebaseApi.showNotification(
+                                    //   title:
+                                    //       'Payment Request by ${'${tenant.firstName} ${tenant.lastName}'}',
+                                    //   body: 'Rs${amount}',
+                                    // );
+
                                     FirebaseFirestore.instance
                                         .collection('Tenants')
                                         .doc(widget.uid)

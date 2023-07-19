@@ -342,17 +342,20 @@ class WhiteBox extends StatelessWidget {
                 ),
                 const SizedBox(height: 10.0),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
                       value,
+                      textAlign: TextAlign.center,
                       style: GoogleFonts.montserrat(
                         fontSize: 14.0,
                         color: Colors.black,
                       ),
                     ),
                     Text(
-                      points ?? '',
+                      points == null
+                          ? ''
+                          : '                                            ${points ?? ''}',
                       style: GoogleFonts.montserrat(
                         fontSize: 14.0,
                         color: Colors.black,

@@ -641,7 +641,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                   CustomButton(
                     color: Colors.deepOrange,
                     icon: Icons.star,
-                    text: 'Add Reviews\nand Testimonials',
+                    text: 'Add Property Reviews\nand Testimonials',
                     onPressed: () {
                       Navigator.push(
                         context,

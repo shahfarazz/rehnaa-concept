@@ -277,6 +277,16 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
                     decoration:
                         const InputDecoration(labelText: 'Credit Points'),
                     keyboardType: TextInputType.number,
+                    validator: (value) {
+                      //check if value can be parsed
+                      if (value != null && int.tryParse(value) == null) {
+                        return 'Please enter valid credit points';
+                      }
+                      if (value != null && int.tryParse(value)! > 10) {
+                        return 'Please enter valid credit points';
+                      }
+                      // return '';
+                    },
                   ),
                   TextFormField(
                     controller: cnicNumberController,
@@ -371,6 +381,9 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
                     validator: (value) {
                       //check if value can be parsed
                       if (value != null && int.tryParse(value) == null) {
+                        return 'Please enter a valid credit score';
+                      }
+                      if (value != null && int.tryParse(value)! > 10) {
                         return 'Please enter a valid credit score';
                       }
                     },
@@ -471,6 +484,7 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
                           'securityDeposit':
                               securityDepositController.text ?? '',
                           'creditScore': creditScoreController.text ?? '',
+                          'otherInfo': otherInfoController.text ?? '',
                         };
 
                         //create a checkpackage that discludes all the document references.
@@ -509,6 +523,10 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
                                       creditPointsController.text != 'null'
                                   ? creditPointsController.text
                                   : 'empty',
+                          'otherInfo': otherInfoController.text.isNotEmpty &&
+                                  otherInfoController.text != 'null'
+                              ? otherInfoController.text
+                              : 'empty',
                         };
 
                         showDialog(

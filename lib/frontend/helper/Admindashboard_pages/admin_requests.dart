@@ -286,6 +286,39 @@ class _AdminRequestsPageState extends State<AdminRequestsPage> {
             print('Error222: $e');
           }
         }
+        // securityDepositRequest
+        try {
+          if (doc["securityDepositRequest"] != null) {
+            for (var i = 0; i < doc["securityDepositRequest"].length; i++) {
+              // add each request to the adminRequests list
+
+              adminRequests.add(
+                AdminRequestData(
+                  name: doc["securityDepositRequest"][i]["fullname"],
+                  // requestedAmount:
+                  //     doc["securityDepositRequest"][i]["amount"].toString(),
+                  uid: doc["securityDepositRequest"][i]["uid"],
+                  // cashOrBankTransfer: doc["securityDepositRequest"][i]
+                  //     ["paymentMethod"],
+                  requestID: doc.id,
+                  requestType: 'Security Deposit Request',
+                  // invoiceNumber: doc["securityDepositRequest"][i]["invoiceNumber"],
+                  withinArrayID: doc["securityDepositRequest"][i]["requestID"],
+                  // altTenantName: doc["securityDepositRequest"][i]["tenantname"],
+                  docTimestamp: doc["securityDepositRequest"][i]["timestamp"],
+                  // dataFields: doc["securityDepositRequest"][i]["dataFields"],
+                  isHandled:
+                      doc["securityDepositRequest"][i]["isHandled"] ?? false,
+                  txnType: 'securityDepositRequest',
+                ),
+              );
+            }
+          }
+        } catch (e) {
+          if (kDebugMode) {
+            print('Error222: $e');
+          }
+        }
 
         //TODO add other states of requests if needed
       });
@@ -1090,7 +1123,8 @@ class LandlordWithdrawalCard extends StatelessWidget {
                             {
                               'notifications': FieldValue.arrayUnion([
                                 {
-                                  'title': 'Rent Advance Request Accepted',
+                                  'title':
+                                      'Rent Advance Request Accepted, an admin will contact you shortly',
                                 }
                               ])
                             },
@@ -1115,6 +1149,53 @@ class LandlordWithdrawalCard extends StatelessWidget {
                                 {
                                   'title':
                                       'Interest Free Loan Request Accepted',
+                                }
+                              ])
+                            },
+                          );
+
+                          // Reset the state of the page
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const AdminRequestsPage(),
+                            ),
+                          );
+                        } else if (data.requestType ==
+                            'Security Deposit Request') {
+                          // Send a notification to the tenant
+                          await transaction.update(
+                            FirebaseFirestore.instance
+                                .collection('Notifications')
+                                .doc(data.uid),
+                            {
+                              'notifications': FieldValue.arrayUnion([
+                                {
+                                  'title':
+                                      'Security Deposit Request Accepted, an admin will contact you shortly',
+                                }
+                              ])
+                            },
+                          );
+
+                          // Reset the state of the page
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const AdminRequestsPage(),
+                            ),
+                          );
+                        } else if (data.requestType ==
+                            'Property Approval Request') {
+                          // Send a notification to the landlord
+                          await transaction.update(
+                            FirebaseFirestore.instance
+                                .collection('Notifications')
+                                .doc(data.uid),
+                            {
+                              'notifications': FieldValue.arrayUnion([
+                                {
+                                  'title': 'Property Approval Request Accepted',
                                 }
                               ])
                             },

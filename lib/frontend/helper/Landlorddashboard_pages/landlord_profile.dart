@@ -764,7 +764,9 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
                                     title: 'CNIC Number',
                                     subtitle: decryptString(docData['cnic']))
                                 : Container(),
-                            docData['address'] != null
+
+                            docData['address'] != '' &&
+                                    docData['address'] != null
                                 ? ProfileInfoItem(
                                     icon: Icons.home,
                                     title: 'Address',

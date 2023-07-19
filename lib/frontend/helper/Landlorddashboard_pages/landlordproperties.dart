@@ -294,43 +294,48 @@ class _LandlordPropertiesPageState extends State<LandlordPropertiesPage>
               children: [
                 Scaffold(
                   backgroundColor: const Color.fromARGB(255, 255, 255, 255),
-                  body: ListView(
-                    children: snapshot.data!.map((propertySnapshot) {
-                      Property property = Property.fromJson(
-                          propertySnapshot.data() as Map<String, dynamic>);
+                  body: RefreshIndicator(
+                    onRefresh: () async {
+                      await _updatePropertyStream();
+                    },
+                    child: ListView(
+                      children: snapshot.data!.map((propertySnapshot) {
+                        Property property = Property.fromJson(
+                            propertySnapshot.data() as Map<String, dynamic>);
 
-                      return PropertyCard(
-                        property: property,
-                        firstName: firstName ?? '',
-                        lastName: lastName ?? '',
-                        pathToImage: property.landlord?.pathToImage ??
-                            'assets/userimage.png',
-                        location: property.location,
-                        address: property.address,
-                        type: property.type,
-                        area: property.area ?? 0,
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => PropertyPage(
-                                property: property,
-                                firstName: firstName ?? '',
-                                lastName: lastName ?? '',
-                                pathToImage: property.landlord?.pathToImage ??
-                                    'assets/userimage.png',
-                                location: property.location,
-                                address: property.address,
-                                emailOrPhone:
-                                    property.landlord?.emailOrPhone ?? '',
-                                isTenantCall: false,
-                                // landlord: property.landlord!
+                        return PropertyCard(
+                          property: property,
+                          firstName: firstName ?? '',
+                          lastName: lastName ?? '',
+                          pathToImage: property.landlord?.pathToImage ??
+                              'assets/userimage.png',
+                          location: property.location,
+                          address: property.address,
+                          type: property.type,
+                          area: property.area ?? 0,
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => PropertyPage(
+                                  property: property,
+                                  firstName: firstName ?? '',
+                                  lastName: lastName ?? '',
+                                  pathToImage: property.landlord?.pathToImage ??
+                                      'assets/userimage.png',
+                                  location: property.location,
+                                  address: property.address,
+                                  emailOrPhone:
+                                      property.landlord?.emailOrPhone ?? '',
+                                  isTenantCall: false,
+                                  // landlord: property.landlord!
+                                ),
                               ),
-                            ),
-                          );
-                        },
-                      );
-                    }).toList(),
+                            );
+                          },
+                        );
+                      }).toList(),
+                    ),
                   ),
                 ),
                 Positioned(

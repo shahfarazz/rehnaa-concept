@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../backend/models/dealermodel.dart';
@@ -24,6 +25,7 @@ class _DealerEstampPageState extends State<DealerEstampPage> {
   List<Landlord> landlords = [];
   bool isLoading = true;
   Dealer? dealer;
+  bool _noEstamp = true;
   @override
   void initState() {
     super.initState();
@@ -85,6 +87,15 @@ class _DealerEstampPageState extends State<DealerEstampPage> {
             await landlordID.get();
         Landlord landlord = Landlord.fromJson(documentSnapshot.data());
         landlord.tempID = landlordID.id;
+        landlord.hasEstamp = (dealer?.landlordMap?[landlord.tempID]
+                ?['eStampTenantName'] !=
+            null);
+        if (landlord.hasEstamp) {
+          print('reached hereree');
+          setState(() {
+            _noEstamp = false;
+          });
+        }
         landlordList.add(landlord);
         // print('dealer landlordmap: ${dealer.landlordMap?[landlord.tempID]}');
       }
@@ -160,7 +171,7 @@ class _DealerEstampPageState extends State<DealerEstampPage> {
                 ),
               ),
               Expanded(
-                child: filteredLandlords.isEmpty
+                child: filteredLandlords.isEmpty || _noEstamp
                     ? RefreshIndicator(
                         onRefresh: _refreshFunction,
                         child: SingleChildScrollView(
@@ -211,6 +222,18 @@ class _DealerEstampPageState extends State<DealerEstampPage> {
                             final landlord = filteredLandlords[index];
                             return GestureDetector(
                               onTap: () {
+                                if (!(landlord.hasEstamp)) {
+                                  //flutter toast no estamp found
+                                  Fluttertoast.showToast(
+                                      msg: "No E-Stamp Papers Found",
+                                      toastLength: Toast.LENGTH_SHORT,
+                                      gravity: ToastGravity.BOTTOM,
+                                      timeInSecForIosWeb: 1,
+                                      backgroundColor: Colors.red,
+                                      textColor: Colors.white,
+                                      fontSize: 16.0);
+                                  return;
+                                }
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(

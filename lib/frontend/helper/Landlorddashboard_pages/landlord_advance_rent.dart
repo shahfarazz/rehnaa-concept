@@ -35,6 +35,10 @@ class _LandlordAdvanceRentPageState extends State<LandlordAdvanceRentPage> {
       setState(() {
         isApplied = true;
       });
+    } else {
+      setState(() {
+        isApplied = false;
+      });
     }
 
     if (myLandlord.data()?['whenApplied'] != null) {
@@ -45,10 +49,26 @@ class _LandlordAdvanceRentPageState extends State<LandlordAdvanceRentPage> {
       final DateTime now = DateTime.now();
       final difference = now.difference(whenApplied).inDays;
 
+      print('difference: $difference');
+
       if (difference >= 90) {
         setState(() {
           isApplied = false;
         });
+      } else {
+        // show toast
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: Colors.red,
+            content: Text(
+              'You have already applied for rent advance. Please wait for ${90 - difference} days to apply again.',
+              style: TextStyle(
+                fontSize: 18,
+                fontFamily: GoogleFonts.montserrat().fontFamily,
+              ),
+            ),
+          ),
+        );
       }
     }
   }

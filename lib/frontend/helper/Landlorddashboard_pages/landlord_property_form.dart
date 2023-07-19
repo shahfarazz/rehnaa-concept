@@ -53,6 +53,7 @@ class _LandlordPropertyFormsState extends State<LandlordPropertyForms> {
   final TextEditingController _areaController = TextEditingController();
 
   var pathToImage = <String>[];
+  var data = 'Select Image';
 
   @override
   void dispose() {
@@ -89,7 +90,7 @@ class _LandlordPropertyFormsState extends State<LandlordPropertyForms> {
         'price': double.parse(_priceController.text),
         'area': double.parse(_areaController.text),
         'isDetailsFilled': true,
-        'pathToImage': pathToImage.isNotEmpty ? pathToImage : [''],
+        'imagePath': pathToImage.isNotEmpty ? pathToImage : [''],
       };
 
       try {
@@ -693,81 +694,148 @@ class _LandlordPropertyFormsState extends State<LandlordPropertyForms> {
               //property image using stateful builder and image picker
               //should save to pathToImage variable list which is the image path
               // to firebase storage which will be properties/imageName
+
               StatefulBuilder(
                 builder: (BuildContext context, StateSetter setState) {
-                  return Column(
-                    children: [
-                      Material(
-                        elevation: 4.0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(32.0),
-                        ),
-                        child: Ink(
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [
-                                const Color(0xff0FA697),
-                                const Color(0xff45BF7A),
-                                const Color(0xff0DF205),
-                              ],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                            ),
-                            borderRadius: BorderRadius.circular(32.0),
-                          ),
-                          child: InkWell(
-                            onTap: () {
-                              showDialog(
-                                context: context,
-                                builder: (context2) {
-                                  return const SpinKitFadingCube(
-                                    color: Color.fromARGB(255, 30, 197, 83),
-                                  );
-                                },
-                              );
-                              uploadImages().then((success) {
-                                Navigator.pop(context);
-                                final message = success
-                                    ? 'Images uploaded successfully'
-                                    : 'Failed to upload images';
-                                // ScaffoldMessenger.of(context).showSnackBar(
-                                //   SnackBar(
-                                //     content: Text(message),
-                                //     backgroundColor: Colors.green,
-                                //   ),
-                                // );
-                                // replace with a green flutter toast
-                                Fluttertoast.showToast(
-                                    msg: message,
-                                    toastLength: Toast.LENGTH_SHORT,
-                                    gravity: ToastGravity.BOTTOM,
-                                    timeInSecForIosWeb: 1,
-                                    backgroundColor: Colors.green,
-                                    textColor: Colors.white,
-                                    fontSize: 16.0);
-                                return;
-                              });
-                            },
-                            borderRadius: BorderRadius.circular(32.0),
-                            child: Container(
-                              padding: EdgeInsets.symmetric(
-                                  vertical: 16.0, horizontal: 24.0),
-                              child: Text(
-                                'Select Image',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontFamily:
-                                      GoogleFonts.montserrat().fontFamily,
+                  return pathToImage.length > 0
+                      ? Container()
+                      : Column(
+                          children: [
+                            Material(
+                              elevation: 4.0,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(32.0),
+                              ),
+                              child: Ink(
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      const Color(0xff0FA697),
+                                      const Color(0xff45BF7A),
+                                      const Color(0xff0DF205),
+                                    ],
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                  ),
+                                  borderRadius: BorderRadius.circular(32.0),
+                                ),
+                                child: InkWell(
+                                  onTap: () {
+                                    if (data ==
+                                        'images uploaded successfully') {
+                                      return;
+                                    }
+                                    showDialog(
+                                      barrierDismissible: false,
+                                      context: context,
+                                      builder: (context2) {
+                                        return const SpinKitFadingCube(
+                                          color:
+                                              Color.fromARGB(255, 30, 197, 83),
+                                        );
+                                      },
+                                    );
+                                    uploadImages().then((success) {
+                                      Navigator.pop(context);
+                                      final message = success
+                                          ? 'Images uploaded successfully'
+                                          : 'Failed to upload images';
+
+                                      if (success) {
+                                        setState(() {
+                                          data = 'Uploaded';
+                                        });
+                                      }
+                                      Fluttertoast.showToast(
+                                          msg: message,
+                                          toastLength: Toast.LENGTH_SHORT,
+                                          gravity: ToastGravity.BOTTOM,
+                                          timeInSecForIosWeb: 1,
+                                          backgroundColor: Colors.green,
+                                          textColor: Colors.white,
+                                          fontSize: 16.0);
+                                      return;
+                                    });
+                                  },
+                                  borderRadius: BorderRadius.circular(32.0),
+                                  child: Column(
+                                    children: [
+                                      Container(
+                                        padding: EdgeInsets.symmetric(
+                                            vertical: 16.0, horizontal: 24.0),
+                                        child: Text(
+                                          data,
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontFamily: GoogleFonts.montserrat()
+                                                .fontFamily,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                        ),
-                      )
-                    ],
-                  );
+                          ],
+                        );
                 },
               ),
+              pathToImage.length > 0
+                  ? Container(
+                      height: 100,
+                      child: ListView(
+                        padding: EdgeInsets.only(left: 40),
+                        children: [
+                          Text('Uploaded Images:',
+                              textAlign: TextAlign.left,
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontFamily: GoogleFonts.montserrat().fontFamily,
+                                color: Colors.green,
+                              )),
+                          GridView.builder(
+                            shrinkWrap: true,
+                            physics: NeverScrollableScrollPhysics(),
+                            itemCount: pathToImage.length,
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 3, // change this number as needed
+                            ),
+                            itemBuilder: (BuildContext context, int index) {
+                              return Stack(
+                                children: <Widget>[
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(8.0),
+                                    child: Image.network(
+                                      pathToImage[
+                                          index], // assuming pathToImage is list of file paths
+                                      height: 70,
+                                      width: 70,
+                                      fit: BoxFit.cover,
+                                      loadingBuilder: (BuildContext context,
+                                          Widget child,
+                                          ImageChunkEvent? loadingProgress) {
+                                        if (loadingProgress == null)
+                                          return child;
+                                        return Center(
+                                          child: const SpinKitFadingCube(
+                                            color: Color.fromARGB(
+                                                255, 30, 197, 83),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                    )
+                  : Container(),
+
               SizedBox(height: size.height * 0.02),
 
               Material(

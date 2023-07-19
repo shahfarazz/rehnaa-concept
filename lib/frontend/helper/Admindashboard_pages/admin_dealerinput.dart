@@ -6,6 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:rehnaa/frontend/Screens/Admin/admin_login.dart';
 import 'dart:html' as html;
 
 import '../../../backend/models/dealermodel.dart';
@@ -560,9 +561,17 @@ class _AdminDealerInputPageState extends State<AdminDealerInputPage> {
                                 ));
                               });
 
+                              //scaffold to show that user added but please login again
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                      'Dealer added successfully! Please login again'),
+                                ),
+                              );
+
                               Navigator.push(context, MaterialPageRoute(
                                 builder: (context) {
-                                  return const AdminDealerInputPage();
+                                  return const AdminLoginPage();
                                 },
                               ));
                             } catch (e) {

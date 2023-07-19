@@ -17,23 +17,50 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
   bool _isPasswordVisible = false;
   bool _isLoading = true;
 
-  Future<void> checkAlreadyLoggedIn() {
-    _isLoading = true;
+  Future<void> checkAlreadyLoggedIn() async {
+    if (_isLoading == false) return Future.value();
+    await Future.delayed(const Duration(seconds: 3), () {
+      //show dialog with spinkitcube
+      // showDialog(
+      //   context: context,
+      //   builder: (BuildContext context) {
+      //     return AlertDialog(
+      //       title: const Text('Loading'),
+      //       content: const SpinKitFadingCube(
+      //         color: Color.fromARGB(255, 30, 197, 83),
+      //       ),
+      //     );
+      //   },
+      // );
+    });
+    // Navigator.pop(context);
     try {
       if (FirebaseAuth.instance.currentUser != null) {
+        print('reached hereree : ${FirebaseAuth.instance.currentUser!.uid}');
         FirebaseFirestore.instance
             .collection('users')
             .doc(FirebaseAuth.instance.currentUser!.uid)
             .get()
             .then((value) {
+          print('reached here wowww');
+          print('reached hereree1111 : ${value.data()!['type']}');
           if (value.data()!['type'] == 'Admin') {
+            print('reached hereree2222');
+
             Navigator.push(
                 context,
                 MaterialPageRoute(
                     builder: (context) => const AdminDashboard()));
             return;
+          } else {
+            // setState(() {
+            print('reached hereree4444');
+            _isLoading = false;
+            // });
           }
         });
+      } else {
+        print('reached hereree33333');
       }
     } catch (e) {
       print(e);
@@ -120,7 +147,8 @@ class _AdminLoginPageState extends State<AdminLoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    _isLoading = true;
+    // _isLoading = true;
+
     // print('reached herereee');
     return Scaffold(
       appBar: AppBar(

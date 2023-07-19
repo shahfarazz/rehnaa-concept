@@ -526,29 +526,39 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
                           validator: (value) {
                             //check if value can be parsed
                             if (value != null && int.tryParse(value) == null) {
-                              return 'Please enter a valid monthly profit';
+                              return 'Please enter a valid security deposit';
                             }
                           }),
                       TextFormField(
-                          controller: creditScoreController,
-                          decoration:
-                              const InputDecoration(labelText: 'Credit Score'),
-                          validator: (value) {
-                            //check if value can be parsed
-                            if (value != null && int.tryParse(value) == null) {
-                              return 'Please enter a valid monthly profit';
-                            }
-                          }),
+                        controller: creditScoreController,
+                        decoration:
+                            const InputDecoration(labelText: 'Credit Score'),
+                        validator: (value) {
+                          //check if value can be parsed
+                          if (value != null && int.tryParse(value) == null) {
+                            return 'Please enter valid credit score';
+                          }
+                          if (value != null && int.tryParse(value)! > 10) {
+                            return 'Please enter valid credit score';
+                          }
+                          // return '';
+                        },
+                      ),
                       TextFormField(
-                          controller: creditPointsController,
-                          decoration:
-                              const InputDecoration(labelText: 'Credit Points'),
-                          validator: (value) {
-                            //check if value can be parsed
-                            if (value != null && int.tryParse(value) == null) {
-                              return 'Please enter a valid monthly profit';
-                            }
-                          }),
+                        controller: creditPointsController,
+                        decoration:
+                            const InputDecoration(labelText: 'Credit Points'),
+                        validator: (value) {
+                          //check if value can be parsed
+                          if (value != null && int.tryParse(value) == null) {
+                            return 'Please enter valid credit points';
+                          }
+                          if (value != null && int.tryParse(value)! > 10) {
+                            return 'Please enter valid credit points';
+                          }
+                          // return '';
+                        },
+                      ),
                       const SizedBox(height: 20),
                       ElevatedButton(
                         style: ButtonStyle(
@@ -725,6 +735,24 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
                                                     .collection('Landlords')
                                                     .doc(landlord.tempID)
                                                     .update(package);
+
+                                                if (selectedDealers
+                                                    .isNotEmpty) {
+                                                  selectedDealers
+                                                      .forEach((element) {
+                                                    element.set({
+                                                      'landlordRef': FieldValue
+                                                          .arrayUnion([
+                                                        FirebaseFirestore
+                                                            .instance
+                                                            .collection(
+                                                                'Landlords')
+                                                            .doc(
+                                                                landlord.tempID)
+                                                      ])
+                                                    }, SetOptions(merge: true));
+                                                  });
+                                                }
 
                                                 if (landlord.balance >
                                                     (double.tryParse(
