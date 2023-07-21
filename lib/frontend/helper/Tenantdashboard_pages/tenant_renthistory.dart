@@ -118,7 +118,10 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
         int i = entry.key;
         RentPayment e = entry.value;
         e.pdfUrl = urls[i].data()?['url'];
-        e.isMinus = e.landlordRef != null || e.dealerRef != null;
+        print('url is ${e.pdfUrl}');
+        if (e.isMinus == null) {
+          e.isMinus = e.landlordRef != null || e.dealerRef != null;
+        }
 
         return e;
       }).toList();

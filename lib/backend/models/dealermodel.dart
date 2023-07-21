@@ -38,7 +38,7 @@ class Dealer {
       tempID: json['tempID'],
       agencyName: json['agencyName'] ?? '',
       agencyAddress: json['agencyAddress'] ?? '',
-      landlordMap: json['landlordMap'] != null
+      landlordMap: json['landlordMap'] != null && json['landlordMap'].length > 0
           ? Map<String, Map<String, dynamic>>.from(json['landlordMap'])
           : null,
       isGhost: json['isGhost'] ?? false,

@@ -782,57 +782,116 @@ class _LandlordPropertyFormsState extends State<LandlordPropertyForms> {
                 },
               ),
               pathToImage.length > 0
-                  ? Container(
-                      height: 100,
-                      child: ListView(
-                        padding: EdgeInsets.only(left: 40),
-                        children: [
-                          Text('Uploaded Images:',
-                              textAlign: TextAlign.left,
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontFamily: GoogleFonts.montserrat().fontFamily,
-                                color: Colors.green,
-                              )),
-                          GridView.builder(
-                            shrinkWrap: true,
-                            physics: NeverScrollableScrollPhysics(),
-                            itemCount: pathToImage.length,
-                            gridDelegate:
-                                const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 3, // change this number as needed
-                            ),
-                            itemBuilder: (BuildContext context, int index) {
-                              return Stack(
-                                children: <Widget>[
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.circular(8.0),
-                                    child: Image.network(
-                                      pathToImage[
-                                          index], // assuming pathToImage is list of file paths
-                                      height: 70,
-                                      width: 70,
-                                      fit: BoxFit.cover,
-                                      loadingBuilder: (BuildContext context,
-                                          Widget child,
-                                          ImageChunkEvent? loadingProgress) {
-                                        if (loadingProgress == null)
-                                          return child;
-                                        return Center(
-                                          child: const SpinKitFadingCube(
-                                            color: Color.fromARGB(
-                                                255, 30, 197, 83),
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                  ),
-                                ],
-                              );
-                            },
+                  ? Column(
+                      children: [
+                        Container(
+                          height: 100,
+                          child: ListView(
+                            padding: EdgeInsets.only(left: 40),
+                            children: [
+                              Text('Uploaded Images:',
+                                  textAlign: TextAlign.left,
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontFamily:
+                                        GoogleFonts.montserrat().fontFamily,
+                                    color: Colors.green,
+                                  )),
+                              GridView.builder(
+                                shrinkWrap: true,
+                                physics: NeverScrollableScrollPhysics(),
+                                itemCount: pathToImage.length,
+                                gridDelegate:
+                                    const SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount:
+                                      3, // change this number as needed
+                                ),
+                                itemBuilder: (BuildContext context, int index) {
+                                  return Stack(
+                                    children: <Widget>[
+                                      ClipRRect(
+                                        borderRadius:
+                                            BorderRadius.circular(8.0),
+                                        child: Image.network(
+                                          pathToImage[
+                                              index], // assuming pathToImage is list of file paths
+                                          height: 70,
+                                          width: 70,
+                                          fit: BoxFit.cover,
+                                          loadingBuilder: (BuildContext context,
+                                              Widget child,
+                                              ImageChunkEvent?
+                                                  loadingProgress) {
+                                            if (loadingProgress == null)
+                                              return child;
+                                            return Center(
+                                              child: const SpinKitFadingCube(
+                                                color: Color.fromARGB(
+                                                    255, 30, 197, 83),
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
+                        ),
+                        //gesture detector plus icon that adds more images and resets state
+
+                        SizedBox(height: size.height * 0.02),
+
+                        GestureDetector(
+                          onTap: () {
+                            if (data == 'images uploaded successfully') {
+                              return;
+                            }
+                            showDialog(
+                              barrierDismissible: false,
+                              context: context,
+                              builder: (context2) {
+                                return const SpinKitFadingCube(
+                                  color: Color.fromARGB(255, 30, 197, 83),
+                                );
+                              },
+                            );
+                            uploadImages().then((success) {
+                              Navigator.pop(context);
+                              final message = success
+                                  ? 'Images uploaded successfully'
+                                  : 'Failed to upload images';
+
+                              if (success) {
+                                setState(() {
+                                  data = 'Uploaded';
+                                });
+                              }
+                              Fluttertoast.showToast(
+                                  msg: message,
+                                  toastLength: Toast.LENGTH_SHORT,
+                                  gravity: ToastGravity.BOTTOM,
+                                  timeInSecForIosWeb: 1,
+                                  backgroundColor: Colors.green,
+                                  textColor: Colors.white,
+                                  fontSize: 16.0);
+                              print('now pathToImage is $pathToImage');
+                              return;
+                            });
+                          },
+                          child: Container(
+                            height: 40,
+                            width: 40,
+                            color: Colors.green,
+                            child: const Icon(
+                              Icons.add,
+                              color: Colors.white,
+                            ),
+                          ),
+                        )
+                      ],
                     )
                   : Container(),
 
@@ -910,7 +969,7 @@ class _LandlordPropertyFormsState extends State<LandlordPropertyForms> {
 
           setState(() {
             imagePath.add(imageUrl);
-            pathToImage = imagePath;
+            pathToImage.add(imageUrl);
           });
         }
         return true;

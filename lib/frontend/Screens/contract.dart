@@ -268,7 +268,7 @@ class MyScreen extends StatelessWidget {
                                 ),
                                 SizedBox(height: 16),
                                 ContractCard(
-                                  icon: Icons.monetization_on,
+                                  icon: Icons.payments_outlined,
                                   label: 'Monthly Rent:',
                                   data: contractFields?['monthlyRent'] ?? '',
                                 ),

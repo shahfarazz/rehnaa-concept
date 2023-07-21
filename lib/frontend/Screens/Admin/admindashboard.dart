@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:rehnaa/frontend/helper/Admindashboard_pages/admin_new_analytics.dart';
 import 'package:rehnaa/frontend/helper/Admindashboard_pages/admin_requests.dart';
 import 'package:rehnaa/frontend/helper/Admindashboard_pages/admin_tenantinput.dart';
 
@@ -583,7 +584,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => AdminAnalyticsPage(),
+                          builder: (context) => AdminNewAnalyticsPage(),
                         ),
                       );
                     },

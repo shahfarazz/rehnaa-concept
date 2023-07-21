@@ -258,7 +258,9 @@ class _DealerLandlordOnboardedPageState
                                         fontWeight: FontWeight.bold),
                                   ),
                                   trailing: Text(
-                                    landlord.balance.toString(),
+                                    dealer?.landlordMap?[landlord.tempID]
+                                            ?['eStampTenantName'] ??
+                                        '',
                                     style: TextStyle(
                                       color: Colors.black,
                                       fontFamily:

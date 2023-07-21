@@ -8,7 +8,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:crypto/crypto.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart' show rootBundle;
+import 'package:flutter/services.dart'
+    show LengthLimitingTextInputFormatter, rootBundle;
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
@@ -282,15 +283,20 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
                       if (value != null && int.tryParse(value) == null) {
                         return 'Please enter valid credit points';
                       }
-                      if (value != null && int.tryParse(value)! > 10) {
-                        return 'Please enter valid credit points';
-                      }
+                      // if (value != null && int.tryParse(value)! > 10) {
+                      //   return 'Please enter valid credit points';
+                      // }
                       // return '';
                     },
                   ),
                   TextFormField(
                     controller: cnicNumberController,
                     decoration: const InputDecoration(labelText: 'CNIC Number'),
+                    inputFormatters: [
+                      LengthLimitingTextInputFormatter(
+                          13), // Restrict maximum length to 13
+                      // FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+                    ],
                     validator: (value) {
                       //can be null if not has to be 13 digits
                       //check if value can be parsed

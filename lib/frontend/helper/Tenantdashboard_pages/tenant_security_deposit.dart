@@ -188,27 +188,23 @@ class _TenantSecurityDepositPageState extends State<TenantSecurityDepositPage> {
                             child: InkWell(
                               borderRadius: BorderRadius.circular(30.0),
                               onTap: () {
-                                if (isApplySecurity || depositAmount == 0) {
-                                  //show snackbar that either already applied or deposit amount is 0
-                                  // ScaffoldMessenger.of(context).showSnackBar(
-                                  //   SnackBar(
-                                  //     content: Text(
-                                  //       'Either you have already applied or your deposit amount is 0',
-                                  //       style: TextStyle(
-                                  //         fontSize: 16,
-                                  //         fontFamily: GoogleFonts.montserrat()
-                                  //             .fontFamily,
-                                  //       ),
-                                  //       textAlign: TextAlign.center,
-                                  //     ),
-                                  //     backgroundColor: Colors.red,
-                                  //   ),
-                                  // );
-
+                                if (depositAmount == 0) {
+                                  //replace above with red flutter toast
+                                  Fluttertoast.showToast(
+                                    msg: 'Your deposit amount is 0',
+                                    toastLength: Toast.LENGTH_LONG,
+                                    gravity: ToastGravity.BOTTOM,
+                                    timeInSecForIosWeb: 1,
+                                    backgroundColor: Colors.red,
+                                    textColor: Colors.white,
+                                    fontSize: 16.0,
+                                  );
+                                  return;
+                                } else if (isApplySecurity) {
                                   //replace above with red flutter toast
                                   Fluttertoast.showToast(
                                     msg:
-                                        'Either you have already applied or your deposit amount is 0',
+                                        'You have already applied for security deposit withdrawal.',
                                     toastLength: Toast.LENGTH_LONG,
                                     gravity: ToastGravity.BOTTOM,
                                     timeInSecForIosWeb: 1,

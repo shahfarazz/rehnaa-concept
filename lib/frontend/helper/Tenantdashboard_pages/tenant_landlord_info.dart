@@ -207,6 +207,7 @@ class TenantLandlordInfoPage extends StatelessWidget {
                                   ),
                                 ),
                           const SizedBox(height: 10.0),
+                          landlord.property != null &&
                           landlord.property!.length != 0 &&
                                   landlord.property?[0].address != ''
                               ? Center(
@@ -219,7 +220,8 @@ class TenantLandlordInfoPage extends StatelessWidget {
                                 )
                               : const SizedBox.shrink(),
                           const SizedBox(height: 10.0),
-                          landlord.upfrontBonus != ''
+                          landlord.upfrontBonus != '' &&
+                                  landlord.upfrontBonus != null
                               ? Center(
                                   child: WhiteBox(
                                     icon: Icons.money,
@@ -230,7 +232,8 @@ class TenantLandlordInfoPage extends StatelessWidget {
                                 )
                               : const SizedBox.shrink(),
                           const SizedBox(height: 10.0),
-                          landlord.monthlyProfit != ''
+                          landlord.monthlyProfit != '' &&
+                                  landlord.monthlyProfit != null
                               ? Center(
                                   child: WhiteBox(
                                     icon: Icons.money,

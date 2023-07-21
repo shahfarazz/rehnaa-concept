@@ -915,7 +915,8 @@ class LandlordWithdrawalCard extends StatelessWidget {
                                   .collection('Landlords')
                                   .doc(data.uid),
                               'invoiceNumber': data.invoiceNumber,
-                              'tenantname': data.altTenantName
+                              'tenantname': data.altTenantName,
+                              'isMinus': true,
                             },
                           );
 
@@ -1093,7 +1094,8 @@ class LandlordWithdrawalCard extends StatelessWidget {
                                 .collection('Dealers')
                                 .doc(data.uid),
                             'invoiceNumber': data.invoiceNumber,
-                            'tenantname': data.altTenantName
+                            'tenantname': data.altTenantName,
+                            'isMinus': true
                           });
 
                           // Append the rentPaymentRef to the dealer's rentpaymentRef array

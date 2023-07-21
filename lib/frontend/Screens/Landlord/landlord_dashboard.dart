@@ -318,6 +318,7 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
 
                       if (data != null && data.containsKey('notifications')) {
                         List<dynamic> notificationstemp = data['notifications'];
+                        
 
                         // Filter notifications based on read status
                         List<dynamic> unreadNotifications =

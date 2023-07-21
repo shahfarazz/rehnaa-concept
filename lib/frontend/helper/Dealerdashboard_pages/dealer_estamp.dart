@@ -244,48 +244,55 @@ class _DealerEstampPageState extends State<DealerEstampPage> {
                                   ),
                                 );
                               },
-                              child: Card(
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10.0),
-                                ),
-                                elevation: 5.0,
-                                child: ListTile(
-                                  contentPadding: const EdgeInsets.symmetric(
-                                      horizontal: 20.0, vertical: 10.0),
-                                  title: Text(
-                                    landlord.firstName +
-                                        " " +
-                                        landlord.lastName,
-                                    style: TextStyle(
-                                        color: Colors.green,
-                                        fontFamily:
-                                            GoogleFonts.montserrat().fontFamily,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                  subtitle: Text(
-                                    dealer?.landlordMap?[landlord.tempID]
-                                        ?['eStampAddress'],
-                                    style: TextStyle(
-                                        color: Colors.green,
-                                        fontFamily:
-                                            GoogleFonts.montserrat().fontFamily,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                  trailing: Text(
-                                    '${dealer?.landlordMap?[landlord.tempID]?['eStampDate']}\n\nRs.${dealer?.landlordMap?[landlord.tempID]?['eStampCharges']}',
-                                    // landlord.contractStartDate == ''
-                                    //     ? 'No Contract\n\n${landlord.monthlyRent == "" ? "No Rent" : landlord.monthlyRent}'
-                                    //     : '${landlord.contractStartDate!}\n ${landlord.monthlyRent == "" ? "No Rent" : landlord.monthlyRent}',
-                                    style: TextStyle(
-                                      color: Colors.black,
-                                      fontFamily:
-                                          GoogleFonts.montserrat().fontFamily,
-                                    ),
-                                  ),
+                              child: landlord.hasEstamp
+                                  ? Card(
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(10.0),
+                                      ),
+                                      elevation: 5.0,
+                                      child: ListTile(
+                                        contentPadding:
+                                            const EdgeInsets.symmetric(
+                                                horizontal: 20.0,
+                                                vertical: 10.0),
+                                        title: Text(
+                                          landlord.firstName +
+                                              " " +
+                                              landlord.lastName,
+                                          style: TextStyle(
+                                              color: Colors.green,
+                                              fontFamily:
+                                                  GoogleFonts.montserrat()
+                                                      .fontFamily,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                        subtitle: Text(
+                                          dealer?.landlordMap?[landlord.tempID]
+                                              ?['eStampAddress'],
+                                          style: TextStyle(
+                                              color: Colors.green,
+                                              fontFamily:
+                                                  GoogleFonts.montserrat()
+                                                      .fontFamily,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                        trailing: Text(
+                                          '${dealer?.landlordMap?[landlord.tempID]?['eStampDate']}\n\nRs.${dealer?.landlordMap?[landlord.tempID]?['eStampCharges']}',
+                                          // landlord.contractStartDate == ''
+                                          //     ? 'No Contract\n\n${landlord.monthlyRent == "" ? "No Rent" : landlord.monthlyRent}'
+                                          //     : '${landlord.contractStartDate!}\n ${landlord.monthlyRent == "" ? "No Rent" : landlord.monthlyRent}',
+                                          style: TextStyle(
+                                            color: Colors.black,
+                                            fontFamily: GoogleFonts.montserrat()
+                                                .fontFamily,
+                                          ),
+                                        ),
 
-                                  // subtitle: Text('dummy'),
-                                ),
-                              ),
+                                        // subtitle: Text('dummy'),
+                                      ),
+                                    )
+                                  : Container(),
                             );
                           },
                         ),
