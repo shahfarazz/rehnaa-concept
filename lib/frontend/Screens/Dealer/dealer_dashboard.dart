@@ -295,11 +295,13 @@ class _DealerDashboardPageState extends State<DealerDashboardPage>
               IconButton(
                 icon: const Icon(Icons.notifications_active),
                 onPressed: () {
-                  EasyDebounce.debounce(
-                    'notifications-debouncer', // Debouncer ID
-                    Duration(seconds: 2), // Debounce duration
-                    _handleNotificationsButtonPress, // Wrapped function
-                  );
+                  // EasyDebounce.debounce(
+                  //   'notifications-debouncer', // Debouncer ID
+                  //   Duration(seconds: 2), // Debounce duration
+                  //   _handleNotificationsButtonPress, // Wrapped function
+                  // );
+                  // _handleNotificationsButtonPress();
+                  _isDialogOpen ? null : _handleNotificationsButtonPress();
                 },
               ),
               Positioned(

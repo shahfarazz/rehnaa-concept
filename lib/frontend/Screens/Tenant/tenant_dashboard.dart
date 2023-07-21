@@ -530,6 +530,34 @@ class _DashboardPageState extends State<TenantDashboardPage>
                         // _closeSidebar();
                       },
                     ),
+                    StatefulBuilder(
+                      builder: (BuildContext context, setState) {
+                        return _buildSidebarItem(
+                          icon: Icons.receipt,
+                          label: 'Vouchers',
+                          onTap: () {
+                            //firebase call set users isNewVouchers to false
+                            FirebaseFirestore.instance
+                                .collection('Tenants')
+                                .doc(widget.uid)
+                                .set({
+                              'isNewVouchers': false,
+                            }, SetOptions(merge: true));
+
+                            setState(() {
+                              isNewVoucher = false;
+                            });
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const NewVouchersPage(),
+                              ),
+                            );
+                          },
+                          showBadge: isNewVoucher,
+                        );
+                      },
+                    ),
                     _buildSidebarItem(
                       icon: Icons.home_work_sharp,
                       label: 'Rented Properties',
@@ -574,34 +602,6 @@ class _DashboardPageState extends State<TenantDashboardPage>
                           ),
                         );
                         // _closeSidebar();
-                      },
-                    ),
-                    StatefulBuilder(
-                      builder: (BuildContext context, setState) {
-                        return _buildSidebarItem(
-                          icon: Icons.receipt,
-                          label: 'Vouchers',
-                          onTap: () {
-                            //firebase call set users isNewVouchers to false
-                            FirebaseFirestore.instance
-                                .collection('Tenants')
-                                .doc(widget.uid)
-                                .set({
-                              'isNewVouchers': false,
-                            }, SetOptions(merge: true));
-
-                            setState(() {
-                              isNewVoucher = false;
-                            });
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const NewVouchersPage(),
-                              ),
-                            );
-                          },
-                          showBadge: isNewVoucher,
-                        );
                       },
                     ),
                     _buildSidebarItem(
