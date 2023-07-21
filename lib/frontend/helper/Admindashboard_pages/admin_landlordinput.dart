@@ -443,7 +443,9 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
                         validator: (value) {
                           //can be null if not has to be 13 digits
                           //check if value can be parsed
-                          if (value != null && value.length != 13) {
+                          if (value != null &&
+                              value.length != 13 &&
+                              value != '') {
                             if (int.tryParse(value) == null) {
                               return 'Please enter a valid CNIC';
                             }
@@ -500,7 +502,9 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
                             const InputDecoration(labelText: 'Monthly Rent'),
                         validator: (value) {
                           //check if value can be parsed
-                          if (value != null && int.tryParse(value) == null) {
+                          if (value != null &&
+                              int.tryParse(value) == null &&
+                              value != '') {
                             return 'Please enter a valid monthly rent';
                           }
                         },
@@ -511,7 +515,9 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
                               const InputDecoration(labelText: 'Upfront Bonus'),
                           validator: (value) {
                             //check if value can be parsed
-                            if (value != null && int.tryParse(value) == null) {
+                            if (value != null &&
+                                int.tryParse(value) == null &&
+                                value != '') {
                               return 'Please enter a valid upfront bonus';
                             }
                           }),
@@ -521,7 +527,9 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
                               labelText: 'Monthly Profit'),
                           validator: (value) {
                             //check if value can be parsed
-                            if (value != null && int.tryParse(value) == null) {
+                            if (value != null &&
+                                int.tryParse(value) == null &&
+                                value != '') {
                               return 'Please enter a valid monthly profit';
                             }
                           }),
@@ -531,7 +539,9 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
                               labelText: 'Security Deposit'),
                           validator: (value) {
                             //check if value can be parsed
-                            if (value != null && int.tryParse(value) == null) {
+                            if (value != null &&
+                                int.tryParse(value) == null &&
+                                value != '') {
                               return 'Please enter a valid security deposit';
                             }
                           }),
@@ -541,12 +551,12 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
                             const InputDecoration(labelText: 'Credit Score'),
                         validator: (value) {
                           //check if value can be parsed
-                          if (value != null && int.tryParse(value) == null) {
+                          if (value != null &&
+                              int.tryParse(value) == null &&
+                              value != '') {
                             return 'Please enter valid credit score';
                           }
-                          if (value != null && int.tryParse(value)! > 10) {
-                            return 'Please enter valid credit score';
-                          }
+
                           // return '';
                         },
                       ),
@@ -556,7 +566,9 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
                             const InputDecoration(labelText: 'Credit Points'),
                         validator: (value) {
                           //check if value can be parsed
-                          if (value != null && int.tryParse(value) == null) {
+                          if (value != null &&
+                              int.tryParse(value) == null &&
+                              value != '') {
                             return 'Please enter valid credit points';
                           }
                           // if (value != null && int.tryParse(value)! > 10) {
@@ -736,6 +748,118 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
                                                     );
                                                   },
                                                 );
+
+                                                setState(() {
+                                                  landlord.balance =
+                                                      double.tryParse(
+                                                              balanceController
+                                                                  .text) ??
+                                                          0.0;
+                                                  landlord.firstName =
+                                                      firstNameController.text;
+                                                  landlord.lastName =
+                                                      lastNameController.text;
+                                                  landlord.propertyRef =
+                                                      selectedProperties;
+                                                  landlord.tenantRef =
+                                                      selectedTenants;
+                                                  landlord.rentpaymentRef =
+                                                      selectedRentPayments;
+                                                  landlord.dealerRef =
+                                                      selectedDealers;
+                                                  landlord.cnic = cnicController
+                                                          .text.isNotEmpty
+                                                      ? encryptString(
+                                                          cnicController.text)
+                                                      : '';
+                                                  landlord.bankName =
+                                                      bankNameController
+                                                              .text.isNotEmpty
+                                                          ? encryptString(
+                                                              bankNameController
+                                                                  .text)
+                                                          : '';
+                                                  landlord.raastId =
+                                                      raastIdController
+                                                              .text.isNotEmpty
+                                                          ? encryptString(
+                                                              raastIdController
+                                                                  .text)
+                                                          : '';
+                                                  landlord.accountNumber =
+                                                      accountNumberController
+                                                              .text.isNotEmpty
+                                                          ? encryptString(
+                                                              accountNumberController
+                                                                  .text)
+                                                          : '';
+                                                  landlord.iban = ibanController
+                                                          .text.isNotEmpty
+                                                      ? encryptString(
+                                                          ibanController.text)
+                                                      : '';
+                                                  landlord.address =
+                                                      addressController
+                                                              .text.isNotEmpty
+                                                          ? addressController
+                                                              .text
+                                                          : '';
+                                                  landlord.contractStartDate =
+                                                      contractStartDate;
+                                                  landlord.contractEndDate =
+                                                      contractEndDate;
+                                                  landlord.monthlyRent =
+                                                      monthlyRentController
+                                                              .text.isNotEmpty
+                                                          ? monthlyRentController
+                                                                  .text ??
+                                                              0.0
+                                                          : 0.0;
+                                                  landlord.upfrontBonus =
+                                                      upfrontBonusController
+                                                              .text.isNotEmpty
+                                                          ? upfrontBonusController
+                                                                  .text ??
+                                                              0.0
+                                                          : 0.0;
+                                                  landlord.monthlyProfit =
+                                                      monthlyProfitController
+                                                              .text.isNotEmpty
+                                                          ? monthlyProfitController
+                                                                  .text ??
+                                                              0.0
+                                                          : 0.0;
+                                                  landlord.securityDeposit =
+                                                      securityDepositController
+                                                                  .text
+                                                                  .isNotEmpty &&
+                                                              securityDepositController
+                                                                      .text !=
+                                                                  'null'
+                                                          ? securityDepositController
+                                                              .text
+                                                          : '';
+                                                  landlord.creditScore =
+                                                      creditScoreController.text
+                                                                  .isNotEmpty &&
+                                                              creditScoreController
+                                                                      .text !=
+                                                                  'null'
+                                                          ? creditScoreController
+                                                              .text
+                                                          : '';
+                                                  landlord.creditPoints =
+                                                      creditPointsController
+                                                                  .text
+                                                                  .isNotEmpty &&
+                                                              creditPointsController
+                                                                      .text !=
+                                                                  'null'
+                                                          ? creditPointsController
+                                                              .text
+                                                          : '';
+                                                });
+
                                                 // Your save logic goes here
                                                 await FirebaseFirestore.instance
                                                     .collection('Landlords')
@@ -784,7 +908,7 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
                                                             0.0) +
                                                         (landlord.balance),
                                                     'date': DateTime.now(),
-                                                    'isMinus': true,
+                                                    'isMinus': false,
                                                     'paymentType': '',
                                                     // 'description': 'Balance updated by landlord',
                                                     // 'paymentType': 'Bank Transfer',
@@ -811,7 +935,7 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
                                                         {
                                                           // 'amount': data.requestedAmount,
                                                           'title':
-                                                              'Your account has been credited by ${-(double.tryParse(balanceController.text) ?? 0.0) + (landlord.balance)}',
+                                                              'Your account has been debited by ${-(double.tryParse(balanceController.text) ?? 0.0) + (landlord.balance)}',
                                                         }
                                                       ])
                                                     });
@@ -840,7 +964,7 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
                                                             0.0) -
                                                         landlord.balance),
                                                     'date': DateTime.now(),
-                                                    'isMinus': false,
+                                                    'isMinus': true,
                                                     // 'description': 'Balance updated by landlord',
                                                     'paymentType': '',
                                                   }).then((value) async {
@@ -866,7 +990,7 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
                                                         {
                                                           // 'amount': data.requestedAmount,
                                                           'title':
-                                                              'Your account has been debited by PKR${((double.tryParse(balanceController.text) ?? 0.0) - landlord.balance)}'
+                                                              'Your account has been credited by PKR${((double.tryParse(balanceController.text) ?? 0.0) - landlord.balance)}'
                                                         }
                                                       ])
                                                     }, SetOptions(merge: true));

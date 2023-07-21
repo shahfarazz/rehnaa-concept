@@ -425,6 +425,7 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
       child: Scaffold(
         body: Column(
           children: [
+            SizedBox(height: 15),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [

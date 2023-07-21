@@ -280,7 +280,9 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
                     keyboardType: TextInputType.number,
                     validator: (value) {
                       //check if value can be parsed
-                      if (value != null && int.tryParse(value) == null) {
+                      if (value != null &&
+                          int.tryParse(value) == null &&
+                          value != '') {
                         return 'Please enter valid credit points';
                       }
                       // if (value != null && int.tryParse(value)! > 10) {
@@ -300,7 +302,7 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
                     validator: (value) {
                       //can be null if not has to be 13 digits
                       //check if value can be parsed
-                      if (value != null && value.length != 13) {
+                      if (value != null && value.length != 13 && value != '') {
                         if (int.tryParse(value) == null) {
                           return 'Please enter a valid CNIC';
                         }
@@ -359,7 +361,9 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
                         const InputDecoration(labelText: 'Monthly Rent'),
                     validator: (value) {
                       //check if value can be parsed
-                      if (value != null && int.tryParse(value) == null) {
+                      if (value != null &&
+                          int.tryParse(value) == null &&
+                          value != '') {
                         return 'Please enter a valid monthly rent';
                       }
                     },
@@ -375,7 +379,9 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
                         const InputDecoration(labelText: 'Security Deposit'),
                     validator: (value) {
                       //check if value can be parsed
-                      if (value != null && int.tryParse(value) == null) {
+                      if (value != null &&
+                          int.tryParse(value) == null &&
+                          value != '') {
                         return 'Please enter a valid security deposit';
                       }
                     },
@@ -386,10 +392,9 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
                         const InputDecoration(labelText: 'Credit Score'),
                     validator: (value) {
                       //check if value can be parsed
-                      if (value != null && int.tryParse(value) == null) {
-                        return 'Please enter a valid credit score';
-                      }
-                      if (value != null && int.tryParse(value)! > 10) {
+                      if (value != null &&
+                          int.tryParse(value) == null &&
+                          value != '') {
                         return 'Please enter a valid credit score';
                       }
                     },
@@ -570,6 +575,70 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
                                                 );
                                               },
                                             );
+
+                                            setState(() {
+                                              tenant.firstName =
+                                                  firstNameController.text ??
+                                                      '';
+                                              tenant.lastName =
+                                                  lastNameController.text ?? '';
+                                              tenant.description =
+                                                  descriptionController.text ??
+                                                      '';
+                                              tenant.balance = double.tryParse(
+                                                      rentController.text) ??
+                                                  0.0;
+                                              tenant.creditPoints =
+                                                  int.tryParse(
+                                                          creditPointsController
+                                                              .text) ??
+                                                      0;
+                                              tenant.cnic = cnicNumberController
+                                                      .text.isNotEmpty
+                                                  ? encryptString(
+                                                      cnicNumberController.text)
+                                                  : '';
+                                              tenant.emailOrPhone =
+                                                  emailOrPhoneController.text ??
+                                                      '';
+                                              tenant
+                                                  .familyMembers = int.tryParse(
+                                                      familyMembersController
+                                                          .text) ??
+                                                  0;
+                                              tenant.rating = double.tryParse(
+                                                      ratingController.text) ??
+                                                  0.0;
+                                              tenant.landlordRef =
+                                                  tenant.landlordRef;
+                                              tenant.propertyAddress =
+                                                  propertyAddressController
+                                                          .text ??
+                                                      '';
+                                              tenant.address =
+                                                  addressController.text ?? '';
+                                              tenant.contractStartDate =
+                                                  contractStartDate;
+                                              tenant.contractEndDate =
+                                                  contractEndDate;
+                                              tenant.monthlyRent =
+                                                  monthlyRentController.text ??
+                                                      '';
+                                              tenant.policeVerification =
+                                                  policeVerification;
+                                              tenant.tasdeeqVerification =
+                                                  tasdeeqVerification;
+                                              tenant.securityDeposit =
+                                                  securityDepositController
+                                                          .text ??
+                                                      '';
+                                              tenant.creditScore =
+                                                  creditScoreController.text ??
+                                                      '';
+                                              tenant.otherInfo =
+                                                  otherInfoController.text ??
+                                                      '';
+                                            });
 
                                             await FirebaseFirestore.instance
                                                 .collection('Tenants')

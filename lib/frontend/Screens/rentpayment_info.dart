@@ -55,12 +55,13 @@ class RentPaymentInfoPage extends StatelessWidget {
                   top: 65.0,
                   left: 10.0,
                   child: GestureDetector(
+                    behavior: HitTestBehavior.translucent,
                     onTap: () {
                       Navigator.pop(context);
                     },
                     child: Container(
-                      width: 40,
-                      height: 40,
+                      width: 50,
+                      height: 50,
                       decoration: const BoxDecoration(
                         shape: BoxShape.circle,
                         color: Color(0xFF33907C),
@@ -88,7 +89,7 @@ class RentPaymentInfoPage extends StatelessWidget {
                     SizedBox(height: size.height * 0.08),
                     const SizedBox(height: 20.0),
                     Text(
-                      '$firstName $lastName',
+                      ' $firstName $lastName',
                       style: GoogleFonts.montserrat(
                         fontSize: 24.0,
                         fontWeight: FontWeight.bold,

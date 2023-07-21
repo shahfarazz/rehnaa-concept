@@ -5,13 +5,13 @@ import 'rentpaymentmodel.dart';
 import 'tenantsmodel.dart';
 
 class Landlord {
-  final String firstName;
-  final String lastName;
-  final num balance;
-  final String? pathToImage;
-  final List<DocumentReference<Map<String, dynamic>>>? tenantRef;
-  final List<DocumentReference<Map<String, dynamic>>> propertyRef;
-  final List<DocumentReference<Map<String, dynamic>>>? rentpaymentRef;
+  String firstName;
+  String lastName;
+  num balance;
+  String? pathToImage;
+  List<DocumentReference<Map<String, dynamic>>>? tenantRef;
+  List<DocumentReference<Map<String, dynamic>>> propertyRef;
+  List<DocumentReference<Map<String, dynamic>>>? rentpaymentRef;
   List<Tenant>? tenant = [];
   List<Property>? property = [];
   List<RentPayment>? rentpayment = [];
