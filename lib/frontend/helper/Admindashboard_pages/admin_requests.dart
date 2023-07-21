@@ -996,7 +996,8 @@ class LandlordWithdrawalCard extends StatelessWidget {
                                   .collection('Tenants')
                                   .doc(data.uid),
                               'landlordRef': null,
-                              'invoiceNumber': data.invoiceNumber
+                              'invoiceNumber': data.invoiceNumber,
+                              'isMinus': false,
                             },
                           );
 

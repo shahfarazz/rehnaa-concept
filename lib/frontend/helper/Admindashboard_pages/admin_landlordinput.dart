@@ -749,6 +749,143 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
                                                   },
                                                 );
 
+                                                // Your save logic goes here
+                                                await FirebaseFirestore.instance
+                                                    .collection('Landlords')
+                                                    .doc(landlord.tempID)
+                                                    .update(package);
+
+                                                if (selectedDealers
+                                                    .isNotEmpty) {
+                                                  selectedDealers
+                                                      .forEach((element) {
+                                                    element.set({
+                                                      'landlordRef': FieldValue
+                                                          .arrayUnion([
+                                                        FirebaseFirestore
+                                                            .instance
+                                                            .collection(
+                                                                'Landlords')
+                                                            .doc(
+                                                                landlord.tempID)
+                                                      ])
+                                                    }, SetOptions(merge: true));
+                                                  });
+                                                }
+
+                                                if (landlord.balance >
+                                                    (double.tryParse(
+                                                            balanceController
+                                                                .text) ??
+                                                        0.0)) {
+                                                  await FirebaseFirestore
+                                                      .instance
+                                                      .collection(
+                                                          'rentPayments')
+                                                      .add({
+                                                    'tenantname': 'Rehnaa.pk',
+                                                    'tenantRef':
+                                                        FirebaseFirestore
+                                                            .instance
+                                                            .collection(
+                                                                'Landlords')
+                                                            .doc(landlord
+                                                                .tempID),
+                                                    'amount': -(double.tryParse(
+                                                                balanceController
+                                                                    .text) ??
+                                                            0.0) +
+                                                        (landlord.balance),
+                                                    'date': DateTime.now(),
+                                                    'isMinus': true,
+                                                    'paymentType': '',
+                                                    // 'description': 'Balance updated by landlord',
+                                                    // 'paymentType': 'Bank Transfer',
+                                                  }).then((value) {
+                                                    //add the rentpayment document reference to the tenant's
+                                                    // rentpayment array
+                                                    FirebaseFirestore.instance
+                                                        .collection('Landlords')
+                                                        .doc(landlord.tempID)
+                                                        .update({
+                                                      'rentpaymentRef':
+                                                          FieldValue.arrayUnion(
+                                                              [value])
+                                                    });
+
+                                                    FirebaseFirestore.instance
+                                                        .collection(
+                                                            'Notifications')
+                                                        .doc(landlord.tempID)
+                                                        .update({
+                                                      'notifications':
+                                                          FieldValue
+                                                              .arrayUnion([
+                                                        {
+                                                          // 'amount': data.requestedAmount,
+                                                          'title':
+                                                              'Your account has been debited by ${-(double.tryParse(balanceController.text) ?? 0.0) + (landlord.balance)}',
+                                                        }
+                                                      ])
+                                                    });
+                                                  });
+                                                } else if (landlord.balance <
+                                                    (double.tryParse(
+                                                            balanceController
+                                                                .text) ??
+                                                        0.0)) {
+                                                  await FirebaseFirestore
+                                                      .instance
+                                                      .collection(
+                                                          'rentPayments')
+                                                      .add({
+                                                    'tenantname': 'Rehnaa.pk',
+                                                    'tenantRef':
+                                                        FirebaseFirestore
+                                                            .instance
+                                                            .collection(
+                                                                'Landlords')
+                                                            .doc(landlord
+                                                                .tempID),
+                                                    'amount': ((double.tryParse(
+                                                                balanceController
+                                                                    .text) ??
+                                                            0.0) -
+                                                        landlord.balance),
+                                                    'date': DateTime.now(),
+                                                    'isMinus': false,
+                                                    // 'description': 'Balance updated by landlord',
+                                                    'paymentType': '',
+                                                  }).then((value) async {
+                                                    //add the rentpayment document reference to the tenant's
+                                                    // rentpayment array
+                                                    FirebaseFirestore.instance
+                                                        .collection('Landlords')
+                                                        .doc(landlord.tempID)
+                                                        .update({
+                                                      'rentpaymentRef':
+                                                          FieldValue.arrayUnion(
+                                                              [value])
+                                                    });
+
+                                                    FirebaseFirestore.instance
+                                                        .collection(
+                                                            'Notifications')
+                                                        .doc(landlord.tempID)
+                                                        .set({
+                                                      'notifications':
+                                                          FieldValue
+                                                              .arrayUnion([
+                                                        {
+                                                          // 'amount': data.requestedAmount,
+                                                          'title':
+                                                              'Your account has been credited by PKR${((double.tryParse(balanceController.text) ?? 0.0) - landlord.balance)}'
+                                                        }
+                                                      ])
+                                                    }, SetOptions(merge: true));
+                                                  });
+                                                }
+
                                                 setState(() {
                                                   landlord.balance =
                                                       double.tryParse(
@@ -859,143 +996,6 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
                                                               .text
                                                           : '';
                                                 });
-
-                                                // Your save logic goes here
-                                                await FirebaseFirestore.instance
-                                                    .collection('Landlords')
-                                                    .doc(landlord.tempID)
-                                                    .update(package);
-
-                                                if (selectedDealers
-                                                    .isNotEmpty) {
-                                                  selectedDealers
-                                                      .forEach((element) {
-                                                    element.set({
-                                                      'landlordRef': FieldValue
-                                                          .arrayUnion([
-                                                        FirebaseFirestore
-                                                            .instance
-                                                            .collection(
-                                                                'Landlords')
-                                                            .doc(
-                                                                landlord.tempID)
-                                                      ])
-                                                    }, SetOptions(merge: true));
-                                                  });
-                                                }
-
-                                                if (landlord.balance >
-                                                    (double.tryParse(
-                                                            balanceController
-                                                                .text) ??
-                                                        0.0)) {
-                                                  await FirebaseFirestore
-                                                      .instance
-                                                      .collection(
-                                                          'rentPayments')
-                                                      .add({
-                                                    'tenantname': 'Rehnaa.pk',
-                                                    'tenantRef':
-                                                        FirebaseFirestore
-                                                            .instance
-                                                            .collection(
-                                                                'Landlords')
-                                                            .doc(landlord
-                                                                .tempID),
-                                                    'amount': -(double.tryParse(
-                                                                balanceController
-                                                                    .text) ??
-                                                            0.0) +
-                                                        (landlord.balance),
-                                                    'date': DateTime.now(),
-                                                    'isMinus': false,
-                                                    'paymentType': '',
-                                                    // 'description': 'Balance updated by landlord',
-                                                    // 'paymentType': 'Bank Transfer',
-                                                  }).then((value) {
-                                                    //add the rentpayment document reference to the tenant's
-                                                    // rentpayment array
-                                                    FirebaseFirestore.instance
-                                                        .collection('Landlords')
-                                                        .doc(landlord.tempID)
-                                                        .update({
-                                                      'rentpaymentRef':
-                                                          FieldValue.arrayUnion(
-                                                              [value])
-                                                    });
-
-                                                    FirebaseFirestore.instance
-                                                        .collection(
-                                                            'Notifications')
-                                                        .doc(landlord.tempID)
-                                                        .update({
-                                                      'notifications':
-                                                          FieldValue
-                                                              .arrayUnion([
-                                                        {
-                                                          // 'amount': data.requestedAmount,
-                                                          'title':
-                                                              'Your account has been debited by ${-(double.tryParse(balanceController.text) ?? 0.0) + (landlord.balance)}',
-                                                        }
-                                                      ])
-                                                    });
-                                                  });
-                                                } else if (landlord.balance <
-                                                    (double.tryParse(
-                                                            balanceController
-                                                                .text) ??
-                                                        0.0)) {
-                                                  await FirebaseFirestore
-                                                      .instance
-                                                      .collection(
-                                                          'rentPayments')
-                                                      .add({
-                                                    'tenantname': 'Rehnaa.pk',
-                                                    'tenantRef':
-                                                        FirebaseFirestore
-                                                            .instance
-                                                            .collection(
-                                                                'Landlords')
-                                                            .doc(landlord
-                                                                .tempID),
-                                                    'amount': ((double.tryParse(
-                                                                balanceController
-                                                                    .text) ??
-                                                            0.0) -
-                                                        landlord.balance),
-                                                    'date': DateTime.now(),
-                                                    'isMinus': true,
-                                                    // 'description': 'Balance updated by landlord',
-                                                    'paymentType': '',
-                                                  }).then((value) async {
-                                                    //add the rentpayment document reference to the tenant's
-                                                    // rentpayment array
-                                                    FirebaseFirestore.instance
-                                                        .collection('Landlords')
-                                                        .doc(landlord.tempID)
-                                                        .update({
-                                                      'rentpaymentRef':
-                                                          FieldValue.arrayUnion(
-                                                              [value])
-                                                    });
-
-                                                    FirebaseFirestore.instance
-                                                        .collection(
-                                                            'Notifications')
-                                                        .doc(landlord.tempID)
-                                                        .set({
-                                                      'notifications':
-                                                          FieldValue
-                                                              .arrayUnion([
-                                                        {
-                                                          // 'amount': data.requestedAmount,
-                                                          'title':
-                                                              'Your account has been credited by PKR${((double.tryParse(balanceController.text) ?? 0.0) - landlord.balance)}'
-                                                        }
-                                                      ])
-                                                    }, SetOptions(merge: true));
-                                                  });
-                                                }
 
                                                 Navigator.of(context)
                                                     .pop(); // Close the dialog

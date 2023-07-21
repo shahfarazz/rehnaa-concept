@@ -99,7 +99,10 @@ class RentPaymentInfoPage extends StatelessWidget {
                     const SizedBox(height: 10.0),
                     Center(
                       child: Text(
-                        rentPayment.property?.title ?? 'Withdrawal',
+                        rentPayment.property?.title ??
+                            (rentPayment.isMinus ?? false
+                                ? 'Withdrawal'
+                                : 'Payment'),
                         textAlign: TextAlign.center,
                         style: GoogleFonts.montserrat(
                           fontSize: 16.0,
@@ -147,7 +150,7 @@ class RentPaymentInfoPage extends StatelessWidget {
                       const SizedBox(height: 10.0),
                       Center(
                         child: WhiteBox(
-                          icon: Icons.attach_money,
+                          icon: Icons.payments_outlined,
                           iconColor: const Color(0xff33907c),
                           label: 'Payment Amount',
                           value: rentPayment.amount.toString(),

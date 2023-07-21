@@ -990,7 +990,8 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
                                                                                 });
                                                                               },
                                                                               child: Icon(
-                                                                                _obscurePassword ? Icons.visibility : Icons.visibility_off,
+                                                                                // _obscurePassword ? Icons.visibility : Icons.visibility_off,
+                                                                                _obscurePassword ? Icons.visibility_off : Icons.visibility,
                                                                                 color: Colors.green,
                                                                               ),
                                                                             ),
@@ -1045,7 +1046,8 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
                                                                                 });
                                                                               },
                                                                               child: Icon(
-                                                                                _obscurePassword2 ? Icons.visibility : Icons.visibility_off,
+                                                                                // _obscurePassword2 ? Icons.visibility : Icons.visibility_off,
+                                                                                _obscurePassword2 ? Icons.visibility_off : Icons.visibility,
                                                                                 color: Colors.green,
                                                                               ),
                                                                             ),

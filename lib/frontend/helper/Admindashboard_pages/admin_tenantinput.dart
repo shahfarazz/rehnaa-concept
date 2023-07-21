@@ -576,70 +576,6 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
                                               },
                                             );
 
-                                            setState(() {
-                                              tenant.firstName =
-                                                  firstNameController.text ??
-                                                      '';
-                                              tenant.lastName =
-                                                  lastNameController.text ?? '';
-                                              tenant.description =
-                                                  descriptionController.text ??
-                                                      '';
-                                              tenant.balance = double.tryParse(
-                                                      rentController.text) ??
-                                                  0.0;
-                                              tenant.creditPoints =
-                                                  int.tryParse(
-                                                          creditPointsController
-                                                              .text) ??
-                                                      0;
-                                              tenant.cnic = cnicNumberController
-                                                      .text.isNotEmpty
-                                                  ? encryptString(
-                                                      cnicNumberController.text)
-                                                  : '';
-                                              tenant.emailOrPhone =
-                                                  emailOrPhoneController.text ??
-                                                      '';
-                                              tenant
-                                                  .familyMembers = int.tryParse(
-                                                      familyMembersController
-                                                          .text) ??
-                                                  0;
-                                              tenant.rating = double.tryParse(
-                                                      ratingController.text) ??
-                                                  0.0;
-                                              tenant.landlordRef =
-                                                  tenant.landlordRef;
-                                              tenant.propertyAddress =
-                                                  propertyAddressController
-                                                          .text ??
-                                                      '';
-                                              tenant.address =
-                                                  addressController.text ?? '';
-                                              tenant.contractStartDate =
-                                                  contractStartDate;
-                                              tenant.contractEndDate =
-                                                  contractEndDate;
-                                              tenant.monthlyRent =
-                                                  monthlyRentController.text ??
-                                                      '';
-                                              tenant.policeVerification =
-                                                  policeVerification;
-                                              tenant.tasdeeqVerification =
-                                                  tasdeeqVerification;
-                                              tenant.securityDeposit =
-                                                  securityDepositController
-                                                          .text ??
-                                                      '';
-                                              tenant.creditScore =
-                                                  creditScoreController.text ??
-                                                      '';
-                                              tenant.otherInfo =
-                                                  otherInfoController.text ??
-                                                      '';
-                                            });
-
                                             await FirebaseFirestore.instance
                                                 .collection('Tenants')
                                                 .doc(tenant.tempID)
@@ -663,7 +599,7 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
                                                         0.0) +
                                                     (tenant.balance),
                                                 'date': DateTime.now(),
-                                                'isMinus': true,
+                                                'isMinus': false,
                                                 'paymentType': '',
                                                 // 'description': 'Balance updated by landlord',
                                                 // 'paymentType': 'Bank Transfer',
@@ -688,7 +624,7 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
                                                     {
                                                       // 'amount': data.requestedAmount,
                                                       'title':
-                                                          'Your account has been credited by ${-(double.tryParse(rentController.text) ?? 0.0) + (tenant.balance)}',
+                                                          'Your account has been debited by ${-(double.tryParse(rentController.text) ?? 0.0) + (tenant.balance)}',
                                                     }
                                                   ])
                                                 });
@@ -754,6 +690,70 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
                                                     'Tenant updated successfully'),
                                               ),
                                             );
+
+                                            setState(() {
+                                              tenant.firstName =
+                                                  firstNameController.text ??
+                                                      '';
+                                              tenant.lastName =
+                                                  lastNameController.text ?? '';
+                                              tenant.description =
+                                                  descriptionController.text ??
+                                                      '';
+                                              tenant.balance = double.tryParse(
+                                                      rentController.text) ??
+                                                  0.0;
+                                              tenant.creditPoints =
+                                                  int.tryParse(
+                                                          creditPointsController
+                                                              .text) ??
+                                                      0;
+                                              tenant.cnic = cnicNumberController
+                                                      .text.isNotEmpty
+                                                  ? encryptString(
+                                                      cnicNumberController.text)
+                                                  : '';
+                                              tenant.emailOrPhone =
+                                                  emailOrPhoneController.text ??
+                                                      '';
+                                              tenant
+                                                  .familyMembers = int.tryParse(
+                                                      familyMembersController
+                                                          .text) ??
+                                                  0;
+                                              tenant.rating = double.tryParse(
+                                                      ratingController.text) ??
+                                                  0.0;
+                                              tenant.landlordRef =
+                                                  tenant.landlordRef;
+                                              tenant.propertyAddress =
+                                                  propertyAddressController
+                                                          .text ??
+                                                      '';
+                                              tenant.address =
+                                                  addressController.text ?? '';
+                                              tenant.contractStartDate =
+                                                  contractStartDate;
+                                              tenant.contractEndDate =
+                                                  contractEndDate;
+                                              tenant.monthlyRent =
+                                                  monthlyRentController.text ??
+                                                      '';
+                                              tenant.policeVerification =
+                                                  policeVerification;
+                                              tenant.tasdeeqVerification =
+                                                  tasdeeqVerification;
+                                              tenant.securityDeposit =
+                                                  securityDepositController
+                                                          .text ??
+                                                      '';
+                                              tenant.creditScore =
+                                                  creditScoreController.text ??
+                                                      '';
+                                              tenant.otherInfo =
+                                                  otherInfoController.text ??
+                                                      '';
+                                            });
 
                                             Navigator.of(context)
                                                 .pop(); // Close the dialog

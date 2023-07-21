@@ -115,7 +115,10 @@ class _AdminEstampsEditorPageState extends State<AdminEstampsEditorPage> {
     dealer.landlordMap!.addAll(updatedLandlordMap);
 
     FirebaseFirestore.instance.collection('rentPayments').add({
-      'tenantname': widget.landlord.firstName + ' ' + widget.landlord.lastName,
+      'tenantname': widget.landlord.firstName +
+          ' ' +
+          widget.landlord.lastName +
+          '\n\nEstamp Charges',
       'LandlordRef':
           FirebaseFirestore.instance.collection('Dealers').doc(dealer.tempID),
       'amount':
@@ -128,6 +131,9 @@ class _AdminEstampsEditorPageState extends State<AdminEstampsEditorPage> {
     }).then((val) {
       FirebaseFirestore.instance.collection('Dealers').doc(dealerId).update({
         'landlordMap': dealer.landlordMap,
+        'balance': //subtract amount from balance
+            FieldValue.increment(
+                -(int.tryParse(eStampCostController.text) ?? 0)),
         'rentpaymentRef':
             FieldValue.arrayUnion([val]) // key - value pairs Ali Ahmed
       }).then((_) {
@@ -328,8 +334,11 @@ class _AdminEstampsEditorPageState extends State<AdminEstampsEditorPage> {
                     setState(() {});
                   },
                   decoration: InputDecoration(
-                    labelText: 'eStamp Cost',
-                  ),
+                      labelText: 'eStamp Cost (if editing the estamp set to 0)',
+                      labelStyle: TextStyle(
+                        color: Colors.red,
+                        fontWeight: FontWeight.bold,
+                      )),
                 ),
                 SizedBox(height: 16.0),
                 ElevatedButton(
