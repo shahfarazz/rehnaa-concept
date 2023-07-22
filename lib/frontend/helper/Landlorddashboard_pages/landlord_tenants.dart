@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:rehnaa/backend/models/tenantsmodel.dart';
@@ -29,13 +30,13 @@ class _LandlordTenantsPageState extends State<LandlordTenantsPage>
 
   // int _currentPage = 0;
   final int _pageSize = 4; // Number of tenants to show per page
-  final Completer<void> _loadTenantsCompleter =
-      Completer<void>(); // Completer for canceling the Future.delayed() call
+  final Completer<void> _loadTenantsCompleter = Completer<void>();
+
+  bool _isLoading = false; // Completer for canceling the Future.delayed() call
 
   @override
   bool get wantKeepAlive => true;
 
-  Timer? _timer;
   bool firstCall = true;
 
   @override
@@ -61,6 +62,7 @@ class _LandlordTenantsPageState extends State<LandlordTenantsPage>
       _tenants = [];
       refs = [];
       shouldDisplayContent = false;
+      _isLoading = true;
       _loadTenants();
     });
   }
@@ -70,6 +72,7 @@ class _LandlordTenantsPageState extends State<LandlordTenantsPage>
     _loadTenantsCompleter
         .complete(); // Complete the Completer to cancel the Future.delayed() call
     _pageController.dispose(); // Dispose the PageController
+    _tenants.clear();
     super.dispose();
     // _stopPeriodicFetching();
   }
@@ -77,6 +80,7 @@ class _LandlordTenantsPageState extends State<LandlordTenantsPage>
   // Fetch tenant data from Firestore
   Future<void> _loadTenants() async {
     // print('called');
+
     DocumentSnapshot<Map<String, dynamic>> landlordSnapshot =
         await FirebaseFirestore.instance
             .collection('Landlords')
@@ -87,6 +91,7 @@ class _LandlordTenantsPageState extends State<LandlordTenantsPage>
       setState(() {
         shouldDisplayContent = true;
       });
+
       // print('reached here');
       Map<String, dynamic>? landlordData = landlordSnapshot.data();
       if (landlordData != null && landlordData['tenantRef'] != null) {
@@ -137,8 +142,13 @@ class _LandlordTenantsPageState extends State<LandlordTenantsPage>
         if (mounted) {
           setState(() {
             _tenants = fetchedTenants;
+            _isLoading = false;
           });
         }
+      } else {
+        setState(() {
+          _isLoading = false;
+        });
       }
     }
   }
@@ -257,55 +267,63 @@ class _LandlordTenantsPageState extends State<LandlordTenantsPage>
     final int pageCount = (_tenants.length / _pageSize).ceil();
 
     Widget buildTenantsList() {
+      print(
+          '_tenants length is ${_tenants.isEmpty} & shouldDisplayContent is $shouldDisplayContent');
       if (_tenants.isEmpty && !shouldDisplayContent) {
         return const LandlordTenantSkeleton();
       } else if (_tenants.isEmpty && shouldDisplayContent) {
-        return RefreshIndicator(
-          onRefresh: _refreshUserProfile,
-          child: SingleChildScrollView(
-              physics: AlwaysScrollableScrollPhysics(),
-              child: Column(
-                children: [
-                  Card(
-                    elevation: 4.0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20.0),
-                    ),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20.0),
-                        color: Colors.white,
-                      ),
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(
-                            Icons.error_outline_rounded,
-                            size: 48.0,
-                            color: Color(0xff33907c),
+        return _isLoading
+            ? Center(
+                child: SpinKitFadingCube(
+                  color: Color.fromARGB(255, 30, 197, 83),
+                ),
+              )
+            : RefreshIndicator(
+                onRefresh: _refreshUserProfile,
+                child: SingleChildScrollView(
+                    physics: AlwaysScrollableScrollPhysics(),
+                    child: Column(
+                      children: [
+                        Card(
+                          elevation: 4.0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20.0),
                           ),
-                          const SizedBox(height: 16.0),
-                          Text(
-                            'No tenants to show',
-                            style: GoogleFonts.montserrat(
-                              fontSize: 20.0,
-                              // fontWeight: FontWeight.bold,
-                              color: const Color(0xff33907c),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20.0),
+                              color: Colors.white,
+                            ),
+                            padding: const EdgeInsets.all(16.0),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(
+                                  Icons.error_outline_rounded,
+                                  size: 48.0,
+                                  color: Color(0xff33907c),
+                                ),
+                                const SizedBox(height: 16.0),
+                                Text(
+                                  'No tenants to show',
+                                  style: GoogleFonts.montserrat(
+                                    fontSize: 20.0,
+                                    // fontWeight: FontWeight.bold,
+                                    color: const Color(0xff33907c),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: size.height * 0.35),
-                ],
-              )),
-        );
+                        ),
+                        SizedBox(height: size.height * 0.35),
+                      ],
+                    )),
+              );
       } else {
         return Container(
           height:
-              size.height * 0.9, // Adjust this value according to your needs
+              size.height * 0.69, // Adjust this value according to your needs
           child: PageView.builder(
             controller: _pageController,
             itemCount: pageCount,
@@ -359,7 +377,7 @@ class _LandlordTenantsPageState extends State<LandlordTenantsPage>
               ),
             ),
           ),
-          SizedBox(height: size.height * 0.03),
+          // SizedBox(height: size.height * 0.03),
         ],
       ),
     );

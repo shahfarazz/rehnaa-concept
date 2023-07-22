@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:rehnaa/frontend/helper/Dealerdashboard_pages/landlordonboardedinfo.dart';
 
@@ -212,6 +213,21 @@ class _DealerLandlordOnboardedPageState
                             final landlord = filteredLandlords[index];
                             return GestureDetector(
                               onTap: () {
+                                if (dealer?.landlordMap?[landlord.tempID]
+                                        ?['eStampTenantName'] ==
+                                    null) {
+                                  //flutter toast here
+                                  Fluttertoast.showToast(
+                                      msg:
+                                          "Landlord has not onboarded any tenant yet, wait for estamp",
+                                      toastLength: Toast.LENGTH_SHORT,
+                                      gravity: ToastGravity.BOTTOM,
+                                      timeInSecForIosWeb: 1,
+                                      backgroundColor: Colors.red,
+                                      textColor: Colors.white,
+                                      fontSize: 16.0);
+                                  return;
+                                }
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
@@ -242,7 +258,9 @@ class _DealerLandlordOnboardedPageState
                                         fontWeight: FontWeight.bold),
                                   ),
                                   trailing: Text(
-                                    landlord.balance.toString(),
+                                    dealer?.landlordMap?[landlord.tempID]
+                                            ?['eStampTenantName'] ??
+                                        '',
                                     style: TextStyle(
                                       color: Colors.black,
                                       fontFamily:

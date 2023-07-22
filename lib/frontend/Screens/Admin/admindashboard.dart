@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:rehnaa/frontend/helper/Admindashboard_pages/admin_new_analytics.dart';
 import 'package:rehnaa/frontend/helper/Admindashboard_pages/admin_requests.dart';
 import 'package:rehnaa/frontend/helper/Admindashboard_pages/admin_tenantinput.dart';
 
@@ -28,31 +29,20 @@ class AdminDashboard extends StatefulWidget {
 }
 
 class _AdminDashboardState extends State<AdminDashboard> {
-  Timer? _timer;
+  // Timer? _timer;
+  StreamSubscription<QuerySnapshot>? _notifsSubscription;
 
   @override
   void initState() {
     super.initState();
     _getNotifs();
-    _startPeriodicFetch();
-  }
-
-  // Periodically fetch new data every 5 seconds
-  void _startPeriodicFetch() {
-    _timer = Timer.periodic(const Duration(seconds: 5), (_) {
-      _getNotifs();
-    });
-  }
-
-  // Stop periodic fetching
-  void _stopPeriodicFetch() {
-    _timer?.cancel();
+    // _startPeriodicFetch();
   }
 
   @override
   void dispose() {
-    _stopPeriodicFetch();
     super.dispose();
+    _notifsSubscription?.cancel();
   }
 
   List<Map<String, String>> notifications = [];
@@ -61,106 +51,97 @@ class _AdminDashboardState extends State<AdminDashboard> {
   Map<String, List<Map<String, String>>>
       notificationsAndAlreadyReadNotifications = {};
 
-  Future<void> _getNotifs() async {
-    QuerySnapshot<Map<String, dynamic>> notificationSnapshots =
-        await FirebaseFirestore.instance.collection('AdminRequests').get();
+  void _getNotifs() {
+    _notifsSubscription?.cancel(); // Cancel the previous subscription if any
 
-    if (notificationSnapshots.size > 0) {
-      List<Map<String, String>> tempNotifications = [];
-      notificationsAndAlreadyReadNotifications.clear();
+    _notifsSubscription = FirebaseFirestore.instance
+        .collection('AdminRequests')
+        .snapshots()
+        .listen((QuerySnapshot snapshot) {
+      if (snapshot.size > 0) {
+        List<Map<String, String>> tempNotifications = [];
+        notificationsAndAlreadyReadNotifications.clear();
 
-      for (var notificationsnapshot in notificationSnapshots.docs) {
-        var notificationData = notificationsnapshot.data();
+        for (var notificationsnapshot in snapshot.docs) {
+          var notificationData =
+              notificationsnapshot.data() as Map<String, dynamic>;
 
-        // sort notificationData by timestamp descending
-        // but you will have to traverse and collect all the timestamps first
-        // then sort them as they are in arrays called 'withdrawRequest', 'paymentRequest',
-        //'rentAccrualRequest', 'rentalRequest', 'withdrawRequestDealer',
+          try {
+            notificationData.forEach((key, value) {
+              if (key == 'withdrawRequest' || key == 'paymentRequest') {
+                value.forEach((item) {
+                  Map<String, String> notification = {
+                    'title': key,
+                    'amount': item['amount'].toString(),
+                    'fullname': item['fullname'],
+                    'paymentMethod': item['paymentMethod'],
+                    'senderid': notificationsnapshot.id,
+                    'requestID': item['requestID'],
+                  };
+                  notificationsAndAlreadyReadNotifications[
+                          notification['senderid']!] =
+                      List.from(notificationsAndAlreadyReadNotifications[
+                              notification['senderid']!] ??
+                          [])
+                        ..add(notification);
 
-        // Map<String,dynamic> notificationsWithTimestamps = {};
-
-        //the above gives an error no such method sort so we need to find a way to sort the list
-        //manually
-
-        notificationData.forEach((key, value) {
-          if (key == 'withdrawRequest' || key == 'paymentRequest') {
-            value.forEach((item) {
-              Map<String, String> notification = {
-                'title': key,
-                'amount': item['amount'].toString(),
-                'fullname': item['fullname'],
-                'paymentMethod': item['paymentMethod'],
-                'senderid': notificationsnapshot.id,
-                'requestID': item['requestID'],
-              };
-              notificationsAndAlreadyReadNotifications[
-                      notification['senderid']!] =
-                  List.from(notificationsAndAlreadyReadNotifications[
-                          notification['senderid']!] ??
-                      [])
-                    ..add(notification);
-
-              if (!item.containsKey('read') || !item['read']) {
-                tempNotifications.add(notification);
+                  if (!item.containsKey('read') || !item['read']) {
+                    tempNotifications.add(notification);
+                  }
+                });
+              } else if (key == 'rentalRequest') {
+                value.forEach((item) {
+                  Map<String, String> notification = {
+                    'title': key,
+                    'fullname': item['fullname'],
+                    'uid': item['uid'],
+                    'property name': item['property']['title'],
+                    'senderid': notificationsnapshot.id,
+                    'requestID': item['requestID'],
+                  };
+                  notificationsAndAlreadyReadNotifications[
+                          notification['senderid']!] =
+                      List.from(notificationsAndAlreadyReadNotifications[
+                              notification['senderid']!] ??
+                          [])
+                        ..add(notification);
+                  if (!item.containsKey('read') || !item['read']) {
+                    tempNotifications.add(notification);
+                  }
+                });
+              } else if (key == 'timestamp') {
+                // Do nothing
+              } else {
+                // Leave other cases blank for now
+                value.forEach((item) {
+                  Map<String, String> notification = {
+                    'title': key,
+                    'fullname': '',
+                    // 'uid': item['uid'],
+                    'senderid': notificationsnapshot.id,
+                    'requestID': item['requestID'],
+                  };
+                  notificationsAndAlreadyReadNotifications[
+                          notification['senderid']!] =
+                      List.from(notificationsAndAlreadyReadNotifications[
+                              notification['senderid']!] ??
+                          [])
+                        ..add(notification);
+                  if (!item.containsKey('read') || !item['read']) {
+                    tempNotifications.add(notification);
+                  }
+                });
               }
             });
-          } else if (key == 'rentalRequest') {
-            value.forEach((item) {
-              Map<String, String> notification = {
-                'title': key,
-                'fullname': item['fullname'],
-                'uid': item['uid'],
-                'property name': item['property']['title'],
-                'senderid': notificationsnapshot.id,
-                'requestID': item['requestID'],
-              };
-              notificationsAndAlreadyReadNotifications[
-                      notification['senderid']!] =
-                  List.from(notificationsAndAlreadyReadNotifications[
-                          notification['senderid']!] ??
-                      [])
-                    ..add(notification);
-              if (!item.containsKey('read') || !item['read']) {
-                tempNotifications.add(notification);
-              }
-            });
-          } else if (key == 'timestamp') {
-            // Do nothing
-          } else {
-            // Leave other cases blank for now
-            value.forEach((item) {
-              Map<String, String> notification = {
-                'title': key,
-                'fullname': '',
-                // 'uid': item['uid'],
-                'senderid': notificationsnapshot.id,
-                'requestID': item['requestID'],
-              };
-              notificationsAndAlreadyReadNotifications[
-                      notification['senderid']!] =
-                  List.from(notificationsAndAlreadyReadNotifications[
-                          notification['senderid']!] ??
-                      [])
-                    ..add(notification);
-              if (!item.containsKey('read') || !item['read']) {
-                tempNotifications.add(notification);
-              }
-            });
-            // Map<String, String> notification = {
-            //   'title': key,
-            //   'amount': '',
-            //   'fullname': '',
-            //   'paymentMethod': '',
-            //   'senderid': notificationsnapshot.id,
-            // };
-            // tempNotifications.add(notification);
+          } catch (e) {
+            // print('error is $e');
           }
+        }
+        setState(() {
+          notifications = tempNotifications;
         });
       }
-      setState(() {
-        notifications = tempNotifications;
-      });
-    }
+    });
   }
 
   @override
@@ -332,13 +313,38 @@ class _AdminDashboardState extends State<AdminDashboard> {
                 const SizedBox(height: 16.0),
                 Align(
                   alignment: Alignment.centerRight,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    child: const Text('Close'),
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      onTap: () {
+                        Navigator.pop(context);
+                      },
+                      child: Ink(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight,
+                            colors: [
+                              Color(0xff0FA697),
+                              Color(0xff45BF7A),
+                              Color(0xff0DF205),
+                            ],
+                          ),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            'Close',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16.0,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
-                ),
+                )
               ],
             ),
           );
@@ -578,7 +584,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => AdminAnalyticsPage(),
+                          builder: (context) => AdminNewAnalyticsPage(),
                         ),
                       );
                     },
@@ -636,7 +642,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
                   CustomButton(
                     color: Colors.deepOrange,
                     icon: Icons.star,
-                    text: 'Add Reviews\nand Testimonials',
+                    text: 'Add Property Reviews\nand Testimonials',
                     onPressed: () {
                       Navigator.push(
                         context,

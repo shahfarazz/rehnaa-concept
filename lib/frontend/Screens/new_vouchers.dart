@@ -1,11 +1,12 @@
 import 'dart:async';
 
+// import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:easy_image_viewer/easy_image_viewer.dart';
+// import 'package:easy_image_viewer/easy_image_viewer.dart';
 
 import '../helper/Tenantdashboard_pages/tenant_propertyinfo.dart';
 
@@ -25,7 +26,7 @@ class _NewVouchersPageState extends State<NewVouchersPage> {
   var imageNames = [];
   double loadingProgress = 0.0;
   bool isLoading = true;
-  Timer? loadingTimer;
+  // Timer? loadingTimer;
   String? searchQuery = '';
 
   void _loadImages() {
@@ -42,11 +43,11 @@ class _NewVouchersPageState extends State<NewVouchersPage> {
     });
 
     // Start the loading timer
-    loadingTimer = Timer.periodic(const Duration(milliseconds: 100), (_) {
-      setState(() {
-        loadingProgress += 0.1;
-      });
-    });
+    // loadingTimer = Timer.periodic(const Duration(milliseconds: 100), (_) {
+    //   setState(() {
+    //     loadingProgress += 0.1;
+    //   });
+    // });
   }
 
   @override
@@ -57,8 +58,8 @@ class _NewVouchersPageState extends State<NewVouchersPage> {
 
   @override
   void dispose() {
-    loadingTimer
-        ?.cancel(); // Cancel the loading timer when the widget is disposed
+    // loadingTimer
+    // ?.cancel(); // Cancel the loading timer when the widget is disposed
     super.dispose();
   }
 
@@ -127,6 +128,7 @@ class _NewVouchersPageState extends State<NewVouchersPage> {
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: TextField(
+                        cursorColor: Colors.green,
                         onChanged: (value) {
                           setState(() {
                             searchQuery = value.toLowerCase();
@@ -186,19 +188,18 @@ class _NewVouchersPageState extends State<NewVouchersPage> {
                                     child: SizedBox(
                                       width: 200,
                                       height: 200,
-                                      child: Image.network(
-                                          images[reversedIndex],
-                                          fit: BoxFit.cover,
-                                          loadingBuilder: (context, child,
-                                                  loadingProgress) =>
-                                              Center(
-                                                child: loadingProgress == null
-                                                    ? child
-                                                    : const SpinKitFadingCube(
-                                                        color: Color.fromARGB(
-                                                            255, 30, 197, 83),
-                                                      ),
-                                              )),
+                                      child: CachedNetworkImage(
+                                        imageUrl: images[reversedIndex],
+                                        fit: BoxFit.cover,
+                                        placeholder: (context, url) => Center(
+                                          child: const SpinKitFadingCube(
+                                            color: Color.fromARGB(
+                                                255, 30, 197, 83),
+                                          ),
+                                        ),
+                                        errorWidget: (context, url, error) =>
+                                            Icon(Icons.error),
+                                      ),
                                     ),
                                   ),
                                 ),

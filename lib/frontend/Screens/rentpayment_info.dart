@@ -55,12 +55,13 @@ class RentPaymentInfoPage extends StatelessWidget {
                   top: 65.0,
                   left: 10.0,
                   child: GestureDetector(
+                    behavior: HitTestBehavior.translucent,
                     onTap: () {
                       Navigator.pop(context);
                     },
                     child: Container(
-                      width: 40,
-                      height: 40,
+                      width: 50,
+                      height: 50,
                       decoration: const BoxDecoration(
                         shape: BoxShape.circle,
                         color: Color(0xFF33907C),
@@ -88,7 +89,7 @@ class RentPaymentInfoPage extends StatelessWidget {
                     SizedBox(height: size.height * 0.08),
                     const SizedBox(height: 20.0),
                     Text(
-                      '$firstName $lastName',
+                      ' $firstName $lastName',
                       style: GoogleFonts.montserrat(
                         fontSize: 24.0,
                         fontWeight: FontWeight.bold,
@@ -98,7 +99,10 @@ class RentPaymentInfoPage extends StatelessWidget {
                     const SizedBox(height: 10.0),
                     Center(
                       child: Text(
-                        rentPayment.property?.title ?? 'Withdrawal',
+                        rentPayment.property?.title ??
+                            (rentPayment.isMinus ?? false
+                                ? 'Withdrawal'
+                                : 'Payment'),
                         textAlign: TextAlign.center,
                         style: GoogleFonts.montserrat(
                           fontSize: 16.0,
@@ -128,7 +132,9 @@ class RentPaymentInfoPage extends StatelessWidget {
                           icon: _getPaymentIcon(rentPayment.paymentType),
                           iconColor: const Color(0xff33907c),
                           label: 'Payment Type',
-                          value: rentPayment.paymentType,
+                          value: firstName == 'Rehnaa.pk'
+                              ? 'N/A'
+                              : rentPayment.paymentType,
                         ),
                       ),
                       const SizedBox(height: 10.0),
@@ -144,7 +150,7 @@ class RentPaymentInfoPage extends StatelessWidget {
                       const SizedBox(height: 10.0),
                       Center(
                         child: WhiteBox(
-                          icon: Icons.attach_money,
+                          icon: Icons.payments_outlined,
                           iconColor: const Color(0xff33907c),
                           label: 'Payment Amount',
                           value: rentPayment.amount.toString(),
@@ -153,29 +159,31 @@ class RentPaymentInfoPage extends StatelessWidget {
                       const SizedBox(height: 10.0),
 
                       // make a box where pdf will be shown
-                      GestureDetector(
-                          onTap: () {
-                            // print('receiptUrl: $receiptUrl');
-                            if (receiptUrl != 'No pdf') {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => PDFScreen(
-                                    path: receiptUrl,
-                                    displayAppBar: true,
-                                  ),
+                      firstName == 'Rehnaa.pk'
+                          ? Container()
+                          : GestureDetector(
+                              onTap: () {
+                                // print('receiptUrl: $receiptUrl');
+                                if (receiptUrl != 'No pdf') {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => PDFScreen(
+                                        path: receiptUrl,
+                                        displayAppBar: true,
+                                      ),
+                                    ),
+                                  );
+                                }
+                              },
+                              child: Center(
+                                child: WhiteBox(
+                                  icon: Icons.picture_as_pdf,
+                                  iconColor: const Color(0xff33907c),
+                                  label: 'Payment Receipt',
+                                  value: 'Click to view',
                                 ),
-                              );
-                            }
-                          },
-                          child: Center(
-                            child: WhiteBox(
-                              icon: Icons.picture_as_pdf,
-                              iconColor: const Color(0xff33907c),
-                              label: 'Payment Receipt',
-                              value: 'Click to view',
-                            ),
-                          ))
+                              ))
                     ],
                   ),
                 ),

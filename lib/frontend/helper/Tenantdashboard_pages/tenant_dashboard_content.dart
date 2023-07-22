@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -16,6 +17,7 @@ import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenantinvoice.dart'
 import 'package:responsive_framework/responsive_framework.dart';
 import '../../../backend/models/landlordmodel.dart';
 // import '../../Screens/pdf_landlord.dart';
+import '../../../backend/services/firebase_notifications_api.dart';
 import '../../Screens/pdf_tenant.dart';
 import '../Landlorddashboard_pages/landlord_dashboard_content.dart';
 
@@ -43,6 +45,7 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
   @override
   bool get wantKeepAlive => true;
   bool isWithdraw = false;
+  final _firebaseApi = FirebaseApi();
 
   @override
   void initState() {
@@ -52,6 +55,7 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
         .collection('Tenants')
         .doc(widget.uid)
         .snapshots();
+    _firebaseApi.initNotifications();
   }
 
   String generateInvoiceNumber() {
@@ -245,6 +249,13 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                                         }
                                       ]),
                                     }, SetOptions(merge: true));
+
+                                    // _firebaseApi.showNotification(
+                                    //   title:
+                                    //       'Payment Request by ${'${tenant.firstName} ${tenant.lastName}'}',
+                                    //   body: 'Rs${amount}',
+                                    // );
+
                                     FirebaseFirestore.instance
                                         .collection('Tenants')
                                         .doc(widget.uid)
@@ -308,17 +319,16 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                                               'uid': widget.uid,
                                               'invoiceNumber': invoiceNumber,
                                               'requestID': randomID,
-                                              'timestamp': Timestamp.now()
+                                              'timestamp': Timestamp.now(),
                                             }
                                           ]),
                                         }, SetOptions(merge: true));
 
                                         // print(
                                         // 'reached here landlord is ${landlord.firstName} ${landlord.lastName}}');
-
-                                        Navigator.pop(context);
-                                        Navigator.pop(context);
                                       }
+                                      Navigator.pop(context);
+                                      Navigator.pop(context);
                                     });
                                   } else {
                                     Fluttertoast.showToast(
@@ -351,6 +361,16 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
   }
 
   void someFunction(Tenant tenant) {
+    if (tenant.landlordRef == null) {
+      Fluttertoast.showToast(
+        msg: 'No landlord found',
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 3,
+        backgroundColor: Colors.red,
+      );
+      return;
+    }
     showOptionDialog(() {
       // setState(() {
       isWithdraw = true;

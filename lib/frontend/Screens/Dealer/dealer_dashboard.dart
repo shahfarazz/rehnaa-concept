@@ -66,8 +66,7 @@ class _DealerDashboardPageState extends State<DealerDashboardPage>
         .collection('Notifications')
         .doc(widget.uid)
         .snapshots();
-    isNewVouchers();
-    _startPeriodicFetch();
+    _startDealerVoucherStream();
   }
 
   @override
@@ -76,20 +75,8 @@ class _DealerDashboardPageState extends State<DealerDashboardPage>
     _sidebarController.dispose();
     _notificationStream.drain();
     _notificationStream2.drain();
-    _stopPeriodicFetch();
+    _dealerVouchersSubscription?.cancel();
     super.dispose();
-  }
-
-  // Periodically fetch new data every 15 seconds
-  void _startPeriodicFetch() {
-    _timer = Timer.periodic(const Duration(seconds: 15), (_) {
-      isNewVouchers();
-    });
-  }
-
-  // Stop periodic fetching
-  void _stopPeriodicFetch() {
-    _timer?.cancel();
   }
 
   void _handleNotificationsButtonPress() async {
@@ -132,33 +119,25 @@ class _DealerDashboardPageState extends State<DealerDashboardPage>
     });
   }
 
-  Future<void> isNewVouchers() async {
-    //check for isNew varialbe in the user document
-    // and set the isNewVoucher variable accordingly
-    // also after setting isNewVoucher to true or false, update the isNew variable in the user document
-    // which should now be false
+  StreamSubscription<DocumentSnapshot<Map<String, dynamic>>>?
+      _dealerVouchersSubscription;
 
-    try {
-      FirebaseFirestore.instance
-          .collection('Dealers')
-          .doc(widget.uid)
-          .get()
-          .then((value) {
-        if (value.exists) {
-          if (value.data()!['isNewVouchers'] == true && isNewVoucher == false) {
-            setState(() {
-              isNewVoucher = true;
-            });
-          } else if (value.data()!['isNewVouchers'] == false &&
-              isNewVoucher == true) {
-            setState(() {
-              isNewVoucher = false;
-            });
-          }
-        }
-      });
-    } on Exception catch (e) {
-      print('Error is $e');
+  void _startDealerVoucherStream() {
+    _dealerVouchersSubscription = FirebaseFirestore.instance
+        .collection('Dealers')
+        .doc(widget.uid)
+        .snapshots()
+        .listen(_dealerVoucherUpdate);
+  }
+
+  void _dealerVoucherUpdate(DocumentSnapshot<Map<String, dynamic>> snapshot) {
+    if (snapshot.exists) {
+      bool? isNew = snapshot.data()?['isNewVouchers'];
+      if (isNew != null && isNew != isNewVoucher) {
+        setState(() {
+          isNewVoucher = isNew;
+        });
+      }
     }
   }
 
@@ -269,30 +248,41 @@ class _DealerDashboardPageState extends State<DealerDashboardPage>
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Stack(
-              children: [
-                ClipPath(
-                  clipper: HexagonClipper(),
-                  child: Transform.scale(
-                    scale: 0.87,
-                    child: Container(
-                      color: Colors.white,
-                      width: 60,
-                      height: 60,
+            GestureDetector(
+                onTap: () {
+                  // Add your desired logic here
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => DealerDashboardPage(
+                              uid: widget.uid,
+                            )),
+                  );
+                },
+                child: Stack(
+                  children: [
+                    ClipPath(
+                      clipper: HexagonClipper(),
+                      child: Transform.scale(
+                        scale: 0.87,
+                        child: Container(
+                          color: Colors.white,
+                          width: 60,
+                          height: 60,
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-                ClipPath(
-                  clipper: HexagonClipper(),
-                  child: Image.asset(
-                    'assets/mainlogo.png',
-                    width: 60,
-                    height: 60,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              ],
-            ),
+                    ClipPath(
+                      clipper: HexagonClipper(),
+                      child: Image.asset(
+                        'assets/mainlogo.png',
+                        width: 60,
+                        height: 60,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ],
+                )),
             const SizedBox(width: 8),
           ],
         ),
@@ -305,11 +295,13 @@ class _DealerDashboardPageState extends State<DealerDashboardPage>
               IconButton(
                 icon: const Icon(Icons.notifications_active),
                 onPressed: () {
-                  EasyDebounce.debounce(
-                    'notifications-debouncer', // Debouncer ID
-                    Duration(seconds: 2), // Debounce duration
-                    _handleNotificationsButtonPress, // Wrapped function
-                  );
+                  // EasyDebounce.debounce(
+                  //   'notifications-debouncer', // Debouncer ID
+                  //   Duration(seconds: 2), // Debounce duration
+                  //   _handleNotificationsButtonPress, // Wrapped function
+                  // );
+                  // _handleNotificationsButtonPress();
+                  _isDialogOpen ? null : _handleNotificationsButtonPress();
                 },
               ),
               Positioned(

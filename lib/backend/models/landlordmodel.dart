@@ -5,15 +5,15 @@ import 'rentpaymentmodel.dart';
 import 'tenantsmodel.dart';
 
 class Landlord {
-  final String firstName;
-  final String lastName;
-  final num balance;
-  final String? pathToImage;
-  final List<DocumentReference<Map<String, dynamic>>>? tenantRef;
-  final List<DocumentReference<Map<String, dynamic>>> propertyRef;
-  final List<DocumentReference<Map<String, dynamic>>>? rentpaymentRef;
+  String firstName;
+  String lastName;
+  num balance;
+  String? pathToImage;
+  List<DocumentReference<Map<String, dynamic>>>? tenantRef;
+  List<DocumentReference<Map<String, dynamic>>> propertyRef;
+  List<DocumentReference<Map<String, dynamic>>>? rentpaymentRef;
   List<Tenant>? tenant = [];
-  List<Property> property = [];
+  List<Property>? property = [];
   List<RentPayment>? rentpayment = [];
   String tempID;
   List<DocumentReference<Map<String, dynamic>>>? dealerRef;
@@ -26,8 +26,8 @@ class Landlord {
   Timestamp? dateJoined;
   String? address;
   String? rating;
-  String? contractStartDate;
-  String? contractEndDate;
+  var contractStartDate;
+  var contractEndDate;
   var monthlyRent;
   var upfrontBonus;
   var monthlyProfit;
@@ -35,6 +35,8 @@ class Landlord {
   var securityDeposit;
   var creditPoints;
   var creditScore;
+  var hasEstamp;
+
   Landlord({
     required this.firstName,
     required this.lastName,
@@ -66,6 +68,7 @@ class Landlord {
     this.securityDeposit,
     this.creditPoints,
     this.creditScore,
+    this.hasEstamp,
   });
 
   static Landlord fromJson(Map<String, dynamic>? json) {
@@ -76,6 +79,10 @@ class Landlord {
       tenantRef: json['tenantRef'] != null
           ? List<DocumentReference<Map<String, dynamic>>>.from(
               json['tenantRef'].map((ref) => ref as DocumentReference))
+          : null,
+      dealerRef: json['dealerRef'] != null
+          ? List<DocumentReference<Map<String, dynamic>>>.from(
+              json['dealerRef'].map((ref) => ref as DocumentReference))
           : null,
       property: json['property'] != null
           ? List<Property>.from(
@@ -94,8 +101,12 @@ class Landlord {
       dateJoined: json['dateJoined'],
       address: json['address'] ?? '',
       rating: json['rating'] ?? '0.0',
-      contractStartDate: json['contractStartDate'] ?? '',
-      contractEndDate: json['contractEndDate'] ?? '',
+      contractStartDate: json['contractStartDate'] != null
+          ? json['contractStartDate'].toDate()
+          : null,
+      contractEndDate: json['contractEndDate'] != null
+          ? json['contractEndDate'].toDate()
+          : null,
       monthlyRent: json['monthlyRent'] ?? '',
       upfrontBonus: json['upfrontBonus'] ?? '',
       monthlyProfit: json['monthlyProfit'] ?? '',
@@ -103,6 +114,7 @@ class Landlord {
       securityDeposit: json['securityDeposit'] ?? '',
       creditPoints: json['creditPoints'] ?? '',
       creditScore: json['creditScore'] ?? '',
+      cnic: json['cnic'] ?? '',
     );
 
     // await landlord.fetchData();

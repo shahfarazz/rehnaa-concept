@@ -1,12 +1,11 @@
+import 'dart:async';
 import 'dart:js_interop';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:rehnaa/frontend/helper/Admindashboard_pages/admin_requests_property_contracts.dart';
-
 import '../../Screens/Admin/admindashboard.dart';
 
 class AdminRequestsPage extends StatefulWidget {
@@ -18,14 +17,17 @@ class AdminRequestsPage extends StatefulWidget {
 
 class _AdminRequestsPageState extends State<AdminRequestsPage> {
   bool _isLoading = true;
+  StreamSubscription<QuerySnapshot<Map<String, dynamic>>>?
+      _requestsSubscription;
 
-  Future<void> _getRequests() async {
-    adminRequests.clear();
-    FirebaseFirestore.instance
+  void _listenForRequests() {
+    _requestsSubscription = FirebaseFirestore.instance
         .collection('AdminRequests')
-        .get()
-        .then((QuerySnapshot querySnapshot) {
-      for (var doc in querySnapshot.docs) {
+        .snapshots()
+        .listen((QuerySnapshot querySnapshot) {
+      adminRequests.clear();
+      // Process the updated querySnapshot and update your adminRequests list
+      querySnapshot.docs.forEach((DocumentSnapshot doc) {
         try {
           if (doc["withdrawRequest"] != null) {
             // if yes, then loop through the array
@@ -56,6 +58,7 @@ class _AdminRequestsPageState extends State<AdminRequestsPage> {
                   withinArrayID: doc["withdrawRequest"][i]["requestID"],
                   docTimestamp: doc["withdrawRequest"][i]["timestamp"],
                   isHandled: doc["withdrawRequest"][i]["isHandled"] ?? false,
+                  txnType: 'withdrawRequest',
                 ),
               );
             }
@@ -73,18 +76,19 @@ class _AdminRequestsPageState extends State<AdminRequestsPage> {
 
               adminRequests.add(
                 AdminRequestData(
-                  name: doc["paymentRequest"][i]["fullname"],
-                  requestedAmount:
-                      doc["paymentRequest"][i]["amount"].toString(),
-                  uid: doc["paymentRequest"][i]["uid"],
-                  cashOrBankTransfer: doc["paymentRequest"][i]["paymentMethod"],
-                  requestID: doc.id,
-                  requestType: 'Tenant Payment Request',
-                  invoiceNumber: doc["paymentRequest"][i]["invoiceNumber"],
-                  withinArrayID: doc["paymentRequest"][i]["requestID"],
-                  docTimestamp: doc["paymentRequest"][i]["timestamp"],
-                  isHandled: doc["paymentRequest"][i]["isHandled"] ?? false,
-                ),
+                    name: doc["paymentRequest"][i]["fullname"],
+                    requestedAmount:
+                        doc["paymentRequest"][i]["amount"].toString(),
+                    uid: doc["paymentRequest"][i]["uid"],
+                    cashOrBankTransfer: doc["paymentRequest"][i]
+                        ["paymentMethod"],
+                    requestID: doc.id,
+                    requestType: 'Tenant Payment Request',
+                    invoiceNumber: doc["paymentRequest"][i]["invoiceNumber"],
+                    withinArrayID: doc["paymentRequest"][i]["requestID"],
+                    docTimestamp: doc["paymentRequest"][i]["timestamp"],
+                    isHandled: doc["paymentRequest"][i]["isHandled"] ?? false,
+                    txnType: 'paymentRequest'),
               );
             }
           }
@@ -102,22 +106,22 @@ class _AdminRequestsPageState extends State<AdminRequestsPage> {
 
               adminRequests.add(
                 AdminRequestData(
-                  name: doc["rentalRequest"][i]["fullname"],
-                  requestedAmount:
-                      doc["rentalRequest"][i]["property"]["price"].toString(),
-                  uid: doc["rentalRequest"][i]["uid"],
-                  propertyTitle: doc["rentalRequest"][i]["property"]["title"],
-                  propertyLocation: doc["rentalRequest"][i]["property"]
-                      ["location"],
-                  requestID: doc.id,
-                  requestType: 'Tenant Rental Request',
-                  propertyLandlordRef: doc["rentalRequest"][i]["property"]
-                      ["landlordRef"],
-                  withinArrayID: doc["rentalRequest"][i]["requestID"],
-                  propertyID: doc["rentalRequest"][i]["propertyID"],
-                  docTimestamp: doc["rentalRequest"][i]["timestamp"],
-                  isHandled: doc["rentalRequest"][i]['isHandled'] ?? false,
-                ),
+                    name: doc["rentalRequest"][i]["fullname"],
+                    requestedAmount:
+                        doc["rentalRequest"][i]["property"]["price"].toString(),
+                    uid: doc["rentalRequest"][i]["uid"],
+                    propertyTitle: doc["rentalRequest"][i]["property"]["title"],
+                    propertyLocation: doc["rentalRequest"][i]["property"]
+                        ["location"],
+                    requestID: doc.id,
+                    requestType: 'Tenant Rental Request',
+                    propertyLandlordRef: doc["rentalRequest"][i]["property"]
+                        ["landlordRef"],
+                    withinArrayID: doc["rentalRequest"][i]["requestID"],
+                    propertyID: doc["rentalRequest"][i]["propertyID"],
+                    docTimestamp: doc["rentalRequest"][i]["timestamp"],
+                    isHandled: doc["rentalRequest"][i]['isHandled'] ?? false,
+                    txnType: 'rentalRequest'),
               );
             }
           }
@@ -140,6 +144,8 @@ class _AdminRequestsPageState extends State<AdminRequestsPage> {
                 requestID: doc.id,
                 docTimestamp: doc["rentAccrualRequest"][i]["timestamp"],
                 isHandled: doc["rentAccrualRequest"][i]["isHandled"] ?? false,
+                withinArrayID: doc["rentAccrualRequest"][i]["requestID"],
+                txnType: 'rentAccrualRequest',
               ));
             }
           }
@@ -170,6 +176,7 @@ class _AdminRequestsPageState extends State<AdminRequestsPage> {
                   docTimestamp: doc["withdrawRequestDealer"][i]["timestamp"],
                   isHandled:
                       doc["withdrawRequestDealer"][i]["isHandled"] ?? false,
+                  txnType: 'withdrawRequestDealer',
                 ),
               );
             }
@@ -201,6 +208,7 @@ class _AdminRequestsPageState extends State<AdminRequestsPage> {
                   // altTenantName: doc["rentAdvanceRequest"][i]["tenantname"],
                   docTimestamp: doc["rentAdvanceRequest"][i]["timestamp"],
                   isHandled: doc["rentAdvanceRequest"][i]["isHandled"] ?? false,
+                  txnType: 'rentAdvanceRequest',
                 ),
               );
             }
@@ -233,6 +241,8 @@ class _AdminRequestsPageState extends State<AdminRequestsPage> {
                   docTimestamp: doc["interestFreeLoanRequest"][i]["timestamp"],
                   isHandled:
                       doc["interestFreeLoanRequest"][i]["isHandled"] ?? false,
+
+                  txnType: 'interestFreeLoanRequest',
                 ),
               );
             }
@@ -266,6 +276,40 @@ class _AdminRequestsPageState extends State<AdminRequestsPage> {
                   dataFields: doc["propertyApprovalRequest"][i]["dataFields"],
                   isHandled:
                       doc["propertyApprovalRequest"][i]["isHandled"] ?? false,
+                  txnType: 'propertyApprovalRequest',
+                ),
+              );
+            }
+          }
+        } catch (e) {
+          if (kDebugMode) {
+            print('Error222: $e');
+          }
+        }
+        // securityDepositRequest
+        try {
+          if (doc["securityDepositRequest"] != null) {
+            for (var i = 0; i < doc["securityDepositRequest"].length; i++) {
+              // add each request to the adminRequests list
+
+              adminRequests.add(
+                AdminRequestData(
+                  name: doc["securityDepositRequest"][i]["fullname"],
+                  // requestedAmount:
+                  //     doc["securityDepositRequest"][i]["amount"].toString(),
+                  uid: doc["securityDepositRequest"][i]["uid"],
+                  // cashOrBankTransfer: doc["securityDepositRequest"][i]
+                  //     ["paymentMethod"],
+                  requestID: doc.id,
+                  requestType: 'Security Deposit Request',
+                  // invoiceNumber: doc["securityDepositRequest"][i]["invoiceNumber"],
+                  withinArrayID: doc["securityDepositRequest"][i]["requestID"],
+                  // altTenantName: doc["securityDepositRequest"][i]["tenantname"],
+                  docTimestamp: doc["securityDepositRequest"][i]["timestamp"],
+                  // dataFields: doc["securityDepositRequest"][i]["dataFields"],
+                  isHandled:
+                      doc["securityDepositRequest"][i]["isHandled"] ?? false,
+                  txnType: 'securityDepositRequest',
                 ),
               );
             }
@@ -277,8 +321,10 @@ class _AdminRequestsPageState extends State<AdminRequestsPage> {
         }
 
         //TODO add other states of requests if needed
-      }
+      });
+
       setState(() {
+        displayedRequests.clear();
         displayedRequests.addAll(adminRequests);
         displayedRequests
             .sort((a, b) => b.docTimestamp.compareTo(a.docTimestamp));
@@ -297,12 +343,26 @@ class _AdminRequestsPageState extends State<AdminRequestsPage> {
 
   int currentPage = 1;
   int itemsPerPage = 2;
+  // Timer? _timer;
 
   @override
   void initState() {
     super.initState();
     displayedRequests.addAll(adminRequests);
-    _getRequests();
+    // _getRequests();
+    _listenForRequests();
+    // _timer = Timer.periodic(const Duration(seconds: 3), (timer) {
+    //   //
+    //   _getRequests();
+    // });
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    // _timer!.cancel();
+    _requestsSubscription?.cancel();
   }
 
   void filterRequests(String query) {
@@ -447,7 +507,10 @@ class _AdminRequestsPageState extends State<AdminRequestsPage> {
                           // reverse: true,
                           itemBuilder: (context, index) {
                             final request = getPaginatedRequests()[index];
-                            return LandlordWithdrawalCard(data: request);
+                            return LandlordWithdrawalCard(
+                              data: request,
+                              // timer: _timer!,
+                            );
                           },
                         )
                       : Card(
@@ -541,6 +604,7 @@ class AdminRequestData {
   Timestamp docTimestamp;
   var dataFields;
   var isHandled;
+  var txnType;
 
   AdminRequestData({
     required this.name,
@@ -559,14 +623,17 @@ class AdminRequestData {
     required this.docTimestamp,
     this.dataFields,
     required this.isHandled,
+    required this.txnType,
   });
 }
 
 class LandlordWithdrawalCard extends StatelessWidget {
-  final AdminRequestData data;
+  AdminRequestData data;
+  // Timer timer;
 
   LandlordWithdrawalCard({
     required this.data,
+    // required this.timer,
   });
 
   TextEditingController _newRentalAmountController = TextEditingController();
@@ -666,576 +733,284 @@ class LandlordWithdrawalCard extends StatelessWidget {
             children: [
               ElevatedButton(
                 onPressed: () async {
-                  print('data.uid: ${data.uid}');
-                  print('data.requestType: ${data.requestType}');
-
-                  //showdialog with a circular progress indicator
-                  showDialog(
-                    context: context,
-                    builder: (context) {
-                      return const Center(
-                        child: SpinKitFadingCube(
-                          color: Color.fromARGB(255, 30, 197, 83),
-                        ),
-                      );
-                    },
-                  );
-
-                  if (data.isHandled) {
-                    //show a snackbar
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('This request has already been handled'),
-                      ),
-                    );
-                    //close the dialog
-                    Navigator.pop(context);
-                  }
-
-                  // Handle accept button press
-                  //check if i can access the data here by printing all the data
-                  // print all possible fields in the data object
-                  if (data.propertyLocation.isNull) {
-                    //withdrawal request or payment request
-                    if (data.requestType == 'Landlord Withdraw Request') {
-                      //withdrawal request
-                      //update the landlord's balance
-                      FirebaseFirestore.instance
-                          .collection('Landlords')
-                          .doc(data.uid)
-                          .update({
-                        'balance': FieldValue.increment(
-                            -int.parse(data.requestedAmount!)),
-                      });
-                      //remove the withdrawal request
-
-                      FirebaseFirestore.instance
-                          .collection('AdminRequests')
-                          .doc(data.requestID)
-                          .get()
-                          .then((snapshot) {
-                        if (snapshot.exists) {
-                          final List<dynamic> withdrawRequestArray =
-                              snapshot.get('withdrawRequest') ?? [];
-
-                          final updatedArray = List.from(withdrawRequestArray)
-                            ..removeWhere((element) =>
-                                element['requestID'] == data.withinArrayID);
-
-                          FirebaseFirestore.instance
-                              .collection('AdminRequests')
-                              .doc(data.requestID)
-                              .update({'withdrawRequest': updatedArray});
-                        }
-                      });
-                      //send a notification to the landlord by accessing the landlord's uid on Collection 'Notifications'
-                      // and appending to the array called 'notifications' which has fields amount and title
-                      FirebaseFirestore.instance
-                          .collection('Notifications')
-                          .doc(data.uid)
-                          .update({
-                        'notifications': FieldValue.arrayUnion([
-                          {
-                            'amount': data.requestedAmount,
-                            'title': 'Withdrawal Request Accepted',
-                          }
-                        ])
-                      });
-                      // set isWithdraw in Landlord's document to false
-                      FirebaseFirestore.instance
-                          .collection('Landlords')
-                          .doc(data.uid)
-                          .update({
-                        'isWithdraw': false,
-                      });
-                      //create a rentPayment firebase document that will be used to track the payment
-                      // rentpayment will have fields amount date paymenttype propertyRef and tenantRef and landlordRef
-                      // with a random id and store this id in a local variable
-
-                      final rentPaymentRef = FirebaseFirestore.instance
-                          .collection('rentPayments')
-                          .doc();
-
-                      //go to rentPayments firebase collection and create a document with the id stored in the local variable
-                      // and set the fields amount date paymenttype propertyRef and tenantRef and landlordRef
-                      // with the values from the data object
-                      rentPaymentRef.set({
-                        //convert requestedAmount to an integer
-                        //date should be a firebase timestamp
-                        // if payment type is cash set paymenttype to "cash" on "Bank Transfer" make it "banktransfer"
-                        'amount': int.parse(data.requestedAmount!),
-                        'date': DateTime.now(),
-                        'paymentType': data.cashOrBankTransfer == 'Cash'
-                            ? 'cash'
-                            : 'banktransfer',
-                        'propertyRef': null,
-                        'tenantRef': null,
-                        //landlord ref has to be a document reference to data.uid in Landlord doc
-                        'landlordRef': FirebaseFirestore.instance
-                            .collection('Landlords')
-                            .doc(data.uid),
-                        'invoiceNumber': data.invoiceNumber,
-                        'tenantname': data.altTenantName
-                      });
-
-                      //reset the state of the page
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const AdminRequestsPage(),
-                        ),
-                      );
-
-                      // append the landlord's rentPaymentRef whic is a list of documentreferences to the rentPaymentRef
-                      // in the Landlord's document
-                      FirebaseFirestore.instance
-                          .collection('Landlords')
-                          .doc(data.uid)
-                          .update({
-                        'rentpaymentRef': FieldValue.arrayUnion([
-                          rentPaymentRef,
-                        ])
-                      });
-                    } else if (data.requestType == 'Tenant Payment Request') {
-                      //payment request
-                      //update the tenant's balance
-                      FirebaseFirestore.instance
-                          .collection('Tenants')
-                          .doc(data.uid)
-                          .update({
-                        'balance': FieldValue.increment(
-                            -int.parse(data.requestedAmount!)),
-                      });
-
-                      //remove the payment request
-                      FirebaseFirestore.instance
-                          .collection('AdminRequests')
-                          .doc(data.requestID)
-                          .get()
-                          .then((snapshot) {
-                        if (snapshot.exists) {
-                          final List<dynamic> withdrawRequestArray =
-                              snapshot.get('paymentRequest') ?? [];
-
-                          final updatedArray = List.from(withdrawRequestArray)
-                            ..removeWhere((element) =>
-                                element['requestID'] == data.withinArrayID);
-
-                          FirebaseFirestore.instance
-                              .collection('AdminRequests')
-                              .doc(data.requestID)
-                              .update({'paymentRequest': updatedArray});
-                        }
-                      }).then((value) {
-                        //reset the state of the page
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const AdminRequestsPage(),
-                          ),
-                        );
-                      });
-
-                      //send a notification to the tenant by accessing the tenant's uid on Collection 'Notifications'
-                      // and appending to the array called 'notifications' which has fields amount and title
-                      FirebaseFirestore.instance
-                          .collection('Notifications')
-                          .doc(data.uid)
-                          .update({
-                        'notifications': FieldValue.arrayUnion([
-                          {
-                            'amount': data.requestedAmount,
-                            'title': 'Payment Request Accepted',
-                          }
-                        ])
-                      });
-                      // set isWithdraw in Tenant's document to false
-                      FirebaseFirestore.instance
-                          .collection('Tenants')
-                          .doc(data.uid)
-                          .update({
-                        'isWithdraw': false,
-                      });
-                      //create a rentPayment firebase document that will be used to track the payment
-                      // rentpayment will have fields amount date paymenttype propertyRef and tenantRef and landlordRef
-                      // with a random id and store this id in a local variable
-                      final rentPaymentRef = FirebaseFirestore.instance
-                          .collection('rentPayments')
-                          .doc();
-
-                      //go to rentPayments firebase collection and create a document with the id stored in the local variable
-                      // and set the fields amount date paymenttype propertyRef and tenantRef and landlordRef
-                      // with the values from the data object
-                      rentPaymentRef.set({
-                        //convert requestedAmount to an integer
-                        //date should be a firebase timestamp
-                        // if payment type is cash set paymenttype to "cash" on "Bank Transfer" make it "banktransfer"
-                        'amount': int.parse(data.requestedAmount!),
-                        'date': DateTime.now(),
-                        'paymentType': data.cashOrBankTransfer == 'Cash'
-                            ? 'cash'
-                            : 'banktransfer',
-                        'propertyRef': null,
-                        //tenant ref has to be a document reference to data.uid in Tenant doc
-                        'tenantRef': FirebaseFirestore.instance
-                            .collection('Tenants')
-                            .doc(data.uid),
-                        'landlordRef': null,
-                        'invoiceNumber': data.invoiceNumber
-                      });
-
-                      // set the tenant's rentPaymentRef to tenant's own id reference which is data.requestID
-                      FirebaseFirestore.instance
-                          .collection('Tenants')
-                          .doc(data.uid)
-                          .update({
-                        'rentpaymentRef': FieldValue.arrayUnion([
-                          rentPaymentRef,
-                        ])
-                      });
-                    } else if (data.requestType == 'Rent Accrual Request') {
-                      FirebaseFirestore.instance
-                          .collection('Notifications')
-                          .doc(data.uid)
-                          .update({
-                        'notifications': FieldValue.arrayUnion([
-                          {
-                            // 'amount': data.requestedAmount,
-                            'title':
-                                'Your Rent Accrual request has been accepted, somebody from the Rehnaa team will contact you shortly',
-                          }
-                        ])
-                      });
-
-                      FirebaseFirestore.instance
-                          .collection('AdminRequests')
-                          .doc(data.requestID)
-                          .get()
-                          .then((snapshot) {
-                        if (snapshot.exists) {
-                          final List<dynamic> withdrawRequestArray =
-                              snapshot.get('rentAccrualRequest') ?? [];
-
-                          final updatedArray = List.from(withdrawRequestArray)
-                            ..removeWhere((element) =>
-                                element['requestID'] == data.withinArrayID);
-
-                          FirebaseFirestore.instance
-                              .collection('AdminRequests')
-                              .doc(data.requestID)
-                              .update({'rentAccrualRequest': updatedArray});
-                        }
-                      });
-                      //reset the state of the page
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const AdminRequestsPage(),
-                        ),
-                      );
-                    } else if (data.requestType == 'Dealer Withdraw Request') {
-                      //withdrawal request
-                      //update the landlord's balance
-                      print('reached here');
-                      FirebaseFirestore.instance
-                          .collection('Dealers')
-                          .doc(data.uid)
-                          .update({
-                        'balance': FieldValue.increment(
-                            -int.parse(data.requestedAmount!)),
-                      });
-                      //remove the withdrawal request
-
-                      FirebaseFirestore.instance
-                          .collection('AdminRequests')
-                          .doc(data.requestID)
-                          .get()
-                          .then((snapshot) {
-                        if (snapshot.exists) {
-                          final List<dynamic> withdrawRequestArray =
-                              snapshot.get('withdrawRequestDealer') ?? [];
-
-                          final updatedArray = List.from(withdrawRequestArray)
-                            ..removeWhere((element) =>
-                                element['requestID'] == data.withinArrayID);
-
-                          FirebaseFirestore.instance
-                              .collection('AdminRequests')
-                              .doc(data.requestID)
-                              .update({'withdrawRequestDealer': updatedArray});
-                        }
-                      });
-                      //send a notification to the landlord by accessing the landlord's uid on Collection 'Notifications'
-                      // and appending to the array called 'notifications' which has fields amount and title
-                      FirebaseFirestore.instance
-                          .collection('Notifications')
-                          .doc(data.uid)
-                          .update({
-                        'notifications': FieldValue.arrayUnion([
-                          {
-                            'amount': data.requestedAmount,
-                            'title': 'Withdrawal Request Accepted',
-                          }
-                        ])
-                      });
-                      // set isWithdraw in Landlord's document to false
-                      FirebaseFirestore.instance
-                          .collection('Dealers')
-                          .doc(data.uid)
-                          .update({
-                        'isWithdraw': false,
-                      });
-                      //create a rentPayment firebase document that will be used to track the payment
-                      // rentpayment will have fields amount date paymenttype propertyRef and tenantRef and landlordRef
-                      // with a random id and store this id in a local variable
-
-                      final rentPaymentRef = FirebaseFirestore.instance
-                          .collection('rentPayments')
-                          .doc();
-
-                      //go to rentPayments firebase collection and create a document with the id stored in the local variable
-                      // and set the fields amount date paymenttype propertyRef and tenantRef and landlordRef
-                      // with the values from the data object
-                      rentPaymentRef.set({
-                        //convert requestedAmount to an integer
-                        //date should be a firebase timestamp
-                        // if payment type is cash set paymenttype to "cash" on "Bank Transfer" make it "banktransfer"
-                        'amount': int.parse(data.requestedAmount!),
-                        'date': DateTime.now(),
-                        'paymentType': data.cashOrBankTransfer == 'Cash'
-                            ? 'cash'
-                            : 'banktransfer',
-                        'propertyRef': null,
-                        'tenantRef': null,
-                        //landlord ref has to be a document reference to data.uid in Landlord doc
-                        'landlordRef': null,
-                        'dealerRef': FirebaseFirestore.instance
-                            .collection('Dealers')
-                            .doc(data.uid),
-                        'invoiceNumber': data.invoiceNumber,
-                        'tenantname': data.altTenantName
-                      });
-
-                      //reset the state of the page
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const AdminRequestsPage(),
-                        ),
-                      );
-
-                      // append the landlord's rentPaymentRef whic is a list of documentreferences to the rentPaymentRef
-                      // in the Landlord's document
-                      FirebaseFirestore.instance
-                          .collection('Dealers')
-                          .doc(data.uid)
-                          .update({
-                        'rentpaymentRef': FieldValue.arrayUnion([
-                          rentPaymentRef,
-                        ])
-                      });
-                    } else if (data.requestType == 'Rent Advance Request') {
-                      //rent advance request
-
-                      //remove the withdrawal request
-
-                      FirebaseFirestore.instance
-                          .collection('AdminRequests')
-                          .doc(data.requestID)
-                          .get()
-                          .then((snapshot) {
-                        if (snapshot.exists) {
-                          final List<dynamic> withdrawRequestArray =
-                              snapshot.get('rentAdvanceRequest') ?? [];
-
-                          final updatedArray = List.from(withdrawRequestArray)
-                            ..removeWhere((element) =>
-                                element['requestID'] == data.withinArrayID);
-
-                          FirebaseFirestore.instance
-                              .collection('AdminRequests')
-                              .doc(data.requestID)
-                              .update({'rentAdvanceRequest': updatedArray});
-                        }
-                      });
-                      //send a notification to the tenant
-                      // by accessing the tenant's uid on Collection 'Notifications'
-                      // and appending to the array called 'notifications' which has fields amount and title
-                      FirebaseFirestore.instance
-                          .collection('Notifications')
-                          .doc(data.uid)
-                          .update({
-                        'notifications': FieldValue.arrayUnion([
-                          {
-                            // 'amount': data.requestedAmount,
-                            'title': 'Rent Advance Request Accepted',
-                          }
-                        ])
-                      });
-
-                      //reset the state of the page
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const AdminRequestsPage(),
-                        ),
-                      );
-                    } else if (data.requestType ==
-                        'Interest Free Loan Request') {
-                      //remove the withdrawal request
-
-                      FirebaseFirestore.instance
-                          .collection('AdminRequests')
-                          .doc(data.requestID)
-                          .get()
-                          .then((snapshot) {
-                        if (snapshot.exists) {
-                          final List<dynamic> withdrawRequestArray =
-                              snapshot.get('interestFreeLoanRequest') ?? [];
-
-                          final updatedArray = List.from(withdrawRequestArray)
-                            ..removeWhere((element) =>
-                                element['requestID'] == data.withinArrayID);
-
-                          FirebaseFirestore.instance
-                              .collection('AdminRequests')
-                              .doc(data.requestID)
-                              .update(
-                                  {'interestFreeLoanRequest': updatedArray});
-                        }
-                      });
-                      //send a notification to the tenant
-                      // by accessing the tenant's uid on Collection 'Notifications'
-                      // and appending to the array called 'notifications' which has fields amount and title
-                      FirebaseFirestore.instance
-                          .collection('Notifications')
-                          .doc(data.uid)
-                          .update({
-                        'notifications': FieldValue.arrayUnion([
-                          {
-                            // 'amount': data.requestedAmount,
-                            'title': 'Interest Free Loan Request Accepted',
-                          }
-                        ])
-                      });
-
-                      //reset the state of the page
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const AdminRequestsPage(),
-                        ),
-                      );
-                    } else if (data.requestType ==
-                        'Property Approval Request') {
-                      //property approval request
-
-                      print('reached here222');
-
+                  try {
+                    // Step 3: Perform the await transaction logic within the lock
+                    await FirebaseFirestore.instance
+                        .runTransaction((transaction) async {
+                      //pause the timer until the transaction is complete
+                      // timer.cancel();
+                      //showdialog with a circular progress indicator
                       showDialog(
                         context: context,
-                        builder: (BuildContext context) {
-                          return AlertDialog(
-                            title: Text('Admin Approval'),
-                            content: SizedBox(
-                              width: double.maxFinite,
-                              child: ListView.builder(
-                                shrinkWrap: true,
-                                itemCount: data.dataFields.length,
-                                itemBuilder: (BuildContext context, int index) {
-                                  String key =
-                                      data.dataFields.keys.elementAt(index);
-                                  dynamic value =
-                                      data.dataFields.values.elementAt(index);
+                        builder: (context) {
+                          return const Center(
+                            child: SpinKitFadingCube(
+                              color: Color.fromARGB(255, 30, 197, 83),
+                            ),
+                          );
+                        },
+                      );
 
-                                  return ListTile(
-                                    title: Text(key),
-                                    subtitle: Text(value.toString()),
-                                  );
-                                },
+                      DocumentSnapshot requestSnapshot = await transaction.get(
+                          FirebaseFirestore.instance
+                              .collection('AdminRequests')
+                              .doc(data.requestID));
+
+                      if (!requestSnapshot.exists) {
+                        throw Exception("AdminRequest document does not exist");
+                      }
+
+                      // Check if the 'data' object is present in the 'withdrawRequest' array
+                      final List<dynamic> withdrawRequestArray =
+                          requestSnapshot.get(data.txnType) ?? [];
+
+                      final dynamic requestData =
+                          withdrawRequestArray.firstWhere(
+                              (element) =>
+                                  element['requestID'] == data.withinArrayID,
+                              orElse: () => null);
+
+                      // If the 'data' object isn't found, throw an exception (or handle this scenario in a way that suits your use case)
+                      if (requestData == null) {
+                        throw Exception(
+                            "Request data is no longer present in the AdminRequests document");
+                      }
+
+                      var newRentalAmount;
+                      var newBalance;
+                      var rentalAmount;
+                      DocumentSnapshot tenantSnapshot;
+                      DocumentSnapshot propertySnapshot;
+                      String? propAddress;
+                      DocumentReference? landlordRef;
+
+                      // reads required for Tenant Rental Request
+                      if (data.txnType == 'rentalRequest') {
+                        // Get the necessary data
+                        tenantSnapshot = await transaction.get(FirebaseFirestore
+                            .instance
+                            .collection('Tenants')
+                            .doc(data.uid));
+                        propertySnapshot = await transaction.get(
+                            FirebaseFirestore.instance
+                                .collection('Properties')
+                                .doc(data.propertyID));
+
+                        // Extract the needed data
+                        propAddress = propertySnapshot.get('address');
+                        landlordRef = propertySnapshot.get('landlordRef');
+
+                        newRentalAmount = await showDialog<String?>(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: const Text('Enter New Rental Amount'),
+                            content: TextField(
+                              controller: _newRentalAmountController,
+                              keyboardType: TextInputType.number,
+                              decoration: const InputDecoration(
+                                labelText: 'New Rental Amount',
                               ),
                             ),
                             actions: [
                               TextButton(
                                 onPressed: () {
-                                  Navigator.of(context)
-                                      .pop(false); // Return false if rejected
+                                  Navigator.pop(context);
                                 },
-                                child: Text('Reject'),
+                                child: const Text('Cancel'),
                               ),
                               TextButton(
                                 onPressed: () {
-                                  Navigator.of(context)
-                                      .pop(true); // Return true if approved
+                                  Navigator.pop(context,
+                                      _newRentalAmountController?.text);
                                 },
-                                child: Text('Approve'),
+                                child: const Text('Submit'),
                               ),
                             ],
-                          );
-                        },
-                      ).then((value) {
-                        if (value == true) {
-                          // Continue with the code below
-                          //remove the withdrawal request
+                          ),
+                        );
+                        rentalAmount = newRentalAmount ?? data.requestedAmount!;
+                        newBalance = int.parse(rentalAmount);
+                      }
 
+                      if (requestSnapshot.exists) {
+                        final List<dynamic> withdrawRequestArray =
+                            requestSnapshot.get(data.txnType) ?? [];
+
+                        final updatedArray = List.from(withdrawRequestArray)
+                          ..removeWhere((element) =>
+                              element['requestID'] == data.withinArrayID);
+
+                        transaction.update(
                           FirebaseFirestore.instance
                               .collection('AdminRequests')
-                              .doc(data.requestID)
-                              .get()
-                              .then((snapshot) {
-                            if (snapshot.exists) {
-                              final List<dynamic> withdrawRequestArray =
-                                  snapshot.get('propertyApprovalRequest') ?? [];
+                              .doc(data.requestID),
+                          {data.txnType: updatedArray},
+                        );
+                      }
 
-                              final updatedArray = List.from(
-                                  withdrawRequestArray)
-                                ..removeWhere((element) =>
-                                    element['requestID'] == data.withinArrayID);
+                      // Update the request as handled
+                      await transaction.update(
+                          requestSnapshot.reference, {'isHandled': true});
 
-                              FirebaseFirestore.instance
-                                  .collection('AdminRequests')
-                                  .doc(data.requestID)
-                                  .update({
-                                'propertyApprovalRequest': updatedArray
-                              });
-                            }
-                          });
-                          //send a notification to the landlord
-                          // by accessing the landlord's uid on Collection 'Notifications'
-                          // and appending to the array called 'notifications' which has fields amount and title
-                          FirebaseFirestore.instance
-                              .collection('Notifications')
-                              .doc(data.uid)
-                              .update({
-                            'notifications': FieldValue.arrayUnion([
-                              {
-                                // 'amount': data.requestedAmount,
-                                'title': 'Property Approval Request Accepted',
-                              }
-                            ])
-                          });
-                          //create document of property in the Properties collection
-                          //with the dataFields of the request
+                      // Handle accept button press
+                      //check if i can access the data here by printing all the data
+                      // print all possible fields in the data object
+                      if (data.propertyLocation.isNull) {
+                        // Check if it is a withdrawal request
+                        if (data.requestType == 'Landlord Withdraw Request') {
+                          // Withdrawal request
+                          // Update the landlord's balance
+                          await transaction.update(
+                            FirebaseFirestore.instance
+                                .collection('Landlords')
+                                .doc(data.uid),
+                            {
+                              'balance': FieldValue.increment(
+                                  -int.parse(data.requestedAmount!)),
+                            },
+                          );
 
-                          //create a new doc in the properties collection
-                          //and save its uid and then save the dataFields in it
-                          var docRef = FirebaseFirestore.instance
-                              .collection('Properties')
+                          // Remove the withdrawal request from the AdminRequests document
+
+                          // Send a notification to the landlord by appending to the 'notifications' array
+                          await transaction.update(
+                            FirebaseFirestore.instance
+                                .collection('Notifications')
+                                .doc(data.uid),
+                            {
+                              'notifications': FieldValue.arrayUnion([
+                                {
+                                  'amount': data.requestedAmount,
+                                  'title': 'Withdrawal Request Accepted',
+                                }
+                              ])
+                            },
+                          );
+
+                          // Set 'isWithdraw' in the Landlord's document to false
+                          await transaction.update(
+                            FirebaseFirestore.instance
+                                .collection('Landlords')
+                                .doc(data.uid),
+                            {'isWithdraw': false},
+                          );
+
+                          // Create a rentPayment document in the 'rentPayments' collection
+                          final rentPaymentRef = FirebaseFirestore.instance
+                              .collection('rentPayments')
                               .doc();
 
-                          var landlordRef = FirebaseFirestore.instance
-                              .collection('Landlords')
-                              .doc(data.uid);
+                          // Set the fields of the rentPayment document
+                          await transaction.set(
+                            rentPaymentRef,
+                            {
+                              'amount': int.parse(data.requestedAmount!),
+                              'date': DateTime.now(),
+                              'paymentType': data.cashOrBankTransfer == 'Cash'
+                                  ? 'cash'
+                                  : 'banktransfer',
+                              'propertyRef': null,
+                              'tenantRef': null,
+                              'landlordRef': FirebaseFirestore.instance
+                                  .collection('Landlords')
+                                  .doc(data.uid),
+                              'invoiceNumber': data.invoiceNumber,
+                              'tenantname': data.altTenantName,
+                              'isMinus': true,
+                            },
+                          );
 
-                          docRef.set(data.dataFields);
-                          docRef.update({
-                            'landlordRef': landlordRef,
-                            'imagePath': data.dataFields['pathToImage']
-                          });
-                          landlordRef.update({
-                            'propertyRef': FieldValue.arrayUnion([docRef]),
-                          });
+                          // Append the rentPaymentRef to the 'rentpaymentRef' array in the Landlord's document
+                          await transaction.update(
+                            FirebaseFirestore.instance
+                                .collection('Landlords')
+                                .doc(data.uid),
+                            {
+                              'rentpaymentRef':
+                                  FieldValue.arrayUnion([rentPaymentRef]),
+                            },
+                          );
 
+                          Navigator.pop(context);
+
+                          // Reset the state of the page
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const AdminRequestsPage(),
+                            ),
+                          );
+                        } else if (data.requestType ==
+                            'Tenant Payment Request') {
+                          // Payment request
+                          // Update the tenant's balance
+                          await transaction.update(
+                            FirebaseFirestore.instance
+                                .collection('Tenants')
+                                .doc(data.uid),
+                            {
+                              'balance': FieldValue.increment(
+                                  -int.parse(data.requestedAmount!)),
+                            },
+                          );
+
+                          // Send a notification to the tenant by appending to the 'notifications' array
+                          await transaction.update(
+                            FirebaseFirestore.instance
+                                .collection('Notifications')
+                                .doc(data.uid),
+                            {
+                              'notifications': FieldValue.arrayUnion([
+                                {
+                                  'amount': data.requestedAmount,
+                                  'title': 'Payment Request Accepted',
+                                }
+                              ])
+                            },
+                          );
+
+                          // Set 'isWithdraw' in the Tenant's document to false
+                          await transaction.update(
+                            FirebaseFirestore.instance
+                                .collection('Tenants')
+                                .doc(data.uid),
+                            {'isWithdraw': false},
+                          );
+
+                          // Create a rentPayment document in the 'rentPayments' collection
+                          final rentPaymentRef = FirebaseFirestore.instance
+                              .collection('rentPayments')
+                              .doc();
+
+                          // Set the fields of the rentPayment document
+                          await transaction.set(
+                            rentPaymentRef,
+                            {
+                              'amount': int.parse(data.requestedAmount!),
+                              'date': DateTime.now(),
+                              'paymentType': data.cashOrBankTransfer == 'Cash'
+                                  ? 'cash'
+                                  : 'banktransfer',
+                              'propertyRef': null,
+                              'tenantRef': FirebaseFirestore.instance
+                                  .collection('Tenants')
+                                  .doc(data.uid),
+                              'landlordRef': null,
+                              'invoiceNumber': data.invoiceNumber,
+                              'isMinus': false,
+                            },
+                          );
+
+                          // Append the rentPaymentRef to the 'rentpaymentRef' array in the Tenant's document
+                          await transaction.update(
+                            FirebaseFirestore.instance
+                                .collection('Tenants')
+                                .doc(data.uid),
+                            {
+                              'rentpaymentRef':
+                                  FieldValue.arrayUnion([rentPaymentRef]),
+                            },
+                          );
                           //reset the state of the page
                           Navigator.pushReplacement(
                             context,
@@ -1243,10 +1018,296 @@ class LandlordWithdrawalCard extends StatelessWidget {
                               builder: (context) => const AdminRequestsPage(),
                             ),
                           );
+                        } else if (data.requestType == 'Rent Accrual Request') {
+                          // Send a notification to the tenant
+                          await transaction.update(
+                            FirebaseFirestore.instance
+                                .collection('Notifications')
+                                .doc(data.uid),
+                            {
+                              'notifications': FieldValue.arrayUnion([
+                                {
+                                  'title':
+                                      'Your Rent Accrual request has been accepted, somebody from the Rehnaa team will contact you shortly',
+                                }
+                              ])
+                            },
+                          );
 
-                          //
-                        } else {
-                          // Return to the admin requests page
+                          // Reset the state of the page
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const AdminRequestsPage(),
+                            ),
+                          );
+                        } else if (data.requestType ==
+                            'Dealer Withdraw Request') {
+                          // Update the dealer's balance
+                          await transaction.update(
+                            FirebaseFirestore.instance
+                                .collection('Dealers')
+                                .doc(data.uid),
+                            {
+                              'balance': FieldValue.increment(
+                                  -int.parse(data.requestedAmount!)),
+                            },
+                          );
+
+                          // Send a notification to the dealer
+                          await transaction.update(
+                            FirebaseFirestore.instance
+                                .collection('Notifications')
+                                .doc(data.uid),
+                            {
+                              'notifications': FieldValue.arrayUnion([
+                                {
+                                  'amount': data.requestedAmount,
+                                  'title': 'Withdrawal Request Accepted',
+                                }
+                              ])
+                            },
+                          );
+
+                          // Update the dealer's isWithdraw field
+                          await transaction.update(
+                            FirebaseFirestore.instance
+                                .collection('Dealers')
+                                .doc(data.uid),
+                            {'isWithdraw': false},
+                          );
+
+                          // Create a rentPayment document for the withdrawal
+                          final rentPaymentRef = FirebaseFirestore.instance
+                              .collection('rentPayments')
+                              .doc();
+
+                          await transaction.set(rentPaymentRef, {
+                            'amount': int.parse(data.requestedAmount!),
+                            'date': DateTime.now(),
+                            'paymentType': data.cashOrBankTransfer == 'Cash'
+                                ? 'cash'
+                                : 'banktransfer',
+                            'propertyRef': null,
+                            'tenantRef': null,
+                            'landlordRef': null,
+                            'dealerRef': FirebaseFirestore.instance
+                                .collection('Dealers')
+                                .doc(data.uid),
+                            'invoiceNumber': data.invoiceNumber,
+                            'tenantname': data.altTenantName,
+                            'isMinus': true
+                          });
+
+                          // Append the rentPaymentRef to the dealer's rentpaymentRef array
+                          await transaction.update(
+                            FirebaseFirestore.instance
+                                .collection('Dealers')
+                                .doc(data.uid),
+                            {
+                              'rentpaymentRef':
+                                  FieldValue.arrayUnion([rentPaymentRef]),
+                            },
+                          );
+
+                          // Reset the state of the page
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const AdminRequestsPage(),
+                            ),
+                          );
+                        } else if (data.requestType == 'Rent Advance Request') {
+                          // Send a notification to the tenant
+                          await transaction.update(
+                            FirebaseFirestore.instance
+                                .collection('Notifications')
+                                .doc(data.uid),
+                            {
+                              'notifications': FieldValue.arrayUnion([
+                                {
+                                  'title':
+                                      'Rent Advance Request Accepted, an admin will contact you shortly',
+                                }
+                              ])
+                            },
+                          );
+
+                          // Reset the state of the page
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const AdminRequestsPage(),
+                            ),
+                          );
+                        } else if (data.requestType ==
+                            'Interest Free Loan Request') {
+                          // Send a notification to the tenant
+                          await transaction.update(
+                            FirebaseFirestore.instance
+                                .collection('Notifications')
+                                .doc(data.uid),
+                            {
+                              'notifications': FieldValue.arrayUnion([
+                                {
+                                  'title':
+                                      'Interest Free Loan Request Accepted',
+                                }
+                              ])
+                            },
+                          );
+
+                          // Reset the state of the page
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const AdminRequestsPage(),
+                            ),
+                          );
+                        } else if (data.requestType ==
+                            'Security Deposit Request') {
+                          // Send a notification to the tenant
+                          await transaction.update(
+                            FirebaseFirestore.instance
+                                .collection('Notifications')
+                                .doc(data.uid),
+                            {
+                              'notifications': FieldValue.arrayUnion([
+                                {
+                                  'title':
+                                      'Security Deposit Request Accepted, an admin will contact you shortly',
+                                }
+                              ])
+                            },
+                          );
+
+                          // Reset the state of the page
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const AdminRequestsPage(),
+                            ),
+                          );
+                        } else if (data.requestType ==
+                            'Property Approval Request') {
+                          // Send a notification to the landlord
+                          await transaction.update(
+                            FirebaseFirestore.instance
+                                .collection('Notifications')
+                                .doc(data.uid),
+                            {
+                              'notifications': FieldValue.arrayUnion([
+                                {
+                                  'title': 'Property Approval Request Accepted',
+                                }
+                              ])
+                            },
+                          );
+
+                          // Reset the state of the page
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const AdminRequestsPage(),
+                            ),
+                          );
+                        } else if (data.requestType ==
+                            'Property Approval Request') {
+                          // Send a notification to the landlord
+                          await transaction.update(
+                            FirebaseFirestore.instance
+                                .collection('Notifications')
+                                .doc(data.uid),
+                            {
+                              'notifications': FieldValue.arrayUnion([
+                                {
+                                  'title': 'Property Approval Request Accepted',
+                                }
+                              ])
+                            },
+                          );
+
+                          // ignore: use_build_context_synchronously
+                          await showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: Text('Admin Approval'),
+                                content: SizedBox(
+                                  width: double.maxFinite,
+                                  child: ListView.builder(
+                                    shrinkWrap: true,
+                                    itemCount: data.dataFields.length,
+                                    itemBuilder:
+                                        (BuildContext context, int index) {
+                                      String key =
+                                          data.dataFields.keys.elementAt(index);
+                                      dynamic value = data.dataFields.values
+                                          .elementAt(index);
+
+                                      return ListTile(
+                                        title: Text(key),
+                                        subtitle: Text(value.toString()),
+                                      );
+                                    },
+                                  ),
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.of(context).pop(
+                                          false); // Return false if rejected
+                                    },
+                                    child: Text('Reject'),
+                                  ),
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.of(context)
+                                          .pop(true); // Return true if approved
+                                    },
+                                    child: Text('Approve'),
+                                  ),
+                                ],
+                              );
+                            },
+                          ).then((value) async {
+                            if (value == true) {
+                              // Create a document for the property in the Properties collection
+                              var docRef = FirebaseFirestore.instance
+                                  .collection('Properties')
+                                  .doc();
+                              var landlordRef = FirebaseFirestore.instance
+                                  .collection('Landlords')
+                                  .doc(data.uid);
+
+                              // Set the data fields of the property document
+                              await transaction.set(docRef, data.dataFields);
+                              await transaction.update(docRef, {
+                                'landlordRef': landlordRef,
+                                //check if imagePath exists otherwise set it to empty string
+                                'imagePath':
+                                    data.dataFields['imagePath'] == 'no images'
+                                        ? ''
+                                        : data.dataFields['imagePath'],
+                              });
+
+                              // Update the landlord's propertyRef array with the property document reference
+                              await transaction.update(landlordRef, {
+                                'propertyRef': FieldValue.arrayUnion([docRef]),
+                              });
+                            } else {
+                              // Reset the state of the page
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      const AdminRequestsPage(),
+                                ),
+                              );
+                            }
+                          });
+
+                          // Reset the state of the page
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
@@ -1254,183 +1315,148 @@ class LandlordWithdrawalCard extends StatelessWidget {
                             ),
                           );
                         }
-                      });
-                    }
-                    print('property.requestType is ${data.requestType}');
-                  } else if (data.requestType == 'Tenant Rental Request') {
-                    //rental request
 
-                    //before updating with data.requestedamount
-                    //prompt the admin to enter a new rental amount
-                    // print('mai idher hee hon');
-                    // pop up a dialog box to enter the new rental amount
+                        print('property.requestType is ${data.requestType}');
+                      } else if (data.requestType == 'Tenant Rental Request') {
+                        // Prompt the admin to enter a new rental amount
 
-                    //newrenatal amount is coming as null there is some mistake
-                    //fix it use _newRentalAmountController
+                        // Update the tenant's balance with the requested or new rental amount
+                        // final rentalAmount =
+                        //     newRentalAmount ?? data.requestedAmount!;
+                        await transaction.update(
+                          FirebaseFirestore.instance
+                              .collection('Tenants')
+                              .doc(data.uid),
+                          {
+                            'balance': FieldValue.increment(newBalance),
+                          },
+                        );
 
-                    final newRentalAmount = await showDialog<String?>(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                        title: const Text('Enter New Rental Amount'),
-                        content: TextField(
-                          controller: _newRentalAmountController,
-                          keyboardType: TextInputType.number,
-                          decoration: const InputDecoration(
-                            labelText: 'New Rental Amount',
-                          ),
-                        ),
-                        actions: [
-                          TextButton(
-                            onPressed: () {
-                              Navigator.pop(context);
+                        // Send a notification to the tenant
+                        await transaction.update(
+                          FirebaseFirestore.instance
+                              .collection('Notifications')
+                              .doc(data.uid),
+                          {
+                            'notifications': FieldValue.arrayUnion([
+                              {
+                                'amount': rentalAmount,
+                                'title': 'Rental Request Accepted',
+                              }
+                            ])
+                          },
+                        );
+
+                        // Set the tenant's isWithdraw to false and set propertyRef and address
+                        await transaction.set(
+                            FirebaseFirestore.instance
+                                .collection('Tenants')
+                                .doc(data.uid),
+                            {
+                              'isWithdraw': false,
+                              'propertyRef': FirebaseFirestore.instance
+                                  .collection('Properties')
+                                  .doc(data.propertyID),
+                              'address': propAddress ?? 'No address provided',
                             },
-                            child: const Text('Cancel'),
+                            SetOptions(merge: true));
+
+                        // Set the property's tenantRef to the tenant's document reference
+                        await transaction.update(
+                          FirebaseFirestore.instance
+                              .collection('Properties')
+                              .doc(data.propertyID),
+                          {
+                            'tenantRef': FirebaseFirestore.instance
+                                .collection('Tenants')
+                                .doc(data.uid),
+                          },
+                        );
+
+                        // Set the tenant's landlordRef to the property's landlordRef
+                        await transaction.update(
+                          FirebaseFirestore.instance
+                              .collection('Tenants')
+                              .doc(data.uid),
+                          {
+                            'landlordRef': landlordRef,
+                          },
+                        );
+
+                        // Update the landlord's tenantRef with the tenant's document reference
+                        await transaction.update(
+                          FirebaseFirestore.instance
+                              .collection('Landlords')
+                              .doc(landlordRef!.id),
+                          {
+                            'tenantRef': FieldValue.arrayUnion([
+                              FirebaseFirestore.instance
+                                  .collection('Tenants')
+                                  .doc(data.uid),
+                            ])
+                          },
+                        );
+
+                        // Update the property's isRequestedByTenants field
+                        await transaction.update(
+                          FirebaseFirestore.instance
+                              .collection('Properties')
+                              .doc(data.propertyID),
+                          {
+                            'isRequestedByTenants':
+                                FieldValue.arrayRemove([data.uid])
+                          },
+                        );
+
+                        // Navigate to the AdminPropertyContractsPage
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => AdminPropertyContractsPage(
+                              landlordID: landlordRef!.id,
+                              tenantID: data.uid,
+                            ),
                           ),
-                          TextButton(
-                            onPressed: () {
-                              Navigator.pop(
-                                  context, _newRentalAmountController?.text);
-                            },
-                            child: const Text('Submit'),
-                          ),
-                        ],
+                        );
+                      }
+
+                      //commit
+                      // await transaction.commit();
+                    });
+                  } catch (e) {
+                    // Handle any errors that occurred during the await transaction
+                    //show a snackbar
+                    print('actual error is $e');
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content:
+                            Text('An admin is already handling this request'),
                       ),
                     );
-
-                    //update the tenant's balance to show they owe this amount
-                    // this is done by adding the requested amount to the tenant's balance
-                    if (newRentalAmount != null) {
-                      FirebaseFirestore.instance
-                          .collection('Tenants')
-                          .doc(data.uid)
-                          .update({
-                        'balance':
-                            FieldValue.increment(int.parse(newRentalAmount)),
-                      });
-                    } else {
-                      FirebaseFirestore.instance
-                          .collection('Tenants')
-                          .doc(data.uid)
-                          .update({
-                        'balance': FieldValue.increment(
-                            int.parse(data.requestedAmount!)),
-                      });
-                    }
-
-                    //remove the rental request
-                    FirebaseFirestore.instance
-                        .collection('AdminRequests')
-                        .doc(data.requestID)
-                        .get()
-                        .then((snapshot) {
-                      if (snapshot.exists) {
-                        final List<dynamic> withdrawRequestArray =
-                            snapshot.get('rentalRequest') ?? [];
-
-                        final updatedArray = List.from(withdrawRequestArray)
-                          ..removeWhere((element) =>
-                              element['requestID'] == data.withinArrayID);
-
-                        FirebaseFirestore.instance
-                            .collection('AdminRequests')
-                            .doc(data.requestID)
-                            .update({'rentalRequest': updatedArray});
-                      }
-                    });
-                    //send a notification to the tenant by accessing the tenant's uid on Collection 'Notifications'
-                    // and appending to the array called 'notifications' which has fields amount and title
-                    FirebaseFirestore.instance
-                        .collection('Notifications')
-                        .doc(data.uid)
-                        .update({
-                      'notifications': FieldValue.arrayUnion([
-                        {
-                          'amount': data.requestedAmount,
-                          'title': 'Rental Request Accepted',
-                        }
-                      ])
-                    });
-
-                    //get property's address from the property's document
-                    // store in a local variable
-
-                    var propAddress = await FirebaseFirestore.instance
-                        .collection('Properties')
-                        .doc(data.propertyID)
-                        .get()
-                        .then((value) => value.data()!['address']);
-
-                    // set isWithdraw in Tenant's document to false and set propertyRef to the property's document reference
-                    FirebaseFirestore.instance
-                        .collection('Tenants')
-                        .doc(data.uid)
-                        .set({
-                      'isWithdraw': false,
-                      'propertyRef': FirebaseFirestore.instance
-                          .collection('Properties')
-                          .doc(data.propertyID),
-                      'address': propAddress ?? 'No address provided',
-                    }, SetOptions(merge: true));
-
-                    //set properties tenantref to the tenant's document reference
-                    FirebaseFirestore.instance
-                        .collection('Properties')
-                        .doc(data.propertyID)
-                        .update({
-                      'tenantRef': FirebaseFirestore.instance
-                          .collection('Tenants')
-                          .doc(data.uid),
-                    });
-
-                    //set tenants landlordref to the property's landlordref
-                    // first get landlordref from the property
-                    // then set the tenant's landlordref to the property's landlordref
-                    DocumentReference<Map<String, dynamic>>? landlordRef =
-                        data.propertyLandlordRef;
-
-                    //set the tenant's landlordref to the tenant's landlordref
-                    FirebaseFirestore.instance
-                        .collection('Tenants')
-                        .doc(data.uid)
-                        .update({
-                      'landlordRef': landlordRef,
-                    });
-
-                    // set the landlord's tenantRef to the document reference of tenant's uid
-                    // tenants uid is stored in data.uid
-                    // tenantRef is a list of document references append tenant ref to it
-                    FirebaseFirestore.instance
-                        .collection('Landlords')
-                        .doc(landlordRef!.id)
-                        .update({
-                      'tenantRef': FieldValue.arrayUnion([
-                        FirebaseFirestore.instance
-                            .collection('Tenants')
-                            .doc(data.uid),
-                      ])
-                    });
-
-                    // Update Properties's isRequestedbyTenants field
-                    FirebaseFirestore.instance
-                        .collection('Properties')
-                        .doc(data.propertyID)
-                        .update({
-                      'isRequestedByTenants': FieldValue.arrayRemove([data.uid])
-                    });
-
-                    //a new page should be called for setting the contract
-
-                    // make a navigation to that page
+                    await Future.delayed(const Duration(seconds: 2));
+                    //reload the page
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => AdminPropertyContractsPage(
-                          landlordID: landlordRef.id,
-                          tenantID: data.uid,
-                        ),
+                        builder: (context) => const AdminRequestsPage(),
                       ),
                     );
+                  } finally {
+                    if (data.requestType != 'Tenant Rental Request') {
+                      //close the dialog
+                      Navigator.pop(context);
+                      //reload the page
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const AdminRequestsPage(),
+                        ),
+                      );
+                    }
                   }
+
+                  // print('data.uid: ${data.uid}');
+                  // print('data.requestType: ${data.requestType}');
 
                   // Navigator.pop(context);
                 },
@@ -1665,4 +1691,249 @@ class LandlordWithdrawalCard extends StatelessWidget {
       ),
     );
   }
+
+  // _getNewData(
+  //     String? withinArrayID, String? requestID, String? requestType) async {
+  //   DocumentSnapshot<Map<String, dynamic>> newData = await FirebaseFirestore
+  //       .instance
+  //       .collection('AdminRequests')
+  //       .doc(requestID)
+  //       .get();
+
+  //   var doc = newData.data() as Map<String, dynamic>;
+
+  //   //doc contains many array types
+  //   //inside those arrays find the one with the withinArrayID
+  //   //then add it as an adminrequest
+
+  //   try {
+  //     if (doc["withdrawRequest"] != null) {
+  //       // if yes, then loop through the array
+  //       print('withdraw request found doc is ${doc["withdrawRequest"]}');
+
+  //       //find
+
+  //       //find the instance of the array with the withinArrayID
+  //       List<dynamic> doclist = doc['withdrawRequest'];
+
+  //       var mydoc = doclist.firstWhere(
+  //         (element) => element['requestID'] == withinArrayID,
+  //         orElse: () => null,
+  //       ) as Map<String, dynamic>;
+
+  //       // print('mydoc is $mydoc');
+
+  //       return AdminRequestData(
+  //         name: mydoc["fullname"],
+  //         requestedAmount: mydoc["amount"].toString(),
+  //         uid: mydoc["uid"],
+  //         cashOrBankTransfer: mydoc["paymentMethod"],
+  //         requestID: requestID!,
+  //         requestType: 'Landlord Withdraw Request',
+  //         invoiceNumber: mydoc["invoiceNumber"],
+  //         altTenantName: mydoc["tenantname"],
+  //         withinArrayID: mydoc["requestID"],
+  //         docTimestamp: mydoc["timestamp"],
+  //         isHandled: mydoc["isHandled"] ?? false,
+  //       );
+  //     }
+  //   } catch (e) {
+  //     if (kDebugMode) {
+  //       print('Error: $e');
+  //     }
+  //   }
+
+  //   try {
+  //     if (doc["paymentRequest"] != null) {
+  //       for (var i = 0; i < doc["paymentRequest"].length; i++) {
+  //         // add each request to the adminRequests list
+
+  //         AdminRequestData(
+  //           name: doc["paymentRequest"][i]["fullname"],
+  //           requestedAmount: doc["paymentRequest"][i]["amount"].toString(),
+  //           uid: doc["paymentRequest"][i]["uid"],
+  //           cashOrBankTransfer: doc["paymentRequest"][i]["paymentMethod"],
+  //           requestID: requestID!,
+  //           requestType: 'Tenant Payment Request',
+  //           invoiceNumber: doc["paymentRequest"][i]["invoiceNumber"],
+  //           withinArrayID: doc["paymentRequest"][i]["requestID"],
+  //           docTimestamp: doc["paymentRequest"][i]["timestamp"],
+  //           isHandled: doc["paymentRequest"][i]["isHandled"] ?? false,
+  //         );
+  //       }
+  //     }
+  //   } catch (e) {
+  //     if (kDebugMode) {
+  //       print('Error222: $e');
+  //     }
+  //   }
+
+  //   try {
+  //     if (doc['rentalRequest'] != null) {
+  //       // print('rental request found');
+  //       for (var i = 0; i < doc["rentalRequest"].length; i++) {
+  //         // add each request to the adminRequests list
+
+  //         AdminRequestData(
+  //           name: doc["rentalRequest"][i]["fullname"],
+  //           requestedAmount:
+  //               doc["rentalRequest"][i]["property"]["price"].toString(),
+  //           uid: doc["rentalRequest"][i]["uid"],
+  //           propertyTitle: doc["rentalRequest"][i]["property"]["title"],
+  //           propertyLocation: doc["rentalRequest"][i]["property"]["location"],
+  //           requestID: requestID!,
+  //           requestType: 'Tenant Rental Request',
+  //           propertyLandlordRef: doc["rentalRequest"][i]["property"]
+  //               ["landlordRef"],
+  //           withinArrayID: doc["rentalRequest"][i]["requestID"],
+  //           propertyID: doc["rentalRequest"][i]["propertyID"],
+  //           docTimestamp: doc["rentalRequest"][i]["timestamp"],
+  //           isHandled: doc["rentalRequest"][i]['isHandled'] ?? false,
+  //         );
+  //       }
+  //     }
+  //   } catch (e) {
+  //     if (kDebugMode) {
+  //       print('Error: $e');
+  //     }
+  //   }
+
+  //   try {
+  //     if (doc['rentAccrualRequest'] != null) {
+  //       // print('rental request found');
+  //       for (var i = 0; i < doc["rentAccrualRequest"].length; i++) {
+  //         // add each request to the adminRequests list
+
+  //         AdminRequestData(
+  //           name: doc["rentAccrualRequest"][i]["fullname"],
+  //           uid: doc["rentAccrualRequest"][i]["uid"],
+  //           requestType: 'Rent Accrual Request',
+  //           requestID: requestID!,
+  //           docTimestamp: doc["rentAccrualRequest"][i]["timestamp"],
+  //           isHandled: doc["rentAccrualRequest"][i]["isHandled"] ?? false,
+  //           withinArrayID: doc["rentAccrualRequest"][i]["requestID"],
+  //         );
+  //       }
+  //     }
+  //   } catch (e) {
+  //     if (kDebugMode) {
+  //       print('Error: $e');
+  //     }
+  //   }
+  //   try {
+  //     if (doc["withdrawRequestDealer"] != null) {
+  //       for (var i = 0; i < doc["withdrawRequestDealer"].length; i++) {
+  //         // add each request to the adminRequests list
+
+  //         AdminRequestData(
+  //           name: doc["withdrawRequestDealer"][i]["fullname"],
+  //           requestedAmount:
+  //               doc["withdrawRequestDealer"][i]["amount"].toString(),
+  //           uid: doc["withdrawRequestDealer"][i]["uid"],
+  //           cashOrBankTransfer: doc["withdrawRequestDealer"][i]
+  //               ["paymentMethod"],
+  //           requestID: requestID!,
+  //           requestType: 'Dealer Withdraw Request',
+  //           invoiceNumber: doc["withdrawRequestDealer"][i]["invoiceNumber"],
+  //           withinArrayID: doc["withdrawRequestDealer"][i]["requestID"],
+  //           altTenantName: doc["withdrawRequestDealer"][i]["tenantname"],
+  //           docTimestamp: doc["withdrawRequestDealer"][i]["timestamp"],
+  //           isHandled: doc["withdrawRequestDealer"][i]["isHandled"] ?? false,
+  //         );
+  //       }
+  //     }
+  //   } catch (e) {
+  //     if (kDebugMode) {
+  //       print('Error222: $e');
+  //     }
+  //   }
+
+  //   //try catch for rentAdvanceRequest
+  //   try {
+  //     if (doc["rentAdvanceRequest"] != null) {
+  //       for (var i = 0; i < doc["rentAdvanceRequest"].length; i++) {
+  //         // add each request to the adminRequests list
+
+  //         AdminRequestData(
+  //           name: doc["rentAdvanceRequest"][i]["fullname"],
+  //           // requestedAmount:
+  //           //     doc["rentAdvanceRequest"][i]["amount"].toString(),
+  //           uid: doc["rentAdvanceRequest"][i]["uid"],
+  //           // cashOrBankTransfer: doc["rentAdvanceRequest"][i]
+  //           //     ["paymentMethod"],
+  //           requestID: requestID!,
+  //           requestType: 'Rent Advance Request',
+  //           // invoiceNumber: doc["rentAdvanceRequest"][i]["invoiceNumber"],
+  //           withinArrayID: doc["rentAdvanceRequest"][i]["requestID"],
+  //           // altTenantName: doc["rentAdvanceRequest"][i]["tenantname"],
+  //           docTimestamp: doc["rentAdvanceRequest"][i]["timestamp"],
+  //           isHandled: doc["rentAdvanceRequest"][i]["isHandled"] ?? false,
+  //         );
+  //       }
+  //     }
+  //   } catch (e) {
+  //     if (kDebugMode) {
+  //       print('Error222: $e');
+  //     }
+  //   }
+
+  //   //try catch for interestFreeLoanRequest
+  //   try {
+  //     if (doc["interestFreeLoanRequest"] != null) {
+  //       for (var i = 0; i < doc["interestFreeLoanRequest"].length; i++) {
+  //         // add each request to the adminRequests list
+
+  //         AdminRequestData(
+  //           name: doc["interestFreeLoanRequest"][i]["fullname"],
+  //           // requestedAmount:
+  //           //     doc["interestFreeLoanRequest"][i]["amount"].toString(),
+  //           uid: doc["interestFreeLoanRequest"][i]["uid"],
+  //           // cashOrBankTransfer: doc["interestFreeLoanRequest"][i]
+  //           //     ["paymentMethod"],
+  //           requestID: requestID!,
+  //           requestType: 'Interest Free Loan Request',
+  //           // invoiceNumber: doc["interestFreeLoanRequest"][i]["invoiceNumber"],
+  //           withinArrayID: doc["interestFreeLoanRequest"][i]["requestID"],
+  //           // altTenantName: doc["interestFreeLoanRequest"][i]["tenantname"],
+  //           docTimestamp: doc["interestFreeLoanRequest"][i]["timestamp"],
+  //           isHandled: doc["interestFreeLoanRequest"][i]["isHandled"] ?? false,
+  //         );
+  //       }
+  //     }
+  //   } catch (e) {
+  //     if (kDebugMode) {
+  //       print('Error222: $e');
+  //     }
+  //   }
+
+  //   //try catch for propertyApprovalRequest
+  //   try {
+  //     if (doc["propertyApprovalRequest"] != null) {
+  //       for (var i = 0; i < doc["propertyApprovalRequest"].length; i++) {
+  //         // add each request to the adminRequests list
+
+  //         AdminRequestData(
+  //           name: doc["propertyApprovalRequest"][i]["fullname"],
+  //           // requestedAmount:
+  //           //     doc["propertyApprovalRequest"][i]["amount"].toString(),
+  //           uid: doc["propertyApprovalRequest"][i]["uid"],
+  //           // cashOrBankTransfer: doc["propertyApprovalRequest"][i]
+  //           //     ["paymentMethod"],
+  //           requestID: requestID!,
+  //           requestType: 'Property Approval Request',
+  //           // invoiceNumber: doc["propertyApprovalRequest"][i]["invoiceNumber"],
+  //           withinArrayID: doc["propertyApprovalRequest"][i]["requestID"],
+  //           // altTenantName: doc["propertyApprovalRequest"][i]["tenantname"],
+  //           docTimestamp: doc["propertyApprovalRequest"][i]["timestamp"],
+  //           dataFields: doc["propertyApprovalRequest"][i]["dataFields"],
+  //           isHandled: doc["propertyApprovalRequest"][i]["isHandled"] ?? false,
+  //         );
+  //       }
+  //     }
+  //   } catch (e) {
+  //     if (kDebugMode) {
+  //       print('Error222: $e');
+  //     }
+  //   }
+  // }
 }

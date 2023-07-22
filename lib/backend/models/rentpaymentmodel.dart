@@ -11,6 +11,7 @@ class RentPayment {
   final DocumentReference<Map<String, dynamic>>? propertyRef;
   final DocumentReference<Map<String, dynamic>>? tenantRef;
   final DocumentReference<Map<String, dynamic>>? landlordRef;
+  final DocumentReference<Map<String, dynamic>>? dealerRef;
   Property? property;
   Tenant? tenant;
   Landlord? landlord;
@@ -33,6 +34,7 @@ class RentPayment {
     this.invoiceNumber,
     this.tenantname,
     this.isMinus,
+    this.dealerRef,
   });
 
   static Future<RentPayment> fromJson(Map<String, dynamic> json) async {
@@ -42,6 +44,8 @@ class RentPayment {
         json['tenantRef'] as DocumentReference<Map<String, dynamic>>?;
     final landlordRef =
         json['landlordRef'] as DocumentReference<Map<String, dynamic>>?;
+    final dealerRef =
+        json['dealerRef'] as DocumentReference<Map<String, dynamic>>?;
 
     try {
       RentPayment rentPayment = RentPayment(

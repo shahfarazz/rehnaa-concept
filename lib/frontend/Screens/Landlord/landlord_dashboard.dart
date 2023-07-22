@@ -10,16 +10,13 @@ import 'package:rehnaa/frontend/Screens/new_vouchers.dart';
 import 'package:rehnaa/frontend/Screens/privacypolicy.dart';
 import 'package:rehnaa/frontend/Screens/faq.dart';
 import 'package:rehnaa/frontend/Screens/login_page.dart';
-// import 'package:rehnaa/frontend/Screens/vouchers.dart';
 import 'package:rehnaa/frontend/helper/Landlorddashboard_pages/landlord_dashboard_content.dart';
 import 'package:rehnaa/frontend/helper/Landlorddashboard_pages/landlord_profile.dart';
 import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenant_renthistory.dart';
 import '../../helper/Landlorddashboard_pages/landlord_advance_rent.dart';
 import '../../helper/Landlorddashboard_pages/landlord_interestfreeloan.dart';
-// import '../../helper/Landlorddashboard_pages/landlord_renthistory.dart';
 import '../../helper/Landlorddashboard_pages/landlord_tenants.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:easy_debounce/easy_debounce.dart';
 
 import '../../helper/Landlorddashboard_pages/landlordproperties.dart';
 import '../../helper/Tenantdashboard_pages/tenant_security_deposit.dart';
@@ -63,20 +60,7 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
         .collection('Notifications')
         .doc(widget.uid)
         .snapshots();
-    isNewVouchers();
-    _startPeriodicFetch();
-  }
-
-  // Periodically fetch new data every 15 seconds
-  void _startPeriodicFetch() {
-    _timer = Timer.periodic(const Duration(seconds: 15), (_) {
-      isNewVouchers();
-    });
-  }
-
-  // Stop periodic fetching
-  void _stopPeriodicFetch() {
-    _timer?.cancel();
+    _startLandlordVoucherStream();
   }
 
   @override
@@ -85,7 +69,8 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
     _sidebarController.dispose();
     _notificationStream.drain();
     _notificationStream2.drain();
-    _stopPeriodicFetch();
+    _landlordVouchersSubscription?.cancel();
+
     super.dispose();
   }
 
@@ -100,33 +85,25 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
     );
   }
 
-  Future<void> isNewVouchers() async {
-    //check for isNew varialbe in the user document
-    // and set the isNewVoucher variable accordingly
-    // also after setting isNewVoucher to true or false, update the isNew variable in the user document
-    // which should now be false
+  StreamSubscription<DocumentSnapshot<Map<String, dynamic>>>?
+      _landlordVouchersSubscription;
 
-    try {
-      FirebaseFirestore.instance
-          .collection('Landlords')
-          .doc(widget.uid)
-          .get()
-          .then((value) {
-        if (value.exists) {
-          if (value.data()!['isNewVouchers'] == true && isNewVoucher == false) {
-            setState(() {
-              isNewVoucher = true;
-            });
-          } else if (value.data()!['isNewVouchers'] == false &&
-              isNewVoucher == true) {
-            setState(() {
-              isNewVoucher = false;
-            });
-          }
-        }
-      });
-    } on Exception catch (e) {
-      print('Error is $e');
+  void _startLandlordVoucherStream() {
+    _landlordVouchersSubscription = FirebaseFirestore.instance
+        .collection('Landlords')
+        .doc(widget.uid)
+        .snapshots()
+        .listen(_landlordVoucherUpdate);
+  }
+
+  void _landlordVoucherUpdate(DocumentSnapshot<Map<String, dynamic>> snapshot) {
+    if (snapshot.exists) {
+      bool? isNew = snapshot.data()?['isNewVouchers'];
+      if (isNew != null && isNew != isNewVoucher) {
+        setState(() {
+          isNewVoucher = isNew;
+        });
+      }
     }
   }
 
@@ -269,29 +246,41 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Stack(
-              children: [
-                ClipPath(
-                  clipper: HexagonClipper(),
-                  child: Transform.scale(
-                    scale: 0.87,
-                    child: Container(
-                      color: Colors.white,
-                      width: 60,
-                      height: 60,
+            GestureDetector(
+              onTap: () {
+                // Add your desired logic here
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => LandlordDashboardPage(
+                            uid: widget.uid,
+                          )),
+                );
+              },
+              child: Stack(
+                children: [
+                  ClipPath(
+                    clipper: HexagonClipper(),
+                    child: Transform.scale(
+                      scale: 0.87,
+                      child: Container(
+                        color: Colors.white,
+                        width: 60,
+                        height: 60,
+                      ),
                     ),
                   ),
-                ),
-                ClipPath(
-                  clipper: HexagonClipper(),
-                  child: Image.asset(
-                    'assets/mainlogo.png',
-                    width: 60,
-                    height: 60,
-                    fit: BoxFit.cover,
+                  ClipPath(
+                    clipper: HexagonClipper(),
+                    child: Image.asset(
+                      'assets/mainlogo.png',
+                      width: 60,
+                      height: 60,
+                      fit: BoxFit.cover,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
             const SizedBox(width: 8),
           ],
@@ -329,6 +318,7 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
 
                       if (data != null && data.containsKey('notifications')) {
                         List<dynamic> notificationstemp = data['notifications'];
+                        
 
                         // Filter notifications based on read status
                         List<dynamic> unreadNotifications =

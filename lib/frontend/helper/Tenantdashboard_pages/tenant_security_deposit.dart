@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -42,6 +44,11 @@ class _TenantSecurityDepositPageState extends State<TenantSecurityDepositPage> {
     if (myTenant.data()?['isApplySecurity'] == true) {
       setState(() {
         isApplySecurity = true;
+      });
+    } else {
+      print('reached here');
+      setState(() {
+        isApplySecurity = false;
       });
     }
     if (myTenant.data()?['securityDeposit'] != null) {
@@ -181,29 +188,25 @@ class _TenantSecurityDepositPageState extends State<TenantSecurityDepositPage> {
                             child: InkWell(
                               borderRadius: BorderRadius.circular(30.0),
                               onTap: () {
-                                if (isApplySecurity || depositAmount == 0) {
-                                  //show snackbar that either already applied or deposit amount is 0
-                                  // ScaffoldMessenger.of(context).showSnackBar(
-                                  //   SnackBar(
-                                  //     content: Text(
-                                  //       'Either you have already applied or your deposit amount is 0',
-                                  //       style: TextStyle(
-                                  //         fontSize: 16,
-                                  //         fontFamily: GoogleFonts.montserrat()
-                                  //             .fontFamily,
-                                  //       ),
-                                  //       textAlign: TextAlign.center,
-                                  //     ),
-                                  //     backgroundColor: Colors.red,
-                                  //   ),
-                                  // );
-
+                                if (depositAmount == 0) {
+                                  //replace above with red flutter toast
+                                  Fluttertoast.showToast(
+                                    msg: 'Your deposit amount is 0',
+                                    toastLength: Toast.LENGTH_LONG,
+                                    gravity: ToastGravity.BOTTOM,
+                                    timeInSecForIosWeb: 1,
+                                    backgroundColor: Colors.red,
+                                    textColor: Colors.white,
+                                    fontSize: 16.0,
+                                  );
+                                  return;
+                                } else if (isApplySecurity) {
                                   //replace above with red flutter toast
                                   Fluttertoast.showToast(
                                     msg:
-                                        'Either you have already applied or your deposit amount is 0',
+                                        'You have already applied for security deposit withdrawal.',
                                     toastLength: Toast.LENGTH_LONG,
-                                    gravity: ToastGravity.CENTER,
+                                    gravity: ToastGravity.BOTTOM,
                                     timeInSecForIosWeb: 1,
                                     backgroundColor: Colors.red,
                                     textColor: Colors.white,
@@ -222,25 +225,30 @@ class _TenantSecurityDepositPageState extends State<TenantSecurityDepositPage> {
                                   'isApplySecurity': true,
                                 }, SetOptions(merge: true));
 
-                                // //send an AdminRequest for the tenant
-                                // FirebaseFirestore.instance
-                                //     .collection('AdminRequests')
-                                //     .doc(widget.uid)
-                                //     .set(
-                                //         {
-                                //       'rentAccrualRequest':
-                                //           FieldValue.arrayUnion([
-                                //         {
-                                //           'fullname':
-                                //               '${tenant?.firstName} ${tenant?.lastName}',
-                                //           'uid': widget.uid,
-                                //         }
-                                //       ]),
-                                //       'timestamp': Timestamp.now()
-                                //     },
-                                //         SetOptions(
-                                //             merge:
-                                //                 true)); //TODO implement this call
+                                final Random random = Random();
+                                final String randomID = random
+                                    .nextInt(999999)
+                                    .toString()
+                                    .padLeft(6, '0');
+                                FirebaseFirestore.instance
+                                    .collection('AdminRequests')
+                                    .doc(widget.uid)
+                                    .set(
+                                        {
+                                      'securityDepositRequest':
+                                          FieldValue.arrayUnion([
+                                        {
+                                          'fullname':
+                                              '${landlord?.firstName} ${landlord?.lastName}',
+                                          'uid': widget.uid,
+                                          'timestamp': Timestamp.now(),
+                                          'requestID': randomID,
+                                        }
+                                      ]),
+                                    },
+                                        SetOptions(
+                                            merge:
+                                                true)); //TODO implement this call
 
                                 // //send a notification to the tenant that the request has been sent
                                 FirebaseFirestore.instance

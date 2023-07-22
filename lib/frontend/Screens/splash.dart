@@ -25,26 +25,19 @@ class _SplashScreenState extends State<SplashScreen> {
     });
   }
 
-  Future<void> checkUserLoginStatus() async {
-    User? user = FirebaseAuth.instance.currentUser;
+  void checkUserLoginStatus() async {
+    await Future.delayed(Duration(seconds: 2));
 
-    // print('user is $user');
+    FirebaseAuth.instance.authStateChanges().listen((User? user) async {
+      if (user != null) {
+        // If the user is logged in, navigate to the main page.
+        FirebaseCrashlytics.instance.setUserIdentifier(user.uid);
 
-    await Future.delayed(const Duration(seconds: 2));
+        DocumentSnapshot documentSnapshot = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .get();
 
-    if (user != null) {
-      // If the user is logged in, navigate to the main page.
-      // ignore: use_build_context_synchronously
-
-      // checking if user is Tenant or Landlord
-      FirebaseCrashlytics.instance.setUserIdentifier(user.uid);
-
-      FirebaseFirestore.instance
-          .collection('users')
-          .doc(user.uid)
-          .get()
-          .then((DocumentSnapshot documentSnapshot) {
-        // print('DocumentSnapshot data: ${documentSnapshot.data()}');
         if (documentSnapshot.exists) {
           Map<String, dynamic> data =
               documentSnapshot.data() as Map<String, dynamic>;
@@ -69,17 +62,17 @@ class _SplashScreenState extends State<SplashScreen> {
             builder: (context) => LoginPage(),
           ));
         }
-      });
-    } else {
-      // If the user is not logged in, navigate to the login page.
-      if (kDebugMode) {
-        print('User is not logged in');
+      } else {
+        // If the user is not logged in, navigate to the login page.
+        if (kDebugMode) {
+          print('User is not logged in');
+        }
+        // ignore: use_build_context_synchronously
+        Navigator.of(context).pushReplacement(MaterialPageRoute(
+          builder: (context) => LoginPage(),
+        ));
       }
-      // ignore: use_build_context_synchronously
-      Navigator.of(context).pushReplacement(MaterialPageRoute(
-        builder: (context) => LoginPage(),
-      ));
-    }
+    });
   }
 
   // store the current year in a String variable

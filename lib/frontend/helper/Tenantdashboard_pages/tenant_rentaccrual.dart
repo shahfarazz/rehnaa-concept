@@ -56,7 +56,7 @@ class _TenantRentAccrualPageState extends State<TenantRentAccrualPage> {
         child: Container(
           color: Colors.grey[200], // Set the background color
           padding: EdgeInsets.symmetric(
-            vertical: size.height * 0.05,
+            vertical: 100,
             horizontal: size.width * 0.05,
           ), // Updated padding
           child: Card(

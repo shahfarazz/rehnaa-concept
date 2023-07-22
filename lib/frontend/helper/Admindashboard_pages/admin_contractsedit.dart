@@ -33,8 +33,28 @@ class _ContractEditPageState extends State<ContractEditPage> {
   TextEditingController _propertyAddressController = TextEditingController();
 
   TextEditingController _monthlyRentController = TextEditingController();
-  TextEditingController _contractStartDateController = TextEditingController();
-  TextEditingController _contractEndDateController = TextEditingController();
+  DateTime? contractStartDate;
+  DateTime? contractEndDate;
+
+  Future<void> _selectDate(bool isStartDate, StateSetter setState1) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2020),
+      lastDate: DateTime(2025),
+    );
+
+    if (picked != null) {
+      setState1(() {
+        if (isStartDate) {
+          contractStartDate = picked;
+        } else {
+          contractEndDate = picked;
+        }
+      });
+    }
+  }
+
   TextEditingController _usePurposeController = TextEditingController();
   TextEditingController _subletOptionController = TextEditingController();
   TextEditingController _utilitiesIncludedController = TextEditingController();
@@ -57,32 +77,28 @@ class _ContractEditPageState extends State<ContractEditPage> {
 
     _landlordNameController =
         TextEditingController(text: widget.contractData['landlordName']);
-    _landlordCnicController =
-        TextEditingController(text: widget.contractData['landlordCnic']);
+    _landlordCnicController = TextEditingController(
+        text: decryptString(widget.contractData['landlordCnic']));
     _tenantNameController =
         TextEditingController(text: widget.contractData['tenantName']);
-    _tenantCnicController =
-        TextEditingController(text: widget.contractData['tenantCnic']);
+    _tenantCnicController = TextEditingController(
+        text: decryptString(widget.contractData['tenantCnic']));
     _firstWitnessNameController =
         TextEditingController(text: widget.contractData['firstWitnessName']);
-    _firstWitnessCnicController =
-        TextEditingController(text: widget.contractData['firstWitnessCnic']);
-    _firstWitnessContactController =
-        TextEditingController(text: widget.contractData['firstWitnessContact']);
+    _firstWitnessCnicController = TextEditingController(
+        text: decryptString(widget.contractData['firstWitnessCnic']));
+    _firstWitnessContactController = TextEditingController(
+        text: decryptString(widget.contractData['firstWitnessContact']));
     _secondWitnessNameController =
         TextEditingController(text: widget.contractData['secondWitnessName']);
-    _secondWitnessCnicController =
-        TextEditingController(text: widget.contractData['secondWitnessCnic']);
+    _secondWitnessCnicController = TextEditingController(
+        text: decryptString(widget.contractData['secondWitnessCnic']));
     _secondWitnessContactController = TextEditingController(
         text: widget.contractData['secondWitnessContact']);
     _propertyAddressController =
         TextEditingController(text: widget.contractData['propertyAddress']);
     _monthlyRentController =
         TextEditingController(text: widget.contractData['monthlyRent']);
-    _contractStartDateController =
-        TextEditingController(text: widget.contractData['contractStartDate']);
-    _contractEndDateController =
-        TextEditingController(text: widget.contractData['contractEndDate']);
     _usePurposeController =
         TextEditingController(text: widget.contractData['usePurpose']);
     _subletOptionController =
@@ -105,6 +121,9 @@ class _ContractEditPageState extends State<ContractEditPage> {
         TextEditingController(text: widget.contractData['rehnaaSecurity']);
     _additionalInformationController = TextEditingController(
         text: widget.contractData['additionalInformation']);
+
+    contractEndDate = widget.contractData['contractEndDate'].toDate();
+    contractStartDate = widget.contractData['contractStartDate'].toDate();
   }
 
   @override
@@ -121,8 +140,6 @@ class _ContractEditPageState extends State<ContractEditPage> {
     _secondWitnessContactController.dispose();
     _propertyAddressController.dispose();
     _monthlyRentController.dispose();
-    _contractStartDateController.dispose();
-    _contractEndDateController.dispose();
     _usePurposeController.dispose();
     _subletOptionController.dispose();
     _utilitiesIncludedController.dispose();
@@ -151,8 +168,10 @@ class _ContractEditPageState extends State<ContractEditPage> {
       'secondWitnessContact': _secondWitnessContactController.text,
       'propertyAddress': _propertyAddressController.text,
       'monthlyRent': _monthlyRentController.text,
-      'contractStartDate': _contractStartDateController.text,
-      'contractEndDate': _contractEndDateController.text,
+      if (contractStartDate != null)
+        'contractStartDate': Timestamp.fromDate(contractStartDate!),
+      if (contractEndDate != null)
+        'contractEndDate': Timestamp.fromDate(contractEndDate!),
       'usePurpose': _usePurposeController.text,
       'subletOption': _subletOptionController.text,
       'utilitiesIncluded': _utilitiesIncludedController.text,
@@ -209,8 +228,10 @@ class _ContractEditPageState extends State<ContractEditPage> {
               .collection('Landlords')
               .doc(landlordID)
               .update({
-            'contractStartDate': _contractStartDateController.text,
-            'contractEndDate': _contractEndDateController.text,
+            if (contractStartDate != null)
+              'contractStartDate': Timestamp.fromDate(contractStartDate!),
+            if (contractEndDate != null)
+              'contractEndDate': Timestamp.fromDate(contractEndDate!),
             'propertyAddress': _propertyAddressController.text,
             'monthlyRent': _monthlyRentController.text,
           });
@@ -221,8 +242,10 @@ class _ContractEditPageState extends State<ContractEditPage> {
               .collection('Tenants')
               .doc(tenantID)
               .update({
-            'contractStartDate': _contractStartDateController.text,
-            'contractEndDate': _contractEndDateController.text,
+            if (contractStartDate != null)
+              'contractStartDate': Timestamp.fromDate(contractStartDate!),
+            if (contractEndDate != null)
+              'contractEndDate': Timestamp.fromDate(contractEndDate!),
             'propertyAddress': _propertyAddressController.text,
             'monthlyRent': _monthlyRentController.text,
           });
@@ -385,15 +408,26 @@ class _ContractEditPageState extends State<ContractEditPage> {
               labelText: 'Monthly Rent',
             ),
             const SizedBox(height: 16.0),
-            _buildTextField(
-              controller: _contractStartDateController,
-              labelText: 'Contract Start Date',
-            ),
-            const SizedBox(height: 16.0),
-            _buildTextField(
-              controller: _contractEndDateController,
-              labelText: 'Contract End Date',
-            ),
+            StatefulBuilder(builder: (context, setState) {
+              return TextButton(
+                onPressed: () => _selectDate(true, setState),
+                child: Text(
+                  contractStartDate != null
+                      ? 'Contract Start Date: ${contractStartDate.toString()}'
+                      : 'Select Contract Start Date',
+                ),
+              );
+            }),
+            StatefulBuilder(builder: (context, setState) {
+              return TextButton(
+                onPressed: () => _selectDate(false, setState),
+                child: Text(
+                  contractEndDate != null
+                      ? 'Contract End Date: ${contractEndDate.toString()}'
+                      : 'Select Contract End Date',
+                ),
+              );
+            }),
             const SizedBox(height: 16.0),
             _buildTextField(
               controller: _usePurposeController,

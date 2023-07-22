@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 import '../../../backend/models/dealermodel.dart';
 import '../../../backend/models/landlordmodel.dart';
@@ -39,6 +40,8 @@ class _AdminEstampsEditorPageState extends State<AdminEstampsEditorPage> {
       TextEditingController();
   TextEditingController eStampUpfrontBonusController = TextEditingController();
   TextEditingController eStampMonthlyProfitController = TextEditingController();
+  //estampCost
+  TextEditingController eStampCostController = TextEditingController();
 
   @override
   void initState() {
@@ -74,6 +77,8 @@ class _AdminEstampsEditorPageState extends State<AdminEstampsEditorPage> {
               landlordData['eStampUpfrontBonus'] ?? '';
           eStampMonthlyProfitController.text =
               landlordData['eStampMonthlyProfit'] ?? '';
+          eStampCostController.text =
+              landlordData['eStampCost'].toString() ?? '';
         });
       }
     }
@@ -81,6 +86,9 @@ class _AdminEstampsEditorPageState extends State<AdminEstampsEditorPage> {
 
   void saveLandlordMap(String dealerId) {
     Dealer dealer = widget.dealer;
+    if (dealer.landlordMap == null) {
+      dealer.landlordMap = {};
+    }
 
     Map<String, dynamic> landlordData = {
       'eStampAddress': eStampAddressController.text,
@@ -96,31 +104,56 @@ class _AdminEstampsEditorPageState extends State<AdminEstampsEditorPage> {
       'eStampPropertyRentAmount': eStampPropertyRentAmountController.text,
       'eStampUpfrontBonus': eStampUpfrontBonusController.text,
       'eStampMonthlyProfit': eStampMonthlyProfitController.text,
+      'eStampCost': int.tryParse(eStampCostController.text) ?? 0,
     };
 
     Map<String, Map<String, dynamic>> updatedLandlordMap = {
       widget.landlord.tempID: landlordData,
     };
 
-    FirebaseFirestore.instance.collection('Dealers').doc(dealerId).update({
-      'landlordMap': updatedLandlordMap,
-    }).then((_) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Landlord E-Stamp saved successfully.'),
-        ),
-      );
-    }).catchError((error) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Failed to save Landlord Map: $error'),
-        ),
-      );
-    });
+    // to the dealer.landlordmap add the new map of landlord data mapped to the landlord id
+    dealer.landlordMap!.addAll(updatedLandlordMap);
 
-    Navigator.push(context, MaterialPageRoute(builder: (context) {
-      return AdminEstampsPage();
-    }));
+    FirebaseFirestore.instance.collection('rentPayments').add({
+      'tenantname': widget.landlord.firstName +
+          ' ' +
+          widget.landlord.lastName +
+          '\n\nEstamp Charges',
+      'LandlordRef':
+          FirebaseFirestore.instance.collection('Dealers').doc(dealer.tempID),
+      'amount':
+          int.tryParse(eStampCostController.text) ?? 0, //convert to int later
+      'date': DateTime.now(),
+      'isMinus': true,
+      'isNoPdf': true,
+      // 'description': 'Balance updated by dealer',
+      'paymentType': '',
+    }).then((val) {
+      FirebaseFirestore.instance.collection('Dealers').doc(dealerId).update({
+        'landlordMap': dealer.landlordMap,
+        'balance': //subtract amount from balance
+            FieldValue.increment(
+                -(int.tryParse(eStampCostController.text) ?? 0)),
+        'rentpaymentRef':
+            FieldValue.arrayUnion([val]) // key - value pairs Ali Ahmed
+      }).then((_) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Landlord E-Stamp saved successfully.'),
+          ),
+        );
+      }).catchError((error) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to save Landlord Map: $error'),
+          ),
+        );
+      });
+
+      Navigator.push(context, MaterialPageRoute(builder: (context) {
+        return AdminEstampsPage();
+      }));
+    });
   }
 
   @override
@@ -274,6 +307,38 @@ class _AdminEstampsEditorPageState extends State<AdminEstampsEditorPage> {
                   decoration: InputDecoration(
                     labelText: 'eStamp Monthly Profit',
                   ),
+                ),
+                SizedBox(height: 16.0),
+                TextField(
+                  controller: eStampCostController,
+                  onChanged: (value) {
+                    //if alphabet is entered show an error using toast and clear the field and return
+                    if (value.contains(RegExp(r'[a-zA-Z]'))) {
+                      // ScaffoldMessenger.of(context).showSnackBar(
+                      //   SnackBar(
+                      //     backgroundColor: Colors.red,
+                      //     content: Text('Please enter digits only'),
+                      //   ),
+                      // );
+                      //replace with a red flutter toast
+                      Fluttertoast.showToast(
+                          msg: "Please enter digits only",
+                          toastLength: Toast.LENGTH_SHORT,
+                          gravity: ToastGravity.BOTTOM,
+                          backgroundColor: Colors.red,
+                          textColor: Colors.white,
+                          fontSize: 16.0);
+                      eStampCostController.clear();
+                      return;
+                    }
+                    setState(() {});
+                  },
+                  decoration: InputDecoration(
+                      labelText: 'eStamp Cost (if editing the estamp set to 0)',
+                      labelStyle: TextStyle(
+                        color: Colors.red,
+                        fontWeight: FontWeight.bold,
+                      )),
                 ),
                 SizedBox(height: 16.0),
                 ElevatedButton(

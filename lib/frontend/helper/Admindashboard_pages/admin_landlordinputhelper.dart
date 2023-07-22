@@ -177,7 +177,7 @@ class _LandlordCardWidgetState extends State<LandlordCardWidget> {
     await uploadImages();
 
     // Hash sensitive information
-    final hashedCnic = encryptString(cnicController.text);
+    final hashedCnic = (cnicController.text);
     final hashedBankName = encryptString(bankNameController.text);
     final hashedRaastId = encryptString(raastIdController.text);
     final hashedAccountNumber = encryptString(accountNumberController.text);
@@ -334,6 +334,10 @@ class _LandlordCardWidgetState extends State<LandlordCardWidget> {
                   ),
                   const SizedBox(height: 20),
                   ElevatedButton(
+                    style: ButtonStyle(
+                      backgroundColor:
+                          MaterialStateProperty.all<Color>(Colors.green),
+                    ),
                     onPressed: selectImages,
                     child: Text(buttonLabel),
                   ),
@@ -398,6 +402,10 @@ class _LandlordCardWidgetState extends State<LandlordCardWidget> {
                       alignment: Alignment.center,
                       children: [
                         ElevatedButton(
+                          style: ButtonStyle(
+                            backgroundColor:
+                                MaterialStateProperty.all<Color>(Colors.green),
+                          ),
                           onPressed: validateInputs,
                           child: const Text('Submit'),
                         ),

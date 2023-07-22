@@ -9,7 +9,8 @@ import 'package:fluttertoast/fluttertoast.dart';
 // import 'package:image_picker/image_picker.dart';
 // import 'package:firebase_storage/firebase_storage.dart';
 // import 'dart:io';
-import 'package:flutter/services.dart' show rootBundle;
+import 'package:flutter/services.dart'
+    show LengthLimitingTextInputFormatter, rootBundle;
 // import 'package:path_provider/path_provider.dart';
 // ignore: avoid_web_libraries_in_flutter
 
@@ -123,7 +124,7 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
                       leading: const Icon(Icons.person_2),
                       title: Text(
                         // if tenant ref exists show yes otherwise no
-                        'TenantRef: ${landlord.tenantRef != null ? 'Yes' : 'No'}',
+                        'TenantRef: ${landlord.tenantRef != null && landlord.tenantRef!.isNotEmpty ? 'Yes' : 'No'}',
 
                         style: const TextStyle(
                           fontSize: 16,
@@ -135,7 +136,7 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
                       title: Text(
                         // if property ref exists show yes otherwise no
 
-                        'PropertyRef: ${landlord.propertyRef != null ? 'Yes' : 'No'}',
+                        'PropertyRef: ${landlord.propertyRef != null && landlord.propertyRef.isNotEmpty ? 'Yes' : 'No'}',
                         // 'Property Ref: ${landlord.propertyRef.toString()}',
                         style: const TextStyle(
                           fontSize: 16,
@@ -146,7 +147,7 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
                       leading: const Icon(Icons.receipt),
                       title: Text(
                         // if rent payment ref exists show yes otherwise no
-                        'RentPaymentRef: ${landlord.rentpaymentRef != null ? 'Yes' : 'No'}',
+                        'RentPaymentRef: ${landlord.rentpaymentRef != null && landlord.rentpaymentRef!.isNotEmpty ? 'Yes' : 'No'}',
                         // 'Rent Payment Ref: ${landlord.rentpaymentRef?.toString() ?? ''}',
                         style: const TextStyle(
                           fontSize: 16,
@@ -183,8 +184,8 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
                             (context, url, downloadProgress) {
                           return Container(
                             padding: EdgeInsets.only(left: 150.0),
-                            child: CircularProgressIndicator(
-                              value: downloadProgress.progress,
+                            child: SpinKitFadingCube(
+                              color: Color.fromARGB(255, 30, 197, 83),
                             ),
                           );
                         },
@@ -192,6 +193,10 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
                     ),
                     const SizedBox(height: 10),
                     ElevatedButton(
+                      style: ButtonStyle(
+                        backgroundColor:
+                            MaterialStateProperty.all<Color>(Colors.green),
+                      ),
                       onPressed: () {
                         Navigator.pop(context); // Close the details dialog
                         _showEditDialog(landlord); // Open the edit dialog
@@ -224,7 +229,7 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
     final TextEditingController dealerRefController =
         TextEditingController(text: landlord.dealerRef?.toString() ?? '');
     final TextEditingController cnicController =
-        TextEditingController(text: landlord.cnic ?? '');
+        TextEditingController(text: decryptString(landlord.cnic ?? '') ?? '');
     final TextEditingController bankNameController =
         TextEditingController(text: landlord.bankName ?? '');
     final TextEditingController raastIdController =
@@ -234,19 +239,42 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
     final TextEditingController ibanController =
         TextEditingController(text: landlord.iban ?? '');
     final TextEditingController addressController = TextEditingController(
-        text: landlord.address == '' ? '' : decryptString(landlord.address!));
+        text: landlord.address == '' ? '' : landlord.address!);
 
-    final hashedCnic = encryptString(cnicController.text);
-    final hashedBankName = encryptString(bankNameController.text);
-    final hashedRaastId = encryptString(raastIdController.text);
-    final hashedAccountNumber = encryptString(accountNumberController.text);
-    final hashedIban = encryptString(ibanController.text);
+    // print('landlord address is ${landlord.address}');
 
-    final TextEditingController contractStartDateController =
-        TextEditingController(
-            text: landlord.contractStartDate?.toString() ?? '');
-    final TextEditingController contractEndDateController =
-        TextEditingController(text: landlord.contractEndDate?.toString() ?? '');
+    // final hashedCnic = encryptString(cnicController.text);
+    // final hashedBankName = encryptString(bankNameController.text);
+    // final hashedRaastId = encryptString(raastIdController.text);
+    // final hashedAccountNumber = encryptString(accountNumberController.text);
+    // final hashedIban = encryptString(ibanController.text);
+
+    // final TextEditingController contractStartDateController =
+    //     TextEditingController(
+    //         text: landlord.contractStartDate?.toString() ?? '');
+    DateTime? contractStartDate = landlord.contractStartDate;
+    DateTime? contractEndDate = landlord.contractEndDate;
+
+    Future<void> _selectDate(bool isStartDate, StateSetter setState1) async {
+      final DateTime? picked = await showDatePicker(
+        context: context,
+        initialDate: DateTime.now(),
+        firstDate: DateTime(2020),
+        lastDate: DateTime(2025),
+      );
+
+      if (picked != null) {
+        setState1(() {
+          if (isStartDate) {
+            contractStartDate = picked;
+          } else {
+            contractEndDate = picked;
+          }
+        });
+      }
+    }
+
+    ;
     final TextEditingController monthlyRentController =
         TextEditingController(text: landlord.monthlyRent?.toString() ?? '');
     final TextEditingController upfrontBonusController =
@@ -266,6 +294,8 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
     final TextEditingController creditPointsController =
         TextEditingController(text: landlord.creditPoints?.toString() ?? '');
 
+    final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+
     showDialog(
       context: context,
       builder: (context) {
@@ -274,440 +304,744 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const ListTile(
-                  title: Text('Edit Landlord Details'),
-                ),
-                TextField(
-                  controller: firstNameController,
-                  decoration: const InputDecoration(labelText: 'First Name'),
-                ),
-                TextField(
-                  controller: lastNameController,
-                  decoration: const InputDecoration(labelText: 'Last Name'),
-                ),
-                TextField(
-                  controller: balanceController,
-                  decoration: const InputDecoration(labelText: 'Balance'),
-                  keyboardType: TextInputType.number,
-                ),
-                const SizedBox(height: 10),
-                StatefulBuilder(
-                  builder: (BuildContext context, StateSetter setState) {
-                    return ListTile(
-                      title: const Text('Select Properties'),
-                      subtitle: Text(
-                        '${selectedProperties.length} properties selected',
-                        // Add any necessary style modifications here
+                Form(
+                  key: formKey,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const ListTile(
+                        title: Text('Edit Landlord Details'),
                       ),
-                      onTap: () {
-                        setState(() {
-                          _showPropertySelectionDialog(() {
-                            setState(() {
-                              // Update the state of selectedProperties here
-                              // print('selectedproperties: $selectedProperties');
-                            });
-                          });
-                        });
-                      },
-                    );
-                  },
-                ),
-                StatefulBuilder(
-                  builder: (BuildContext context, StateSetter setState) {
-                    return ListTile(
-                        title: const Text('Select Tenants'),
-                        subtitle: Text(
-                          selectedTenants.length.toString() +
-                              ' tenants selected',
-                        ),
-                        onTap: () {
-                          setState(() {
-                            _showTenantSelectionDialog(() {
-                              setState(() {
-                                // Update the state of selectedTenants here
-                                // print('selectedTenants: $selectedTenants');
-                              });
-                            });
-                          });
-                        });
-                  },
-                ),
-                StatefulBuilder(
-                  builder: (BuildContext context, StateSetter setState) {
-                    return ListTile(
-                      title: const Text('Select Rent Payments'),
-                      subtitle: Text(
-                        selectedRentPayments.length.toString() +
-                            ' rent payments selected',
+                      TextFormField(
+                        controller: firstNameController,
+                        decoration:
+                            const InputDecoration(labelText: 'First Name'),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter first name';
+                          }
+                          return null;
+                        },
                       ),
-                      onTap: () {
-                        setState(() {
-                          _showRentPaymentSelectionDialog(() {
-                            setState(() {
-                              // Update the state of selectedRentPayments here
-                              // print('selectedRentPayments: $selectedRentPayments');
-                            });
-                          });
-                        });
-                      },
-                    );
-                  },
-                ),
-                StatefulBuilder(
-                  builder: (BuildContext context, StateSetter setState) {
-                    return ListTile(
-                      title: const Text('Select Dealers'),
-                      subtitle: Text(
-                        selectedDealers.length.toString() + ' dealers selected',
+                      TextFormField(
+                        controller: lastNameController,
+                        decoration:
+                            const InputDecoration(labelText: 'Last Name'),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter last name';
+                          }
+                          return null;
+                        },
                       ),
-                      onTap: () {
-                        setState(() {
-                          _showDealerSelectionDialog(() {
-                            setState(() {
-                              // Update the state of selectedDealers here
-                              // print('selectedDealers: $selectedDealers');
-                            });
-                          });
-                        });
-                      },
-                    );
-                  },
-                ),
-                const SizedBox(height: 20),
-                // Visibility(
-                //   visible: landlord.dealerRef != null,
-                //   child: TextField(
-                //     controller: dealerRefController,
-                //     decoration: const InputDecoration(labelText: 'Dealer Ref'),
-                //   ),
-                // ),
-                TextField(
-                  controller: cnicController,
-                  decoration: const InputDecoration(labelText: 'CNIC'),
-                ),
-                TextField(
-                  controller: addressController,
-                  decoration: const InputDecoration(labelText: 'Address'),
-                ),
-                TextField(
-                  controller: bankNameController,
-                  decoration: const InputDecoration(labelText: 'Bank Name'),
-                ),
-                TextField(
-                  controller: raastIdController,
-                  decoration: const InputDecoration(labelText: 'Raast ID'),
-                ),
-                TextField(
-                  controller: accountNumberController,
-                  decoration:
-                      const InputDecoration(labelText: 'Account Number'),
-                ),
-                TextField(
-                  controller: ibanController,
-                  decoration: const InputDecoration(labelText: 'IBAN'),
-                ),
-                TextField(
-                  controller: contractStartDateController,
-                  decoration:
-                      const InputDecoration(labelText: 'Contract Start Date'),
-                ),
-                TextField(
-                  controller: contractEndDateController,
-                  decoration:
-                      const InputDecoration(labelText: 'Contract End Date'),
-                ),
-                TextField(
-                  controller: monthlyRentController,
-                  decoration: const InputDecoration(labelText: 'Monthly Rent'),
-                ),
-                TextField(
-                  controller: upfrontBonusController,
-                  decoration: const InputDecoration(labelText: 'Upfront Bonus'),
-                ),
-                TextField(
-                  controller: monthlyProfitController,
-                  decoration:
-                      const InputDecoration(labelText: 'Monthly Profit'),
-                ),
-                TextField(
-                  controller: securityDepositController,
-                  decoration:
-                      const InputDecoration(labelText: 'Security Deposit'),
-                ),
-                TextField(
-                  controller: creditScoreController,
-                  decoration: const InputDecoration(labelText: 'Credit Score'),
-                ),
-                TextField(
-                  controller: creditPointsController,
-                  decoration: const InputDecoration(labelText: 'Credit Points'),
-                ),
-
-                const SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () async {
-                    var package = {
-                      'firstName': firstNameController.text,
-                      'lastName': lastNameController.text,
-                      'balance': double.tryParse(balanceController.text) ?? 0.0,
-                      'propertyRef': selectedProperties,
-                      'tenantRef': selectedTenants,
-                      'rentpaymentRef': selectedRentPayments,
-                      'dealerRef': selectedDealers,
-                      'cnic': cnicController.text.isNotEmpty
-                          ? encryptString(cnicController.text)
-                          : FieldValue.delete(),
-                      'bankName': bankNameController.text.isNotEmpty
-                          ? encryptString(bankNameController.text)
-                          : FieldValue.delete(),
-                      'raastId': raastIdController.text.isNotEmpty
-                          ? encryptString(raastIdController.text)
-                          : FieldValue.delete(),
-                      'accountNumber': accountNumberController.text.isNotEmpty
-                          ? encryptString(accountNumberController.text)
-                          : FieldValue.delete(),
-                      'iban': ibanController.text.isNotEmpty
-                          ? encryptString(ibanController.text)
-                          : FieldValue.delete(),
-                      'address': addressController.text.isNotEmpty
-                          ? encryptString(addressController.text)
-                          : FieldValue.delete(),
-                      'contractStartDate':
-                          contractStartDateController.text.isNotEmpty &&
-                                  contractStartDateController.text != 'null'
-                              ? contractStartDateController.text
-                              : FieldValue.delete(),
-                      'contractEndDate':
-                          contractEndDateController.text.isNotEmpty &&
-                                  contractEndDateController.text != 'null'
-                              ? contractEndDateController.text
-                              : FieldValue.delete(),
-                      'monthlyRent': monthlyRentController.text.isNotEmpty
-                          ? monthlyRentController.text ?? 0.0
-                          : FieldValue.delete(),
-                      'upfrontBonus': upfrontBonusController.text.isNotEmpty
-                          ? upfrontBonusController.text ?? 0.0
-                          : FieldValue.delete(),
-                      'monthlyProfit': monthlyProfitController.text.isNotEmpty
-                          ? monthlyProfitController.text ?? 0.0
-                          : FieldValue.delete(),
-                      'securityDeposit':
-                          securityDepositController.text.isNotEmpty &&
-                                  securityDepositController.text != 'null'
-                              ? securityDepositController.text
-                              : FieldValue.delete(),
-                      'creditScore': creditScoreController.text.isNotEmpty &&
-                              creditScoreController.text != 'null'
-                          ? creditScoreController.text
-                          : FieldValue.delete(),
-                      'creditPoints': creditPointsController.text.isNotEmpty &&
-                              creditPointsController.text != 'null'
-                          ? creditPointsController.text
-                          : FieldValue.delete(),
-                    };
-
-                    //show contents of package in a dialog and ask if you are sure about this
-
-                    showDialog(
-                      context: context,
-                      builder: (context) {
-                        return Dialog(
-                          child: SingleChildScrollView(
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Column(
-                                  children: package.keys.map((key) {
-                                    return ListTile(
-                                      title: Text(key),
-                                      subtitle: Text(package[key].toString()),
-                                    );
-                                  }).toList(),
-                                ),
-                                ButtonBar(
-                                  children: [
-                                    ElevatedButton(
-                                      onPressed: () {
-                                        // Continue with the code
-                                        print('User confirmed');
-
-                                        FirebaseFirestore.instance
-                                            .collection('Landlords')
-                                            .doc(landlord.tempID)
-                                            .set(package,
-                                                SetOptions(merge: true))
-                                            .then((_) async {
-                                          //if selectedDealers not null set the landlordRef in the dealer
-
-                                          try {
-                                            for (var dealer
-                                                in selectedDealers) {
-                                              await dealer.set({
-                                                'landlordRef':
-                                                    FieldValue.arrayUnion([
-                                                  FirebaseFirestore.instance
-                                                      .collection('Landlords')
-                                                      .doc(landlord.tempID)
-                                                ])
-                                              }, SetOptions(merge: true));
-                                            }
-                                          } catch (e) {
-                                            print(
-                                                'error in setting landlordRef in dealer $e');
-                                          }
-
-                                          if (landlord.balance >
-                                              (double.tryParse(
-                                                      balanceController.text) ??
-                                                  0.0)) {
-                                            await FirebaseFirestore.instance
-                                                .collection('rentPayments')
-                                                .add({
-                                              'tenantname': 'Rehnaa.pk',
-                                              'LandlordRef': FirebaseFirestore
-                                                  .instance
-                                                  .collection('Landlords')
-                                                  .doc(landlord.tempID),
-                                              'amount': -(double.tryParse(
-                                                          balanceController
-                                                              .text) ??
-                                                      0.0) +
-                                                  landlord.balance,
-                                              'date': DateTime.now(),
-                                              'isMinus': true,
-                                              // 'description': 'Balance updated by landlord',
-                                              'paymentType': '',
-                                            }).then((value) {
-                                              //add the rentpayment document reference to the tenant's
-                                              // rentpayment array
-                                              FirebaseFirestore.instance
-                                                  .collection('Landlords')
-                                                  .doc(landlord.tempID)
-                                                  .update({
-                                                'rentpaymentRef':
-                                                    FieldValue.arrayUnion(
-                                                        [value])
-                                              });
-
-                                              //send a notification to the Landlord
-
-                                              FirebaseFirestore.instance
-                                                  .collection('Notifications')
-                                                  .doc(landlord.tempID)
-                                                  .update({
-                                                'notifications':
-                                                    FieldValue.arrayUnion([
-                                                  {
-                                                    // 'amount': data.requestedAmount,
-                                                    'title':
-                                                        'Your account has been debited by ${-(double.tryParse(balanceController.text) ?? 0.0) + landlord.balance}',
-                                                  }
-                                                ])
-                                              });
-                                            });
-                                          } else if (landlord.balance <
-                                              (double.tryParse(
-                                                      balanceController.text) ??
-                                                  0.0)) {
-                                            await FirebaseFirestore.instance
-                                                .collection('rentPayments')
-                                                .add({
-                                              'tenantname': 'Rehnaa.pk',
-                                              'LandlordRef': FirebaseFirestore
-                                                  .instance
-                                                  .collection('Landlords')
-                                                  .doc(landlord.tempID),
-                                              'amount': ((double.tryParse(
-                                                          balanceController
-                                                              .text) ??
-                                                      0.0) -
-                                                  landlord.balance),
-                                              'date': DateTime.now(),
-                                              'isMinus': false,
-                                              // 'description': 'Balance updated by landlord',
-                                              'paymentType': '',
-                                            }).then((value) {
-                                              //add the rentpayment document reference to the tenant's
-                                              // rentpayment array
-                                              // print('reached hrere 222');
-                                              FirebaseFirestore.instance
-                                                  .collection('Landlords')
-                                                  .doc(landlord.tempID)
-                                                  .update({
-                                                'rentpaymentRef':
-                                                    FieldValue.arrayUnion(
-                                                        [value])
-                                              });
-
-                                              FirebaseFirestore.instance
-                                                  .collection('Notifications')
-                                                  .doc(landlord.tempID)
-                                                  .update({
-                                                'notifications':
-                                                    FieldValue.arrayUnion([
-                                                  {
-                                                    // 'amount': data.requestedAmount,
-                                                    'title':
-                                                        'Your account has been credited by ${((double.tryParse(balanceController.text) ?? 0.0) - landlord.balance)}',
-                                                  }
-                                                ])
-                                              });
-                                            });
-                                          }
-
-                                          Fluttertoast.showToast(
-                                            msg:
-                                                'Landlord details updated successfully!',
-                                            toastLength: Toast.LENGTH_SHORT,
-                                            gravity: ToastGravity.CENTER,
-                                            backgroundColor: Colors.green,
-                                            textColor: Colors.white,
-                                          );
-                                          // Navigator.pop(context); // Close the edit dialog
-                                          Navigator.push(context,
-                                              MaterialPageRoute(
-                                                  builder: (context) {
-                                            return AdminLandlordInputPage();
-                                          }));
-                                        }).catchError((error) {
-                                          print('error is $error');
-                                          Fluttertoast.showToast(
-                                            msg:
-                                                'Failed to update landlord details. Please try again.',
-                                            toastLength: Toast.LENGTH_SHORT,
-                                            gravity: ToastGravity.CENTER,
-                                            backgroundColor: Colors.red,
-                                            textColor: Colors.white,
-                                          );
-                                          throw error;
-                                        });
-                                      },
-                                      child: Text('Yes'),
-                                    ),
-                                    ElevatedButton(
-                                      onPressed: () {
-                                        // Do nothing and navigate back or close the dialog
-                                        print('User canceled');
-                                        Navigator.of(context).pop();
-                                        // Navigator.pop(context); // Close the edit dialog
-                                        Navigator.push(context,
-                                            MaterialPageRoute(
-                                                builder: (context) {
-                                          return AdminLandlordInputPage();
-                                        }));
-                                      },
-                                      child: Text('No'),
-                                    ),
-                                  ],
-                                ),
-                              ],
+                      TextFormField(
+                        controller: balanceController,
+                        decoration: const InputDecoration(labelText: 'Balance'),
+                        keyboardType: TextInputType.number,
+                      ),
+                      const SizedBox(height: 10),
+                      StatefulBuilder(
+                        builder: (BuildContext context, StateSetter setState) {
+                          return ListTile(
+                            title: const Text('Select Properties'),
+                            subtitle: Text(
+                              '${selectedProperties.length} properties selected',
+                              // Add any necessary style modifications here
                             ),
+                            onTap: () {
+                              setState(() {
+                                _showPropertySelectionDialog(() {
+                                  setState(() {
+                                    // Update the state of selectedProperties here
+                                    // print('selectedproperties: $selectedProperties');
+                                  });
+                                });
+                              });
+                            },
+                          );
+                        },
+                      ),
+                      StatefulBuilder(
+                        builder: (BuildContext context, StateSetter setState) {
+                          return ListTile(
+                            title: const Text('Select Tenants'),
+                            subtitle: Text(
+                              selectedTenants.length.toString() +
+                                  ' tenants selected',
+                            ),
+                            onTap: () {
+                              setState(() {
+                                _showTenantSelectionDialog(() {
+                                  setState(() {
+                                    // Update the state of selectedTenants here
+                                    // print('selectedTenants: $selectedTenants');
+                                  });
+                                });
+                              });
+                            },
+                          );
+                        },
+                      ),
+                      StatefulBuilder(
+                        builder: (BuildContext context, StateSetter setState) {
+                          return ListTile(
+                            title: const Text('Select Rent Payments'),
+                            subtitle: Text(
+                              selectedRentPayments.length.toString() +
+                                  ' rent payments selected',
+                            ),
+                            onTap: () {
+                              setState(() {
+                                _showRentPaymentSelectionDialog(() {
+                                  setState(() {
+                                    // Update the state of selectedRentPayments here
+                                    // print('selectedRentPayments: $selectedRentPayments');
+                                  });
+                                });
+                              });
+                            },
+                          );
+                        },
+                      ),
+                      StatefulBuilder(
+                        builder: (BuildContext context, StateSetter setState) {
+                          return ListTile(
+                            title: const Text('Select Dealers'),
+                            subtitle: Text(
+                              selectedDealers.length.toString() +
+                                  ' dealers selected',
+                            ),
+                            onTap: () {
+                              setState(() {
+                                _showDealerSelectionDialog(() {
+                                  setState(() {
+                                    // Update the state of selectedDealers here
+                                    // print('selectedDealers: $selectedDealers');
+                                  });
+                                });
+                              });
+                            },
+                          );
+                        },
+                      ),
+                      const SizedBox(height: 20),
+                      // Visibility(
+                      //   visible: landlord.dealerRef != null,
+                      //   child: TextFormField(
+                      //     controller: dealerRefController,
+                      //     decoration: const InputDecoration(labelText: 'Dealer Ref'),
+                      //   ),
+                      // ),
+                      TextFormField(
+                        controller: cnicController,
+                        decoration: const InputDecoration(labelText: 'CNIC'),
+                        inputFormatters: [
+                          LengthLimitingTextInputFormatter(
+                              13), // Restrict maximum length to 13
+                          // FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+                        ],
+                        validator: (value) {
+                          //can be null if not has to be 13 digits
+                          //check if value can be parsed
+                          if (value != null &&
+                              value.length != 13 &&
+                              value != '') {
+                            if (int.tryParse(value) == null) {
+                              return 'Please enter a valid CNIC';
+                            }
+                            return 'please enter a valid CNIC';
+                          }
+                        },
+                      ),
+                      TextFormField(
+                        controller: addressController,
+                        decoration: const InputDecoration(labelText: 'Address'),
+                      ),
+                      TextFormField(
+                        controller: bankNameController,
+                        decoration:
+                            const InputDecoration(labelText: 'Bank Name'),
+                      ),
+                      TextFormField(
+                        controller: raastIdController,
+                        decoration:
+                            const InputDecoration(labelText: 'Raast ID'),
+                      ),
+                      TextFormField(
+                        controller: accountNumberController,
+                        decoration:
+                            const InputDecoration(labelText: 'Account Number'),
+                      ),
+                      TextFormField(
+                        controller: ibanController,
+                        decoration: const InputDecoration(labelText: 'IBAN'),
+                      ),
+                      StatefulBuilder(builder: (context, setState) {
+                        return TextButton(
+                          onPressed: () => _selectDate(true, setState),
+                          child: Text(
+                            contractStartDate != null
+                                ? 'Contract Start Date: ${contractStartDate.toString()}'
+                                : 'Select Contract Start Date',
                           ),
                         );
-                      },
-                    );
-                  },
-                  child: const Text('Save'),
+                      }),
+                      StatefulBuilder(builder: (context, setState) {
+                        return TextButton(
+                          onPressed: () => _selectDate(false, setState),
+                          child: Text(
+                            contractEndDate != null
+                                ? 'Contract End Date: ${contractEndDate.toString()}'
+                                : 'Select Contract End Date',
+                          ),
+                        );
+                      }),
+                      TextFormField(
+                        controller: monthlyRentController,
+                        decoration:
+                            const InputDecoration(labelText: 'Monthly Rent'),
+                        validator: (value) {
+                          //check if value can be parsed
+                          if (value != null &&
+                              int.tryParse(value) == null &&
+                              value != '') {
+                            return 'Please enter a valid monthly rent';
+                          }
+                        },
+                      ),
+                      TextFormField(
+                          controller: upfrontBonusController,
+                          decoration:
+                              const InputDecoration(labelText: 'Upfront Bonus'),
+                          validator: (value) {
+                            //check if value can be parsed
+                            if (value != null &&
+                                int.tryParse(value) == null &&
+                                value != '') {
+                              return 'Please enter a valid upfront bonus';
+                            }
+                          }),
+                      TextFormField(
+                          controller: monthlyProfitController,
+                          decoration: const InputDecoration(
+                              labelText: 'Monthly Profit'),
+                          validator: (value) {
+                            //check if value can be parsed
+                            if (value != null &&
+                                int.tryParse(value) == null &&
+                                value != '') {
+                              return 'Please enter a valid monthly profit';
+                            }
+                          }),
+                      TextFormField(
+                          controller: securityDepositController,
+                          decoration: const InputDecoration(
+                              labelText: 'Security Deposit'),
+                          validator: (value) {
+                            //check if value can be parsed
+                            if (value != null &&
+                                int.tryParse(value) == null &&
+                                value != '') {
+                              return 'Please enter a valid security deposit';
+                            }
+                          }),
+                      TextFormField(
+                        controller: creditScoreController,
+                        decoration:
+                            const InputDecoration(labelText: 'Credit Score'),
+                        validator: (value) {
+                          //check if value can be parsed
+                          if (value != null &&
+                              int.tryParse(value) == null &&
+                              value != '') {
+                            return 'Please enter valid credit score';
+                          }
+
+                          // return '';
+                        },
+                      ),
+                      TextFormField(
+                        controller: creditPointsController,
+                        decoration:
+                            const InputDecoration(labelText: 'Credit Points'),
+                        validator: (value) {
+                          //check if value can be parsed
+                          if (value != null &&
+                              int.tryParse(value) == null &&
+                              value != '') {
+                            return 'Please enter valid credit points';
+                          }
+                          // if (value != null && int.tryParse(value)! > 10) {
+                          //   return 'Please enter valid credit points';
+                          // }
+                          // return '';
+                        },
+                      ),
+                      const SizedBox(height: 20),
+                      ElevatedButton(
+                        style: ButtonStyle(
+                          backgroundColor:
+                              MaterialStateProperty.all<Color>(Colors.green),
+                        ),
+                        onPressed: () async {
+                          if (formKey.currentState!.validate()) {
+                            // Form is valid, proceed with saving data
+
+                            var package = {
+                              'firstName': firstNameController.text,
+                              'lastName': lastNameController.text,
+                              'balance':
+                                  double.tryParse(balanceController.text) ??
+                                      0.0,
+                              'propertyRef': selectedProperties,
+                              'tenantRef': selectedTenants,
+                              'rentpaymentRef': selectedRentPayments,
+                              'dealerRef': selectedDealers,
+                              'cnic': cnicController.text.isNotEmpty
+                                  ? encryptString(cnicController.text)
+                                  : FieldValue.delete(),
+                              'bankName': bankNameController.text.isNotEmpty
+                                  ? encryptString(bankNameController.text)
+                                  : FieldValue.delete(),
+                              'raastId': raastIdController.text.isNotEmpty
+                                  ? encryptString(raastIdController.text)
+                                  : FieldValue.delete(),
+                              'accountNumber': accountNumberController
+                                      .text.isNotEmpty
+                                  ? encryptString(accountNumberController.text)
+                                  : FieldValue.delete(),
+                              'iban': ibanController.text.isNotEmpty
+                                  ? encryptString(ibanController.text)
+                                  : FieldValue.delete(),
+                              'address': addressController.text.isNotEmpty
+                                  ? addressController.text
+                                  : FieldValue.delete(),
+                              if (contractStartDate != null)
+                                'contractStartDate':
+                                    Timestamp.fromDate(contractStartDate!),
+                              if (contractEndDate != null)
+                                'contractEndDate':
+                                    Timestamp.fromDate(contractEndDate!),
+                              'monthlyRent':
+                                  monthlyRentController.text.isNotEmpty
+                                      ? monthlyRentController.text ?? 0.0
+                                      : FieldValue.delete(),
+                              'upfrontBonus':
+                                  upfrontBonusController.text.isNotEmpty
+                                      ? upfrontBonusController.text ?? 0.0
+                                      : FieldValue.delete(),
+                              'monthlyProfit':
+                                  monthlyProfitController.text.isNotEmpty
+                                      ? monthlyProfitController.text ?? 0.0
+                                      : FieldValue.delete(),
+                              'securityDeposit': securityDepositController
+                                          .text.isNotEmpty &&
+                                      securityDepositController.text != 'null'
+                                  ? securityDepositController.text
+                                  : FieldValue.delete(),
+                              'creditScore':
+                                  creditScoreController.text.isNotEmpty &&
+                                          creditScoreController.text != 'null'
+                                      ? creditScoreController.text
+                                      : FieldValue.delete(),
+                              'creditPoints':
+                                  creditPointsController.text.isNotEmpty &&
+                                          creditPointsController.text != 'null'
+                                      ? creditPointsController.text
+                                      : FieldValue.delete(),
+                            };
+
+                            //create a checkpackage that discludes all the document references.
+                            var checkpackage = {
+                              'firstName': firstNameController.text,
+                              'lastName': lastNameController.text,
+                              'balance':
+                                  double.tryParse(balanceController.text) ??
+                                      0.0,
+                              'cnic': cnicController.text.isNotEmpty
+                                  ? cnicController.text
+                                  : 'empty',
+                              'bankName': bankNameController.text.isNotEmpty
+                                  ? bankNameController.text
+                                  : 'empty',
+                              'raastId': raastIdController.text.isNotEmpty
+                                  ? raastIdController.text
+                                  : 'empty',
+                              'accountNumber':
+                                  accountNumberController.text.isNotEmpty
+                                      ? accountNumberController.text
+                                      : 'empty',
+                              'iban': ibanController.text.isNotEmpty
+                                  ? ibanController.text
+                                  : 'empty',
+                              'address': addressController.text.isNotEmpty
+                                  ? addressController.text
+                                  : 'empty',
+                              if (contractStartDate != null)
+                                'contractStartDate':
+                                    Timestamp.fromDate(contractStartDate!),
+                              if (contractEndDate != null)
+                                'contractEndDate':
+                                    Timestamp.fromDate(contractEndDate!),
+                              'monthlyRent':
+                                  monthlyRentController.text.isNotEmpty
+                                      ? monthlyRentController.text ?? 0.0
+                                      : 'empty',
+                              'upfrontBonus':
+                                  upfrontBonusController.text.isNotEmpty
+                                      ? upfrontBonusController.text ?? 0.0
+                                      : 'empty',
+                              'monthlyProfit':
+                                  monthlyProfitController.text.isNotEmpty
+                                      ? monthlyProfitController.text ?? 0.0
+                                      : 'empty',
+                              'securityDeposit': securityDepositController
+                                          .text.isNotEmpty &&
+                                      securityDepositController.text != 'null'
+                                  ? securityDepositController.text
+                                  : 'empty',
+                              'creditScore':
+                                  creditScoreController.text.isNotEmpty &&
+                                          creditScoreController.text != 'null'
+                                      ? creditScoreController.text
+                                      : 'empty',
+                              'creditPoints':
+                                  creditPointsController.text.isNotEmpty &&
+                                          creditPointsController.text != 'null'
+                                      ? creditPointsController.text
+                                      : 'empty',
+                            };
+
+                            // Show contents of package in a dialog and ask if you are sure about this
+                            showDialog(
+                              context: context,
+                              builder: (context) {
+                                return Dialog(
+                                  child: SingleChildScrollView(
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Column(
+                                          children:
+                                              checkpackage.keys.map((key) {
+                                            return ListTile(
+                                              title: Text(key),
+                                              subtitle: Text(
+                                                  checkpackage[key].toString()),
+                                            );
+                                          }).toList(),
+                                        ),
+                                        ButtonBar(
+                                          children: [
+                                            ElevatedButton(
+                                              onPressed: () async {
+                                                // Continue with the code
+                                                print('User confirmed');
+                                                showDialog(
+                                                  context: context,
+                                                  builder: (context) {
+                                                    return const Center(
+                                                      child: SpinKitFadingCube(
+                                                        color: Color.fromARGB(
+                                                            255, 30, 197, 83),
+                                                      ),
+                                                    );
+                                                  },
+                                                );
+
+                                                // Your save logic goes here
+                                                await FirebaseFirestore.instance
+                                                    .collection('Landlords')
+                                                    .doc(landlord.tempID)
+                                                    .update(package);
+
+                                                if (selectedDealers
+                                                    .isNotEmpty) {
+                                                  selectedDealers
+                                                      .forEach((element) {
+                                                    element.set({
+                                                      'landlordRef': FieldValue
+                                                          .arrayUnion([
+                                                        FirebaseFirestore
+                                                            .instance
+                                                            .collection(
+                                                                'Landlords')
+                                                            .doc(
+                                                                landlord.tempID)
+                                                      ])
+                                                    }, SetOptions(merge: true));
+                                                  });
+                                                }
+
+                                                if (landlord.balance >
+                                                    (double.tryParse(
+                                                            balanceController
+                                                                .text) ??
+                                                        0.0)) {
+                                                  await FirebaseFirestore
+                                                      .instance
+                                                      .collection(
+                                                          'rentPayments')
+                                                      .add({
+                                                    'tenantname': 'Rehnaa.pk',
+                                                    'tenantRef':
+                                                        FirebaseFirestore
+                                                            .instance
+                                                            .collection(
+                                                                'Landlords')
+                                                            .doc(landlord
+                                                                .tempID),
+                                                    'amount': -(double.tryParse(
+                                                                balanceController
+                                                                    .text) ??
+                                                            0.0) +
+                                                        (landlord.balance),
+                                                    'date': DateTime.now(),
+                                                    'isMinus': true,
+                                                    'paymentType': '',
+                                                    // 'description': 'Balance updated by landlord',
+                                                    // 'paymentType': 'Bank Transfer',
+                                                  }).then((value) {
+                                                    //add the rentpayment document reference to the tenant's
+                                                    // rentpayment array
+                                                    FirebaseFirestore.instance
+                                                        .collection('Landlords')
+                                                        .doc(landlord.tempID)
+                                                        .update({
+                                                      'rentpaymentRef':
+                                                          FieldValue.arrayUnion(
+                                                              [value])
+                                                    });
+
+                                                    FirebaseFirestore.instance
+                                                        .collection(
+                                                            'Notifications')
+                                                        .doc(landlord.tempID)
+                                                        .update({
+                                                      'notifications':
+                                                          FieldValue
+                                                              .arrayUnion([
+                                                        {
+                                                          // 'amount': data.requestedAmount,
+                                                          'title':
+                                                              'Your account has been debited by ${-(double.tryParse(balanceController.text) ?? 0.0) + (landlord.balance)}',
+                                                        }
+                                                      ])
+                                                    });
+                                                  });
+                                                } else if (landlord.balance <
+                                                    (double.tryParse(
+                                                            balanceController
+                                                                .text) ??
+                                                        0.0)) {
+                                                  await FirebaseFirestore
+                                                      .instance
+                                                      .collection(
+                                                          'rentPayments')
+                                                      .add({
+                                                    'tenantname': 'Rehnaa.pk',
+                                                    'tenantRef':
+                                                        FirebaseFirestore
+                                                            .instance
+                                                            .collection(
+                                                                'Landlords')
+                                                            .doc(landlord
+                                                                .tempID),
+                                                    'amount': ((double.tryParse(
+                                                                balanceController
+                                                                    .text) ??
+                                                            0.0) -
+                                                        landlord.balance),
+                                                    'date': DateTime.now(),
+                                                    'isMinus': false,
+                                                    // 'description': 'Balance updated by landlord',
+                                                    'paymentType': '',
+                                                  }).then((value) async {
+                                                    //add the rentpayment document reference to the tenant's
+                                                    // rentpayment array
+                                                    FirebaseFirestore.instance
+                                                        .collection('Landlords')
+                                                        .doc(landlord.tempID)
+                                                        .update({
+                                                      'rentpaymentRef':
+                                                          FieldValue.arrayUnion(
+                                                              [value])
+                                                    });
+
+                                                    FirebaseFirestore.instance
+                                                        .collection(
+                                                            'Notifications')
+                                                        .doc(landlord.tempID)
+                                                        .set({
+                                                      'notifications':
+                                                          FieldValue
+                                                              .arrayUnion([
+                                                        {
+                                                          // 'amount': data.requestedAmount,
+                                                          'title':
+                                                              'Your account has been credited by PKR${((double.tryParse(balanceController.text) ?? 0.0) - landlord.balance)}'
+                                                        }
+                                                      ])
+                                                    }, SetOptions(merge: true));
+                                                  });
+                                                }
+
+                                                setState(() {
+                                                  landlord.balance =
+                                                      double.tryParse(
+                                                              balanceController
+                                                                  .text) ??
+                                                          0.0;
+                                                  landlord.firstName =
+                                                      firstNameController.text;
+                                                  landlord.lastName =
+                                                      lastNameController.text;
+                                                  landlord.propertyRef =
+                                                      selectedProperties;
+                                                  landlord.tenantRef =
+                                                      selectedTenants;
+                                                  landlord.rentpaymentRef =
+                                                      selectedRentPayments;
+                                                  landlord.dealerRef =
+                                                      selectedDealers;
+                                                  landlord.cnic = cnicController
+                                                          .text.isNotEmpty
+                                                      ? encryptString(
+                                                          cnicController.text)
+                                                      : '';
+                                                  landlord.bankName =
+                                                      bankNameController
+                                                              .text.isNotEmpty
+                                                          ? encryptString(
+                                                              bankNameController
+                                                                  .text)
+                                                          : '';
+                                                  landlord.raastId =
+                                                      raastIdController
+                                                              .text.isNotEmpty
+                                                          ? encryptString(
+                                                              raastIdController
+                                                                  .text)
+                                                          : '';
+                                                  landlord.accountNumber =
+                                                      accountNumberController
+                                                              .text.isNotEmpty
+                                                          ? encryptString(
+                                                              accountNumberController
+                                                                  .text)
+                                                          : '';
+                                                  landlord.iban = ibanController
+                                                          .text.isNotEmpty
+                                                      ? encryptString(
+                                                          ibanController.text)
+                                                      : '';
+                                                  landlord.address =
+                                                      addressController
+                                                              .text.isNotEmpty
+                                                          ? addressController
+                                                              .text
+                                                          : '';
+                                                  landlord.contractStartDate =
+                                                      contractStartDate;
+                                                  landlord.contractEndDate =
+                                                      contractEndDate;
+                                                  landlord.monthlyRent =
+                                                      monthlyRentController
+                                                              .text.isNotEmpty
+                                                          ? monthlyRentController
+                                                                  .text ??
+                                                              0.0
+                                                          : 0.0;
+                                                  landlord.upfrontBonus =
+                                                      upfrontBonusController
+                                                              .text.isNotEmpty
+                                                          ? upfrontBonusController
+                                                                  .text ??
+                                                              0.0
+                                                          : 0.0;
+                                                  landlord.monthlyProfit =
+                                                      monthlyProfitController
+                                                              .text.isNotEmpty
+                                                          ? monthlyProfitController
+                                                                  .text ??
+                                                              0.0
+                                                          : 0.0;
+                                                  landlord.securityDeposit =
+                                                      securityDepositController
+                                                                  .text
+                                                                  .isNotEmpty &&
+                                                              securityDepositController
+                                                                      .text !=
+                                                                  'null'
+                                                          ? securityDepositController
+                                                              .text
+                                                          : '';
+                                                  landlord.creditScore =
+                                                      creditScoreController.text
+                                                                  .isNotEmpty &&
+                                                              creditScoreController
+                                                                      .text !=
+                                                                  'null'
+                                                          ? creditScoreController
+                                                              .text
+                                                          : '';
+                                                  landlord.creditPoints =
+                                                      creditPointsController
+                                                                  .text
+                                                                  .isNotEmpty &&
+                                                              creditPointsController
+                                                                      .text !=
+                                                                  'null'
+                                                          ? creditPointsController
+                                                              .text
+                                                          : '';
+                                                });
+
+                                                Navigator.of(context)
+                                                    .pop(); // Close the dialog
+                                                Navigator.of(context).pop();
+                                                Navigator.of(context).pop();
+
+                                                //snackbar
+                                                Fluttertoast.showToast(
+                                                    msg:
+                                                        "Landlord Updated Successfully",
+                                                    toastLength:
+                                                        Toast.LENGTH_SHORT,
+                                                    gravity:
+                                                        ToastGravity.CENTER,
+                                                    timeInSecForIosWeb: 1,
+                                                    backgroundColor:
+                                                        Colors.green,
+                                                    textColor: Colors.white,
+                                                    fontSize: 16.0);
+                                              },
+                                              child: Text('Yes'),
+                                            ),
+                                            ElevatedButton(
+                                              onPressed: () {
+                                                // Do nothing and close the dialog
+                                                print('User canceled');
+                                                Navigator.of(context)
+                                                    .pop(); // Close the dialog
+                                              },
+                                              child: Text('No'),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              },
+                            );
+                          }
+                        },
+                        child: const Text('Save'),
+                      ),
+                      SizedBox(height: 15),
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -1228,19 +1562,42 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
 }
 
 Widget buildFloatingActionButton(BuildContext context) {
-  return FloatingActionButton(
-    onPressed: () {
-      showDialog(
-        context: context,
-        builder: (context) {
-          return Dialog(
-            child: LandlordCardWidget(),
-          );
-        },
-      );
-      // Add functionality for the + floating action button here
-    },
-    backgroundColor: const Color(0xff0FA697),
-    child: const Icon(Icons.add),
+  return Material(
+    elevation: 4.0,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(28.0),
+    ),
+    child: InkWell(
+      onTap: () {
+        showDialog(
+          context: context,
+          builder: (context) {
+            return Dialog(
+              child: LandlordCardWidget(),
+            );
+          },
+        );
+      },
+      borderRadius: BorderRadius.circular(28.0),
+      child: Container(
+        padding: EdgeInsets.all(16.0),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              const Color(0xff0FA697),
+              const Color(0xff45BF7A),
+              const Color(0xff0DF205),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(28.0),
+        ),
+        child: Icon(
+          Icons.add,
+          color: Colors.white,
+        ),
+      ),
+    ),
   );
 }

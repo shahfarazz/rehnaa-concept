@@ -4,6 +4,7 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
+// import 'package:rehnaa/backend/services/firebase_notifications_api.dart';
 // import 'package:rehnaa/frontend/Screens/Admin/admindashboard.dart';
 // import 'package:rehnaa/frontend/Screens/Landlord/landlord_dashboard.dart';
 // import 'package:rehnaa/frontend/Screens/login_page.dart';
@@ -13,6 +14,7 @@ import 'backend/services/authentication_service.dart';
 // import 'frontend/Screens/Dealer/dealer_dashboard.dart';
 // import 'frontend/Screens/Tenant/tenant_dashboard.dart';
 // import 'frontend/Screens/Tenant/tenantsignupdetails.dart';
+import 'backend/services/firebase_notifications_api.dart';
 import 'frontend/Screens/splash.dart';
 import 'firebase_options.dart';
 // import 'frontend/helper/Tenantdashboard_pages/tenant_profile.dart';
@@ -23,6 +25,7 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  await FirebaseApi().initNotifications();
   FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterError;
   FlutterError.onError = (errorDetails) {
     FirebaseCrashlytics.instance.recordFlutterFatalError(errorDetails);

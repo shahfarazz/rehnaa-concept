@@ -47,6 +47,7 @@ class _SignUpPageState extends State<SignUpPage> {
   String? verificationId;
   Timer? verificationTimer;
   Timer? letVerifyTimer;
+  int _secondsRemaining = 60;
 
   dispose() {
     verificationTimer?.cancel();
@@ -55,14 +56,23 @@ class _SignUpPageState extends State<SignUpPage> {
   }
 
   bool isEmail(String input) {
-    final regex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+    final regex = RegExp(
+        r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*\.[a-zA-Z]{2,}$');
+
     return regex.hasMatch(input);
   }
 
   Future<void> signUpWithEmailAndPassword() async {
     String? formError = _validateForm();
     if (formError != null) {
-      _showToast(formError, Colors.red);
+      // _showToast(formError, Colors.red);
+      //snackbar form error
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: Colors.red,
+          content: Text(formError),
+        ),
+      );
       return;
     }
     try {
@@ -73,76 +83,70 @@ class _SignUpPageState extends State<SignUpPage> {
         password: password,
       );
       await userCredential.user!.sendEmailVerification();
+      //sign out user
       _showToast(
         'Verification email has been sent. Please check your inbox.',
         Colors.green,
       );
       verificationTimer?.cancel(); // Cancel any existing timer
       letVerifyTimer?.cancel(); // Cancel any existing timer
-      letVerifyTimer = Timer.periodic(const Duration(seconds: 30), (timer) {});
-      verificationTimer =
-          Timer.periodic(const Duration(seconds: 5), (timer) async {
-        await FirebaseAuth.instance.currentUser!.reload();
-        if (FirebaseAuth.instance.currentUser!.emailVerified) {
-          timer.cancel();
-          setState(() => isLoading = false);
-          // ignore: use_build_context_synchronously
-          FirebaseFirestore.instance
-              .collection('users')
-              .doc(FirebaseAuth.instance.currentUser!.uid)
-              .set({
-            'firstName': firstName,
-            'lastName': lastName,
-            'emailOrPhone': emailOrPhone,
-            'type': selectedOption,
-          });
 
-          if (selectedOption == 'Landlord') {
-            await FirebaseFirestore.instance
-                .collection('Landlords')
-                .doc(FirebaseAuth.instance.currentUser!.uid)
-                .set({
-              'firstName': firstName,
-              'lastName': lastName,
-              'emailOrPhone': emailOrPhone,
-              'type': selectedOption,
-              'balance': 0,
-              'pathToImage': 'assets/defaulticon.png',
-              'dateJoined': Timestamp.now(),
-            });
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => LandlordDashboardPage(
-                      uid: FirebaseAuth.instance.currentUser!.uid)),
-            );
-          } else if (selectedOption == 'Tenant') {
-            await FirebaseFirestore.instance
-                .collection('Tenants')
-                .doc(FirebaseAuth.instance.currentUser!.uid)
-                .set({
-              'firstName': firstName,
-              'lastName': lastName,
-              'emailOrPhone': emailOrPhone,
-              'type': selectedOption,
-              'balance': 0,
-              'pathToImage': 'assets/defaulticon.png',
-              'dateJoined': Timestamp.now(),
-            });
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => TenantDashboardPage(
-                      uid: FirebaseAuth.instance.currentUser!.uid)),
-            );
-          }
-
-          _showToast('Sign up successful.', Colors.green);
-        }
+      // if (FirebaseAuth.instance.currentUser!.emailVerified) {
+      // timer.cancel();
+      setState(() => isLoading = false);
+      // ignore: use_build_context_synchronously
+      FirebaseFirestore.instance
+          .collection('users')
+          .doc(FirebaseAuth.instance.currentUser!.uid)
+          .set({
+        'firstName': firstName,
+        'lastName': lastName,
+        'emailOrPhone': emailOrPhone,
+        'type': selectedOption,
       });
+
+      if (selectedOption == 'Landlord') {
+        await FirebaseFirestore.instance
+            .collection('Landlords')
+            .doc(FirebaseAuth.instance.currentUser!.uid)
+            .set({
+          'firstName': firstName,
+          'lastName': lastName,
+          'emailOrPhone': emailOrPhone,
+          'type': selectedOption,
+          'balance': 0,
+          'pathToImage': 'assets/defaulticon.png',
+          'dateJoined': Timestamp.now(),
+        });
+      } else if (selectedOption == 'Tenant') {
+        await FirebaseFirestore.instance
+            .collection('Tenants')
+            .doc(FirebaseAuth.instance.currentUser!.uid)
+            .set({
+          'firstName': firstName,
+          'lastName': lastName,
+          'emailOrPhone': emailOrPhone,
+          'type': selectedOption,
+          'balance': 0,
+          'pathToImage': 'assets/defaulticon.png',
+          'dateJoined': Timestamp.now(),
+        });
+      }
+
+      _showToast('Sign in via the login page.', Colors.green);
+
+      await FirebaseAuth.instance.signOut();
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const LoginPage()),
+      );
+
+      // }
     } catch (e) {
       setState(() => isLoading = false);
       _showToast('Sign up failed, please try again', Colors.red);
+      print('error occured: $e');
       return;
     }
   }
@@ -437,6 +441,7 @@ class _SignUpPageState extends State<SignUpPage> {
   Widget buildInputField(String label,
       {required Function(String) onChanged, String? errorText}) {
     return TextField(
+      enabled: isLoading ? false : true,
       cursorColor: Colors.green,
       onChanged: onChanged,
       style: TextStyle(
@@ -477,6 +482,7 @@ class _SignUpPageState extends State<SignUpPage> {
     required Function() onToggle,
   }) {
     return TextField(
+      enabled: isLoading ? false : true,
       onChanged: onChanged,
       obscureText: !showPassword,
       style: TextStyle(
@@ -537,7 +543,11 @@ class _SignUpPageState extends State<SignUpPage> {
 
   Widget buildOptionButton(String text) {
     return InkWell(
-      onTap: () => setState(() => selectedOption = text),
+      onTap: () {
+        if (!isLoading) {
+          setState(() => selectedOption = text);
+        }
+      },
       child: Container(
         width: 100,
         height: 40,
@@ -643,16 +653,10 @@ class _SignUpPageState extends State<SignUpPage> {
             recognizer: TapGestureRecognizer()
               ..onTap = () {
                 // Navigate to the login page and dispose of the sign-up page
-
-                //check if verification timer is running and if so dont let user go back to login page
-                if (letVerifyTimer != null && letVerifyTimer!.isActive) {
-                  _showToast("Please complete verification", Colors.red);
-                } else {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (context) => LoginPage()),
-                  );
-                }
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const LoginPage()),
+                );
               },
           ),
         ],

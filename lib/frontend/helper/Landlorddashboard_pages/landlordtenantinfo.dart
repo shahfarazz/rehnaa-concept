@@ -129,10 +129,12 @@ class LandlordTenantInfoPage extends StatelessWidget {
                       maxLines: 2,
                     ),
                   ),
+                  SizedBox(height: 16),
                 ],
               ),
             ],
           ),
+          SizedBox(height: 20.0),
           Expanded(
             child: FractionallySizedBox(
               widthFactor: 0.9,
@@ -150,10 +152,10 @@ class LandlordTenantInfoPage extends StatelessWidget {
                       padding: const EdgeInsets.all(16.0),
                       child: Column(
                         children: [
-                          const SizedBox(height: 10.0),
+                          const SizedBox(height: 12.0),
                           // Rest of your card's content...
 
-                          tenant.creditScore != ""
+                          tenant.creditScore != "" && tenant.creditScore != null
                               ? Center(
                                   child: WhiteBox(
                                     icon: Icons.star,
@@ -167,7 +169,7 @@ class LandlordTenantInfoPage extends StatelessWidget {
                                 )
                               : Container(),
 
-                          tenant.address == ''
+                          tenant.address == '' || tenant.address == null
                               ? Container()
                               : Center(
                                   child: WhiteBox(
@@ -179,18 +181,19 @@ class LandlordTenantInfoPage extends StatelessWidget {
                           const SizedBox(height: 10.0),
 
                           const SizedBox(height: 10.0),
-                          tenant.cnicNumber != null
+                          tenant.cnic != "" && tenant.cnic != null
                               ? Center(
                                   child: WhiteBox(
-                                    icon: Icons.numbers,
+                                    icon: Icons.perm_identity_rounded,
                                     iconColor: const Color(0xff33907c),
                                     label: 'CNIC Number',
-                                    value: decryptString(tenant.cnicNumber!),
+                                    value: decryptString(tenant.cnic!),
                                   ),
                                 )
                               : Container(),
                           const SizedBox(height: 10.0),
-                          tenant.emailOrPhone != ''
+                          tenant.emailOrPhone != '' ||
+                                  tenant.emailOrPhone != null
                               ? Center(
                                   child: WhiteBox(
                                     icon: Icons.email,
@@ -209,7 +212,6 @@ class LandlordTenantInfoPage extends StatelessWidget {
                                     iconColor: const Color(0xff33907c),
                                     label: 'Contract Start Date',
                                     value: tenant.contractStartDate!
-                                        .toDate()
                                         .toString()
                                         .substring(0, 10),
                                   ),
@@ -223,13 +225,13 @@ class LandlordTenantInfoPage extends StatelessWidget {
                                     iconColor: const Color(0xff33907c),
                                     label: 'Contract End Date',
                                     value: tenant.contractEndDate!
-                                        .toDate()
                                         .toString()
                                         .substring(0, 10),
                                   ),
                                 ),
                           const SizedBox(height: 10.0),
-                          tenant.propertyAddress == 'No address found'
+                          tenant.propertyAddress == 'No address found' ||
+                                  tenant.propertyAddress == null
                               ? Container()
                               : Center(
                                   child: WhiteBox(
@@ -368,6 +370,7 @@ class WhiteBox extends StatelessWidget {
                             style: GoogleFonts.montserrat(
                               fontSize: 16.0,
                               color: const Color(0xff33907c),
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
                         ],

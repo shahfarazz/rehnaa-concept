@@ -145,6 +145,18 @@ class LandlordsOnboardedInfoPage extends StatelessWidget {
                                     ?['eStampMonthlyProfit'],
                               ),
                               SizedBox(height: 24),
+                              ContractCard(
+                                icon: Icons.sell,
+                                label: 'Estamp Cost',
+                                data: dealer?.landlordMap?[landlord.tempID]
+                                            ?['eStampCost'] !=
+                                        null
+                                    ? dealer?.landlordMap?[landlord.tempID]
+                                                ?['eStampCost']
+                                            .toString() ??
+                                        '0'
+                                    : '0',
+                              ),
                             ],
                           ),
                         ),

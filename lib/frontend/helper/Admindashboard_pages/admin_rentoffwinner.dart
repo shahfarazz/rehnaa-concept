@@ -6,6 +6,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../backend/models/tenantsmodel.dart';
+import '../../Screens/Admin/admindashboard.dart';
 
 class AdminRentOffWinnerPage extends StatefulWidget {
   @override
@@ -30,9 +31,24 @@ class _AdminRentOffWinnerPageState extends State<AdminRentOffWinnerPage> {
       QuerySnapshot<Map<String, dynamic>> querySnapshot =
           await FirebaseFirestore.instance.collection('Tenants').get();
 
+      //check data in querySnapshot.docs for isGhost = true and remove them from the list
+      List newquerySnapshot = [];
+      querySnapshot.docs.forEach((doc) {
+        var data = doc.data();
+        // print('data is ${data['isGhost']}');
+        if (data['isGhost'] == true) {
+          // querySnapshot.docs.remove(doc);
+        } else {
+          newquerySnapshot.add(doc);
+        }
+      });
+
+      print('newquerySnapshot is $newquerySnapshot');
+
       setState(() {
-        tenants = querySnapshot.docs.map((doc1) {
+        tenants = newquerySnapshot.map((doc1) {
           var doc = doc1.data();
+
           return Tenant(
             firstName: doc['firstName'] ?? '',
             lastName: doc['lastName'] ?? '',
@@ -42,11 +58,12 @@ class _AdminRentOffWinnerPageState extends State<AdminRentOffWinnerPage> {
             familyMembers: doc['familyMembers'] ?? 0,
             pathToImage: doc['pathToImage'] ?? '',
             tempID: doc1.id,
-            cnicNumber: '',
+            cnic: '',
             creditPoints: 0,
             description: '',
             tasdeeqVerification: true,
             policeVerification: true,
+            isRentoffWinner: doc['isRentOffWinner'] ?? false,
           );
         }).toList();
         filteredTenants = List.from(tenants);
@@ -87,9 +104,10 @@ class _AdminRentOffWinnerPageState extends State<AdminRentOffWinnerPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Rent Off Winners'),
+        title: const Text('Admin Requests'),
         flexibleSpace: Container(
           decoration: const BoxDecoration(
+            // borderRadius: BorderRadius.circular(24),
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
@@ -100,6 +118,21 @@ class _AdminRentOffWinnerPageState extends State<AdminRentOffWinnerPage> {
               ],
             ),
           ),
+        ),
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back,
+            color: Colors.white,
+          ),
+          onPressed: () {
+            // Navigator.pop(context);
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => AdminDashboard(),
+              ),
+            );
+          },
         ),
       ),
       body: Padding(
@@ -144,6 +177,12 @@ class _AdminRentOffWinnerPageState extends State<AdminRentOffWinnerPage> {
                             : CachedNetworkImageProvider(tenant.pathToImage!)
                                 as ImageProvider,
                       ),
+                      trailing: tenant.isRentoffWinner
+                          ? const Icon(
+                              Icons.check_circle,
+                              color: Colors.green,
+                            )
+                          : null,
                       title: Text(
                         '${tenant.firstName} ${tenant.lastName}',
                         style: const TextStyle(

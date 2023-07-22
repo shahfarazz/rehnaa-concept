@@ -30,17 +30,19 @@ class _TenantPropertiesPageState extends State<TenantPropertiesPage>
   bool _isLoading = false;
   List<Property> _properties = [];
   DocumentSnapshot? _lastDocument;
-  ScrollController _scrollController = ScrollController();
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
+    // print('reset state');
     super.initState();
     _propertiesFuture = _fetchProperties();
 
     _scrollController.addListener(() {
-      if (_scrollController.position.pixels ==
+      if (_scrollController.position.pixels >=
           _scrollController.position.maxScrollExtent) {
         _loadMoreProperties();
+        // print('lmao yeah');
       }
     });
   }
@@ -50,17 +52,25 @@ class _TenantPropertiesPageState extends State<TenantPropertiesPage>
       _isLoading = true;
       _properties = [];
       _lastDocument = null;
+      _propertiesFuture = _fetchProperties();
     });
+    // _properties = [];
 
-    List<Property> refreshedProperties = await _fetchProperties();
+    // List<Property> refreshedProperties = await _fetchProperties();
+    // print('refreshed properties are ${refreshedProperties.length}');
 
-    setState(() {
-      _properties = refreshedProperties;
-      _isLoading = false;
-    });
+    // print('Before setState');
+    // setState(() {
+    //   _properties = refreshedProperties;
+    // });
+    // print('After setState');
+
+    //   _isLoading = false;
+    // });
   }
 
   Future<List<Property>> _fetchProperties() async {
+    print('reached here');
     Query<Map<String, dynamic>> query =
         FirebaseFirestore.instance.collection('Properties').limit(5);
 
@@ -77,10 +87,11 @@ class _TenantPropertiesPageState extends State<TenantPropertiesPage>
           Property.fromJson(documentSnapshot.data() as Map<String, dynamic>);
       property.propertyID = documentSnapshot.id;
 
-      print(property.tenantRef?.id != null);
+      print('tenantrefid--> ${property.tenantRef?.id}');
 
       if (property.tenantRef?.id != null ||
           property.tenantRef?.id == widget.uid) {
+        print('reached here with propertytitle --> ${property.title}');
         continue;
       } else {
         properties.add(property);
@@ -91,17 +102,23 @@ class _TenantPropertiesPageState extends State<TenantPropertiesPage>
       _lastDocument = snapshot.docs.last;
     }
 
+    print('returned properties with length ${properties.length}');
+
+    _isLoading = false;
+
     return properties;
   }
 
   Future<void> _loadMoreProperties() async {
     if (_isLoading) return;
 
+    print('reached here lload load');
+
     setState(() {
       _isLoading = true;
     });
 
-    await Future.delayed(Duration(seconds: 2));
+    // await Future.delayed(Duration(seconds: 2));
 
     List<Property> newProperties = await _fetchProperties();
 
@@ -138,39 +155,49 @@ class _TenantPropertiesPageState extends State<TenantPropertiesPage>
           } else if (snapshot.hasError) {
             return const Center(child: Text('Error retrieving data'));
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(
-              child: Card(
-                elevation: 4.0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20.0),
-                ),
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20.0),
-                    color: Colors.white,
-                  ),
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(
-                        Icons.house,
-                        size: 48.0,
-                        color: Color(0xff33907c),
-                      ),
-                      const SizedBox(height: 16.0),
-                      Text(
-                        'No Properties to show',
-                        style: GoogleFonts.montserrat(
-                          fontSize: 20.0,
-                          color: const Color(0xff33907c),
+            return RefreshIndicator(
+                onRefresh: _refreshProperties,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SingleChildScrollView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      child: Center(
+                        child: Card(
+                          elevation: 4.0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20.0),
+                          ),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20.0),
+                              color: Colors.white,
+                            ),
+                            padding: const EdgeInsets.all(16.0),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(
+                                  Icons.house,
+                                  size: 48.0,
+                                  color: Color(0xff33907c),
+                                ),
+                                const SizedBox(height: 16.0),
+                                Text(
+                                  'No Properties to show',
+                                  style: GoogleFonts.montserrat(
+                                    fontSize: 20.0,
+                                    color: const Color(0xff33907c),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
                       ),
-                    ],
-                  ),
-                ),
-              ),
-            );
+                    ),
+                  ],
+                ));
           } else {
             _properties = snapshot.data!;
 

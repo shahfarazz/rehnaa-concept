@@ -8,7 +8,7 @@ class Tenant {
   num rating;
   num balance;
   //  String propertyDetails;
-  String? cnicNumber;
+  String? cnic;
   String? emailOrPhone;
   bool? tasdeeqVerification;
   bool? policeVerification;
@@ -21,8 +21,8 @@ class Tenant {
   String? tempID;
   Timestamp? dateJoined;
   String? address;
-  Timestamp? contractStartDate;
-  Timestamp? contractEndDate;
+  DateTime? contractStartDate;
+  DateTime? contractEndDate;
   String? propertyAddress;
   String? monthlyRent;
   // ignore: prefer_typing_uninitialized_variables
@@ -35,6 +35,7 @@ class Tenant {
   var creditScore;
   var creditPoints;
   var otherInfo;
+  var isRentoffWinner;
 
   Tenant({
     required this.firstName,
@@ -44,7 +45,7 @@ class Tenant {
     required this.balance,
     required this.creditPoints,
     // required this.propertyDetails,
-    required this.cnicNumber,
+    required this.cnic,
     required this.emailOrPhone,
     required this.tasdeeqVerification,
     required this.familyMembers,
@@ -68,6 +69,7 @@ class Tenant {
     this.securityDeposit,
     this.creditScore,
     this.otherInfo,
+    this.isRentoffWinner,
   });
 
   factory Tenant.fromJson(Map<String, dynamic> json) {
@@ -79,7 +81,7 @@ class Tenant {
       balance: json['balance'] ?? 0.0,
       creditPoints: json['creditPoints'] ?? "",
       // propertyDetails: json['propertyDetails'] ?? 'No property details',
-      cnicNumber: json['cnicNumber'] ?? 'N/A',
+      cnic: json['cnic'],
       emailOrPhone: json['emailOrPhone'] ?? 'N/A',
       tasdeeqVerification: json['tasdeeqVerification'] ?? null,
       familyMembers: json['familyMembers'] ?? 0,
@@ -91,9 +93,13 @@ class Tenant {
           ? List<DocumentReference<Map<String, dynamic>>>.from(
               json['rentpaymentRef'].map((ref) => ref as DocumentReference))
           : null,
-      address: json['address'] ?? '',
-      contractStartDate: json['contractStartDate'],
-      contractEndDate: json['contractEndDate'],
+      address: json['address'],
+      contractStartDate: json['contractStartDate'] != null
+          ? json['contractStartDate'].toDate()
+          : null,
+      contractEndDate: json['contractEndDate'] != null
+          ? json['contractEndDate'].toDate()
+          : null,
       propertyAddress: json['propertyAddress'] ?? 'No address found',
       monthlyRent: json['monthlyRent'] ?? '',
       // upfrontBonus: json['upfrontBonus'] ?? '',
@@ -115,7 +121,7 @@ class Tenant {
       'balance': balance,
       'creditPoints': creditPoints,
       // 'propertyDetails': propertyDetails,
-      'cnicNumber': cnicNumber,
+      'cnic': cnic,
       'emailOrPhone': emailOrPhone,
       'tasdeeqVerification': tasdeeqVerification,
       'familyMembers': familyMembers,
@@ -150,7 +156,7 @@ class Tenant {
       balance: 1000,
       creditPoints: 100,
       // propertyDetails: 'Dummy property',
-      cnicNumber: '123456789',
+      cnic: '123456789',
       emailOrPhone: 'dummy@example.com',
       tasdeeqVerification: true,
       familyMembers: 2,

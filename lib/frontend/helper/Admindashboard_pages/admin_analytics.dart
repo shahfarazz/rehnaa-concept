@@ -3,8 +3,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:rehnaa/backend/models/landlordmodel.dart';
 import 'package:rehnaa/backend/models/propertymodel.dart';
 import 'package:rehnaa/backend/models/rentpaymentmodel.dart';
-import 'package:rehnaa/backend/models/tenantsmodel.dart';
-import 'package:fl_chart/fl_chart.dart';
 import 'package:rehnaa/frontend/helper/bargraphs/bargraph.dart';
 
 class AdminAnalyticsPage extends StatefulWidget {
@@ -20,7 +18,7 @@ class _AdminAnalyticsPageState extends State<AdminAnalyticsPage> {
     List<Landlord> landlordList = [];
 
     for (var doc in querySnapshot.docs) {
-      Landlord landlord = await Landlord.fromJson(doc.data());
+      Landlord landlord = Landlord.fromJson(doc.data());
       landlordList.add(landlord);
     }
 

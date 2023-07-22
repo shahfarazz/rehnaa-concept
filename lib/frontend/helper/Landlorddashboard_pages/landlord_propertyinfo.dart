@@ -6,6 +6,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../backend/models/landlordmodel.dart';
 import '../../../backend/models/propertymodel.dart';
 import '../Tenantdashboard_pages/tenant_propertyinfo.dart';
 // import 'package:photo_view/photo_view.dart';
@@ -19,17 +20,20 @@ class PropertyPage extends StatefulWidget {
   final String address;
   final String emailOrPhone;
   final bool isTenantCall;
+  // final Landlord landlord;
 
-  const PropertyPage(
-      {super.key,
-      required this.property,
-      required this.firstName,
-      required this.lastName,
-      required this.pathToImage,
-      required this.location,
-      required this.address,
-      required this.emailOrPhone,
-      required this.isTenantCall});
+  const PropertyPage({
+    super.key,
+    required this.property,
+    required this.firstName,
+    required this.lastName,
+    required this.pathToImage,
+    required this.location,
+    required this.address,
+    required this.emailOrPhone,
+    required this.isTenantCall,
+    // required this.landlord
+  });
 
   @override
   // ignore: library_private_types_in_public_api
@@ -68,6 +72,7 @@ class _PropertyPageState extends State<PropertyPage> {
                     pathToImage: widget.pathToImage,
                     emailOrPhone: widget.emailOrPhone,
                     isTenantCall: widget.isTenantCall,
+                    // landlord: widget.landlord,
                   ),
                 ),
               ],
@@ -215,15 +220,18 @@ class PropertyDetails extends StatelessWidget {
   final String pathToImage;
   final String emailOrPhone;
   final bool isTenantCall;
+  // final Landlord landlord;
 
-  const PropertyDetails(
-      {super.key,
-      required this.property,
-      required this.firstName,
-      required this.lastName,
-      required this.pathToImage,
-      required this.emailOrPhone,
-      required this.isTenantCall});
+  const PropertyDetails({
+    super.key,
+    required this.property,
+    required this.firstName,
+    required this.lastName,
+    required this.pathToImage,
+    required this.emailOrPhone,
+    required this.isTenantCall,
+    // required this.landlord
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -405,10 +413,41 @@ class PropertyDetails extends StatelessWidget {
                             shape: BoxShape.circle,
                             border: Border.all(color: Colors.black, width: 2),
                           ),
-                          child: const CircleAvatar(
-                            // Replace with the owner's image
-                            backgroundImage: AssetImage('assets/userimage.jpg'),
-                          ),
+                          child: CircleAvatar(
+                              // Replace with the owner's image
+                              // backgroundImage: AssetImage('assets/userimage.jpg'),
+                              child: ClipOval(
+                            child: pathToImage != null &&
+                                    pathToImage!.isNotEmpty
+                                ? (pathToImage!.startsWith('assets')
+                                    ? Image.asset(
+                                        pathToImage!,
+                                        width: 150,
+                                        height: 150,
+                                      )
+                                    : Image.network(
+                                        fit: BoxFit.cover,
+                                        pathToImage!,
+                                        width: 150,
+                                        height: 150,
+                                        loadingBuilder:
+                                            (context, child, loadingProgress) {
+                                          if (loadingProgress == null)
+                                            return child;
+                                          return Center(
+                                            child: const SpinKitFadingCube(
+                                              color: Color.fromARGB(
+                                                  255, 30, 197, 83),
+                                            ),
+                                          );
+                                        },
+                                      ))
+                                : Image.asset(
+                                    'assets/defaulticon.png',
+                                    width: 150,
+                                    height: 150,
+                                  ),
+                          )),
                         ),
                         const SizedBox(width: 8),
                         Column(

@@ -462,10 +462,12 @@ class AuthenticationService extends ChangeNotifier {
       if (kDebugMode) {
         print('Signing in with Email and Password...');
       }
+
       await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
+
       if (kDebugMode) {
         print('Signed in with Email and Password.');
       }
@@ -486,6 +488,13 @@ class AuthenticationService extends ChangeNotifier {
               Colors.redAccent);
           return;
         }
+      }
+      //check if email is verified
+      if (FirebaseAuth.instance.currentUser!.emailVerified == false &&
+          userDoc.data()!['type'] != 'Dealer') {
+        showToast('Please verify your email first.', Colors.red);
+        Navigator.pop(context);
+        return;
       }
 
       if (userDoc.data()!['type'] == 'Tenant') {

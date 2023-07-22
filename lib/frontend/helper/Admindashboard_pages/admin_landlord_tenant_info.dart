@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:rehnaa/backend/services/helperfunctions.dart';
 
 import '../../../backend/models/tenantsmodel.dart';
 
@@ -114,7 +115,7 @@ class _AdminLandlordTenantInfoPageState
             rating: doc['rating'] ?? 0.0,
             balance: doc['balance'] ?? 0,
             creditPoints: doc['creditPoints'] ?? 0,
-            cnicNumber: doc['cnicNumber'] ?? '',
+            cnic: decryptString(doc['cnic']) ?? '',
             emailOrPhone: doc['emailOrPhone'] ?? '',
             tasdeeqVerification: doc['tasdeeqVerification'] ?? false,
             policeVerification: false,
