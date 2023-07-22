@@ -559,6 +559,36 @@ class _DashboardPageState extends State<TenantDashboardPage>
                       },
                     ),
                     _buildSidebarItem(
+                      icon: Icons.discount,
+                      label: 'Rent Off Winners',
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => TenantMonthlyRentOffPage(
+                              uid: widget.uid,
+                            ),
+                          ),
+                        );
+                        // _closeSidebar();
+                      },
+                    ),
+                    _buildSidebarItem(
+                      icon: Icons.real_estate_agent,
+                      label: 'Rent Accrual',
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => TenantRentAccrualPage(
+                              uid: widget.uid,
+                            ),
+                          ),
+                        );
+                        // _closeSidebar();
+                      },
+                    ),
+                    _buildSidebarItem(
                       icon: Icons.home_work_sharp,
                       label: 'Rented Properties',
                       onTap: () {
@@ -590,21 +620,6 @@ class _DashboardPageState extends State<TenantDashboardPage>
                       },
                     ),
                     _buildSidebarItem(
-                      icon: Icons.discount,
-                      label: 'Rent Off Winners',
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => TenantMonthlyRentOffPage(
-                              uid: widget.uid,
-                            ),
-                          ),
-                        );
-                        // _closeSidebar();
-                      },
-                    ),
-                    _buildSidebarItem(
                       icon: Icons.lock,
                       label: 'Privacy Policy',
                       onTap: () {
@@ -625,21 +640,6 @@ class _DashboardPageState extends State<TenantDashboardPage>
                           context,
                           MaterialPageRoute(
                             builder: (context) => const FAQPage(),
-                          ),
-                        );
-                        // _closeSidebar();
-                      },
-                    ),
-                    _buildSidebarItem(
-                      icon: Icons.real_estate_agent,
-                      label: 'Rent Accrual',
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => TenantRentAccrualPage(
-                              uid: widget.uid,
-                            ),
                           ),
                         );
                         // _closeSidebar();

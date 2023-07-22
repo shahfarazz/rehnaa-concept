@@ -22,7 +22,7 @@ class TenantMonthlyRentOffPage extends StatefulWidget {
 class _TenantMonthlyRentOffPageState extends State<TenantMonthlyRentOffPage>
     with TickerProviderStateMixin {
   late ConfettiController _confettiController;
-  late AnimationController _animationController;
+  // late AnimationController _animationController;
   double _currentRotation = 0;
   bool _animationFinished = false; // New state variable
   bool _isPageVisible = false;
@@ -70,30 +70,30 @@ class _TenantMonthlyRentOffPageState extends State<TenantMonthlyRentOffPage>
     super.initState();
     _confettiController =
         ConfettiController(duration: const Duration(seconds: 5));
-    _animationController = AnimationController(
-      duration: const Duration(seconds: 8),
-      vsync: this,
-    );
-    _animationController.addListener(() {
-      setState(() {
-        _currentRotation = _animationController.value * 2 * pi;
-      });
-    });
-    _animationController.addStatusListener((status) {
-      if (status == AnimationStatus.completed) {
-        setState(() {
-          _animationFinished =
-              true; // Set the state variable when the animation finishes
-        });
-      }
-    });
+    // _animationController = AnimationController(
+    //   duration: const Duration(seconds: 8),
+    //   vsync: this,
+    // );
+    // _animationController.addListener(() {
+    //   setState(() {
+    //     _currentRotation = _animationController.value * 2 * pi;
+    //   });
+    // });
+    // _animationController.addStatusListener((status) {
+    //   if (status == AnimationStatus.completed) {
+    //     setState(() {
+    //       _animationFinished =
+    //           true; // Set the state variable when the animation finishes
+    //     });
+    //   }
+    // });
     // fetchWinnerTenants();
   }
 
   @override
   void dispose() {
     _confettiController.dispose();
-    _animationController.dispose();
+    // _animationController.dispose();
     super.dispose();
   }
 
@@ -106,22 +106,22 @@ class _TenantMonthlyRentOffPageState extends State<TenantMonthlyRentOffPage>
     _confettiController =
         ConfettiController(duration: const Duration(seconds: 5));
     _confettiController.play();
-    _animationController.reset();
-    _animationController.dispose();
-    _animationController = AnimationController(
-      duration: const Duration(seconds: 8),
-      vsync: this,
-    );
-    _animationFinished = false;
-    _animationController.forward();
-    _animationController.addStatusListener((status) {
-      if (status == AnimationStatus.completed) {
-        setState(() {
-          _animationFinished =
-              true; // Set the state variable when the animation finishes
-        });
-      }
-    });
+    // _animationController.reset();
+    // _animationController.dispose();
+    // _animationController = AnimationController(
+    //   duration: const Duration(seconds: 8),
+    //   vsync: this,
+    // );
+    // _animationFinished = false;
+    // _animationController.forward();
+    // _animationController.addStatusListener((status) {
+    //   if (status == AnimationStatus.completed) {
+    //     setState(() {
+    //       _animationFinished =
+    //           true; // Set the state variable when the animation finishes
+    //     });
+    //   }
+    // });
   }
 
   @override
@@ -311,89 +311,89 @@ class _TenantMonthlyRentOffPageState extends State<TenantMonthlyRentOffPage>
                               ),
                               SizedBox(height: size.height * 0.03),
                               // Replace your CircleAvatar widget with the revolving images
-                              _animationFinished
-                                  ? CircleAvatar(
-                                      radius: size.width * 0.2,
-                                      backgroundColor: Colors.white,
-                                      backgroundImage: winnerTenants[index]
-                                              .pathToImage!
-                                              .contains('assets')
-                                          ? AssetImage(
-                                              winnerTenants[index].pathToImage!)
-                                          : CachedNetworkImageProvider(
-                                              winnerTenants[index].pathToImage!,
-                                            ) as ImageProvider,
-                                    )
-                                  : AnimatedBuilder(
-                                      animation: _animationController,
-                                      builder: (BuildContext context,
-                                          Widget? child) {
-                                        return Transform.rotate(
-                                          angle: _animationController.value *
-                                              2 *
-                                              pi,
-                                          child: Stack(
-                                            alignment: Alignment.center,
-                                            children: winnerTenants
-                                                .asMap()
-                                                .entries
-                                                .map(
-                                                  (entry) => Transform(
-                                                    transform: Matrix4.rotationY(
-                                                            _animationController
-                                                                    .value *
-                                                                2 *
-                                                                pi) *
-                                                        Matrix4.rotationZ(
-                                                            _animationController
-                                                                    .value *
-                                                                2 *
-                                                                pi),
-                                                    alignment: Alignment.center,
-                                                    child: Transform.translate(
-                                                      offset: Offset(
-                                                        100 *
-                                                            cos(_animationController
-                                                                        .value *
-                                                                    2 *
-                                                                    pi +
-                                                                (2 *
-                                                                    pi *
-                                                                    entry.key /
-                                                                    winnerTenants
-                                                                        .length)),
-                                                        0.0,
-                                                      ),
-                                                      child: Transform.scale(
-                                                        scale:
-                                                            _animationController
-                                                                .value,
-                                                        child: CircleAvatar(
-                                                          radius: 30.0,
-                                                          backgroundColor:
-                                                              Colors.white,
-                                                          backgroundImage: entry
-                                                                  .value
-                                                                  .pathToImage!
-                                                                  .contains(
-                                                                      'assets')
-                                                              ? AssetImage(entry
-                                                                  .value
-                                                                  .pathToImage!)
-                                                              : CachedNetworkImageProvider(
-                                                                  entry.value
-                                                                      .pathToImage!,
-                                                                ) as ImageProvider,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                )
-                                                .toList(),
-                                          ),
-                                        );
-                                      },
-                                    ),
+                              // _animationFinished
+                              CircleAvatar(
+                                radius: size.width * 0.2,
+                                backgroundColor: Colors.white,
+                                backgroundImage: winnerTenants[index]
+                                        .pathToImage!
+                                        .contains('assets')
+                                    ? AssetImage(
+                                        winnerTenants[index].pathToImage!)
+                                    : CachedNetworkImageProvider(
+                                        winnerTenants[index].pathToImage!,
+                                      ) as ImageProvider,
+                              ),
+                              // : AnimatedBuilder(
+                              //     animation: _animationController,
+                              //     builder: (BuildContext context,
+                              //         Widget? child) {
+                              //       return Transform.rotate(
+                              //         angle: _animationController.value *
+                              //             2 *
+                              //             pi,
+                              //         child: Stack(
+                              //           alignment: Alignment.center,
+                              //           children: winnerTenants
+                              //               .asMap()
+                              //               .entries
+                              //               .map(
+                              //                 (entry) => Transform(
+                              //                   transform: Matrix4.rotationY(
+                              //                           _animationController
+                              //                                   .value *
+                              //                               2 *
+                              //                               pi) *
+                              //                       Matrix4.rotationZ(
+                              //                           _animationController
+                              //                                   .value *
+                              //                               2 *
+                              //                               pi),
+                              //                   alignment: Alignment.center,
+                              //                   child: Transform.translate(
+                              //                     offset: Offset(
+                              //                       100 *
+                              //                           cos(_animationController
+                              //                                       .value *
+                              //                                   2 *
+                              //                                   pi +
+                              //                               (2 *
+                              //                                   pi *
+                              //                                   entry.key /
+                              //                                   winnerTenants
+                              //                                       .length)),
+                              //                       0.0,
+                              //                     ),
+                              //                     child: Transform.scale(
+                              //                       scale:
+                              //                           _animationController
+                              //                               .value,
+                              //                       child: CircleAvatar(
+                              //                         radius: 30.0,
+                              //                         backgroundColor:
+                              //                             Colors.white,
+                              //                         backgroundImage: entry
+                              //                                 .value
+                              //                                 .pathToImage!
+                              //                                 .contains(
+                              //                                     'assets')
+                              //                             ? AssetImage(entry
+                              //                                 .value
+                              //                                 .pathToImage!)
+                              //                             : CachedNetworkImageProvider(
+                              //                                 entry.value
+                              //                                     .pathToImage!,
+                              //                               ) as ImageProvider,
+                              //                       ),
+                              //                     ),
+                              //                   ),
+                              //                 ),
+                              //               )
+                              //               .toList(),
+                              //         ),
+                              //       );
+                              //     },
+                              //   ),
                               SizedBox(height: size.height * 0.03),
                               // Display dummy description
                               Center(

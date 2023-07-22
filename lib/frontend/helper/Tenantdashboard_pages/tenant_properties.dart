@@ -344,6 +344,8 @@ class PropertyCard extends StatelessWidget {
                     SizedBox(height: screenHeight * 0.005),
                     Text(
                       '$location\n$address',
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(fontSize: screenWidth * 0.035),
                     ),
                     SizedBox(height: screenHeight * 0.01),

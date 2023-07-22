@@ -187,6 +187,13 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
     final TextEditingController addressController =
         TextEditingController(text: tenant.address ?? '');
 
+    //phoneNumber
+    final TextEditingController phoneNumberController =
+        TextEditingController(text: tenant.phoneNumber ?? '');
+    //pastLandlordTestimonial
+    final TextEditingController pastLandlordTestimonialController =
+        TextEditingController(text: tenant.pastLandlordTestimonial ?? '');
+
     DateTime? contractStartDate = tenant.contractStartDate;
     DateTime? contractEndDate = tenant.contractEndDate;
 
@@ -399,6 +406,23 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
                       }
                     },
                   ),
+                  TextFormField(
+                      controller: phoneNumberController,
+                      decoration:
+                          const InputDecoration(labelText: 'Phone Number'),
+                      validator: (value) {
+                        //check if value can be parsed
+                        if (value != null &&
+                            int.tryParse(value) == null &&
+                            value != '') {
+                          return 'Please enter a valid phone number';
+                        }
+                      }),
+                  TextFormField(
+                    controller: pastLandlordTestimonialController,
+                    decoration: const InputDecoration(
+                        labelText: 'Past Landlord Testimonial'),
+                  ),
                   // Field to ask for bool value from user for police verification
                   // Give options yes / no
                   StatefulBuilder(
@@ -496,6 +520,9 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
                               securityDepositController.text ?? '',
                           'creditScore': creditScoreController.text ?? '',
                           'otherInfo': otherInfoController.text ?? '',
+                          'phoneNumber': phoneNumberController.text ?? '',
+                          'pastLandlordTestimonial':
+                              pastLandlordTestimonialController.text ?? '',
                         };
 
                         //create a checkpackage that discludes all the document references.
@@ -538,6 +565,13 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
                                   otherInfoController.text != 'null'
                               ? otherInfoController.text
                               : 'empty',
+                          'phoneNumber': phoneNumberController.text.isNotEmpty
+                              ? phoneNumberController.text
+                              : 'empty',
+                          'pastLandlordTestimonial':
+                              pastLandlordTestimonialController.text.isNotEmpty
+                                  ? pastLandlordTestimonialController.text
+                                  : 'empty',
                         };
 
                         showDialog(
@@ -752,6 +786,14 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
                                                       '';
                                               tenant.otherInfo =
                                                   otherInfoController.text ??
+                                                      '';
+                                              tenant.phoneNumber =
+                                                  phoneNumberController.text ??
+                                                      '';
+
+                                              tenant.pastLandlordTestimonial =
+                                                  pastLandlordTestimonialController
+                                                          .text ??
                                                       '';
                                             });
 

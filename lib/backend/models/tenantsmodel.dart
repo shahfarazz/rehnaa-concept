@@ -36,6 +36,8 @@ class Tenant {
   var creditPoints;
   var otherInfo;
   var isRentoffWinner;
+  var phoneNumber;
+  var pastLandlordTestimonial;
 
   Tenant({
     required this.firstName,
@@ -70,6 +72,8 @@ class Tenant {
     this.creditScore,
     this.otherInfo,
     this.isRentoffWinner,
+    this.phoneNumber,
+    this.pastLandlordTestimonial,
   });
 
   factory Tenant.fromJson(Map<String, dynamic> json) {
@@ -109,6 +113,8 @@ class Tenant {
       securityDeposit: json['securityDeposit'] ?? '',
       creditScore: json['creditScore'] ?? '',
       otherInfo: json['otherInfo'] ?? '',
+      phoneNumber: json['phoneNumber'] ?? '',
+      pastLandlordTestimonial: json['pastLandlordTestimonial'] ?? '',
     );
   }
 

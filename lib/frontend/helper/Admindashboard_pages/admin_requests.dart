@@ -78,7 +78,9 @@ class _AdminRequestsPageState extends State<AdminRequestsPage> {
                 AdminRequestData(
                     name: doc["paymentRequest"][i]["fullname"],
                     requestedAmount:
-                        doc["paymentRequest"][i]["amount"].toString(),
+                        (doc["paymentRequest"][i]["amount"] as double)
+                            .ceil()
+                            .toString(),
                     uid: doc["paymentRequest"][i]["uid"],
                     cashOrBankTransfer: doc["paymentRequest"][i]
                         ["paymentMethod"],

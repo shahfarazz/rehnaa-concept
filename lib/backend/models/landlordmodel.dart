@@ -36,6 +36,9 @@ class Landlord {
   var creditPoints;
   var creditScore;
   var hasEstamp;
+  var description;
+  var phoneNumber;
+  var pastTenantTestimonial;
 
   Landlord({
     required this.firstName,
@@ -69,6 +72,9 @@ class Landlord {
     this.creditPoints,
     this.creditScore,
     this.hasEstamp,
+    this.description,
+    this.phoneNumber,
+    this.pastTenantTestimonial,
   });
 
   static Landlord fromJson(Map<String, dynamic>? json) {
@@ -115,6 +121,9 @@ class Landlord {
       creditPoints: json['creditPoints'] ?? '',
       creditScore: json['creditScore'] ?? '',
       cnic: json['cnic'] ?? '',
+      description: json['description'] ?? '',
+      phoneNumber: json['phoneNumber'] ?? '',
+      pastTenantTestimonial: json['pastTenantTestimonial'] ?? '',
     );
 
     // await landlord.fetchData();
