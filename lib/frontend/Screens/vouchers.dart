@@ -187,8 +187,10 @@ class _VouchersPageState extends State<VouchersPage>
                           placeholder: (context, url) => SpinKitFadingCube(
                             color: Color.fromARGB(255, 30, 197, 83),
                           ),
-                          errorWidget: (context, url, error) =>
-                              Icon(Icons.error),
+                          errorWidget: (context, url, error) => Icon(
+                            Icons.error,
+                            color: Colors.green,
+                          ),
                         ),
                       ),
                     ),

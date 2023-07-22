@@ -456,7 +456,11 @@ class PropertyCard extends StatelessWidget {
                   placeholder: (context, url) => const SpinKitFadingCube(
                     color: Color.fromARGB(255, 30, 197, 83),
                   ),
-                  errorWidget: (context, url, error) => const Icon(Icons.error),
+                  //use an asset image called 'mainlogo.png' if the url doesn't work
+                  errorWidget: (context, url, error) => Image.asset(
+                    'assets/mainlogo.png',
+                    fit: BoxFit.scaleDown,
+                  ),
                   fit: BoxFit.cover,
                 ),
               ),
