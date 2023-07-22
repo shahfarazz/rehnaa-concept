@@ -136,8 +136,10 @@ class PropertyCarousel extends StatelessWidget {
                       placeholder: (context, url) => const SpinKitFadingCube(
                         color: Color.fromARGB(255, 30, 197, 83),
                       ),
-                      errorWidget: (context, url, error) =>
-                          const Icon(Icons.error),
+                      errorWidget: (context, url, error) => Image.asset(
+                        'assets/mainlogo.png',
+                        fit: BoxFit.scaleDown,
+                      ),
                       fit: BoxFit.cover,
                     ),
                   ),

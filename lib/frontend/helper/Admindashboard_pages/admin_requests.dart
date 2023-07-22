@@ -46,8 +46,13 @@ class _AdminRequestsPageState extends State<AdminRequestsPage> {
               adminRequests.add(
                 AdminRequestData(
                   name: doc["withdrawRequest"][i]["fullname"],
+                  // requestedAmount:
+                  // doc["withdrawRequest"][i]["amount"].toString(),
+                  //convert as double then apply cieling then back to string
                   requestedAmount:
-                      doc["withdrawRequest"][i]["amount"].toString(),
+                      (doc["withdrawRequest"][i]["amount"] as double)
+                          .ceil()
+                          .toString(),
                   uid: doc["withdrawRequest"][i]["uid"],
                   cashOrBankTransfer: doc["withdrawRequest"][i]
                       ["paymentMethod"],
@@ -164,8 +169,13 @@ class _AdminRequestsPageState extends State<AdminRequestsPage> {
               adminRequests.add(
                 AdminRequestData(
                   name: doc["withdrawRequestDealer"][i]["fullname"],
+                  // requestedAmount:
+                  //     doc["withdrawRequestDealer"][i]["amount"].toString(),
+                  // as double then .ciel then .toString
                   requestedAmount:
-                      doc["withdrawRequestDealer"][i]["amount"].toString(),
+                      (doc["withdrawRequestDealer"][i]["amount"] as double)
+                          .ceil()
+                          .toString(),
                   uid: doc["withdrawRequestDealer"][i]["uid"],
                   cashOrBankTransfer: doc["withdrawRequestDealer"][i]
                       ["paymentMethod"],
@@ -1206,29 +1216,6 @@ class LandlordWithdrawalCard extends StatelessWidget {
                             },
                           );
 
-                          // Reset the state of the page
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const AdminRequestsPage(),
-                            ),
-                          );
-                        } else if (data.requestType ==
-                            'Property Approval Request') {
-                          // Send a notification to the landlord
-                          await transaction.update(
-                            FirebaseFirestore.instance
-                                .collection('Notifications')
-                                .doc(data.uid),
-                            {
-                              'notifications': FieldValue.arrayUnion([
-                                {
-                                  'title': 'Property Approval Request Accepted',
-                                }
-                              ])
-                            },
-                          );
-
                           // ignore: use_build_context_synchronously
                           await showDialog(
                             context: context,
@@ -1548,6 +1535,47 @@ class LandlordWithdrawalCard extends StatelessWidget {
                         'isWithdraw': false,
                       });
                     });
+                  } else if (data.requestType == 'Property Approval Request') {
+                    // Send a notification to the landlord
+                    await FirebaseFirestore.instance
+                        .collection('Notifications')
+                        .doc(data.uid)
+                        .update({
+                      'notifications': FieldValue.arrayUnion([
+                        {
+                          'title': 'Property Approval Request Denied',
+                        }
+                      ])
+                    });
+
+                    //remove the propertyapproval request
+                    await FirebaseFirestore.instance
+                        .collection('AdminRequests')
+                        .doc(data.requestID)
+                        .get()
+                        .then((snapshot) {
+                      if (snapshot.exists) {
+                        final List<dynamic> withdrawRequestArray =
+                            snapshot.get('propertyApprovalRequest') ?? [];
+
+                        final updatedArray = List.from(withdrawRequestArray)
+                          ..removeWhere((element) =>
+                              element['requestID'] == data.withinArrayID);
+
+                        FirebaseFirestore.instance
+                            .collection('AdminRequests')
+                            .doc(data.requestID)
+                            .update({'propertyApprovalRequest': updatedArray});
+                      }
+                    });
+
+                    //reset state
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const AdminRequestsPage(),
+                      ),
+                    );
                   } else if (data.requestType == 'Tenant Rental Request') {
                     //remove the rental request
                     await FirebaseFirestore.instance

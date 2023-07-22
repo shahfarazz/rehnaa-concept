@@ -738,15 +738,69 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
                                   fontFamily:
                                       GoogleFonts.montserrat().fontFamily),
                             ),
-                            Text(
-                              description,
-                              maxLines: 4,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                  fontSize: 18,
-                                  color: Colors.grey,
-                                  fontFamily:
-                                      GoogleFonts.montserrat().fontFamily),
+                            GestureDetector(
+                              onTap: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return AlertDialog(
+                                      title: Text(
+                                        'Description',
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.green,
+                                          fontSize: 16.0,
+                                          fontFamily: GoogleFonts.montserrat()
+                                              .fontFamily,
+                                        ),
+                                      ),
+                                      content: SingleChildScrollView(
+                                          child: Text(
+                                        description,
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          // fontWeight: FontWeight.bold,
+                                          color: Colors.black,
+                                          // fontSize: 16.0,
+                                          fontFamily: GoogleFonts.montserrat()
+                                              .fontFamily,
+                                        ),
+                                      )),
+                                      actions: [
+                                        TextButton(
+                                          child: Text(
+                                            'Close',
+                                            style: TextStyle(
+                                              // fontWeight: FontWeight.bold,
+                                              color: Colors.green,
+                                              // fontSize: 16.0,
+                                              fontFamily:
+                                                  GoogleFonts.montserrat()
+                                                      .fontFamily,
+                                            ),
+                                          ),
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                          },
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+                              },
+                              child: Text(
+                                description == '' || description == null
+                                    ? 'N/A'
+                                    : description!,
+                                textAlign: TextAlign.center,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: GoogleFonts.montserrat(
+                                  fontSize: 16.0,
+                                  color: Colors.grey[600],
+                                ),
+                              ),
                             ),
 
                             // const SizedBox(height: 20),

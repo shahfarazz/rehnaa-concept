@@ -287,9 +287,114 @@ class MyScreen extends StatelessWidget {
                                   label: 'Contract End Date:',
                                   data: contractFields?['contractEndDate']
                                           .toDate()
+                                          .toString()
+                                          .substring(0, 10) ??
+                                      '',
+                                ),
+                                SizedBox(height: 16),
+                                ContractCard(
+                                  icon: Icons.calendar_today,
+                                  label: 'Contract End Date:',
+                                  data: contractFields?['contractEndDate']
+                                          .toDate()
+                                          .toString()
+                                          .substring(0, 10) ??
+                                      '',
+                                ),
+                                SizedBox(height: 16),
+                                ContractCard(
+                                  icon: Icons.calendar_today,
+                                  label: 'Use Purpose:',
+                                  data: contractFields?['usePurpose'] ?? '',
+                                ),
+                                //subletOption
+                                SizedBox(height: 16),
+                                ContractCard(
+                                  icon: Icons.calendar_today,
+                                  label: 'Sublet Option:',
+                                  data: contractFields?['subletOption'] ?? '',
+                                ),
+                                //utilitiesIncluded
+                                SizedBox(height: 16),
+                                ContractCard(
+                                  icon: Icons.calendar_today,
+                                  label: 'Utilities Included:',
+                                  data: contractFields?['utilitiesIncluded'] ??
+                                      '',
+                                ),
+                                //evictionNoticePeriod
+                                SizedBox(height: 16),
+                                ContractCard(
+                                  icon: Icons.calendar_today,
+                                  label: 'Eviction Notice Period:',
+                                  data: contractFields?['evictionNoticePeriod']
                                           .toString() ??
                                       '',
                                 ),
+                                //eStampValue
+                                SizedBox(height: 16),
+                                ContractCard(
+                                  icon: Icons.calendar_today,
+                                  label: 'E-Stamp Value:',
+                                  data: contractFields?['eStampValue']
+                                          .toString() ??
+                                      '',
+                                ),
+                                //notaryPublicStamp
+                                SizedBox(height: 16),
+                                ContractCard(
+                                  icon: Icons.calendar_today,
+                                  label: 'Notary Public Stamp:',
+                                  data: contractFields?['notaryPublicStamp']
+                                          .toString() ??
+                                      '',
+                                ),
+                                //bopChallanForm
+                                SizedBox(height: 16),
+                                ContractCard(
+                                  icon: Icons.calendar_today,
+                                  label: 'BOP Challan Form:',
+                                  data: contractFields?['bopChallanForm']
+                                          .toString() ??
+                                      '',
+                                ),
+                                //policeVerification
+                                SizedBox(height: 16),
+                                ContractCard(
+                                  icon: Icons.calendar_today,
+                                  label: 'Police Verification:',
+                                  data: contractFields?['policeVerification']
+                                          .toString() ??
+                                      '',
+                                ),
+                                //totalSecurity
+                                SizedBox(height: 16),
+                                ContractCard(
+                                  icon: Icons.calendar_today,
+                                  label: 'Total Security:',
+                                  data: contractFields?['totalSecurity']
+                                          .toString() ??
+                                      '',
+                                ),
+                                //rehnaaSecurity
+                                SizedBox(height: 16),
+                                ContractCard(
+                                  icon: Icons.calendar_today,
+                                  label: 'Rehnaa Security:',
+                                  data: contractFields?['rehnaaSecurity']
+                                          .toString() ??
+                                      '',
+                                ),
+                                //additionalInformation
+                                SizedBox(height: 16),
+                                ContractCard(
+                                  icon: Icons.calendar_today,
+                                  label: 'Additional Information:',
+                                  data: contractFields?['additionalInformation']
+                                          .toString() ??
+                                      '',
+                                ),
+
                                 // Rest of the ContractCard widgets...
                               ],
                             ),

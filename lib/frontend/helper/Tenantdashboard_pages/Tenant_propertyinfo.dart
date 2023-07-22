@@ -142,8 +142,10 @@ class PropertyCarousel extends StatelessWidget {
                           color: Color.fromARGB(255, 30, 197, 83),
                         ),
                       ),
-                      errorWidget: (context, url, error) =>
-                          const Icon(Icons.error),
+                      errorWidget: (context, url, error) => Image.asset(
+                        'assets/mainlogo.png',
+                        fit: BoxFit.scaleDown,
+                      ),
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -278,7 +280,10 @@ class _FullScreenImagePageState extends State<FullScreenImagePage> {
                       color: Color.fromARGB(255, 30, 197, 83),
                     ),
                   ),
-                  errorWidget: (context, url, error) => const Icon(Icons.error),
+                  errorWidget: (context, url, error) => Image.asset(
+                    'assets/mainlogo.png',
+                    fit: BoxFit.scaleDown,
+                  ),
                   fit: BoxFit.contain,
                 ),
               );

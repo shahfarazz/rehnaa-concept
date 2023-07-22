@@ -259,7 +259,10 @@ class _DealerLandlordOnboardedPageState
                                   ),
                                   trailing: Text(
                                     dealer?.landlordMap?[landlord.tempID]
-                                            ?['eStampContractStartDate'] ??
+                                                ?['eStampContractStartDate']
+                                            .toDate()
+                                            .toString()
+                                            .substring(0, 10) ??
                                         '',
                                     style: TextStyle(
                                       color: Colors.black,

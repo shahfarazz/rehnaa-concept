@@ -241,6 +241,10 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
     final TextEditingController addressController = TextEditingController(
         text: landlord.address == '' ? '' : landlord.address!);
 
+    // description
+    final TextEditingController descriptionController =
+        TextEditingController(text: landlord.description ?? '');
+
     // print('landlord address is ${landlord.address}');
 
     // final hashedCnic = encryptString(cnicController.text);
@@ -461,6 +465,12 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
                             return 'please enter a valid CNIC';
                           }
                         },
+                      ),
+                      //description
+                      TextFormField(
+                        controller: descriptionController,
+                        decoration:
+                            const InputDecoration(labelText: 'Description'),
                       ),
                       TextFormField(
                         controller: addressController,
@@ -693,6 +703,9 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
                                               'null'
                                       ? pastTenantTestimonialController.text
                                       : FieldValue.delete(),
+                              'description': descriptionController.text != ''
+                                  ? descriptionController.text
+                                  : FieldValue.delete(),
                             };
 
                             //create a checkpackage that discludes all the document references.
@@ -767,6 +780,9 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
                                               'null'
                                       ? pastTenantTestimonialController.text
                                       : 'empty',
+                              'description': descriptionController.text != ''
+                                  ? descriptionController.text
+                                  : 'empty',
                             };
 
                             // Show contents of package in a dialog and ask if you are sure about this

@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:rehnaa/backend/models/landlordmodel.dart';
+import 'package:rehnaa/backend/models/propertymodel.dart';
 
 class Tenant {
   String firstName;
@@ -38,6 +39,7 @@ class Tenant {
   var isRentoffWinner;
   var phoneNumber;
   var pastLandlordTestimonial;
+  Property? property;
 
   Tenant({
     required this.firstName,
@@ -74,6 +76,7 @@ class Tenant {
     this.isRentoffWinner,
     this.phoneNumber,
     this.pastLandlordTestimonial,
+    this.property,
   });
 
   factory Tenant.fromJson(Map<String, dynamic> json) {
@@ -145,6 +148,19 @@ class Tenant {
       landlord = Landlord.fromJson(snapshot.data());
       landlord?.tempID = snapshot.id;
       return landlord;
+    }
+    return null;
+  }
+
+  Future<Property?> getProperty() async {
+    print('propertyRef: $propertyRef');
+    if (propertyRef != null) {
+      DocumentSnapshot<Map<String, dynamic>> snapshot =
+          await propertyRef!.get();
+
+      property = Property.fromJson(snapshot.data()!);
+      // property!.tempID = snapshot.id;
+      return property!;
     }
     return null;
   }

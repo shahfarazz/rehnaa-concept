@@ -142,7 +142,8 @@ class TenantLandlordInfoPage extends StatelessWidget {
                                       GoogleFonts.montserrat().fontFamily,
                                 ),
                               ),
-                              content: Text(
+                              content: SingleChildScrollView(
+                                  child: Text(
                                 landlord.description,
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
@@ -152,7 +153,7 @@ class TenantLandlordInfoPage extends StatelessWidget {
                                   fontFamily:
                                       GoogleFonts.montserrat().fontFamily,
                                 ),
-                              ),
+                              )),
                               actions: [
                                 TextButton(
                                   child: Text(
@@ -175,8 +176,9 @@ class TenantLandlordInfoPage extends StatelessWidget {
                         );
                       },
                       child: Text(
-                        landlord.description == ''
-                            ? 'N/A'
+                        landlord.description == '' ||
+                                landlord.description == null
+                            ? ''
                             : landlord.description!,
                         textAlign: TextAlign.center,
                         maxLines: 1,
@@ -217,7 +219,7 @@ class TenantLandlordInfoPage extends StatelessWidget {
                                   child: WhiteBox(
                                     icon: Icons.star,
                                     iconColor: const Color(0xff33907c),
-                                    label: 'Rating',
+                                    label: 'Credit Score',
                                     value: '${tenant.landlord?.creditScore}',
                                     points: '${tenant.landlord?.creditPoints}',
                                   ),
@@ -242,7 +244,7 @@ class TenantLandlordInfoPage extends StatelessWidget {
                                   child: WhiteBox(
                                     icon: Icons.perm_identity,
                                     iconColor: const Color(0xff33907c),
-                                    label: 'Cnic',
+                                    label: 'CNIC Number',
                                     value: decryptString(landlord.cnic!),
                                   ),
                                 )

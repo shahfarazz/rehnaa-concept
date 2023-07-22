@@ -224,10 +224,12 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
               children: [
                 Row(
                   children: [
-                    Image.asset(
-                      iconAsset,
-                      width: size.width * 0.2,
-                    ),
+                    rentPayment.isEstamp != null
+                        ? Container()
+                        : Image.asset(
+                            iconAsset,
+                            width: size.width * 0.2,
+                          ),
                     SizedBox(width: size.width * 0.04),
                     Expanded(
                       child: Column(
@@ -248,7 +250,9 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
                           ),
                           SizedBox(height: size.height * 0.01),
                           Text(
-                            rentPayment.property?.location ?? '',
+                            rentPayment.isEstamp != null
+                                ? rentPayment.eStampType
+                                : rentPayment.property?.location ?? '',
                             style: GoogleFonts.montserrat(
                               fontSize: size.width * 0.03,
                               color: const Color(0xff33907c),

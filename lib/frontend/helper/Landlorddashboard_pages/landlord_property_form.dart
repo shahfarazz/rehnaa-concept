@@ -948,7 +948,9 @@ class _LandlordPropertyFormsState extends State<LandlordPropertyForms> {
       final List<XFile>? selectedImages = await picker.pickMultiImage();
 
       if (selectedImages != null && selectedImages.isNotEmpty) {
-        if (selectedImages.length > 10) {
+        if (selectedImages.length > 10 ||
+            imagePath.length > 10 ||
+            pathToImage.length > 10) {
           Fluttertoast.showToast(
             msg: 'You can select up to 10 images',
             gravity: ToastGravity.BOTTOM,

@@ -125,7 +125,7 @@ class LandlordTenantInfoPage extends StatelessWidget {
                           builder: (BuildContext context) {
                             return AlertDialog(
                               title: Text(
-                                'Landlord Description',
+                                'Tenant Description',
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
@@ -135,15 +135,17 @@ class LandlordTenantInfoPage extends StatelessWidget {
                                       GoogleFonts.montserrat().fontFamily,
                                 ),
                               ),
-                              content: Text(
-                                tenant.description ?? 'No Description',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  // fontWeight: FontWeight.bold,
-                                  color: Colors.black,
-                                  // fontSize: 16.0,
-                                  fontFamily:
-                                      GoogleFonts.montserrat().fontFamily,
+                              content: SingleChildScrollView(
+                                child: Text(
+                                  tenant.description ?? 'No Description',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    // fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                    // fontSize: 16.0,
+                                    fontFamily:
+                                        GoogleFonts.montserrat().fontFamily,
+                                  ),
                                 ),
                               ),
                               actions: [
@@ -227,7 +229,7 @@ class LandlordTenantInfoPage extends StatelessWidget {
                               ? Container()
                               : Center(
                                   child: WhiteBox(
-                                      icon: Icons.email,
+                                      icon: Icons.home,
                                       iconColor: const Color(0xff33907c),
                                       label: 'Personal Address',
                                       value: tenant.address!),
@@ -267,7 +269,7 @@ class LandlordTenantInfoPage extends StatelessWidget {
                               ? Container()
                               : Center(
                                   child: WhiteBox(
-                                    icon: Icons.email,
+                                    icon: Icons.calendar_today,
                                     iconColor: const Color(0xff33907c),
                                     label: 'Contract Start Date',
                                     value: tenant.contractStartDate!
@@ -283,7 +285,7 @@ class LandlordTenantInfoPage extends StatelessWidget {
                               ? Container()
                               : Center(
                                   child: WhiteBox(
-                                    icon: Icons.email,
+                                    icon: Icons.calendar_today,
                                     iconColor: const Color(0xff33907c),
                                     label: 'Contract End Date',
                                     value: tenant.contractEndDate!
@@ -299,7 +301,7 @@ class LandlordTenantInfoPage extends StatelessWidget {
                               ? Container()
                               : Center(
                                   child: WhiteBox(
-                                    icon: Icons.email,
+                                    icon: Icons.home,
                                     iconColor: const Color(0xff33907c),
                                     label: 'Rented Property Address',
                                     value: tenant.propertyAddress!,

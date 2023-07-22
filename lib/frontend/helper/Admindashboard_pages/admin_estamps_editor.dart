@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 import '../../../backend/models/dealermodel.dart';
@@ -30,10 +31,10 @@ class _AdminEstampsEditorPageState extends State<AdminEstampsEditorPage> {
   TextEditingController eStampDeliveredDateController = TextEditingController();
   TextEditingController eStampPoliceVerificationController =
       TextEditingController();
-  TextEditingController eStampContractStartDateController =
-      TextEditingController();
-  TextEditingController eStampContractEndDateController =
-      TextEditingController();
+  // TextEditingController eStampContractStartDateController =
+  //     TextEditingController();
+  // TextEditingController eStampContractEndDateController =
+  //     TextEditingController();
   TextEditingController eStampPropertyAddressController =
       TextEditingController();
   TextEditingController eStampPropertyRentAmountController =
@@ -42,6 +43,31 @@ class _AdminEstampsEditorPageState extends State<AdminEstampsEditorPage> {
   TextEditingController eStampMonthlyProfitController = TextEditingController();
   //estampCost
   TextEditingController eStampCostController = TextEditingController();
+
+  DateTime? contractStartDate;
+  DateTime? contractEndDate;
+  bool? isFilled;
+  // var oldCost;/
+  // var oldMonthlyProfit;
+  // var oldUpfrontBonus;
+  Future<void> _selectDate(bool isStartDate, StateSetter setState1) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2020),
+      lastDate: DateTime(2025),
+    );
+
+    if (picked != null) {
+      setState1(() {
+        if (isStartDate) {
+          contractStartDate = picked;
+        } else {
+          contractEndDate = picked;
+        }
+      });
+    }
+  }
 
   @override
   void initState() {
@@ -54,6 +80,14 @@ class _AdminEstampsEditorPageState extends State<AdminEstampsEditorPage> {
     if (landlordMap != null) {
       Map<String, dynamic>? landlordData = landlordMap[widget.landlord.tempID];
       if (landlordData != null) {
+        try {
+          contractStartDate = landlordData['eStampContractStartDate'].toDate();
+          contractEndDate = landlordData['eStampContractEndDate'].toDate();
+        } catch (e) {
+          print('error in loading dates');
+          landlordData['eStampContractStartDate'] = null;
+          landlordData['eStampContractEndDate'] = null;
+        }
         setState(() {
           eStampAddressController.text = landlordData['eStampAddress'] ?? '';
           eStampDateController.text = landlordData['eStampDate'] ?? '';
@@ -65,10 +99,6 @@ class _AdminEstampsEditorPageState extends State<AdminEstampsEditorPage> {
               landlordData['eStampDeliveredDate'] ?? '';
           eStampPoliceVerificationController.text =
               landlordData['eStampPoliceVerification'] ?? '';
-          eStampContractStartDateController.text =
-              landlordData['eStampContractStartDate'] ?? '';
-          eStampContractEndDateController.text =
-              landlordData['eStampContractEndDate'] ?? '';
           eStampPropertyAddressController.text =
               landlordData['eStampPropertyAddress'] ?? '';
           eStampPropertyRentAmountController.text =
@@ -79,6 +109,16 @@ class _AdminEstampsEditorPageState extends State<AdminEstampsEditorPage> {
               landlordData['eStampMonthlyProfit'] ?? '';
           eStampCostController.text =
               landlordData['eStampCost'].toString() ?? '';
+
+          contractStartDate = landlordData['eStampContractStartDate'].toDate();
+          contractEndDate = landlordData['eStampContractEndDate'].toDate();
+          isFilled = landlordData['isFilled'];
+          // oldCost:
+          // landlordData['eStampCost'];
+          // oldMonthlyProfit:
+          // landlordData['eStampMonthlyProfit'];
+          // oldUpfrontBonus:
+          // landlordData['eStampUpfrontBonus'];
         });
       }
     }
@@ -98,13 +138,18 @@ class _AdminEstampsEditorPageState extends State<AdminEstampsEditorPage> {
       'eStampValue': eStampValueController.text,
       'eStampDeliveredDate': eStampDeliveredDateController.text,
       'eStampPoliceVerification': eStampPoliceVerificationController.text,
-      'eStampContractStartDate': eStampContractStartDateController.text,
-      'eStampContractEndDate': eStampContractEndDateController.text,
+      // 'eStampContractStartDate': eStampContractStartDateController.text,
+      // 'eStampContractEndDate': eStampContractEndDateController.text,
       'eStampPropertyAddress': eStampPropertyAddressController.text,
       'eStampPropertyRentAmount': eStampPropertyRentAmountController.text,
       'eStampUpfrontBonus': eStampUpfrontBonusController.text,
       'eStampMonthlyProfit': eStampMonthlyProfitController.text,
       'eStampCost': int.tryParse(eStampCostController.text) ?? 0,
+      if (contractStartDate != null)
+        'eStampContractStartDate': Timestamp.fromDate(contractStartDate!),
+      if (contractEndDate != null)
+        'eStampContractEndDate': Timestamp.fromDate(contractEndDate!),
+      'isFilled': true,
     };
 
     Map<String, Map<String, dynamic>> updatedLandlordMap = {
@@ -114,46 +159,124 @@ class _AdminEstampsEditorPageState extends State<AdminEstampsEditorPage> {
     // to the dealer.landlordmap add the new map of landlord data mapped to the landlord id
     dealer.landlordMap!.addAll(updatedLandlordMap);
 
-    FirebaseFirestore.instance.collection('rentPayments').add({
-      'tenantname': widget.landlord.firstName +
-          ' ' +
-          widget.landlord.lastName +
-          '\n\nEstamp Charges',
-      'LandlordRef':
-          FirebaseFirestore.instance.collection('Dealers').doc(dealer.tempID),
-      'amount':
-          int.tryParse(eStampCostController.text) ?? 0, //convert to int later
-      'date': DateTime.now(),
-      'isMinus': true,
-      'isNoPdf': true,
-      // 'description': 'Balance updated by dealer',
-      'paymentType': '',
-    }).then((val) {
+    //show spinkitfadingcube loading indicator as dialog
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (context) => Center(
+        child: SpinKitFadingCube(
+          color: Color.fromARGB(255, 30, 197, 83),
+        ),
+      ),
+    );
+
+    if (!(isFilled ?? false)) {
+      // //check if cost has changed from old value
+      // if(eStampCostController.text != oldCost){
+      //   //if yes then add the new cost to the balance
+      //   dealer.balance = dealer.balance! + (int.tryParse(eStampCostController.text) ?? 0);
+      // }
+
+      FirebaseFirestore.instance.collection('rentPayments').add({
+        'tenantname':
+            widget.landlord.firstName + ' ' + widget.landlord.lastName,
+        'LandlordRef':
+            FirebaseFirestore.instance.collection('Dealers').doc(dealer.tempID),
+        'amount': int.tryParse(eStampMonthlyProfitController.text) ??
+            0, //convert to int later
+        'date': DateTime.now(),
+        'isMinus': true,
+        'isNoPdf': true,
+        'isEstamp': true,
+        'eStampType': 'Monthly Profit',
+        'paymentType': '',
+      }).then((newval1) {
+        FirebaseFirestore.instance.collection('rentPayments').add({
+          'tenantname':
+              widget.landlord.firstName + ' ' + widget.landlord.lastName,
+          'LandlordRef': FirebaseFirestore.instance
+              .collection('Dealers')
+              .doc(dealer.tempID),
+          'amount': int.tryParse(eStampMonthlyProfitController.text) ??
+              0, //convert to int later
+          'date': DateTime.now(),
+          'isMinus': true,
+          'isNoPdf': true,
+          'isEstamp': true,
+          'eStampType': 'Upfront Bonus',
+          'paymentType': '',
+        }).then((newval2) {
+          FirebaseFirestore.instance.collection('rentPayments').add({
+            'tenantname':
+                widget.landlord.firstName + ' ' + widget.landlord.lastName,
+            'LandlordRef':
+                FirebaseFirestore.instance.collection('Dealers').doc(dealerId),
+            'amount': int.tryParse(eStampCostController.text) ??
+                0, //convert to int later
+            'date': DateTime.now(),
+            'isMinus': true,
+            'isNoPdf': true,
+            'isEstamp': true,
+            'eStampType': 'Estamp Charges',
+            'paymentType': '',
+          }).then((val) {
+            FirebaseFirestore.instance
+                .collection('Dealers')
+                .doc(dealerId)
+                .update({
+              'landlordMap': dealer.landlordMap,
+              // 'balance': //subtract amount from balance
+              //     FieldValue.increment(
+              //         -(int.tryParse(eStampCostController.text) ?? 0)),
+              //change the balance based on estampcost estampmonthlyprofit and estampupfrontbonus
+              'balance': FieldValue.increment(-(int.tryParse(
+                      eStampCostController.text) ??
+                  0 +
+                      (int.tryParse(eStampMonthlyProfitController.text) ?? 0) +
+                      (int.tryParse(eStampUpfrontBonusController.text) ?? 0))),
+              // 'rentpaymentRef':
+              //     FieldValue.arrayUnion([val])
+              //add val newval1 and newval2 to rentpaymentref
+              'rentpaymentRef': FieldValue.arrayUnion(
+                  [val, newval1, newval2]) // key - value pairs Ali Ahmed
+            }).then((_) {
+              // Navigator.pop(context);
+              // Navigator.pop(context);
+              Navigator.push(context, MaterialPageRoute(builder: (context) {
+                return AdminEstampsPage();
+              }));
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Landlord E-Stamp saved successfully.'),
+                ),
+              );
+            }).catchError((error) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Failed to save Landlord Map: $error'),
+                ),
+              );
+            });
+
+            Navigator.push(context, MaterialPageRoute(builder: (context) {
+              return AdminEstampsPage();
+            }));
+          });
+        });
+      });
+    } else {
       FirebaseFirestore.instance.collection('Dealers').doc(dealerId).update({
         'landlordMap': dealer.landlordMap,
-        'balance': //subtract amount from balance
-            FieldValue.increment(
-                -(int.tryParse(eStampCostController.text) ?? 0)),
-        'rentpaymentRef':
-            FieldValue.arrayUnion([val]) // key - value pairs Ali Ahmed
-      }).then((_) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Landlord E-Stamp saved successfully.'),
-          ),
-        );
-      }).catchError((error) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Failed to save Landlord Map: $error'),
-          ),
-        );
+        // 'balance': //subtract amount from balance
+        //     FieldValue.increment(
+        //         -(int.tryParse(eStampCostController.text) ?? 0)),
+        // 'rentpaymentRef':
+        //     FieldValue.arrayUnion([val]) // key - value pairs Ali Ahmed
       });
-
       Navigator.push(context, MaterialPageRoute(builder: (context) {
         return AdminEstampsPage();
       }));
-    });
+    }
   }
 
   @override
@@ -169,7 +292,7 @@ class _AdminEstampsEditorPageState extends State<AdminEstampsEditorPage> {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => AdminDashboard()),
+                  MaterialPageRoute(builder: (context) => AdminEstampsPage()),
                 );
               }),
           flexibleSpace: Container(
@@ -254,24 +377,26 @@ class _AdminEstampsEditorPageState extends State<AdminEstampsEditorPage> {
                     labelText: 'eStamp Police Verification',
                   ),
                 ),
-                TextField(
-                  controller: eStampContractStartDateController,
-                  onChanged: (value) {
-                    setState(() {});
-                  },
-                  decoration: InputDecoration(
-                    labelText: 'eStamp Contract Start Date',
-                  ),
-                ),
-                TextField(
-                  controller: eStampContractEndDateController,
-                  onChanged: (value) {
-                    setState(() {});
-                  },
-                  decoration: InputDecoration(
-                    labelText: 'eStamp Contract End Date',
-                  ),
-                ),
+                StatefulBuilder(builder: (context, setState) {
+                  return TextButton(
+                    onPressed: () => _selectDate(true, setState),
+                    child: Text(
+                      contractStartDate != null
+                          ? 'Contract Start Date: ${contractStartDate.toString()}'
+                          : 'Select Contract Start Date',
+                    ),
+                  );
+                }),
+                StatefulBuilder(builder: (context, setState) {
+                  return TextButton(
+                    onPressed: () => _selectDate(false, setState),
+                    child: Text(
+                      contractEndDate != null
+                          ? 'Contract End Date: ${contractEndDate.toString()}'
+                          : 'Select Contract End Date',
+                    ),
+                  );
+                }),
                 TextField(
                   controller: eStampPropertyAddressController,
                   onChanged: (value) {
@@ -290,56 +415,103 @@ class _AdminEstampsEditorPageState extends State<AdminEstampsEditorPage> {
                     labelText: 'eStamp Property Rent Amount',
                   ),
                 ),
-                TextField(
-                  controller: eStampUpfrontBonusController,
-                  onChanged: (value) {
-                    setState(() {});
-                  },
-                  decoration: InputDecoration(
-                    labelText: 'eStamp Upfront Bonus',
-                  ),
-                ),
-                TextField(
-                  controller: eStampMonthlyProfitController,
-                  onChanged: (value) {
-                    setState(() {});
-                  },
-                  decoration: InputDecoration(
-                    labelText: 'eStamp Monthly Profit',
-                  ),
-                ),
+                (isFilled ?? false)
+                    ? Text(
+                        'eStamp Upfront Bonus: ${eStampUpfrontBonusController.text}')
+                    : TextField(
+                        controller: eStampUpfrontBonusController,
+                        onChanged: (value) {
+                          //if alphabet is entered show an error using toast and clear the field and return
+                          if (value.contains(RegExp(r'[a-zA-Z]'))) {
+                            // ScaffoldMessenger.of(context).showSnackBar(
+                            //   SnackBar(
+                            //     backgroundColor: Colors.red,
+                            //     content: Text('Please enter digits only'),
+                            //   ),
+                            // );
+                            //replace with a red flutter toast
+                            Fluttertoast.showToast(
+                                msg: "Please enter digits only",
+                                toastLength: Toast.LENGTH_SHORT,
+                                gravity: ToastGravity.BOTTOM,
+                                backgroundColor: Colors.red,
+                                textColor: Colors.white,
+                                fontSize: 16.0);
+                            eStampUpfrontBonusController.clear();
+                            return;
+                          }
+                          setState(() {});
+                        },
+                        decoration: InputDecoration(
+                          labelText: 'eStamp Upfront Bonus',
+                        ),
+                      ),
+                (isFilled ?? false)
+                    ? Text(
+                        'eStamp Monthly Profit: ${eStampMonthlyProfitController.text}')
+                    : TextField(
+                        controller: eStampMonthlyProfitController,
+                        onChanged: (value) {
+                          //if alphabet is entered show an error using toast and clear the field and return
+                          if (value.contains(RegExp(r'[a-zA-Z]'))) {
+                            // ScaffoldMessenger.of(context).showSnackBar(
+                            //   SnackBar(
+                            //     backgroundColor: Colors.red,
+                            //     content: Text('Please enter digits only'),
+                            //   ),
+                            // );
+                            //replace with a red flutter toast
+                            Fluttertoast.showToast(
+                                msg: "Please enter digits only",
+                                toastLength: Toast.LENGTH_SHORT,
+                                gravity: ToastGravity.BOTTOM,
+                                backgroundColor: Colors.red,
+                                textColor: Colors.white,
+                                fontSize: 16.0);
+                            eStampMonthlyProfitController.clear();
+                            return;
+                          }
+                          setState(() {});
+                        },
+                        decoration: InputDecoration(
+                          labelText: 'eStamp Monthly Profit',
+                        ),
+                      ),
                 SizedBox(height: 16.0),
-                TextField(
-                  controller: eStampCostController,
-                  onChanged: (value) {
-                    //if alphabet is entered show an error using toast and clear the field and return
-                    if (value.contains(RegExp(r'[a-zA-Z]'))) {
-                      // ScaffoldMessenger.of(context).showSnackBar(
-                      //   SnackBar(
-                      //     backgroundColor: Colors.red,
-                      //     content: Text('Please enter digits only'),
-                      //   ),
-                      // );
-                      //replace with a red flutter toast
-                      Fluttertoast.showToast(
-                          msg: "Please enter digits only",
-                          toastLength: Toast.LENGTH_SHORT,
-                          gravity: ToastGravity.BOTTOM,
-                          backgroundColor: Colors.red,
-                          textColor: Colors.white,
-                          fontSize: 16.0);
-                      eStampCostController.clear();
-                      return;
-                    }
-                    setState(() {});
-                  },
-                  decoration: InputDecoration(
-                      labelText: 'eStamp Cost (if editing the estamp set to 0)',
-                      labelStyle: TextStyle(
-                        color: Colors.red,
-                        fontWeight: FontWeight.bold,
-                      )),
-                ),
+                (isFilled ?? false)
+                    ? Text('eStamp Cost: ${eStampCostController.text}')
+                    : TextField(
+                        controller: eStampCostController,
+                        onChanged: (value) {
+                          //if alphabet is entered show an error using toast and clear the field and return
+                          if (value.contains(RegExp(r'[a-zA-Z]'))) {
+                            // ScaffoldMessenger.of(context).showSnackBar(
+                            //   SnackBar(
+                            //     backgroundColor: Colors.red,
+                            //     content: Text('Please enter digits only'),
+                            //   ),
+                            // );
+                            //replace with a red flutter toast
+                            Fluttertoast.showToast(
+                                msg: "Please enter digits only",
+                                toastLength: Toast.LENGTH_SHORT,
+                                gravity: ToastGravity.BOTTOM,
+                                backgroundColor: Colors.red,
+                                textColor: Colors.white,
+                                fontSize: 16.0);
+                            eStampCostController.clear();
+                            return;
+                          }
+                          setState(() {});
+                        },
+                        decoration: InputDecoration(
+                            labelText:
+                                'eStamp Cost (if editing the estamp set to 0)',
+                            labelStyle: TextStyle(
+                              color: Colors.red,
+                              fontWeight: FontWeight.bold,
+                            )),
+                      ),
                 SizedBox(height: 16.0),
                 ElevatedButton(
                   onPressed: () {

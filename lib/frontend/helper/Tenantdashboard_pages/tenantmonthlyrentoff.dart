@@ -214,271 +214,278 @@ class _TenantMonthlyRentOffPageState extends State<TenantMonthlyRentOffPage>
                     //     index == _pageController.page?.round();
 
                     // _animationFinished = true;
-                    return SingleChildScrollView(
-                      child: Stack(
-                        children: [
-                          Container(
-                            height: size.height * 0.5,
-                            child: ClipPath(
-                              clipper: DiagonalClipper(),
-                              child: Container(
+                    return Card(
+                        elevation: 4.0,
+                        // shape: RoundedRectangleBorder(
+                        //   borderRadius: BorderRadius.circular(25.0),
+                        // ),
+                        color: Colors.grey[200],
+                        child: SingleChildScrollView(
+                          child: Stack(
+                            children: [
+                              Container(
                                 height: size.height * 0.5,
-                                decoration: const BoxDecoration(
-                                  gradient: LinearGradient(
-                                    begin: Alignment.topLeft,
-                                    end: Alignment.bottomRight,
-                                    colors: [
-                                      Color(0xff0FA697),
-                                      Color(0xff45BF7A),
-                                      Color(0xff0DF205),
-                                    ],
+                                child: ClipPath(
+                                  clipper: DiagonalClipper(),
+                                  child: Container(
+                                    height: size.height * 0.5,
+                                    decoration: const BoxDecoration(
+                                      gradient: LinearGradient(
+                                        begin: Alignment.topLeft,
+                                        end: Alignment.bottomRight,
+                                        colors: [
+                                          Color(0xff0FA697),
+                                          Color(0xff45BF7A),
+                                          Color(0xff0DF205),
+                                        ],
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
-                          ),
-                          Positioned(
-                            top: 65.0,
-                            left: 10.0,
-                            child: GestureDetector(
-                              onTap: () {
-                                Navigator.pop(context);
-                              },
-                              child: Container(
-                                  width: 40,
-                                  height: 40,
-                                  decoration: const BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: Color(0xFF33907C),
-                                    gradient: LinearGradient(
-                                      begin: Alignment.topLeft,
-                                      end: Alignment.bottomRight,
-                                      colors: [
-                                        Color(0xff0FA697),
-                                        Color(0xff45BF7A),
-                                        Color(0xff0DF205),
+                              Positioned(
+                                top: 65.0,
+                                left: 10.0,
+                                child: GestureDetector(
+                                  onTap: () {
+                                    Navigator.pop(context);
+                                  },
+                                  child: Container(
+                                      width: 40,
+                                      height: 40,
+                                      decoration: const BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: Color(0xFF33907C),
+                                        gradient: LinearGradient(
+                                          begin: Alignment.topLeft,
+                                          end: Alignment.bottomRight,
+                                          colors: [
+                                            Color(0xff0FA697),
+                                            Color(0xff45BF7A),
+                                            Color(0xff0DF205),
+                                          ],
+                                        ),
+                                      ),
+                                      child: const Icon(
+                                        Icons.arrow_back,
+                                        size: 20,
+                                        color: Colors.white,
+                                      )),
+                                ),
+                              ),
+                              Positioned(
+                                  top: size.height *
+                                      0.4, // adjust this according to your layout
+                                  right: 9,
+                                  child: index + 1 < winnerTenants.length
+                                      ? Icon(Icons.arrow_forward_ios,
+                                          color: Colors.black)
+                                      : SizedBox.shrink()),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  SizedBox(height: size.height * 0.05),
+                                  // Display "Monthly Rent OFF Winner" text
+                                  Align(
+                                    alignment: Alignment.topCenter,
+                                    child: ConfettiWidget(
+                                      confettiController: _confettiController,
+                                      blastDirection:
+                                          -1.5708, // Upward direction in radians (90 degrees)
+                                      emissionFrequency: 0.05,
+                                      numberOfParticles: 20,
+                                      maxBlastForce: 20,
+                                      minBlastForce: 10,
+                                      gravity: 0.2,
+                                      colors: const [
+                                        Colors.green,
+                                        Colors.blue,
+                                        Colors.orange,
+                                        Colors.yellow,
                                       ],
                                     ),
                                   ),
-                                  child: const Icon(
-                                    Icons.arrow_back,
-                                    size: 20,
-                                    color: Colors.white,
-                                  )),
-                            ),
-                          ),
-                          Positioned(
-                              top: size.height *
-                                  0.4, // adjust this according to your layout
-                              right: 9,
-                              child: index + 1 < winnerTenants.length
-                                  ? Icon(Icons.arrow_forward_ios,
-                                      color: Colors.black)
-                                  : SizedBox.shrink()),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              SizedBox(height: size.height * 0.05),
-                              // Display "Monthly Rent OFF Winner" text
-                              Align(
-                                alignment: Alignment.topCenter,
-                                child: ConfettiWidget(
-                                  confettiController: _confettiController,
-                                  blastDirection:
-                                      -1.5708, // Upward direction in radians (90 degrees)
-                                  emissionFrequency: 0.05,
-                                  numberOfParticles: 20,
-                                  maxBlastForce: 20,
-                                  minBlastForce: 10,
-                                  gravity: 0.2,
-                                  colors: const [
-                                    Colors.green,
-                                    Colors.blue,
-                                    Colors.orange,
-                                    Colors.yellow,
-                                  ],
-                                ),
-                              ),
-                              SizedBox(height: size.height * 0.105),
+                                  SizedBox(height: size.height * 0.105),
 
-                              Text(
-                                'Monthly Rent OFF Winner',
-                                style: GoogleFonts.montserrat(
-                                  fontSize: 22.0,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              SizedBox(height: size.height * 0.03),
-                              // Replace your CircleAvatar widget with the revolving images
-                              // _animationFinished
-                              CircleAvatar(
-                                radius: size.width * 0.2,
-                                backgroundColor: Colors.white,
-                                backgroundImage: winnerTenants[index]
-                                        .pathToImage!
-                                        .contains('assets')
-                                    ? AssetImage(
-                                        winnerTenants[index].pathToImage!)
-                                    : CachedNetworkImageProvider(
-                                        winnerTenants[index].pathToImage!,
-                                      ) as ImageProvider,
-                              ),
-                              // : AnimatedBuilder(
-                              //     animation: _animationController,
-                              //     builder: (BuildContext context,
-                              //         Widget? child) {
-                              //       return Transform.rotate(
-                              //         angle: _animationController.value *
-                              //             2 *
-                              //             pi,
-                              //         child: Stack(
-                              //           alignment: Alignment.center,
-                              //           children: winnerTenants
-                              //               .asMap()
-                              //               .entries
-                              //               .map(
-                              //                 (entry) => Transform(
-                              //                   transform: Matrix4.rotationY(
-                              //                           _animationController
-                              //                                   .value *
-                              //                               2 *
-                              //                               pi) *
-                              //                       Matrix4.rotationZ(
-                              //                           _animationController
-                              //                                   .value *
-                              //                               2 *
-                              //                               pi),
-                              //                   alignment: Alignment.center,
-                              //                   child: Transform.translate(
-                              //                     offset: Offset(
-                              //                       100 *
-                              //                           cos(_animationController
-                              //                                       .value *
-                              //                                   2 *
-                              //                                   pi +
-                              //                               (2 *
-                              //                                   pi *
-                              //                                   entry.key /
-                              //                                   winnerTenants
-                              //                                       .length)),
-                              //                       0.0,
-                              //                     ),
-                              //                     child: Transform.scale(
-                              //                       scale:
-                              //                           _animationController
-                              //                               .value,
-                              //                       child: CircleAvatar(
-                              //                         radius: 30.0,
-                              //                         backgroundColor:
-                              //                             Colors.white,
-                              //                         backgroundImage: entry
-                              //                                 .value
-                              //                                 .pathToImage!
-                              //                                 .contains(
-                              //                                     'assets')
-                              //                             ? AssetImage(entry
-                              //                                 .value
-                              //                                 .pathToImage!)
-                              //                             : CachedNetworkImageProvider(
-                              //                                 entry.value
-                              //                                     .pathToImage!,
-                              //                               ) as ImageProvider,
-                              //                       ),
-                              //                     ),
-                              //                   ),
-                              //                 ),
-                              //               )
-                              //               .toList(),
-                              //         ),
-                              //       );
-                              //     },
-                              //   ),
-                              SizedBox(height: size.height * 0.03),
-                              // Display dummy description
-                              Center(
-                                child: Text(
-                                  '${winnerTenants[index].firstName} ${winnerTenants[index].lastName}',
-                                  textAlign: TextAlign.center,
-                                  style: GoogleFonts.montserrat(
-                                    fontSize: 20.0,
-                                    color: const Color(0xff33907c),
-                                    fontWeight: FontWeight.bold,
+                                  Text(
+                                    'Monthly Rent OFF Winner',
+                                    style: GoogleFonts.montserrat(
+                                      fontSize: 22.0,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
                                   ),
-                                ),
-                              ),
-                              SizedBox(height: size.height * 0.03),
-                              Padding(
-                                padding:
-                                    EdgeInsets.only(bottom: size.height * 0.07),
-                                child: Column(
-                                  children: [
-                                    SizedBox(height: size.height * 0.03),
-                                    Center(
-                                      child: FractionallySizedBox(
-                                        widthFactor: 0.8,
-                                        child: WhiteBox(
-                                          label: 'Credit Score',
-                                          value: winnerTenants[index]
-                                              .creditPoints
-                                              .toString(),
-                                          points: '120',
-                                        ),
+                                  SizedBox(height: size.height * 0.03),
+                                  // Replace your CircleAvatar widget with the revolving images
+                                  // _animationFinished
+                                  CircleAvatar(
+                                    radius: size.width * 0.2,
+                                    backgroundColor: Colors.white,
+                                    backgroundImage: winnerTenants[index]
+                                            .pathToImage!
+                                            .contains('assets')
+                                        ? AssetImage(
+                                            winnerTenants[index].pathToImage!)
+                                        : CachedNetworkImageProvider(
+                                            winnerTenants[index].pathToImage!,
+                                          ) as ImageProvider,
+                                  ),
+                                  // : AnimatedBuilder(
+                                  //     animation: _animationController,
+                                  //     builder: (BuildContext context,
+                                  //         Widget? child) {
+                                  //       return Transform.rotate(
+                                  //         angle: _animationController.value *
+                                  //             2 *
+                                  //             pi,
+                                  //         child: Stack(
+                                  //           alignment: Alignment.center,
+                                  //           children: winnerTenants
+                                  //               .asMap()
+                                  //               .entries
+                                  //               .map(
+                                  //                 (entry) => Transform(
+                                  //                   transform: Matrix4.rotationY(
+                                  //                           _animationController
+                                  //                                   .value *
+                                  //                               2 *
+                                  //                               pi) *
+                                  //                       Matrix4.rotationZ(
+                                  //                           _animationController
+                                  //                                   .value *
+                                  //                               2 *
+                                  //                               pi),
+                                  //                   alignment: Alignment.center,
+                                  //                   child: Transform.translate(
+                                  //                     offset: Offset(
+                                  //                       100 *
+                                  //                           cos(_animationController
+                                  //                                       .value *
+                                  //                                   2 *
+                                  //                                   pi +
+                                  //                               (2 *
+                                  //                                   pi *
+                                  //                                   entry.key /
+                                  //                                   winnerTenants
+                                  //                                       .length)),
+                                  //                       0.0,
+                                  //                     ),
+                                  //                     child: Transform.scale(
+                                  //                       scale:
+                                  //                           _animationController
+                                  //                               .value,
+                                  //                       child: CircleAvatar(
+                                  //                         radius: 30.0,
+                                  //                         backgroundColor:
+                                  //                             Colors.white,
+                                  //                         backgroundImage: entry
+                                  //                                 .value
+                                  //                                 .pathToImage!
+                                  //                                 .contains(
+                                  //                                     'assets')
+                                  //                             ? AssetImage(entry
+                                  //                                 .value
+                                  //                                 .pathToImage!)
+                                  //                             : CachedNetworkImageProvider(
+                                  //                                 entry.value
+                                  //                                     .pathToImage!,
+                                  //                               ) as ImageProvider,
+                                  //                       ),
+                                  //                     ),
+                                  //                   ),
+                                  //                 ),
+                                  //               )
+                                  //               .toList(),
+                                  //         ),
+                                  //       );
+                                  //     },
+                                  //   ),
+                                  SizedBox(height: size.height * 0.03),
+                                  // Display dummy description
+                                  Center(
+                                    child: Text(
+                                      '${winnerTenants[index].firstName} ${winnerTenants[index].lastName}',
+                                      textAlign: TextAlign.center,
+                                      style: GoogleFonts.montserrat(
+                                        fontSize: 20.0,
+                                        color: const Color(0xff33907c),
+                                        fontWeight: FontWeight.bold,
                                       ),
                                     ),
-                                    // SizedBox(height: size.height * 0.03),
-                                    SizedBox(height: 10.0),
-                                    Center(
-                                      child: FractionallySizedBox(
-                                        widthFactor: 0.8,
-                                        child: WhiteBox(
-                                          label: 'Rent Off:',
-                                          value: winnerTenants[index]
-                                                      .discount
-                                                      .toString() ==
-                                                  '0.24234234'
-                                              ? 'old document'
-                                              : winnerTenants[index]
-                                                  .discount
+                                  ),
+                                  SizedBox(height: size.height * 0.03),
+                                  Padding(
+                                    padding: EdgeInsets.only(
+                                        bottom: size.height * 0.07),
+                                    child: Column(
+                                      children: [
+                                        SizedBox(height: size.height * 0.03),
+                                        Center(
+                                          child: FractionallySizedBox(
+                                            widthFactor: 0.8,
+                                            child: WhiteBox(
+                                              label: 'Credit Score',
+                                              value: winnerTenants[index]
+                                                  .creditPoints
                                                   .toString(),
+                                              points: '120',
+                                            ),
+                                          ),
                                         ),
-                                      ),
-                                    ),
-                                    SizedBox(height: 10.0),
-                                    Center(
-                                      child: FractionallySizedBox(
-                                        widthFactor: 0.8,
-                                        child: WhiteBox(
-                                          label: 'Property Address',
-                                          value: winnerTenants[index]
-                                                  .propertyAddress ??
-                                              'No address found',
+                                        // SizedBox(height: size.height * 0.03),
+                                        SizedBox(height: 10.0),
+                                        Center(
+                                          child: FractionallySizedBox(
+                                            widthFactor: 0.8,
+                                            child: WhiteBox(
+                                              label: 'Rent Off:',
+                                              value: winnerTenants[index]
+                                                          .discount
+                                                          .toString() ==
+                                                      '0.24234234'
+                                                  ? 'old document'
+                                                  : winnerTenants[index]
+                                                          .discount
+                                                          .toString() +
+                                                      '% off on monthly rent',
+                                            ),
+                                          ),
                                         ),
-                                      ),
-                                    ),
-                                    SizedBox(height: 10.0),
-                                    Center(
-                                      child: FractionallySizedBox(
-                                        widthFactor: 0.8,
-                                        child: WhiteBox(
-                                          label: 'Join Date:',
-                                          value: winnerTenants[index]
-                                              .dateJoined!
-                                              .toDate()
-                                              .toString()
-                                              .substring(0, 10),
+                                        SizedBox(height: 10.0),
+                                        Center(
+                                          child: FractionallySizedBox(
+                                            widthFactor: 0.8,
+                                            child: WhiteBox(
+                                              label: 'Property Address',
+                                              value: winnerTenants[index]
+                                                      .propertyAddress ??
+                                                  'No address found',
+                                            ),
+                                          ),
                                         ),
-                                      ),
+                                        SizedBox(height: 10.0),
+                                        Center(
+                                          child: FractionallySizedBox(
+                                            widthFactor: 0.8,
+                                            child: WhiteBox(
+                                              label: 'Join Date:',
+                                              value: winnerTenants[index]
+                                                  .dateJoined!
+                                                  .toDate()
+                                                  .toString()
+                                                  .substring(0, 10),
+                                            ),
+                                          ),
+                                        ),
+                                        SizedBox(height: 20.0),
+                                      ],
                                     ),
-                                    SizedBox(height: 20.0),
-                                  ],
-                                ),
+                                  ),
+                                ],
                               ),
                             ],
                           ),
-                        ],
-                      ),
-                    );
+                        ));
                   },
                 );
               } else {
@@ -544,7 +551,7 @@ class WhiteBox extends StatelessWidget {
               ),
               const SizedBox(height: 10.0),
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
                     value,
@@ -555,7 +562,9 @@ class WhiteBox extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    points ?? '',
+                    points == null
+                        ? ''
+                        : '                                            ${points ?? ''}',
                     style: GoogleFonts.montserrat(
                       fontSize: 14.0,
                       fontWeight: FontWeight.bold,
