@@ -596,6 +596,18 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
   @override
   Widget build(BuildContext context) {
     final authService = AuthenticationService();
+    String formatCNIC(String cnic) {
+      if (cnic.length != 13) {
+        return cnic; // Return the original CNIC if the length is not as expected
+      }
+
+      String part1 = cnic.substring(0, 5);
+      String part2 = cnic.substring(5, 12);
+      String part3 = cnic.substring(12);
+
+      return '$part1-$part2-$part3';
+    }
+
     return Scaffold(
       body: FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
         future: fetchUserProfile(),
@@ -816,7 +828,8 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
                                 ? ProfileInfoItem(
                                     icon: Icons.perm_identity_rounded,
                                     title: 'CNIC Number',
-                                    subtitle: decryptString(docData['cnic']))
+                                    subtitle: formatCNIC(
+                                        decryptString(docData['cnic'])))
                                 : Container(),
 
                             docData['address'] != '' &&
@@ -1454,8 +1467,8 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
                                                                       child:
                                                                           Icon(
                                                                         _obscurePassword3
-                                                                            ? Icons.visibility
-                                                                            : Icons.visibility_off,
+                                                                            ? Icons.visibility_off
+                                                                            : Icons.visibility,
                                                                         color: Colors
                                                                             .green,
                                                                       ),

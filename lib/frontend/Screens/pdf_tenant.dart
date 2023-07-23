@@ -132,7 +132,21 @@ class _PDFEditorTenantPageState extends State<PDFEditorTenantPage> {
         format: PdfStringFormat(alignment: PdfTextAlignment.left));
 
     //CNIC number
-    graphics.drawString(decryptString(cnic), font_small,
+    String formatCNIC(String cnic) {
+      if (cnic.length != 13) {
+        //snackbar error
+        // Fluttertoast.showToast(msg: 'Invalid CNIC');
+        return cnic; // Return the original CNIC if the length is not as expected
+      }
+
+      String part1 = cnic.substring(0, 5);
+      String part2 = cnic.substring(5, 12);
+      String part3 = cnic.substring(12);
+
+      return '$part1-$part2-$part3';
+    }
+
+    graphics.drawString(formatCNIC(decryptString(cnic)), font_small,
         brush: PdfBrushes.black,
         bounds: Rect.fromLTWH(100, 205.5, page.getClientSize().width,
             page.getClientSize().height),

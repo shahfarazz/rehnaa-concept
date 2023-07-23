@@ -1397,16 +1397,20 @@ class LandlordWithdrawalCard extends StatelessWidget {
                           },
                         );
 
-                        // Navigate to the AdminPropertyContractsPage
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => AdminPropertyContractsPage(
-                              landlordID: landlordRef!.id,
-                              tenantID: data.uid,
-                            ),
-                          ),
-                        );
+                        // // Navigate to the AdminPropertyContractsPage
+                        // Navigator.pushReplacement(
+                        //   context,
+                        //   MaterialPageRoute(
+                        //     builder: (context) => AdminPropertyContractsPage(
+                        //       landlordID: landlordRef!.id,
+                        //       tenantID: data.uid,
+                        //     ),
+                        //   ),
+                        // );
+                        Navigator.push(context,
+                            MaterialPageRoute(builder: (context) {
+                          return AdminRequestsPage();
+                        }));
                       }
 
                       //commit

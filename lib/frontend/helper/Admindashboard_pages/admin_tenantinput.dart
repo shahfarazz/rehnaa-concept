@@ -681,7 +681,7 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
                                                         0.0) -
                                                     tenant.balance),
                                                 'date': DateTime.now(),
-                                                'isMinus': false,
+                                                'isMinus': true,
                                                 // 'description': 'Balance updated by landlord',
                                                 'paymentType': '',
                                               }).then((value) async {

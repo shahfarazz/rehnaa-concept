@@ -22,6 +22,17 @@ class TenantLandlordInfoPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
+    String formatCNIC(String cnic) {
+      if (cnic.length != 13) {
+        return cnic; // Return the original CNIC if the length is not as expected
+      }
+
+      String part1 = cnic.substring(0, 5);
+      String part2 = cnic.substring(5, 12);
+      String part3 = cnic.substring(12);
+
+      return '$part1-$part2-$part3';
+    }
 
     return Scaffold(
       body: Column(
@@ -222,6 +233,7 @@ class TenantLandlordInfoPage extends StatelessWidget {
                                     label: 'Credit Score',
                                     value: '${tenant.landlord?.creditScore}',
                                     points: '${tenant.landlord?.creditPoints}',
+                                    pointsIcon: Icons.star_border,
                                   ),
                                 )
                               : const SizedBox.shrink(),
@@ -245,7 +257,8 @@ class TenantLandlordInfoPage extends StatelessWidget {
                                     icon: Icons.perm_identity,
                                     iconColor: const Color(0xff33907c),
                                     label: 'CNIC Number',
-                                    value: decryptString(landlord.cnic!),
+                                    value: formatCNIC(
+                                        decryptString(landlord.cnic!)),
                                   ),
                                 )
                               : const SizedBox.shrink(),
@@ -286,7 +299,7 @@ class TenantLandlordInfoPage extends StatelessWidget {
                                   landlord.pastTenantTestimonial != null
                               ? Center(
                                   child: WhiteBox(
-                                    icon: Icons.info,
+                                    icon: Icons.rate_review,
                                     iconColor: const Color(0xff33907c),
                                     label: 'Past Tenant Testimonial',
                                     value: landlord.pastTenantTestimonial ??
@@ -406,7 +419,7 @@ class WhiteBox extends StatelessWidget {
                         children: [
                           if (icon != null)
                             Icon(
-                              icon,
+                              pointsIcon,
                               color: iconColor,
                             ),
                           const SizedBox(width: 8.0),

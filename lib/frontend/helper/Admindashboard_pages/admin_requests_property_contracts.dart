@@ -5,8 +5,14 @@ import 'package:rehnaa/backend/services/helperfunctions.dart';
 class AdminPropertyContractsPage extends StatefulWidget {
   final String tenantID;
   final String landlordID;
-  const AdminPropertyContractsPage(
-      {Key? key, required this.tenantID, required this.landlordID})
+  String? landlordName;
+  String? tenantName;
+  AdminPropertyContractsPage(
+      {Key? key,
+      required this.tenantID,
+      required this.landlordID,
+      this.landlordName,
+      this.tenantName})
       : super(key: key);
 
   @override
@@ -16,6 +22,7 @@ class AdminPropertyContractsPage extends StatefulWidget {
 
 class _AdminPropertyContractsPageState
     extends State<AdminPropertyContractsPage> {
+  ///set initial landlord name to the one passed from the previous page
   final TextEditingController _landlordNameController = TextEditingController();
   final TextEditingController _landlordCnicController = TextEditingController();
   final TextEditingController _tenantNameController = TextEditingController();
@@ -208,6 +215,8 @@ class _AdminPropertyContractsPageState
 
   @override
   Widget build(BuildContext context) {
+    _landlordNameController.text = widget.landlordName ?? '';
+    _tenantNameController.text = widget.tenantName ?? '';
     return Scaffold(
       appBar: AppBar(
         title: const Text('Property Contracts'),

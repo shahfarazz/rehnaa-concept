@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:rehnaa/backend/services/helperfunctions.dart';
 import 'package:rehnaa/frontend/Screens/rentpayment_info.dart';
@@ -128,6 +129,20 @@ class MyScreen extends StatelessWidget {
           }
 
           Size size = MediaQuery.of(context).size;
+          String formatCNIC(String cnic) {
+            if (cnic.length != 13) {
+              //snackbar error
+              // Fluttertoast.showToast(msg: 'Invalid CNIC');
+              return cnic; // Return the original CNIC if the length is not as expected
+            }
+
+            String part1 = cnic.substring(0, 5);
+            String part2 = cnic.substring(5, 12);
+            String part3 = cnic.substring(12);
+
+            return '$part1-$part2-$part3';
+          }
+
           // PDFScreen pdfScreen
           // print('pdfUrl: $pdfUrl');
           PDFScreen pdfScreen = PDFScreen(
@@ -200,8 +215,8 @@ class MyScreen extends StatelessWidget {
                                 ContractCard(
                                   icon: Icons.credit_card,
                                   label: 'Landlord CNIC:',
-                                  data: decryptString(
-                                      contractFields['landlordCnic']),
+                                  data: formatCNIC(decryptString(
+                                      contractFields['landlordCnic'])),
                                 ),
                                 SizedBox(height: 16),
                                 ContractCard(
@@ -213,8 +228,8 @@ class MyScreen extends StatelessWidget {
                                 ContractCard(
                                   icon: Icons.credit_card,
                                   label: 'Tenant CNIC:',
-                                  data: decryptString(
-                                      contractFields['tenantCnic']),
+                                  data: formatCNIC(decryptString(
+                                      contractFields['tenantCnic'])),
                                 ),
                                 SizedBox(height: 16),
                                 ContractCard(
@@ -227,8 +242,8 @@ class MyScreen extends StatelessWidget {
                                 ContractCard(
                                   icon: Icons.credit_card,
                                   label: 'First Witness CNIC:',
-                                  data: decryptString(
-                                      contractFields['firstWitnessCnic']),
+                                  data: formatCNIC(decryptString(
+                                      contractFields['firstWitnessCnic'])),
                                 ),
                                 SizedBox(height: 16),
                                 ContractCard(
@@ -249,9 +264,9 @@ class MyScreen extends StatelessWidget {
                                 ContractCard(
                                   icon: Icons.credit_card,
                                   label: 'Second Witness CNIC:',
-                                  data: decryptString(
+                                  data: formatCNIC(decryptString(
                                       contractFields?['secondWitnessCnic'] ??
-                                          ''),
+                                          '')),
                                 ),
                                 SizedBox(height: 16),
                                 ContractCard(

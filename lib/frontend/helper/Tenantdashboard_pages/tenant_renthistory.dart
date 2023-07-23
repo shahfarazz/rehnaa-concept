@@ -239,9 +239,11 @@ class _TenantRentHistoryPageState extends State<TenantRentHistoryPage>
                           Text(
                             widget.callerType == 'Tenants'
                                 ? rentPayment.tenantname == 'Old document'
-                                    ? '$firstName $lastName'
+                                    ? '$firstName'
                                     : rentPayment.tenantname!
                                 : rentPayment.tenantname!,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                             style: GoogleFonts.montserrat(
                               fontSize: size.width * 0.04,
                               fontWeight: FontWeight.bold,
