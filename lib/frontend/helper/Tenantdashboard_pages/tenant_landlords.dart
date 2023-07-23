@@ -49,131 +49,91 @@ class _TenantLandlordsPageState extends State<TenantLandlordsPage> {
   // Build a card widget for a landlord
   Widget _buildLandlordCard(Landlord landlord) {
     return GestureDetector(
-      onTap: () {
-        // Navigate to tenant info page
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => TenantLandlordInfoPage(
-              tenant: tenant!,
-              uid: widget.uid,
-              landlord: landlord,
+        onTap: () {
+          // Navigate to tenant info page
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => TenantLandlordInfoPage(
+                tenant: tenant!,
+                uid: widget.uid,
+                landlord: landlord,
+              ),
             ),
-          ),
-        );
-      },
-      child: Card(
-        elevation: 4.0,
-        margin: const EdgeInsets.all(16.0),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20.0),
-        ),
-        child: Container(
-          decoration: BoxDecoration(
+          );
+        },
+        child: Card(
+          elevation: 4.0,
+          margin: const EdgeInsets.all(20.0),
+          shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20.0),
-            color: Colors.white,
           ),
-          padding: const EdgeInsets.all(16.0),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'Landlord Name: ',
-                    style: GoogleFonts.montserrat(
-                      fontSize: 16.0,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black,
-                    ),
+              Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Color(0xff0FA697),
+                      Color(0xff45BF7A),
+                      Color(0xff0DF205),
+                    ],
                   ),
-                ],
-              ),
-              SizedBox(height: 30.0),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    '${landlord.firstName} ${landlord.lastName}',
-                    style: GoogleFonts.montserrat(
-                      fontSize: 16.0,
-                      fontWeight: FontWeight.w600,
-                      color: const Color(0xff33907c),
-                    ),
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(20.0),
+                    topRight: Radius.circular(20.0),
                   ),
-                ],
+                ),
+                padding: const EdgeInsets.all(20.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Landlord Name: ',
+                      style: GoogleFonts.montserrat(
+                        fontSize: 16.0,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              // const SizedBox(height: 10.0),
-              // Row(
-              //   children: [
-              //     Text(
-              //       'Rating:',
-              //       style: GoogleFonts.montserrat(
-              //         fontSize: 14.0,
-              //         fontWeight: FontWeight.bold,
-              //         color: Colors.black,
-              //       ),
-              //     ),
-              //     Text(
-              //       ' ${landlord.rating}',
-              //       style: GoogleFonts.montserrat(
-              //         fontSize: 14.0,
-              //         fontWeight: FontWeight.bold,
-              //         color: const Color(0xff33907c),
-              //       ),
-              //     ),
-              //   ],
-              // ),
-              // const SizedBox(height: 10.0),
-              // Row(
-              //   children: [
-              //     Text(
-              //       'Properties owned: ',
-              //       style: GoogleFonts.montserrat(
-              //         fontSize: 14.0,
-              //         fontWeight: FontWeight.bold,
-              //         color: Colors.black,
-              //       ),
-              //     ),
-              //     // landlord.property != null
-              //     tenant?.propertyRef != null
-              //         ? Expanded(
-              //             child: Wrap(
-              //             direction: Axis.horizontal,
-              //             spacing: 8.0,
-              //             children: landlord.property!.map((property) {
-              //               return
-              //                   // Row(
-              //                   // children: [
-              //                   // SizedBox()
-              //                   Text(
-              //                 property.title,
-              //                 style: TextStyle(
-              //                   fontSize: 14.0,
-              //                   fontWeight: FontWeight.bold,
-              //                   color: const Color(0xff33907c),
-              //                 ),
-              //               );
-              //               // ],
-              //               // );
-              //             }).toList(),
-              //           ))
-              //         : Text(
-              //             'No properties',
-              //             style: TextStyle(
-              //               fontSize: 14.0,
-              //               fontWeight: FontWeight.bold,
-              //               color: const Color(0xff33907c),
-              //             ),
-              //           ),
-              //   ],
-              // )
+              Container(
+                height: 80,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(20.0),
+                    bottomRight: Radius.circular(20.0),
+                  ),
+                ),
+                padding: const EdgeInsets.all(20.0),
+                child: Column(
+                  children: <Widget>[
+                    SizedBox(height: 10.0),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          '${landlord.firstName} ${landlord.lastName}',
+                          style: GoogleFonts.montserrat(
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.w600,
+                            color: const Color(0xff33907c),
+                          ),
+                        ),
+                      ],
+                    ),
+                    // additional fields go here
+                  ],
+                ),
+              ),
             ],
           ),
-        ),
-      ),
-    );
+        ));
   }
 
   @override
@@ -261,7 +221,7 @@ class _TenantLandlordsPageState extends State<TenantLandlordsPage> {
                     SizedBox(height: size.height * 0.05),
                     Container(
                       width: size.width,
-                      height: size.height * 0.2,
+                      height: size.height * 0.25,
                       child: _buildLandlordCard(data!.landlord!),
                     ),
                   ],

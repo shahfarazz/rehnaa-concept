@@ -14,10 +14,11 @@ class Tenant {
   bool? tasdeeqVerification;
   bool? policeVerification;
   num? familyMembers;
-  DocumentReference<Map<String, dynamic>>? landlordRef;
-  DocumentReference<Map<String, dynamic>>? propertyRef;
+  List<DocumentReference<Map<String, dynamic>>>? landlordRefs;
+  List<DocumentReference<Map<String, dynamic>>>? propertyRefs;
   List<DocumentReference<Map<String, dynamic>>>? rentpaymentRef;
-  Landlord? landlord;
+  // Landlord? landlord;
+  List<Landlord>? landlords;
   String? pathToImage;
   String? tempID;
   Timestamp? dateJoined;
@@ -41,6 +42,11 @@ class Tenant {
   var pastLandlordTestimonial;
   Property? property;
   var contractIDs;
+  var whatAreYouLookingFor;
+  var estimatedTimetoShift;
+  var estimatedBudget;
+  var isDetailsFilled;
+  var isFormDeleted;
 
   Tenant({
     required this.firstName,
@@ -55,11 +61,14 @@ class Tenant {
     required this.tasdeeqVerification,
     required this.familyMembers,
     required this.policeVerification,
-    this.landlordRef,
-    this.landlord,
+    // this.landlordRef,
+    // this.landlord,
+    this.landlords,
     this.pathToImage,
     this.tempID,
-    this.propertyRef,
+    // this.propertyRef,
+    this.landlordRefs,
+    this.propertyRefs,
     this.dateJoined,
     this.rentpaymentRef,
     this.address,
@@ -79,9 +88,40 @@ class Tenant {
     this.pastLandlordTestimonial,
     this.property,
     this.contractIDs,
+    this.whatAreYouLookingFor,
+    this.estimatedTimetoShift,
+    this.estimatedBudget,
+    this.isDetailsFilled,
+    this.isFormDeleted,
   });
 
   factory Tenant.fromJson(Map<String, dynamic> json) {
+    var landlordRefOrRefs = json['landlordRef'];
+    var propertyRefOrRefs = json['propertyRef'];
+    // Check if the fields are already lists or single refs, and convert single refs to lists
+    List<DocumentReference<Map<String, dynamic>>>? landlordRefs;
+    if (landlordRefOrRefs is List) {
+      landlordRefs = landlordRefOrRefs
+          .map((ref) => ref as DocumentReference)
+          .cast<DocumentReference<Map<String, dynamic>>>()
+          .toList();
+    } else if (landlordRefOrRefs is DocumentReference) {
+      landlordRefs = [
+        landlordRefOrRefs as DocumentReference<Map<String, dynamic>>
+      ];
+    }
+
+    List<DocumentReference<Map<String, dynamic>>>? propertyRefs;
+    if (propertyRefOrRefs is List) {
+      propertyRefs = propertyRefOrRefs
+          .map((ref) => ref as DocumentReference)
+          .cast<DocumentReference<Map<String, dynamic>>>()
+          .toList();
+    } else if (propertyRefOrRefs is DocumentReference) {
+      propertyRefs = [
+        propertyRefOrRefs as DocumentReference<Map<String, dynamic>>
+      ];
+    }
     return Tenant(
       firstName: json['firstName'],
       lastName: json['lastName'],
@@ -94,7 +134,8 @@ class Tenant {
       emailOrPhone: json['emailOrPhone'] ?? 'N/A',
       tasdeeqVerification: json['tasdeeqVerification'] ?? null,
       familyMembers: json['familyMembers'] ?? 0,
-      landlordRef: json['landlordRef'],
+      // landlordRef: json['landlordRef'],
+      landlordRefs: landlordRefs,
       pathToImage: json['pathToImage'] ?? 'assets/defaulticon.png',
       policeVerification: json['policeVerification'] ?? null,
       dateJoined: json['dateJoined'],
@@ -121,6 +162,11 @@ class Tenant {
       phoneNumber: json['phoneNumber'] ?? '',
       pastLandlordTestimonial: json['pastLandlordTestimonial'] ?? '',
       contractIDs: json['contractIDs'] ?? '',
+      whatAreYouLookingFor: json['whatAreYouLookingFor'] ?? '',
+      estimatedTimetoShift: json['estimatedTimetoShift'] ?? '',
+      estimatedBudget: json['estimatedBudget'] ?? '',
+      isDetailsFilled: json['isDetailsFilled'] ?? false,
+      isFormDeleted: json['isFormDeleted'] ?? false,
     );
   }
 
@@ -137,35 +183,11 @@ class Tenant {
       'emailOrPhone': emailOrPhone,
       'tasdeeqVerification': tasdeeqVerification,
       'familyMembers': familyMembers,
-      'landlordRef': landlordRef,
+      // 'landlordRef': landlordRef,
+      'landlordRefs': landlordRefs,
       'pathToImage': pathToImage,
       'policeVerification': policeVerification,
     };
-  }
-
-  Future<Landlord?> getLandlord() async {
-    if (landlordRef != null) {
-      DocumentSnapshot<Map<String, dynamic>> snapshot =
-          await landlordRef!.get();
-
-      landlord = Landlord.fromJson(snapshot.data());
-      landlord?.tempID = snapshot.id;
-      return landlord;
-    }
-    return null;
-  }
-
-  Future<Property?> getProperty() async {
-    print('propertyRef: $propertyRef');
-    if (propertyRef != null) {
-      DocumentSnapshot<Map<String, dynamic>> snapshot =
-          await propertyRef!.get();
-
-      property = Property.fromJson(snapshot.data()!);
-      // property!.tempID = snapshot.id;
-      return property!;
-    }
-    return null;
   }
 
   static void addDummyTenant() async {

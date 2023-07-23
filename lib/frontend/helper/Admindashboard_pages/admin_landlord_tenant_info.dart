@@ -120,7 +120,7 @@ class _AdminLandlordTenantInfoPageState
             tasdeeqVerification: doc['tasdeeqVerification'] ?? false,
             policeVerification: false,
             familyMembers: doc['familyMembers'] ?? 0,
-            landlordRef: doc['landlordRef'] ?? null,
+            // landlordRef: doc['landlordRef'] ?? null,
             pathToImage: doc['pathToImage'] ?? '',
           );
         }).toList();

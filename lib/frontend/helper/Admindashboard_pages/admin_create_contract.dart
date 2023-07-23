@@ -75,9 +75,7 @@ class _AdminCreateContractsPageState extends State<AdminCreateContractsPage> {
                           color: Color.fromARGB(255, 30, 197, 83),
                         );
                       });
-                  selectLandlordFunc();
-                  setState() {}
-                  ;
+                  selectLandlordFunc(setState);
                 },
                 child: Text('${selectLandlordText}'),
               );
@@ -103,9 +101,7 @@ class _AdminCreateContractsPageState extends State<AdminCreateContractsPage> {
                           color: Color.fromARGB(255, 30, 197, 83),
                         );
                       });
-                  selectTenantFunc();
-                  setState() {}
-                  ;
+                  selectTenantFunc(setState);
                 },
                 child: Text('${selectTenantText}'),
               );
@@ -132,9 +128,9 @@ class _AdminCreateContractsPageState extends State<AdminCreateContractsPage> {
                           color: Color.fromARGB(255, 30, 197, 83),
                         );
                       });
-                  selectPropertFunc();
-                  setState() {}
-                  ;
+                  selectPropertyFunc(setState);
+                  // setState() {}
+                  // ;
                 },
                 child: Text('${selectPropertyText}'),
               );
@@ -262,7 +258,11 @@ class _AdminCreateContractsPageState extends State<AdminCreateContractsPage> {
     );
   }
 
-  Future<void> selectLandlordFunc() {
+  Future<void> selectLandlordFunc(StateSetter outsideSetState) {
+    TextEditingController searchController = TextEditingController();
+    List<DropdownMenuItem> filteredLandlordList = [];
+    bool isSearching = false;
+
     return FirebaseFirestore.instance
         .collection('Landlords')
         .get()
@@ -275,47 +275,95 @@ class _AdminCreateContractsPageState extends State<AdminCreateContractsPage> {
         ));
       });
       //map ids to names with ids as keys and names as values
-      Map landlordMap = Map.fromIterables(snapshot.docs.map((doc) => doc.id),
-          snapshot.docs.map((doc) => doc['firstName'] + ' ' + doc['lastName']));
-      showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text('Select Landlord'),
-              content: StatefulBuilder(builder: (context, setState) {
-                return DropdownButton(
-                  items: landlordList,
-                  onChanged: (value) {
-                    setState(() {
-                      //selected landlord text should have the name of the landlord
+      Map landlordMap = Map.fromIterables(
+        snapshot.docs.map((doc) => doc.id),
+        snapshot.docs.map((doc) => doc['firstName'] + ' ' + doc['lastName']),
+      );
 
-                      selectLandlordText = landlordMap[value];
-                      selectedLandlord = value;
-                      // selectLandlordText = ;
-                    });
-                  },
-                  value: selectedLandlord,
-                  isExpanded: true,
-                );
-              }),
-              actions: [
-                ElevatedButton(
-                  onPressed: () {
-                    setState(() {
-                      selectLandlordText = landlordMap[selectedLandlord];
-                    });
-                    Navigator.of(context).pop();
-                    Navigator.of(context).pop();
-                  },
-                  child: Text('Done'),
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return StatefulBuilder(
+            builder: (context, setState) {
+              return AlertDialog(
+                title: Text('Select Landlord'),
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      controller: searchController,
+                      onChanged: (value) {
+                        setState(() {
+                          if (value.isNotEmpty) {
+                            filteredLandlordList = landlordList
+                                .where((item) =>
+                                    item.child
+                                        .toString()
+                                        .toLowerCase()
+                                        .contains(value.toLowerCase()) ==
+                                    true)
+                                .toList();
+                            isSearching = true;
+                          } else {
+                            filteredLandlordList = landlordList;
+                            isSearching = false;
+                          }
+
+                          // Check if selectedLandlord is still valid after filtering
+                          if (selectedLandlord != null &&
+                              !filteredLandlordList.any(
+                                  (item) => item.value == selectedLandlord)) {
+                            selectedLandlord = filteredLandlordList.isEmpty
+                                ? null
+                                : filteredLandlordList[0].value;
+                          }
+                        });
+                      },
+                      decoration: InputDecoration(
+                        hintText: "Search Landlord",
+                        prefixIcon: Icon(Icons.search),
+                      ),
+                    ),
+                    SizedBox(height: 16),
+                    DropdownButton(
+                      items: isSearching ? filteredLandlordList : landlordList,
+                      onChanged: (value) {
+                        setState(() {
+                          selectLandlordText = landlordMap[value];
+                          selectedLandlord = value;
+                        });
+                      },
+                      value: selectedLandlord,
+                      isExpanded: true,
+                    ),
+                  ],
                 ),
-              ],
-            );
-          });
+                actions: [
+                  ElevatedButton(
+                    onPressed: () {
+                      outsideSetState(() {
+                        selectLandlordText = landlordMap[selectedLandlord];
+                        selectedLandlord = selectedLandlord;
+                      });
+                      Navigator.of(context).pop();
+                      Navigator.of(context).pop();
+                    },
+                    child: Text('Done'),
+                  ),
+                ],
+              );
+            },
+          );
+        },
+      );
     });
   }
 
-  Future<void> selectTenantFunc() {
+  Future<void> selectTenantFunc(StateSetter outsideSetState) {
+    TextEditingController searchController = TextEditingController();
+    List<DropdownMenuItem> filteredTenantList = [];
+    bool isSearching = false;
+
     return FirebaseFirestore.instance
         .collection('Tenants')
         .get()
@@ -328,45 +376,95 @@ class _AdminCreateContractsPageState extends State<AdminCreateContractsPage> {
         ));
       });
       //map ids to names with ids as keys and names as values
-      Map tenantMap = Map.fromIterables(snapshot.docs.map((doc) => doc.id),
-          snapshot.docs.map((doc) => doc['firstName'] + ' ' + doc['lastName']));
+      Map tenantMap = Map.fromIterables(
+        snapshot.docs.map((doc) => doc.id),
+        snapshot.docs.map((doc) => doc['firstName'] + ' ' + doc['lastName']),
+      );
+
       showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text('Select Tenant'),
-              content: StatefulBuilder(builder: (context, setState) {
-                return DropdownButton(
-                  items: tenantList,
-                  onChanged: (value) {
-                    setState(() {
-                      //selected tenant text should have the name of the tenant
-                      selectTenantText = tenantMap[value];
-                      selectedTenant = value;
-                    });
-                  },
-                  value: selectedTenant,
-                  isExpanded: true,
-                );
-              }),
-              actions: [
-                ElevatedButton(
-                  onPressed: () {
-                    setState(() {
-                      selectTenantText = tenantMap[selectedTenant];
-                    });
-                    Navigator.of(context).pop();
-                    Navigator.of(context).pop();
-                  },
-                  child: Text('Done'),
+        context: context,
+        builder: (BuildContext context) {
+          return StatefulBuilder(
+            builder: (context, setState) {
+              return AlertDialog(
+                title: Text('Select Tenant'),
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      controller: searchController,
+                      onChanged: (value) {
+                        setState(() {
+                          if (value.isNotEmpty) {
+                            filteredTenantList = tenantList
+                                .where((item) =>
+                                    item.child
+                                        .toString()
+                                        .toLowerCase()
+                                        .contains(value.toLowerCase()) ==
+                                    true)
+                                .toList();
+                            isSearching = true;
+                          } else {
+                            filteredTenantList = tenantList;
+                            isSearching = false;
+                          }
+
+                          // Check if selectedTenant is still valid after filtering
+                          if (selectedTenant != null &&
+                              !filteredTenantList.any(
+                                  (item) => item.value == selectedTenant)) {
+                            selectedTenant = filteredTenantList.isEmpty
+                                ? null
+                                : filteredTenantList[0].value;
+                          }
+                        });
+                      },
+                      decoration: InputDecoration(
+                        hintText: "Search Tenant",
+                        prefixIcon: Icon(Icons.search),
+                      ),
+                    ),
+                    SizedBox(height: 16),
+                    DropdownButton(
+                      items: isSearching ? filteredTenantList : tenantList,
+                      onChanged: (value) {
+                        setState(() {
+                          selectTenantText = tenantMap[value];
+                          selectedTenant = value;
+                        });
+                      },
+                      value: selectedTenant,
+                      isExpanded: true,
+                    ),
+                  ],
                 ),
-              ],
-            );
-          });
+                actions: [
+                  ElevatedButton(
+                    onPressed: () {
+                      outsideSetState(() {
+                        selectTenantText = tenantMap[selectedTenant];
+                        selectedTenant = selectedTenant;
+                      });
+                      Navigator.of(context).pop();
+                      Navigator.of(context).pop();
+                    },
+                    child: Text('Done'),
+                  ),
+                ],
+              );
+            },
+          );
+        },
+      );
     });
   }
 
-  Future<void> selectPropertFunc() {
+  Future<void> selectPropertyFunc(StateSetter outsideSetState) {
+    TextEditingController searchController = TextEditingController();
+    List<DropdownMenuItem> filteredPropertyList = [];
+    bool isSearching = false;
+
     return FirebaseFirestore.instance
         .collection('Properties')
         .get()
@@ -379,41 +477,87 @@ class _AdminCreateContractsPageState extends State<AdminCreateContractsPage> {
         ));
       });
       //map ids to names with ids as keys and names as values
-      Map propertyMap = Map.fromIterables(snapshot.docs.map((doc) => doc.id),
-          snapshot.docs.map((doc) => doc['title']));
+      Map propertyMap = Map.fromIterables(
+        snapshot.docs.map((doc) => doc.id),
+        snapshot.docs.map((doc) => doc['title']),
+      );
+
       showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text('Select Property'),
-              content: StatefulBuilder(builder: (context, setState) {
-                return DropdownButton(
-                  items: propertyList,
-                  onChanged: (value) {
-                    setState(() {
-                      //selected property text should have the title of the property
-                      selectPropertyText = propertyMap[value];
-                      selectedProperty = value;
-                    });
-                  },
-                  value: selectedProperty,
-                  isExpanded: true,
-                );
-              }),
-              actions: [
-                ElevatedButton(
-                  onPressed: () {
-                    setState(() {
-                      selectPropertyText = propertyMap[selectedProperty];
-                    });
-                    Navigator.of(context).pop();
-                    Navigator.of(context).pop();
-                  },
-                  child: Text('Done'),
+        context: context,
+        builder: (BuildContext context) {
+          return StatefulBuilder(
+            builder: (context, setState) {
+              return AlertDialog(
+                title: Text('Select Property'),
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      controller: searchController,
+                      onChanged: (value) {
+                        setState(() {
+                          if (value.isNotEmpty) {
+                            filteredPropertyList = propertyList
+                                .where((item) =>
+                                    item.child
+                                        .toString()
+                                        .toLowerCase()
+                                        .contains(value.toLowerCase()) ==
+                                    true)
+                                .toList();
+                            isSearching = true;
+                          } else {
+                            filteredPropertyList = propertyList;
+                            isSearching = false;
+                          }
+
+                          // Check if selectedProperty is still valid after filtering
+                          if (selectedProperty != null &&
+                              !filteredPropertyList.any(
+                                  (item) => item.value == selectedProperty)) {
+                            selectedProperty = filteredPropertyList.isEmpty
+                                ? null
+                                : filteredPropertyList[0].value;
+                          }
+                        });
+                      },
+                      decoration: InputDecoration(
+                        hintText: "Search Property",
+                        prefixIcon: Icon(Icons.search),
+                      ),
+                    ),
+                    SizedBox(height: 16),
+                    DropdownButton(
+                      items: isSearching ? filteredPropertyList : propertyList,
+                      onChanged: (value) {
+                        setState(() {
+                          selectPropertyText = propertyMap[value];
+                          selectedProperty = value;
+                        });
+                      },
+                      value: selectedProperty,
+                      isExpanded: true,
+                    ),
+                  ],
                 ),
-              ],
-            );
-          });
+                actions: [
+                  ElevatedButton(
+                    onPressed: () {
+                      outsideSetState(() {
+                        selectPropertyText = propertyMap[selectedProperty];
+                        selectedProperty = selectedProperty;
+                      });
+                      Navigator.of(context).pop();
+                      Navigator.of(context).pop();
+                    },
+                    child: Text('Done'),
+                  ),
+                ],
+              );
+            },
+          );
+        },
+      );
     });
   }
 }

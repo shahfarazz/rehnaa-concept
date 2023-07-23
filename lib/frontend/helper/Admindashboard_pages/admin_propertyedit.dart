@@ -26,6 +26,7 @@ class _PropertyEditPageState extends State<PropertyEditPage> {
   DocumentReference<Map<String, dynamic>>? tenantRef;
 
   bool isLoading = false;
+  int? selectedTenantIndex;
 
   @override
   void initState() {
@@ -41,6 +42,22 @@ class _PropertyEditPageState extends State<PropertyEditPage> {
 
     areaController =
         TextEditingController(text: widget.property.area.toString());
+
+    FirebaseFirestore.instance.collection('Tenants').get().then((snapshot) {
+      List<QueryDocumentSnapshot<Map<String, dynamic>>> tenantDocs =
+          snapshot.docs;
+      for (int i = 0; i < tenantDocs.length; i++) {
+        // print('tenantDocs[${i}].id: ${tenantDocs[i].id}');
+        // print('tenantRef?.id: ${widget.property.tenantRef?.id}');
+        if (tenantDocs[i].id == widget.property.tenantRef?.id) {
+          // print('LOOLOOLOL');
+          setState(() {
+            selectedTenantIndex = i;
+          });
+          break;
+        }
+      }
+    });
 
     setState(() {
       isLoading = false;
@@ -116,7 +133,7 @@ class _PropertyEditPageState extends State<PropertyEditPage> {
     showDialog(
       context: context,
       builder: (context) {
-        int? selectedTenantIndex;
+        // selectedTenantIndex;
         // Declare the selectedTenantIndex variable inside the builder function
 
         List<QueryDocumentSnapshot<Map<String, dynamic>>> tenantDocs =
@@ -125,7 +142,7 @@ class _PropertyEditPageState extends State<PropertyEditPage> {
         return StatefulBuilder(
           builder: (context, setState) {
             return AlertDialog(
-              title: const Text('Select a property'),
+              title: const Text('Select a Tenant'),
               content: Container(
                 constraints: BoxConstraints(maxHeight: 300),
                 child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
@@ -144,25 +161,37 @@ class _PropertyEditPageState extends State<PropertyEditPage> {
 
                     return SingleChildScrollView(
                       child: Column(
-                        children: tenantDocs.map((doc) {
-                          Map<String, dynamic>? tenantData = doc.data();
-                          Tenant tenant = Tenant.fromJson(tenantData);
-                          bool isSelected =
-                              selectedTenantIndex == tenantDocs.indexOf(doc);
-
-                          return RadioListTile<int>(
-                            title:
-                                Text('${tenant.firstName} ${tenant.lastName}'),
-                            value: tenantDocs.indexOf(doc),
+                        children: [
+                          RadioListTile<int>(
+                            title: Text('No tenant'),
+                            value: -1,
                             groupValue: selectedTenantIndex,
                             onChanged: (value) {
                               setState(() {
-                                selectedTenantIndex = value!;
+                                selectedTenantIndex = value;
                               });
                             },
-                            selected: isSelected,
-                          );
-                        }).toList(),
+                            selected: selectedTenantIndex == -1,
+                          )
+                        ]..addAll(tenantDocs.map((doc) {
+                            Map<String, dynamic>? tenantData = doc.data();
+                            Tenant tenant = Tenant.fromJson(tenantData);
+                            bool isSelected =
+                                selectedTenantIndex == tenantDocs.indexOf(doc);
+
+                            return RadioListTile<int>(
+                              title: Text(
+                                  '${tenant.firstName} ${tenant.lastName}'),
+                              value: tenantDocs.indexOf(doc),
+                              groupValue: selectedTenantIndex,
+                              onChanged: (value) {
+                                setState(() {
+                                  selectedTenantIndex = value!;
+                                });
+                              },
+                              selected: isSelected,
+                            );
+                          }).toList()),
                       ),
                     );
                   },
@@ -177,25 +206,22 @@ class _PropertyEditPageState extends State<PropertyEditPage> {
                 ),
                 TextButton(
                   onPressed: () {
-                    if (selectedTenantIndex != null) {
+                    if (selectedTenantIndex != null &&
+                        selectedTenantIndex != -1) {
                       QueryDocumentSnapshot<Map<String, dynamic>>
                           selectedTenantDoc = tenantDocs[selectedTenantIndex!];
-                      // Map<String, dynamic> propertyData =
-                      //     selectedTenantDoc.data();
-                      // // Property selectedproperty =
-                      // //     Property.fromJson(propertyData);
-
                       setState(() {
                         tenantRef = FirebaseFirestore.instance
                             .collection('Tenants')
                             .doc(selectedTenantDoc.id);
                       });
-                      onSelectionDone();
-                      Navigator.pop(context); // Close the dialog
                     } else {
-                      onSelectionDone();
-                      Navigator.pop(context); // Close the dialog
+                      setState(() {
+                        tenantRef = null;
+                      });
                     }
+                    onSelectionDone();
+                    Navigator.pop(context); // Close the dialog
                   },
                   child: const Text('Done'),
                 ),

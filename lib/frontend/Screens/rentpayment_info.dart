@@ -89,7 +89,9 @@ class RentPaymentInfoPage extends StatelessWidget {
                     SizedBox(height: size.height * 0.08),
                     const SizedBox(height: 20.0),
                     Text(
-                      ' $firstName $lastName',
+                      firstName == 'Rehnaa.pk'
+                          ? ' Rehnaa.pk'
+                          : ' $firstName $lastName',
                       style: GoogleFonts.montserrat(
                         fontSize: 24.0,
                         fontWeight: FontWeight.bold,
@@ -159,7 +161,7 @@ class RentPaymentInfoPage extends StatelessWidget {
                       const SizedBox(height: 10.0),
 
                       // make a box where pdf will be shown
-                      firstName == 'Rehnaa.pk'
+                      firstName == 'Rehnaa.pk' || rentPayment.isNoPdf == true
                           ? Container()
                           : GestureDetector(
                               onTap: () {

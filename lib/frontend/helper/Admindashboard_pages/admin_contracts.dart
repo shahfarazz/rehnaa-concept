@@ -1,23 +1,46 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../Screens/Admin/admindashboard.dart';
 import 'admin_contractsedit.dart';
 
 class AdminContractsViewPage extends StatefulWidget {
-  const AdminContractsViewPage({super.key});
+  const AdminContractsViewPage({Key? key}) : super(key: key);
 
   @override
-  State<AdminContractsViewPage> createState() => _AdminContractsEditPageState();
+  State<AdminContractsViewPage> createState() => _AdminContractsViewPageState();
 }
 
-class _AdminContractsEditPageState extends State<AdminContractsViewPage> {
+class _AdminContractsViewPageState extends State<AdminContractsViewPage> {
+  late Future<List<DocumentSnapshot<Map<String, dynamic>>>> _contractsFuture;
+  TextEditingController _searchController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _contractsFuture = fetchContracts();
+  }
+
   Future<List<DocumentSnapshot<Map<String, dynamic>>>> fetchContracts() async {
     final querySnapshot =
         await FirebaseFirestore.instance.collection('Contracts').get();
     return querySnapshot.docs;
+  }
+
+  List<DocumentSnapshot<Map<String, dynamic>>> _filterContracts(
+      List<DocumentSnapshot<Map<String, dynamic>>> contracts, String query) {
+    if (query.isEmpty) {
+      return contracts;
+    } else {
+      return contracts
+          .where((contract) => contract
+              .data()?['landlordName']
+              .toLowerCase()
+              .contains(query.toLowerCase()))
+          .toList();
+    }
   }
 
   @override
@@ -26,13 +49,14 @@ class _AdminContractsEditPageState extends State<AdminContractsViewPage> {
       appBar: AppBar(
         title: const Text('Admin Contracts'),
         leading: IconButton(
-            icon: Icon(Icons.arrow_back),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => AdminDashboard()),
-              );
-            }),
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => AdminDashboard()),
+            );
+          },
+        ),
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
@@ -47,43 +71,69 @@ class _AdminContractsEditPageState extends State<AdminContractsViewPage> {
           ),
         ),
       ),
-      body: FutureBuilder<List<DocumentSnapshot<Map<String, dynamic>>>>(
-        future: fetchContracts(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(
-              child: SpinKitFadingCube(
-                color: Color.fromARGB(255, 30, 197, 83),
-              ),
-            );
-          } else if (snapshot.hasError) {
-            return Center(
-              child: Text('Error: ${snapshot.error}'),
-            );
-          } else {
-            final contracts = snapshot.data;
-            if (contracts?.isEmpty ?? true) {
-              return Center(
-                child: Text(
-                  'No Contracts Found',
-                  style: TextStyle(
-                    fontFamily: GoogleFonts.montserrat().fontFamily,
-                    fontSize: 20,
-                  ),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: TextField(
+              controller: _searchController,
+              decoration: InputDecoration(
+                labelText: 'Search Contracts',
+                prefixIcon: Icon(Icons.search),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10.0),
                 ),
-              );
-            }
-            return ListView.builder(
-              itemCount: contracts?.length,
-              itemBuilder: (context, index) {
-                return ContractCard(
-                  contractData: contracts?[index].data(),
-                  id: contracts?[index].id,
-                );
+              ),
+              onChanged: (query) {
+                setState(() {
+                  _contractsFuture = fetchContracts()
+                      .then((contracts) => _filterContracts(contracts, query));
+                });
               },
-            );
-          }
-        },
+            ),
+          ),
+          Expanded(
+            child: FutureBuilder<List<DocumentSnapshot<Map<String, dynamic>>>>(
+              future: _contractsFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(
+                    child: SpinKitFadingCube(
+                      color: Color.fromARGB(255, 30, 197, 83),
+                    ),
+                  );
+                } else if (snapshot.hasError) {
+                  return Center(
+                    child: Text('Error: ${snapshot.error}'),
+                  );
+                } else {
+                  final contracts = snapshot.data;
+                  if (contracts?.isEmpty ?? true) {
+                    return Center(
+                      child: Text(
+                        'No Contracts Found',
+                        style: TextStyle(
+                          fontFamily: GoogleFonts.montserrat().fontFamily,
+                          fontSize: 20,
+                        ),
+                      ),
+                    );
+                  }
+                  return ListView.builder(
+                    reverse: true,
+                    itemCount: contracts?.length,
+                    itemBuilder: (context, index) {
+                      return ContractCard(
+                        contractData: contracts?[index].data(),
+                        id: contracts?[index].id,
+                      );
+                    },
+                  );
+                }
+              },
+            ),
+          ),
+        ],
       ),
     );
   }

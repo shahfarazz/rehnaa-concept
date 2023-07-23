@@ -99,192 +99,215 @@ class _PDFEditorTenantPageState extends State<PDFEditorTenantPage> {
     String cnic,
   ) async {
     //Load the existing document.
-    final File file = await getFileFromAssets('assets/template2.pdf');
-    final document = PdfDocument(inputBytes: file.readAsBytesSync());
+    try {
+      final File file = await getFileFromAssets('assets/template2.pdf');
+      final document = PdfDocument(inputBytes: file.readAsBytesSync());
 
-    //Get the first page.
-    final PdfPage page = document.pages[0];
+      //Get the first page.
+      final PdfPage page = document.pages[0];
 
-    //Create a PDF graphics for the page.
-    final PdfGraphics graphics = page.graphics;
+      //Create a PDF graphics for the page.
+      final PdfGraphics graphics = page.graphics;
 
-    //Set the standard font.
+      //Set the standard font.
 
-    final fontData =
-        await rootBundle.load('assets/fonts/Montserrat-Regular.ttf');
-    final PdfFont font_main =
-        PdfTrueTypeFont(fontData.buffer.asByteData().buffer.asUint8List(), 22);
-    final PdfFont font =
-        PdfTrueTypeFont(fontData.buffer.asByteData().buffer.asUint8List(), 14);
+      final fontData =
+          await rootBundle.load('assets/fonts/Montserrat-Regular.ttf');
+      final PdfFont font_main = PdfTrueTypeFont(
+          fontData.buffer.asByteData().buffer.asUint8List(), 22);
+      final PdfFont font = PdfTrueTypeFont(
+          fontData.buffer.asByteData().buffer.asUint8List(), 14);
 
-    final PdfFont font_small =
-        PdfTrueTypeFont(fontData.buffer.asByteData().buffer.asUint8List(), 12);
+      final PdfFont font_small = PdfTrueTypeFont(
+          fontData.buffer.asByteData().buffer.asUint8List(), 12);
 
-    final PdfFont font_medium =
-        PdfTrueTypeFont(fontData.buffer.asByteData().buffer.asUint8List(), 18);
+      final PdfFont font_medium = PdfTrueTypeFont(
+          fontData.buffer.asByteData().buffer.asUint8List(), 18);
 
-    //Billing To
-    graphics.drawString(tenantName.substring(0, 20), font_main,
-        brush: PdfBrushes.black,
-        pen: PdfPen(PdfColor(0, 0, 0), width: 0.5),
-        bounds: Rect.fromLTWH(
-            58, 174, page.getClientSize().width, page.getClientSize().height),
-        format: PdfStringFormat(alignment: PdfTextAlignment.left));
+      //Billing To
+      graphics.drawString(
+          tenantName.length >= 20 ? tenantName.substring(0, 20) : tenantName,
+          font_main,
+          brush: PdfBrushes.black,
+          pen: PdfPen(PdfColor(0, 0, 0), width: 0.5),
+          bounds: Rect.fromLTWH(
+              58, 174, page.getClientSize().width, page.getClientSize().height),
+          format: PdfStringFormat(alignment: PdfTextAlignment.left));
 
-    //CNIC number
-    String formatCNIC(String cnic) {
-      if (cnic.length != 13) {
-        //snackbar error
-        // Fluttertoast.showToast(msg: 'Invalid CNIC');
-        return cnic; // Return the original CNIC if the length is not as expected
+      //CNIC number
+      String formatCNIC(String cnic) {
+        if (cnic.length != 13) {
+          //snackbar error
+          // Fluttertoast.showToast(msg: 'Invalid CNIC');
+          return cnic; // Return the original CNIC if the length is not as expected
+        }
+
+        String part1 = cnic.substring(0, 5);
+        String part2 = cnic.substring(5, 12);
+        String part3 = cnic.substring(12);
+
+        return '$part1-$part2-$part3';
       }
 
-      String part1 = cnic.substring(0, 5);
-      String part2 = cnic.substring(5, 12);
-      String part3 = cnic.substring(12);
+      var formattedCNIC = decryptString(cnic);
 
-      return '$part1-$part2-$part3';
-    }
+      try {
+        formattedCNIC = formatCNIC(decryptString(cnic));
+      } catch (e) {}
 
-    graphics.drawString(formatCNIC(decryptString(cnic)), font_small,
-        brush: PdfBrushes.black,
-        bounds: Rect.fromLTWH(100, 205.5, page.getClientSize().width,
-            page.getClientSize().height),
-        format: PdfStringFormat(alignment: PdfTextAlignment.left));
+      graphics.drawString(formattedCNIC, font_small,
+          brush: PdfBrushes.black,
+          bounds: Rect.fromLTWH(100, 205.5, page.getClientSize().width,
+              page.getClientSize().height),
+          format: PdfStringFormat(alignment: PdfTextAlignment.left));
 
-    //Address
-    graphics.drawString(decryptString(landlordAddress!) ?? '', font_small,
-        brush: PdfBrushes.black,
-        bounds: Rect.fromLTWH(
-            60, 220, page.getClientSize().width, page.getClientSize().height),
-        format: PdfStringFormat(alignment: PdfTextAlignment.left));
+      //Address
+      graphics.drawString(decryptString(landlordAddress!) ?? '', font_small,
+          brush: PdfBrushes.black,
+          bounds: Rect.fromLTWH(
+              60, 220, page.getClientSize().width, page.getClientSize().height),
+          format: PdfStringFormat(alignment: PdfTextAlignment.left));
 
-    //Invoice number
-    graphics.drawString(invoiceNumber, font,
-        brush: PdfBrushes.black,
-        bounds: Rect.fromLTWH(
-            442, 162, page.getClientSize().width, page.getClientSize().height),
-        format: PdfStringFormat(alignment: PdfTextAlignment.left));
+      //Invoice number
+      graphics.drawString(invoiceNumber, font,
+          brush: PdfBrushes.black,
+          bounds: Rect.fromLTWH(442, 162, page.getClientSize().width,
+              page.getClientSize().height),
+          format: PdfStringFormat(alignment: PdfTextAlignment.left));
 
-    var date = DateTime.now();
-    String day = getOrdinal(date.day);
-    var formatter = DateFormat('MMMM y');
-    String formatted = '$day ${formatter.format(date)}';
+      var date = DateTime.now();
+      String day = getOrdinal(date.day);
+      var formatter = DateFormat('MMMM y');
+      String formatted = '$day ${formatter.format(date)}';
 
-    //Invoice date
-    graphics.drawString(formatted, font,
-        brush: PdfBrushes.black,
-        bounds: Rect.fromLTWH(
-            445, 183, page.getClientSize().width, page.getClientSize().height),
-        format: PdfStringFormat(alignment: PdfTextAlignment.left));
+      //Invoice date
+      graphics.drawString(formatted, font,
+          brush: PdfBrushes.black,
+          bounds: Rect.fromLTWH(445, 183, page.getClientSize().width,
+              page.getClientSize().height),
+          format: PdfStringFormat(alignment: PdfTextAlignment.left));
 
-    // Due date of invoice
+      // Due date of invoice
 
-    //due date should be 30th of current month
-    var dueDate = DateTime(date.year, date.month, 30);
-    String dueDay = getOrdinal(dueDate.day);
-    var dueFormatter = DateFormat('MMMM y');
-    String dueFormatted = '$dueDay ${dueFormatter.format(dueDate)}';
+      //due date should be 30th of current month
+      var dueDate = DateTime(date.year, date.month, 30);
+      String dueDay = getOrdinal(dueDate.day);
+      var dueFormatter = DateFormat('MMMM y');
+      String dueFormatted = '$dueDay ${dueFormatter.format(dueDate)}';
 
-    graphics.drawString(dueFormatted, font,
-        brush: PdfBrushes.black,
-        bounds: Rect.fromLTWH(
-            445, 205, page.getClientSize().width, page.getClientSize().height),
-        format: PdfStringFormat(alignment: PdfTextAlignment.left));
+      graphics.drawString(dueFormatted, font,
+          brush: PdfBrushes.black,
+          bounds: Rect.fromLTWH(445, 205, page.getClientSize().width,
+              page.getClientSize().height),
+          format: PdfStringFormat(alignment: PdfTextAlignment.left));
 
-    //Property Rented Address
-    graphics.drawString(tenantAddress?.substring(0, 25) ?? '', font_small,
-        brush: PdfBrushes.black,
-        bounds: Rect.fromLTWH(
-            250, 295, page.getClientSize().width, page.getClientSize().height),
-        format: PdfStringFormat(alignment: PdfTextAlignment.left));
+      //Property Rented Address
+      //check if address is above 25
+      graphics.drawString(
+          tenantAddress!.length >= 25
+              ? tenantAddress.substring(0, 25)
+              : tenantAddress,
+          font_small,
+          brush: PdfBrushes.black,
+          bounds: Rect.fromLTWH(250, 295, page.getClientSize().width,
+              page.getClientSize().height),
+          format: PdfStringFormat(alignment: PdfTextAlignment.left));
 
-    //Mode of payment
-    graphics.drawString(paymentMode, font_small,
-        brush: PdfBrushes.black,
-        bounds: Rect.fromLTWH(
-            200, 315, page.getClientSize().width, page.getClientSize().height),
-        format: PdfStringFormat(alignment: PdfTextAlignment.left));
+      //Mode of payment
+      graphics.drawString(paymentMode, font_small,
+          brush: PdfBrushes.black,
+          bounds: Rect.fromLTWH(200, 315, page.getClientSize().width,
+              page.getClientSize().height),
+          format: PdfStringFormat(alignment: PdfTextAlignment.left));
 
-    //landlord Name
-    graphics.drawString(landlordName.substring(0, 16), font_medium,
-        brush: PdfBrushes.black,
-        // pen: PdfPen(PdfColor(0, 0, 0), width: 0.5),
-        bounds: Rect.fromLTWH(
-            70, 440, page.getClientSize().width, page.getClientSize().height),
-        format: PdfStringFormat(alignment: PdfTextAlignment.left));
+      //landlord Name
+      graphics.drawString(
+          landlordName.length >= 16
+              ? landlordName.substring(0, 16)
+              : landlordName,
+          font_main,
+          brush: PdfBrushes.black,
+          // pen: PdfPen(PdfColor(0, 0, 0), width: 0.5),
+          bounds: Rect.fromLTWH(
+              70, 440, page.getClientSize().width, page.getClientSize().height),
+          format: PdfStringFormat(alignment: PdfTextAlignment.left));
 
-    var date2 = DateTime.now();
-    var monthFormatter = DateFormat('MMMM');
-    var yearFormatter = DateFormat('y');
+      var date2 = DateTime.now();
+      var monthFormatter = DateFormat('MMMM');
+      var yearFormatter = DateFormat('y');
 
-    String formattedMonth = monthFormatter.format(date2);
-    String formattedYear = yearFormatter.format(date2);
+      String formattedMonth = monthFormatter.format(date2);
+      String formattedYear = yearFormatter.format(date2);
 
-    String formatted2 = "$formattedMonth' $formattedYear";
+      String formatted2 = "$formattedMonth' $formattedYear";
 
-    //Tenant Month+Year
-    graphics.drawString(formatted2, font_medium,
-        brush: PdfBrushes.black,
-        // pen: PdfPen(PdfColor(0, 0, 0), width: 0.5),
-        bounds: Rect.fromLTWH(
-            250, 440, page.getClientSize().width, page.getClientSize().height),
-        format: PdfStringFormat(alignment: PdfTextAlignment.left));
+      //Tenant Month+Year
+      graphics.drawString(formatted2, font_medium,
+          brush: PdfBrushes.black,
+          // pen: PdfPen(PdfColor(0, 0, 0), width: 0.5),
+          bounds: Rect.fromLTWH(250, 440, page.getClientSize().width,
+              page.getClientSize().height),
+          format: PdfStringFormat(alignment: PdfTextAlignment.left));
 
-    //Tenant Amount
-    graphics.drawString("PKR ${amount}", font_medium,
-        brush: PdfBrushes.black,
-        // pen: PdfPen(PdfColor(0, 0, 0), width: 0.5),
-        bounds: Rect.fromLTWH(
-            390, 440, page.getClientSize().width, page.getClientSize().height),
-        format: PdfStringFormat(alignment: PdfTextAlignment.left));
+      //Tenant Amount
+      graphics.drawString("PKR ${amount}", font_medium,
+          brush: PdfBrushes.black,
+          // pen: PdfPen(PdfColor(0, 0, 0), width: 0.5),
+          bounds: Rect.fromLTWH(390, 440, page.getClientSize().width,
+              page.getClientSize().height),
+          format: PdfStringFormat(alignment: PdfTextAlignment.left));
 
-    //Save the document.
-    final List<int> bytes = await document.save();
+      //Save the document.
+      final List<int> bytes = await document.save();
 
-    //Dispose the document.
-    document.dispose();
+      //Dispose the document.
+      document.dispose();
 
-    //Get the external storage directory
-    final Directory directory = await getApplicationDocumentsDirectory();
+      //Get the external storage directory
+      final Directory directory = await getApplicationDocumentsDirectory();
 
-    //Get the directory path
-    final String path = directory.path;
+      //Get the directory path
+      final String path = directory.path;
 
-    //Create an empty file to write PDF data.
-    final File outputFile = File('$path/Output.pdf');
+      //Create an empty file to write PDF data.
+      final File outputFile = File('$path/Output.pdf');
 
-    //Write PDF data.
-    await outputFile.writeAsBytes(bytes, flush: true);
+      //Write PDF data.
+      await outputFile.writeAsBytes(bytes, flush: true);
 
-    //Open the PDF document in mobile
-    // OpenFile.open('$path/Output.pdf');
+      //Open the PDF document in mobile
+      // OpenFile.open('$path/Output.pdf');
 
-    // upload the pdf to firebase storage
-    FirebaseStorage storage = FirebaseStorage.instance;
-    Reference ref = storage.ref().child("invoice_${invoiceNumber}.pdf");
-    UploadTask uploadTask = ref.putFile(outputFile);
-    uploadTask.then((res) {
-      res.ref.getDownloadURL().then((value) {
-        print("Uploaded File URL: $value");
-        FirebaseFirestore.instance
-            .collection('invoices')
-            .doc(invoiceNumber)
-            .set({
-          // 'invoiceNumber': invoiceNumber,
-          // 'landlordName': landlordName,
-          // 'landlordAddress': landlordAddress,
-          // 'tenantName': tenantName,
-          // 'tenantAddress': tenantAddress,
-          // 'amount': amount,
-          // 'paymentMode': paymentMode,
-          // 'date': formatted,
-          'url': value,
+      // upload the pdf to firebase storage
+      FirebaseStorage storage = FirebaseStorage.instance;
+      Reference ref = storage.ref().child("invoice_${invoiceNumber}.pdf");
+      UploadTask uploadTask = ref.putFile(outputFile);
+      uploadTask.then((res) {
+        res.ref.getDownloadURL().then((value) {
+          print("Uploaded File URL: $value");
+          FirebaseFirestore.instance
+              .collection('invoices')
+              .doc(invoiceNumber)
+              .set({
+            // 'invoiceNumber': invoiceNumber,
+            // 'landlordName': landlordName,
+            // 'landlordAddress': landlordAddress,
+            // 'tenantName': tenantName,
+            // 'tenantAddress': tenantAddress,
+            // 'amount': amount,
+            // 'paymentMode': paymentMode,
+            // 'date': formatted,
+            'url': value,
+          });
         });
       });
-    });
 
-    return outputFile;
+      return outputFile;
+    } catch (e) {
+      print('error in pdf is $e');
+      // return File('');
+      rethrow;
+    }
   }
 
   //funcion which takes the created pdf as input and saves it to the device
