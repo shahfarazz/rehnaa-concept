@@ -85,6 +85,50 @@ class _AdminPropertyContractsPageState
       TextEditingController();
 
   void _addContractToDatabase() {
+    if (contractStartDate == null || contractEndDate == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Please select contract start and end dates'),
+        ),
+      );
+      return;
+    }
+
+    //also check landlord name and tenant name and security deposit and address are not empty
+    //check one by one and give snackbar for each
+    if (_landlordNameController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Please enter landlord name'),
+        ),
+      );
+      return;
+    }
+    if (_tenantNameController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Please enter tenant name'),
+        ),
+      );
+      return;
+    }
+    if (_propertyAddressController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Please enter property address'),
+        ),
+      );
+      return;
+    }
+    if (_totalSecurityController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Please enter total security amount'),
+        ),
+      );
+      return;
+    }
+
     // Retrieve the values from the text controllers
     final String landlordName = _landlordNameController.text;
     final String landlordCnic = _landlordCnicController.text;
@@ -113,10 +157,8 @@ class _AdminPropertyContractsPageState
     final String additionalInformation = _additionalInformationController.text;
 
     //Make a new document in the Contracts collection for the new contract
-    FirebaseFirestore.instance
-        .collection('Contracts')
-        .doc(widget.landlordID)
-        .set({
+    var newContractID;
+    FirebaseFirestore.instance.collection('Contracts').add({
       //add all the fields to the document
       'landlordName': landlordName,
       'landlordCnic': encryptString(landlordCnic),
@@ -149,6 +191,21 @@ class _AdminPropertyContractsPageState
       'additionalInformation': additionalInformation,
       'landlordID': widget.landlordID,
       'tenantID': widget.tenantID,
+    }).then((value) {
+      newContractID = value.id;
+      //add newContractID to contractIDs list in Landlords and Tenants
+      FirebaseFirestore.instance
+          .collection('Landlords')
+          .doc(widget.landlordID)
+          .update({
+        'contractIDs': FieldValue.arrayUnion([newContractID]),
+      });
+      FirebaseFirestore.instance
+          .collection('Tenants')
+          .doc(widget.tenantID)
+          .update({
+        'contractIDs': FieldValue.arrayUnion([newContractID]),
+      });
     });
 
     FirebaseFirestore.instance
@@ -179,7 +236,15 @@ class _AdminPropertyContractsPageState
       'monthlyRent': monthlyRent,
     });
 
+    //snackbar to show that the contract has been added
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Contract Added Successfully'),
+      ),
+    );
+
     //Navigate to the home page
+    Navigator.of(context).pop();
     Navigator.of(context).pop();
   }
 

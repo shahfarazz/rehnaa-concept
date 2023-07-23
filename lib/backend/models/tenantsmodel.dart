@@ -40,6 +40,7 @@ class Tenant {
   var phoneNumber;
   var pastLandlordTestimonial;
   Property? property;
+  var contractIDs;
 
   Tenant({
     required this.firstName,
@@ -77,6 +78,7 @@ class Tenant {
     this.phoneNumber,
     this.pastLandlordTestimonial,
     this.property,
+    this.contractIDs,
   });
 
   factory Tenant.fromJson(Map<String, dynamic> json) {
@@ -118,6 +120,7 @@ class Tenant {
       otherInfo: json['otherInfo'] ?? '',
       phoneNumber: json['phoneNumber'] ?? '',
       pastLandlordTestimonial: json['pastLandlordTestimonial'] ?? '',
+      contractIDs: json['contractIDs'] ?? '',
     );
   }
 

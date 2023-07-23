@@ -20,6 +20,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 import '../../helper/Landlorddashboard_pages/landlordproperties.dart';
 import '../../helper/Tenantdashboard_pages/tenant_security_deposit.dart';
+import '../contracts.dart';
 
 class LandlordDashboardPage extends StatefulWidget {
   final String uid; // UID of the landlord
@@ -468,8 +469,9 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const ContractPage(
-                              identifier: 'Landlord',
+                            builder: (context) => AllContractsPage(
+                              callerType: 'Landlords',
+                              uid: widget.uid,
                             ),
                           ),
                         );
