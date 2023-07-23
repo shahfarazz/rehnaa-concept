@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:rehnaa/backend/models/landlordmodel.dart';
+import 'package:rehnaa/backend/models/propertymodel.dart';
 
 class Tenant {
   String firstName;
@@ -36,6 +37,10 @@ class Tenant {
   var creditPoints;
   var otherInfo;
   var isRentoffWinner;
+  var phoneNumber;
+  var pastLandlordTestimonial;
+  Property? property;
+  var contractIDs;
 
   Tenant({
     required this.firstName,
@@ -70,6 +75,10 @@ class Tenant {
     this.creditScore,
     this.otherInfo,
     this.isRentoffWinner,
+    this.phoneNumber,
+    this.pastLandlordTestimonial,
+    this.property,
+    this.contractIDs,
   });
 
   factory Tenant.fromJson(Map<String, dynamic> json) {
@@ -109,6 +118,9 @@ class Tenant {
       securityDeposit: json['securityDeposit'] ?? '',
       creditScore: json['creditScore'] ?? '',
       otherInfo: json['otherInfo'] ?? '',
+      phoneNumber: json['phoneNumber'] ?? '',
+      pastLandlordTestimonial: json['pastLandlordTestimonial'] ?? '',
+      contractIDs: json['contractIDs'] ?? '',
     );
   }
 
@@ -139,6 +151,19 @@ class Tenant {
       landlord = Landlord.fromJson(snapshot.data());
       landlord?.tempID = snapshot.id;
       return landlord;
+    }
+    return null;
+  }
+
+  Future<Property?> getProperty() async {
+    print('propertyRef: $propertyRef');
+    if (propertyRef != null) {
+      DocumentSnapshot<Map<String, dynamic>> snapshot =
+          await propertyRef!.get();
+
+      property = Property.fromJson(snapshot.data()!);
+      // property!.tempID = snapshot.id;
+      return property!;
     }
     return null;
   }

@@ -19,6 +19,8 @@ class RentPayment {
   String? invoiceNumber;
   String? tenantname;
   bool? isMinus;
+  var isEstamp;
+  var eStampType;
 
   RentPayment({
     required this.amount,
@@ -35,6 +37,8 @@ class RentPayment {
     this.tenantname,
     this.isMinus,
     this.dealerRef,
+    this.isEstamp,
+    this.eStampType,
   });
 
   static Future<RentPayment> fromJson(Map<String, dynamic> json) async {
@@ -58,6 +62,8 @@ class RentPayment {
         invoiceNumber: json['invoiceNumber'],
         tenantname: json['tenantname'] ?? 'Old document',
         isMinus: json['isMinus'],
+        isEstamp: json['isEstamp'],
+        eStampType: json['eStampType'],
       );
 
       if (propertyRef != null) {

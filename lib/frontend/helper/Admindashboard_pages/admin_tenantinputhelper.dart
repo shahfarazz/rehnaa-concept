@@ -219,7 +219,7 @@ class _TenantCardWidgetState extends State<TenantCardWidget> {
                     },
                   ),
                   TextField(
-                    decoration: const InputDecoration(labelText: 'Rent'),
+                    decoration: const InputDecoration(labelText: 'Balance'),
                     keyboardType: TextInputType.number,
                     onChanged: (value) {
                       setState(() {

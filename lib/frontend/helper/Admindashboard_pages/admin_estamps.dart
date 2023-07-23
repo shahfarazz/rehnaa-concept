@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:rehnaa/backend/models/landlordmodel.dart';
 
 import '../../../backend/models/dealermodel.dart';
@@ -135,8 +136,11 @@ class _AdminEstampsPageState extends State<AdminEstampsPage> {
                                               );
                                             } else {
                                               return Center(
-                                                  child:
-                                                      CircularProgressIndicator());
+                                                child: SpinKitFadingCube(
+                                                  color: Color.fromARGB(
+                                                      255, 30, 197, 83),
+                                                ),
+                                              );
                                             }
                                           },
                                         ),
@@ -147,7 +151,11 @@ class _AdminEstampsPageState extends State<AdminEstampsPage> {
                   },
                 );
               } else {
-                return Center(child: CircularProgressIndicator());
+                return Center(
+                  child: SpinKitFadingCube(
+                    color: Color.fromARGB(255, 30, 197, 83),
+                  ),
+                );
               }
             }));
   }

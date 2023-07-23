@@ -79,6 +79,7 @@ class _TenantPropertiesPageState extends State<TenantPropertiesPage>
     }
 
     QuerySnapshot<Map<String, dynamic>> snapshot = await query.get();
+    var notShownList = [];
 
     List<Property> properties = [];
     for (DocumentSnapshot<Map<String, dynamic>> documentSnapshot
@@ -86,14 +87,18 @@ class _TenantPropertiesPageState extends State<TenantPropertiesPage>
       Property property =
           Property.fromJson(documentSnapshot.data() as Map<String, dynamic>);
       property.propertyID = documentSnapshot.id;
+      print('propertyid--> ${property.propertyID}');
 
       print('tenantrefid--> ${property.tenantRef?.id}');
 
       if (property.tenantRef?.id != null ||
           property.tenantRef?.id == widget.uid) {
-        print('reached here with propertytitle --> ${property.title}');
+        // print('reached here with propertytitle --> ${property.title}');
+        notShownList.add(property);
+
         continue;
       } else {
+        print('reached here with propertytitle --> ${property.title}');
         properties.add(property);
       }
     }
@@ -105,6 +110,9 @@ class _TenantPropertiesPageState extends State<TenantPropertiesPage>
     print('returned properties with length ${properties.length}');
 
     _isLoading = false;
+    if (notShownList.length > 3) {
+      _loadMoreProperties();
+    }
 
     return properties;
   }
@@ -208,7 +216,15 @@ class _TenantPropertiesPageState extends State<TenantPropertiesPage>
                 controller: _scrollController,
                 itemBuilder: (context, index) {
                   if (index < _properties.length) {
-                    Property property = _properties[index];
+                    Property? property;
+                    try {
+                      property = _properties[index];
+                    } catch (e) {
+                      // TODO
+                    }
+
+                    if (property == null) return Container();
+
                     if (property.shouldShow == false) {
                       return Container();
                     }
@@ -227,7 +243,7 @@ class _TenantPropertiesPageState extends State<TenantPropertiesPage>
                           context,
                           MaterialPageRoute(
                             builder: (_) => TenantPropertyPage(
-                              property: property,
+                              property: property!,
                               firstName: property.landlord?.firstName ?? '',
                               lastName: property.landlord?.lastName ?? '',
                               pathToImage: property.landlord?.pathToImage ??
@@ -324,7 +340,10 @@ class PropertyCard extends StatelessWidget {
                       color: Color.fromARGB(255, 30, 197, 83),
                     ),
                   ),
-                  errorWidget: (context, url, error) => const Icon(Icons.error),
+                  errorWidget: (context, url, error) => Image.asset(
+                    'assets/mainlogo.png',
+                    fit: BoxFit.scaleDown,
+                  ),
                   fit: BoxFit.cover,
                 ),
               ),
@@ -344,6 +363,8 @@ class PropertyCard extends StatelessWidget {
                     SizedBox(height: screenHeight * 0.005),
                     Text(
                       '$location\n$address',
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(fontSize: screenWidth * 0.035),
                     ),
                     SizedBox(height: screenHeight * 0.01),

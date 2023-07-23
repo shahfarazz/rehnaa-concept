@@ -20,6 +20,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 import '../../helper/Landlorddashboard_pages/landlordproperties.dart';
 import '../../helper/Tenantdashboard_pages/tenant_security_deposit.dart';
+import '../contracts.dart';
 
 class LandlordDashboardPage extends StatefulWidget {
   final String uid; // UID of the landlord
@@ -318,7 +319,6 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
 
                       if (data != null && data.containsKey('notifications')) {
                         List<dynamic> notificationstemp = data['notifications'];
-                        
 
                         // Filter notifications based on read status
                         List<dynamic> unreadNotifications =
@@ -469,9 +469,40 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const ContractPage(
-                              identifier: 'Landlord',
+                            builder: (context) => AllContractsPage(
+                              callerType: 'Landlords',
+                              uid: widget.uid,
                             ),
+                          ),
+                        );
+                        // _closeSidebar();
+                      },
+                    ),
+                    _buildSidebarItem(
+                      icon: Icons.receipt_long,
+                      label: 'Advance Rent',
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => LandlordAdvanceRentPage(
+                              uid: widget.uid,
+                            ),
+                          ),
+                        );
+                        // _closeSidebar();
+                      },
+                    ),
+                    _buildSidebarItem(
+                      icon: Icons.receipt,
+                      label: 'Interest Free Loan',
+                      onTap: () {
+                        //firebase call set users isNewVouchers to false
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                InterestFreeLoanPage(uid: widget.uid),
                           ),
                         );
                         // _closeSidebar();
@@ -506,30 +537,16 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
                       },
                     ),
                     _buildSidebarItem(
-                      icon: Icons.receipt_long,
-                      label: 'Advance Rent',
+                      icon: Icons.security,
+                      label: 'Security Deposit',
                       onTap: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => LandlordAdvanceRentPage(
+                            builder: (context) => TenantSecurityDepositPage(
                               uid: widget.uid,
+                              callerType: 'Landlords',
                             ),
-                          ),
-                        );
-                        // _closeSidebar();
-                      },
-                    ),
-                    _buildSidebarItem(
-                      icon: Icons.receipt,
-                      label: 'Interest Free Loan',
-                      onTap: () {
-                        //firebase call set users isNewVouchers to false
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                InterestFreeLoanPage(uid: widget.uid),
                           ),
                         );
                         // _closeSidebar();
@@ -556,22 +573,6 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
                           context,
                           MaterialPageRoute(
                             builder: (context) => const FAQPage(),
-                          ),
-                        );
-                        // _closeSidebar();
-                      },
-                    ),
-                    _buildSidebarItem(
-                      icon: Icons.security,
-                      label: 'Security Deposit',
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => TenantSecurityDepositPage(
-                              uid: widget.uid,
-                              callerType: 'Landlords',
-                            ),
                           ),
                         );
                         // _closeSidebar();

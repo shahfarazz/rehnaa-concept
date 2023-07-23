@@ -11,6 +11,7 @@ import '../../../backend/services/helperfunctions.dart';
 import '../../helper/Admindashboard_pages/admin_accounts.dart';
 import '../../helper/Admindashboard_pages/admin_analytics.dart';
 import '../../helper/Admindashboard_pages/admin_contracts.dart';
+import '../../helper/Admindashboard_pages/admin_create_contract.dart';
 import '../../helper/Admindashboard_pages/admin_dealerinput.dart';
 import '../../helper/Admindashboard_pages/admin_estamps.dart';
 import '../../helper/Admindashboard_pages/admin_landlord_tenant_info.dart';
@@ -19,6 +20,7 @@ import '../../helper/Admindashboard_pages/admin_propertyinput.dart';
 import '../../helper/Admindashboard_pages/admin_rentoffwinner.dart';
 import '../../helper/Admindashboard_pages/admin_requests_property_contracts.dart';
 import '../../helper/Admindashboard_pages/admin_reviews.dart';
+import '../../helper/Admindashboard_pages/admin_send_monthlyprofit.dart';
 import '../../helper/Admindashboard_pages/admin_vouchers.dart';
 
 class AdminDashboard extends StatefulWidget {
@@ -577,18 +579,19 @@ class _AdminDashboardState extends State<AdminDashboard> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   CustomButton(
-                    color: Colors.cyan,
-                    icon: Icons.analytics,
-                    text: 'Data Analytics',
+                    color: Colors.blue.shade300,
+                    icon: Icons.pending,
+                    text: 'Contract Creation',
                     onPressed: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => AdminNewAnalyticsPage(),
+                          builder: (context) => AdminCreateContractsPage(),
                         ),
                       );
                     },
                   ),
+
                   const SizedBox(width: 20),
                   CustomButton(
                     color: Colors.indigoAccent,
@@ -687,6 +690,40 @@ class _AdminDashboardState extends State<AdminDashboard> {
                   ),
                 ],
               ),
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CustomButton(
+                    color: Colors.cyan,
+                    icon: Icons.analytics,
+                    text: 'Data Analytics',
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => AdminNewAnalyticsPage(),
+                        ),
+                      );
+                    },
+                  ),
+                  const SizedBox(width: 20),
+                  CustomButton(
+                    color: Colors.pink.shade700,
+                    icon: Icons.auto_fix_high_outlined,
+                    text: 'Send Monthly Estamp Profit',
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => AdminSendMonthlyProfitsPage(),
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
+              SizedBox(height: 30)
             ],
           ),
         ));

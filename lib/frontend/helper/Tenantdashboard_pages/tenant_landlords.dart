@@ -30,9 +30,6 @@ class _TenantLandlordsPageState extends State<TenantLandlordsPage> {
         tenant = Tenant.fromJson(value.data()!);
         // print('tenant.landlordRef: ${tenant!.landlordRef?.id}');
         tenant?.landlord = await tenant?.getLandlord();
-        // print('Landlord: ${tenant!.landlord?.firstName}');
-        tenant?.landlord?.property = (await tenant?.landlord?.getProperty())!;
-        // print('landlord.property: ${tenant!.landlord?.property[0].address}');
         return tenant!;
       }
     });
@@ -67,6 +64,7 @@ class _TenantLandlordsPageState extends State<TenantLandlordsPage> {
       },
       child: Card(
         elevation: 4.0,
+        margin: const EdgeInsets.all(16.0),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20.0),
         ),
@@ -80,87 +78,97 @@ class _TenantLandlordsPageState extends State<TenantLandlordsPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Row(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    'Tenant Name: ',
+                    'Landlord Name: ',
                     style: GoogleFonts.montserrat(
                       fontSize: 16.0,
                       fontWeight: FontWeight.w600,
                       color: Colors.black,
                     ),
                   ),
+                ],
+              ),
+              SizedBox(height: 30.0),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
                   Text(
                     '${landlord.firstName} ${landlord.lastName}',
                     style: GoogleFonts.montserrat(
-                      fontSize: 14.0,
-                      fontWeight: FontWeight.bold,
+                      fontSize: 16.0,
+                      fontWeight: FontWeight.w600,
                       color: const Color(0xff33907c),
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 10.0),
-              Row(
-                children: [
-                  Text(
-                    'Rating:',
-                    style: GoogleFonts.montserrat(
-                      fontSize: 14.0,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
-                  ),
-                  Text(
-                    ' ${landlord.rating}',
-                    style: GoogleFonts.montserrat(
-                      fontSize: 14.0,
-                      fontWeight: FontWeight.bold,
-                      color: const Color(0xff33907c),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 10.0),
-              Row(
-                children: [
-                  Text(
-                    'Properties owned: ',
-                    style: GoogleFonts.montserrat(
-                      fontSize: 14.0,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
-                  ),
-                  landlord.property != null
-                      ? Wrap(
-                          direction: Axis.horizontal,
-                          spacing: 8.0,
-                          children: landlord.property!.map((property) {
-                            return Row(
-                              children: [
-                                // SizedBox()
-                                Text(
-                                  property.title,
-                                  style: TextStyle(
-                                    fontSize: 14.0,
-                                    fontWeight: FontWeight.bold,
-                                    color: const Color(0xff33907c),
-                                  ),
-                                ),
-                              ],
-                            );
-                          }).toList(),
-                        )
-                      : Text(
-                          'No properties',
-                          style: TextStyle(
-                            fontSize: 14.0,
-                            fontWeight: FontWeight.bold,
-                            color: const Color(0xff33907c),
-                          ),
-                        ),
-                ],
-              )
+              // const SizedBox(height: 10.0),
+              // Row(
+              //   children: [
+              //     Text(
+              //       'Rating:',
+              //       style: GoogleFonts.montserrat(
+              //         fontSize: 14.0,
+              //         fontWeight: FontWeight.bold,
+              //         color: Colors.black,
+              //       ),
+              //     ),
+              //     Text(
+              //       ' ${landlord.rating}',
+              //       style: GoogleFonts.montserrat(
+              //         fontSize: 14.0,
+              //         fontWeight: FontWeight.bold,
+              //         color: const Color(0xff33907c),
+              //       ),
+              //     ),
+              //   ],
+              // ),
+              // const SizedBox(height: 10.0),
+              // Row(
+              //   children: [
+              //     Text(
+              //       'Properties owned: ',
+              //       style: GoogleFonts.montserrat(
+              //         fontSize: 14.0,
+              //         fontWeight: FontWeight.bold,
+              //         color: Colors.black,
+              //       ),
+              //     ),
+              //     // landlord.property != null
+              //     tenant?.propertyRef != null
+              //         ? Expanded(
+              //             child: Wrap(
+              //             direction: Axis.horizontal,
+              //             spacing: 8.0,
+              //             children: landlord.property!.map((property) {
+              //               return
+              //                   // Row(
+              //                   // children: [
+              //                   // SizedBox()
+              //                   Text(
+              //                 property.title,
+              //                 style: TextStyle(
+              //                   fontSize: 14.0,
+              //                   fontWeight: FontWeight.bold,
+              //                   color: const Color(0xff33907c),
+              //                 ),
+              //               );
+              //               // ],
+              //               // );
+              //             }).toList(),
+              //           ))
+              //         : Text(
+              //             'No properties',
+              //             style: TextStyle(
+              //               fontSize: 14.0,
+              //               fontWeight: FontWeight.bold,
+              //               color: const Color(0xff33907c),
+              //             ),
+              //           ),
+              //   ],
+              // )
             ],
           ),
         ),

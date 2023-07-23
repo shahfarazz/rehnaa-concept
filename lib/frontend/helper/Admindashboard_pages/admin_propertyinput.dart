@@ -173,6 +173,35 @@ class _AdminPropertyInputPageState extends State<AdminPropertyInputPage> {
                           subtitle: Text(property.location),
                           leading: const Icon(Icons.home),
                           onTap: () => openPropertyDetailsPage(property),
+                          trailing: //delete icon with gesture detector
+                              GestureDetector(
+                            onTap: () async {
+                              //check if property has a tenantref and landlordref and if so go to those documents and remove propertyref from their propertyRef array
+                              if (property.tenantRef != null) {
+                                await property.tenantRef!
+                                    .update({'propertyRef': null});
+                              }
+                              if (property.landlordRef != null) {
+                                await property.landlordRef!.update({
+                                  'propertyRef': FieldValue.arrayRemove([
+                                    FirebaseFirestore.instance
+                                        .collection('Properties')
+                                        .doc(property.propertyID)
+                                  ])
+                                });
+                              }
+
+                              await FirebaseFirestore.instance
+                                  .collection('Properties')
+                                  .doc(property.propertyID)
+                                  .delete();
+                              setState(() {
+                                properties.remove(property);
+                                filteredProperties.remove(property);
+                              });
+                            },
+                            child: const Icon(Icons.delete),
+                          ),
                         );
                       },
                     ),

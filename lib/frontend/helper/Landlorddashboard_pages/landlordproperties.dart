@@ -300,40 +300,48 @@ class _LandlordPropertiesPageState extends State<LandlordPropertiesPage>
                     },
                     child: ListView(
                       children: snapshot.data!.map((propertySnapshot) {
-                        Property property = Property.fromJson(
-                            propertySnapshot.data() as Map<String, dynamic>);
+                        Property? property;
+                        try {
+                          property = Property.fromJson(
+                              propertySnapshot.data() as Map<String, dynamic>);
+                        } catch (e) {}
 
-                        return PropertyCard(
-                          property: property,
-                          firstName: firstName ?? '',
-                          lastName: lastName ?? '',
-                          pathToImage: property.landlord?.pathToImage ??
-                              'assets/userimage.png',
-                          location: property.location,
-                          address: property.address,
-                          type: property.type,
-                          area: property.area ?? 0,
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => PropertyPage(
-                                  property: property,
-                                  firstName: firstName ?? '',
-                                  lastName: lastName ?? '',
-                                  pathToImage: property.landlord?.pathToImage ??
-                                      'assets/userimage.png',
-                                  location: property.location,
-                                  address: property.address,
-                                  emailOrPhone:
-                                      property.landlord?.emailOrPhone ?? '',
-                                  isTenantCall: false,
-                                  // landlord: property.landlord!
+                        if (property == null) {
+                          return Container();
+                        } else {
+                          return PropertyCard(
+                            property: property,
+                            firstName: firstName ?? '',
+                            lastName: lastName ?? '',
+                            pathToImage: property.landlord?.pathToImage ??
+                                'assets/userimage.png',
+                            location: property.location,
+                            address: property.address,
+                            type: property.type,
+                            area: property.area ?? 0,
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => PropertyPage(
+                                    property: property!,
+                                    firstName: firstName ?? '',
+                                    lastName: lastName ?? '',
+                                    pathToImage:
+                                        property.landlord?.pathToImage ??
+                                            'assets/userimage.png',
+                                    location: property.location,
+                                    address: property.address,
+                                    emailOrPhone:
+                                        property.landlord?.emailOrPhone ?? '',
+                                    isTenantCall: false,
+                                    // landlord: property.landlord!
+                                  ),
                                 ),
-                              ),
-                            );
-                          },
-                        );
+                              );
+                            },
+                          );
+                        }
                       }).toList(),
                     ),
                   ),
@@ -456,7 +464,11 @@ class PropertyCard extends StatelessWidget {
                   placeholder: (context, url) => const SpinKitFadingCube(
                     color: Color.fromARGB(255, 30, 197, 83),
                   ),
-                  errorWidget: (context, url, error) => const Icon(Icons.error),
+                  //use an asset image called 'mainlogo.png' if the url doesn't work
+                  errorWidget: (context, url, error) => Image.asset(
+                    'assets/mainlogo.png',
+                    fit: BoxFit.scaleDown,
+                  ),
                   fit: BoxFit.cover,
                 ),
               ),
@@ -476,6 +488,8 @@ class PropertyCard extends StatelessWidget {
                     // SizedBox(height: screenHeight * 0.005),
                     Text(
                       '$location\n$address',
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(fontSize: screenWidth * 0.035),
                     ),
                     SizedBox(height: screenHeight * 0.01),

@@ -22,6 +22,7 @@ import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenantmonthlyrentof
 import '../../helper/Tenantdashboard_pages/tenant_landlords.dart';
 import '../../helper/Tenantdashboard_pages/tenant_rented_property.dart';
 import '../../helper/Tenantdashboard_pages/tenant_security_deposit.dart';
+import '../contracts.dart';
 import '../new_vouchers.dart';
 import '../privacypolicy.dart';
 import '../login_page.dart';
@@ -522,12 +523,12 @@ class _DashboardPageState extends State<TenantDashboardPage>
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const ContractPage(
-                              identifier: 'Tenant',
+                            builder: (context) => AllContractsPage(
+                              callerType: 'Tenants',
+                              uid: widget.uid,
                             ),
                           ),
                         );
-                        // _closeSidebar();
                       },
                     ),
                     StatefulBuilder(
@@ -556,6 +557,36 @@ class _DashboardPageState extends State<TenantDashboardPage>
                           },
                           showBadge: isNewVoucher,
                         );
+                      },
+                    ),
+                    _buildSidebarItem(
+                      icon: Icons.discount,
+                      label: 'Rent Off Winners',
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => TenantMonthlyRentOffPage(
+                              uid: widget.uid,
+                            ),
+                          ),
+                        );
+                        // _closeSidebar();
+                      },
+                    ),
+                    _buildSidebarItem(
+                      icon: Icons.real_estate_agent,
+                      label: 'Rent Accrual',
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => TenantRentAccrualPage(
+                              uid: widget.uid,
+                            ),
+                          ),
+                        );
+                        // _closeSidebar();
                       },
                     ),
                     _buildSidebarItem(
@@ -590,21 +621,6 @@ class _DashboardPageState extends State<TenantDashboardPage>
                       },
                     ),
                     _buildSidebarItem(
-                      icon: Icons.discount,
-                      label: 'Rent Off Winners',
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => TenantMonthlyRentOffPage(
-                              uid: widget.uid,
-                            ),
-                          ),
-                        );
-                        // _closeSidebar();
-                      },
-                    ),
-                    _buildSidebarItem(
                       icon: Icons.lock,
                       label: 'Privacy Policy',
                       onTap: () {
@@ -625,21 +641,6 @@ class _DashboardPageState extends State<TenantDashboardPage>
                           context,
                           MaterialPageRoute(
                             builder: (context) => const FAQPage(),
-                          ),
-                        );
-                        // _closeSidebar();
-                      },
-                    ),
-                    _buildSidebarItem(
-                      icon: Icons.real_estate_agent,
-                      label: 'Rent Accrual',
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => TenantRentAccrualPage(
-                              uid: widget.uid,
-                            ),
                           ),
                         );
                         // _closeSidebar();

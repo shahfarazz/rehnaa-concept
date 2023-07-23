@@ -124,7 +124,7 @@ class _PDFEditorTenantPageState extends State<PDFEditorTenantPage> {
         PdfTrueTypeFont(fontData.buffer.asByteData().buffer.asUint8List(), 18);
 
     //Billing To
-    graphics.drawString(tenantName, font_main,
+    graphics.drawString(tenantName.substring(0, 20), font_main,
         brush: PdfBrushes.black,
         pen: PdfPen(PdfColor(0, 0, 0), width: 0.5),
         bounds: Rect.fromLTWH(
@@ -132,7 +132,21 @@ class _PDFEditorTenantPageState extends State<PDFEditorTenantPage> {
         format: PdfStringFormat(alignment: PdfTextAlignment.left));
 
     //CNIC number
-    graphics.drawString(cnic, font_small,
+    String formatCNIC(String cnic) {
+      if (cnic.length != 13) {
+        //snackbar error
+        // Fluttertoast.showToast(msg: 'Invalid CNIC');
+        return cnic; // Return the original CNIC if the length is not as expected
+      }
+
+      String part1 = cnic.substring(0, 5);
+      String part2 = cnic.substring(5, 12);
+      String part3 = cnic.substring(12);
+
+      return '$part1-$part2-$part3';
+    }
+
+    graphics.drawString(formatCNIC(decryptString(cnic)), font_small,
         brush: PdfBrushes.black,
         bounds: Rect.fromLTWH(100, 205.5, page.getClientSize().width,
             page.getClientSize().height),
@@ -179,7 +193,7 @@ class _PDFEditorTenantPageState extends State<PDFEditorTenantPage> {
         format: PdfStringFormat(alignment: PdfTextAlignment.left));
 
     //Property Rented Address
-    graphics.drawString(tenantAddress ?? '', font_small,
+    graphics.drawString(tenantAddress?.substring(0, 25) ?? '', font_small,
         brush: PdfBrushes.black,
         bounds: Rect.fromLTWH(
             250, 295, page.getClientSize().width, page.getClientSize().height),
@@ -193,7 +207,7 @@ class _PDFEditorTenantPageState extends State<PDFEditorTenantPage> {
         format: PdfStringFormat(alignment: PdfTextAlignment.left));
 
     //landlord Name
-    graphics.drawString(landlordName, font_medium,
+    graphics.drawString(landlordName.substring(0, 16), font_medium,
         brush: PdfBrushes.black,
         // pen: PdfPen(PdfColor(0, 0, 0), width: 0.5),
         bounds: Rect.fromLTWH(

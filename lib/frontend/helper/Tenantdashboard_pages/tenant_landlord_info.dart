@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:rehnaa/backend/services/helperfunctions.dart';
 // import 'package:rehnaa/backend/services/helperfunctions.dart';
 // import '../../../backend/models/landlordmodel.dart';
 import '../../../backend/models/landlordmodel.dart';
@@ -21,6 +22,17 @@ class TenantLandlordInfoPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
+    String formatCNIC(String cnic) {
+      if (cnic.length != 13) {
+        return cnic; // Return the original CNIC if the length is not as expected
+      }
+
+      String part1 = cnic.substring(0, 5);
+      String part2 = cnic.substring(5, 12);
+      String part3 = cnic.substring(12);
+
+      return '$part1-$part2-$part3';
+    }
 
     return Scaffold(
       body: Column(
@@ -124,12 +136,68 @@ class TenantLandlordInfoPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 10.0),
                   Center(
-                    child: Text(
-                      "Landlord",
-                      textAlign: TextAlign.center,
-                      style: GoogleFonts.montserrat(
-                        fontSize: 16.0,
-                        color: const Color(0xff33907c),
+                    child: GestureDetector(
+                      onTap: () {
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: Text(
+                                'Landlord Description',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.green,
+                                  fontSize: 16.0,
+                                  fontFamily:
+                                      GoogleFonts.montserrat().fontFamily,
+                                ),
+                              ),
+                              content: SingleChildScrollView(
+                                  child: Text(
+                                landlord.description,
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  // fontWeight: FontWeight.bold,
+                                  color: Colors.black,
+                                  // fontSize: 16.0,
+                                  fontFamily:
+                                      GoogleFonts.montserrat().fontFamily,
+                                ),
+                              )),
+                              actions: [
+                                TextButton(
+                                  child: Text(
+                                    'Close',
+                                    style: TextStyle(
+                                      // fontWeight: FontWeight.bold,
+                                      color: Colors.green,
+                                      // fontSize: 16.0,
+                                      fontFamily:
+                                          GoogleFonts.montserrat().fontFamily,
+                                    ),
+                                  ),
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      },
+                      child: Text(
+                        landlord.description == '' ||
+                                landlord.description == null
+                            ? ''
+                            : landlord.description!,
+                        textAlign: TextAlign.center,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.montserrat(
+                          fontSize: 16.0,
+                          color: const Color(0xff33907c),
+                        ),
                       ),
                     ),
                   ),
@@ -162,9 +230,10 @@ class TenantLandlordInfoPage extends StatelessWidget {
                                   child: WhiteBox(
                                     icon: Icons.star,
                                     iconColor: const Color(0xff33907c),
-                                    label: 'Rating',
+                                    label: 'Credit Score',
                                     value: '${tenant.landlord?.creditScore}',
                                     points: '${tenant.landlord?.creditPoints}',
+                                    pointsIcon: Icons.star_border,
                                   ),
                                 )
                               : const SizedBox.shrink(),
@@ -181,34 +250,22 @@ class TenantLandlordInfoPage extends StatelessWidget {
                           ),
 
                           const SizedBox(height: 10.0),
-                          landlord.contractStartDate == null
-                              ? Container()
-                              : Center(
+
+                          landlord.cnic != '' && landlord.cnic != null
+                              ? Center(
                                   child: WhiteBox(
-                                    icon: Icons.email,
+                                    icon: Icons.perm_identity,
                                     iconColor: const Color(0xff33907c),
-                                    label: 'Contract Start Date',
-                                    value: landlord.contractStartDate!
-                                        .toString()
-                                        .substring(0, 10),
+                                    label: 'CNIC Number',
+                                    value: formatCNIC(
+                                        decryptString(landlord.cnic!)),
                                   ),
-                                ),
+                                )
+                              : const SizedBox.shrink(),
                           const SizedBox(height: 10.0),
-                          landlord.contractEndDate == null
-                              ? Container()
-                              : Center(
-                                  child: WhiteBox(
-                                    icon: Icons.email,
-                                    iconColor: const Color(0xff33907c),
-                                    label: 'Contract End Date',
-                                    value: landlord.contractEndDate!
-                                        .toString()
-                                        .substring(0, 10),
-                                  ),
-                                ),
-                          const SizedBox(height: 10.0),
+
                           landlord.property != null &&
-                          landlord.property!.length != 0 &&
+                                  landlord.property!.length != 0 &&
                                   landlord.property?[0].address != ''
                               ? Center(
                                   child: WhiteBox(
@@ -220,30 +277,65 @@ class TenantLandlordInfoPage extends StatelessWidget {
                                 )
                               : const SizedBox.shrink(),
                           const SizedBox(height: 10.0),
-                          landlord.upfrontBonus != '' &&
-                                  landlord.upfrontBonus != null
+
+                          //TODO add new phone number field in landlord model
+
+                          landlord.phoneNumber != '' &&
+                                  landlord.phoneNumber != null
                               ? Center(
                                   child: WhiteBox(
-                                    icon: Icons.money,
+                                    icon: Icons.phone,
                                     iconColor: const Color(0xff33907c),
-                                    label: 'Upfront Bonus',
-                                    value: landlord.upfrontBonus!,
+                                    label: 'Phone Number',
+                                    value: landlord.phoneNumber ??
+                                        'No Phone Number',
                                   ),
                                 )
                               : const SizedBox.shrink(),
-                          const SizedBox(height: 10.0),
-                          landlord.monthlyProfit != '' &&
-                                  landlord.monthlyProfit != null
+
+                          //TODO add new past tenant testimonial field landlord model
+
+                          landlord.pastTenantTestimonial != '' &&
+                                  landlord.pastTenantTestimonial != null
                               ? Center(
                                   child: WhiteBox(
-                                    icon: Icons.money,
+                                    icon: Icons.rate_review,
                                     iconColor: const Color(0xff33907c),
-                                    label: 'Monthly Profit',
-                                    value: landlord.monthlyProfit!,
+                                    label: 'Past Tenant Testimonial',
+                                    value: landlord.pastTenantTestimonial ??
+                                        'No Testimonial',
                                   ),
                                 )
                               : const SizedBox.shrink(),
-                          const SizedBox(height: 10.0),
+
+                          landlord.dateJoined != '' &&
+                                  landlord.dateJoined != null
+                              ? Center(
+                                  child: WhiteBox(
+                                    icon: Icons.calendar_today,
+                                    iconColor: const Color(0xff33907c),
+                                    label: 'Date Joined',
+                                    value: landlord.dateJoined!
+                                        .toDate()
+                                        .toString()
+                                        .substring(0, 10),
+                                  ),
+                                )
+                              : const SizedBox.shrink(),
+
+                          // const SizedBox(height: 10.0),
+                          // landlord.monthlyProfit != '' &&
+                          //         landlord.monthlyProfit != null
+                          //     ? Center(
+                          //         child: WhiteBox(
+                          //           icon: Icons.money,
+                          //           iconColor: const Color(0xff33907c),
+                          //           label: 'Monthly Profit',
+                          //           value: landlord.monthlyProfit!,
+                          //         ),
+                          //       )
+                          // : const SizedBox.shrink(),
+                          // const SizedBox(height: 10.0),
                           // Center(
                           //   child: WhiteBox(
                           //     icon: Icons.info,
@@ -287,7 +379,7 @@ class WhiteBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 90.0,
+      // height: 90.0,
       width: 280,
       child: SizedBox(
         width: MediaQuery.of(context).size.width,
@@ -327,7 +419,7 @@ class WhiteBox extends StatelessWidget {
                         children: [
                           if (icon != null)
                             Icon(
-                              icon,
+                              pointsIcon,
                               color: iconColor,
                             ),
                           const SizedBox(width: 8.0),
@@ -347,12 +439,70 @@ class WhiteBox extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
-                      value,
-                      textAlign: TextAlign.center,
-                      style: GoogleFonts.montserrat(
-                        fontSize: 14.0,
-                        color: Colors.black,
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () {
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                buttonPadding: const EdgeInsets.all(10.0),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20.0),
+                                ),
+                                contentTextStyle: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 14.0,
+                                  fontFamily:
+                                      GoogleFonts.montserrat().fontFamily,
+                                ),
+                                title: Text(
+                                  label,
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.green,
+                                    fontSize: 16.0,
+                                    fontFamily:
+                                        GoogleFonts.montserrat().fontFamily,
+                                  ),
+                                ),
+                                content: Text(
+                                  value,
+                                  textAlign: TextAlign.center,
+                                ),
+                                actions: [
+                                  TextButton(
+                                    child: Text(
+                                      'Close',
+                                      style: TextStyle(
+                                        // fontWeight: FontWeight.bold,
+                                        color: Colors.green,
+                                        // fontSize: 16.0,
+                                        fontFamily:
+                                            GoogleFonts.montserrat().fontFamily,
+                                      ),
+                                    ),
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        },
+                        child: Text(
+                          value,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          softWrap: true,
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.montserrat(
+                            fontSize: 14.0,
+                            color: Colors.black,
+                          ),
+                        ),
                       ),
                     ),
                     Text(

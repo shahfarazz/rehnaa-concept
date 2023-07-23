@@ -332,13 +332,17 @@ class _TenantSecurityDepositPageState extends State<TenantSecurityDepositPage> {
                             //         EdgeInsets.only(left: size.width * 0.27)),
                             Text(
                               widget.callerType == 'Tenants'
-                                  ? DateFormat('dd MMMM yyyy').format(
-                                      tenant?.dateJoined?.toDate() ??
-                                          DateTime.now())
+                                  ? tenant?.dateJoined
+                                          ?.toDate()
+                                          .toString()
+                                          .substring(0, 10) ??
+                                      'No date found'
                                   : widget.callerType == 'Landlords'
-                                      ? DateFormat('dd MMMM yyyy').format(
-                                          landlord?.dateJoined?.toDate() ??
-                                              DateTime.now())
+                                      ? landlord?.dateJoined
+                                              ?.toDate()
+                                              .toString()
+                                              .substring(0, 10) ??
+                                          'No date found'
                                       : '',
 
                               // 'Date Joined',

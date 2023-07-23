@@ -596,6 +596,18 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
   @override
   Widget build(BuildContext context) {
     final authService = AuthenticationService();
+    String formatCNIC(String cnic) {
+      if (cnic.length != 13) {
+        return cnic; // Return the original CNIC if the length is not as expected
+      }
+
+      String part1 = cnic.substring(0, 5);
+      String part2 = cnic.substring(5, 12);
+      String part3 = cnic.substring(12);
+
+      return '$part1-$part2-$part3';
+    }
+
     return Scaffold(
       body: FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
         future: fetchUserProfile(),
@@ -738,15 +750,69 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
                                   fontFamily:
                                       GoogleFonts.montserrat().fontFamily),
                             ),
-                            Text(
-                              description,
-                              maxLines: 4,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                  fontSize: 18,
-                                  color: Colors.grey,
-                                  fontFamily:
-                                      GoogleFonts.montserrat().fontFamily),
+                            GestureDetector(
+                              onTap: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return AlertDialog(
+                                      title: Text(
+                                        'Description',
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.green,
+                                          fontSize: 16.0,
+                                          fontFamily: GoogleFonts.montserrat()
+                                              .fontFamily,
+                                        ),
+                                      ),
+                                      content: SingleChildScrollView(
+                                          child: Text(
+                                        description,
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          // fontWeight: FontWeight.bold,
+                                          color: Colors.black,
+                                          // fontSize: 16.0,
+                                          fontFamily: GoogleFonts.montserrat()
+                                              .fontFamily,
+                                        ),
+                                      )),
+                                      actions: [
+                                        TextButton(
+                                          child: Text(
+                                            'Close',
+                                            style: TextStyle(
+                                              // fontWeight: FontWeight.bold,
+                                              color: Colors.green,
+                                              // fontSize: 16.0,
+                                              fontFamily:
+                                                  GoogleFonts.montserrat()
+                                                      .fontFamily,
+                                            ),
+                                          ),
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                          },
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+                              },
+                              child: Text(
+                                description == '' || description == null
+                                    ? 'N/A'
+                                    : description!,
+                                textAlign: TextAlign.center,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: GoogleFonts.montserrat(
+                                  fontSize: 16.0,
+                                  color: Colors.grey[600],
+                                ),
+                              ),
                             ),
 
                             // const SizedBox(height: 20),
@@ -762,7 +828,8 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
                                 ? ProfileInfoItem(
                                     icon: Icons.perm_identity_rounded,
                                     title: 'CNIC Number',
-                                    subtitle: decryptString(docData['cnic']))
+                                    subtitle: formatCNIC(
+                                        decryptString(docData['cnic'])))
                                 : Container(),
 
                             docData['address'] != '' &&
@@ -1400,8 +1467,8 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
                                                                       child:
                                                                           Icon(
                                                                         _obscurePassword3
-                                                                            ? Icons.visibility
-                                                                            : Icons.visibility_off,
+                                                                            ? Icons.visibility_off
+                                                                            : Icons.visibility,
                                                                         color: Colors
                                                                             .green,
                                                                       ),

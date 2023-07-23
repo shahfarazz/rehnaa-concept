@@ -187,6 +187,13 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
     final TextEditingController addressController =
         TextEditingController(text: tenant.address ?? '');
 
+    //phoneNumber
+    final TextEditingController phoneNumberController =
+        TextEditingController(text: tenant.phoneNumber ?? '');
+    //pastLandlordTestimonial
+    final TextEditingController pastLandlordTestimonialController =
+        TextEditingController(text: tenant.pastLandlordTestimonial ?? '');
+
     DateTime? contractStartDate = tenant.contractStartDate;
     DateTime? contractEndDate = tenant.contractEndDate;
 
@@ -270,7 +277,7 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
                   ),
                   TextFormField(
                     controller: rentController,
-                    decoration: const InputDecoration(labelText: 'Rent'),
+                    decoration: const InputDecoration(labelText: 'Balance'),
                     keyboardType: TextInputType.number,
                   ),
                   TextFormField(
@@ -399,6 +406,23 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
                       }
                     },
                   ),
+                  TextFormField(
+                      controller: phoneNumberController,
+                      decoration:
+                          const InputDecoration(labelText: 'Phone Number'),
+                      validator: (value) {
+                        //check if value can be parsed
+                        if (value != null &&
+                            int.tryParse(value) == null &&
+                            value != '') {
+                          return 'Please enter a valid phone number';
+                        }
+                      }),
+                  TextFormField(
+                    controller: pastLandlordTestimonialController,
+                    decoration: const InputDecoration(
+                        labelText: 'Past Landlord Testimonial'),
+                  ),
                   // Field to ask for bool value from user for police verification
                   // Give options yes / no
                   StatefulBuilder(
@@ -436,7 +460,7 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
                         title: const Text('Select Landlord'),
                         subtitle: Text(
                           tenant.landlordRef != null
-                              ? 'Selected landlord: ${tenant.landlordRef?.id}'
+                              ? 'Landlord Selected: ${tenant.landlordRef == null ? 'Not selected' : 'Yes'}'
                               : 'Not selected',
                           style: const TextStyle(
                             color: Colors.grey,
@@ -444,7 +468,7 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
                         ),
                         onTap: () {
                           setState(() {
-                            _showLandlordSelectionDialog(() {
+                            _showLandlordSelectionDialog(tenant, () {
                               setState(() {
                                 // Update the tenant's landlordRef directly
                                 tenant.landlordRef = landlordRef;
@@ -496,6 +520,9 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
                               securityDepositController.text ?? '',
                           'creditScore': creditScoreController.text ?? '',
                           'otherInfo': otherInfoController.text ?? '',
+                          'phoneNumber': phoneNumberController.text ?? '',
+                          'pastLandlordTestimonial':
+                              pastLandlordTestimonialController.text ?? '',
                         };
 
                         //create a checkpackage that discludes all the document references.
@@ -538,6 +565,13 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
                                   otherInfoController.text != 'null'
                               ? otherInfoController.text
                               : 'empty',
+                          'phoneNumber': phoneNumberController.text.isNotEmpty
+                              ? phoneNumberController.text
+                              : 'empty',
+                          'pastLandlordTestimonial':
+                              pastLandlordTestimonialController.text.isNotEmpty
+                                  ? pastLandlordTestimonialController.text
+                                  : 'empty',
                         };
 
                         showDialog(
@@ -647,7 +681,7 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
                                                         0.0) -
                                                     tenant.balance),
                                                 'date': DateTime.now(),
-                                                'isMinus': false,
+                                                'isMinus': true,
                                                 // 'description': 'Balance updated by landlord',
                                                 'paymentType': '',
                                               }).then((value) async {
@@ -753,6 +787,14 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
                                               tenant.otherInfo =
                                                   otherInfoController.text ??
                                                       '';
+                                              tenant.phoneNumber =
+                                                  phoneNumberController.text ??
+                                                      '';
+
+                                              tenant.pastLandlordTestimonial =
+                                                  pastLandlordTestimonialController
+                                                          .text ??
+                                                      '';
                                             });
 
                                             Navigator.of(context)
@@ -800,20 +842,47 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
   }
 
   Future<void> _showLandlordSelectionDialog(
-      VoidCallback onSelectionDone) async {
+      Tenant tenant, VoidCallback onSelectionDone) async {
+    TextEditingController searchController = TextEditingController();
     showDialog(
       context: context,
       builder: (context) {
         int? selectedLandlordIndex;
-        // Declare the selectedLandlordIndex variable inside the builder function
-
-        List<QueryDocumentSnapshot<Map<String, dynamic>>> landlordDocs =
-            []; // Declare the landlordDocs list outside the builder function
+        List<QueryDocumentSnapshot<Map<String, dynamic>>> landlordDocs = [];
+        String searchString = '';
 
         return StatefulBuilder(
           builder: (context, setState) {
             return AlertDialog(
-              title: const Text('Select a Landlord'),
+              title: Column(
+                children: [
+                  const Text('Select a Landlord'),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: TextField(
+                      controller: searchController,
+                      onChanged: (value) {
+                        setState(() {
+                          searchString = value.toLowerCase();
+                        });
+                      },
+                      decoration: InputDecoration(
+                        labelText: "Search",
+                        hintText: "Search",
+                        prefixIcon: Icon(
+                          Icons.search,
+                          color: Colors.green,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(25.0),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
               content: Container(
                 constraints: BoxConstraints(maxHeight: 300),
                 child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
@@ -827,30 +896,53 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
                       );
                     }
 
-                    landlordDocs =
-                        snapshot.data!.docs; // Assign value to landlordDocs
+                    landlordDocs = snapshot.data!.docs;
+                    //use tenant.landlorfred to set the selected landlord index
+                    if (tenant.landlordRef != null) {
+                      //find the index of the landlordRef in the landlordDocs
+                      for (int i = 0; i < landlordDocs.length; i++) {
+                        if (landlordDocs[i].id == tenant.landlordRef?.id) {
+                          selectedLandlordIndex = i;
+                          break;
+                        }
+                      }
+                    }
 
                     return SingleChildScrollView(
                       child: Column(
-                        children: landlordDocs.map((doc) {
-                          Map<String, dynamic>? landlordData = doc.data();
-                          Landlord landlord = Landlord.fromJson(landlordData);
-                          bool isSelected = selectedLandlordIndex ==
-                              landlordDocs.indexOf(doc);
+                        children: landlordDocs
+                            .map((doc) {
+                              Map<String, dynamic>? landlordData = doc.data();
+                              Landlord landlord =
+                                  Landlord.fromJson(landlordData);
+                              bool isSelected = selectedLandlordIndex ==
+                                  landlordDocs.indexOf(doc);
 
-                          return RadioListTile<int>(
-                            title: Text(
-                                '${landlord.firstName} ${landlord.lastName}'),
-                            value: landlordDocs.indexOf(doc),
-                            groupValue: selectedLandlordIndex,
-                            onChanged: (value) {
-                              setState(() {
-                                selectedLandlordIndex = value!;
-                              });
-                            },
-                            selected: isSelected,
-                          );
-                        }).toList(),
+                              String fullName =
+                                  '${landlord.firstName} ${landlord.lastName}'
+                                      .toLowerCase();
+
+                              // Filter based on search string
+                              if (fullName.contains(searchString)) {
+                                return RadioListTile<int>(
+                                  title: Text(
+                                      '${landlord.firstName} ${landlord.lastName}'),
+                                  value: landlordDocs.indexOf(doc),
+                                  groupValue: selectedLandlordIndex,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      selectedLandlordIndex = value!;
+                                    });
+                                  },
+                                  selected: isSelected,
+                                );
+                              } else {
+                                return Container(); // Empty container if not matched
+                              }
+                            })
+                            .toList()
+                            .where((widget) => widget != null)
+                            .toList(), // Remove null widgets
                       ),
                     );
                   },
@@ -859,7 +951,7 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
               actions: [
                 TextButton(
                   onPressed: () {
-                    Navigator.pop(context); // Close the dialog
+                    Navigator.pop(context);
                   },
                   child: const Text('Cancel'),
                 ),
@@ -869,21 +961,16 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
                       QueryDocumentSnapshot<Map<String, dynamic>>
                           selectedLandlordDoc =
                           landlordDocs[selectedLandlordIndex!];
-                      // Map<String, dynamic> landlordData =
-                      //     selectedLandlordDoc.data();
-                      // // Landlord selectedLandlord =
-                      // //     Landlord.fromJson(landlordData);
-
                       setState(() {
                         landlordRef = FirebaseFirestore.instance
                             .collection('Landlords')
                             .doc(selectedLandlordDoc.id);
                       });
                       onSelectionDone();
-                      Navigator.pop(context); // Close the dialog
+                      Navigator.pop(context);
                     } else {
                       onSelectionDone();
-                      Navigator.pop(context); // Close the dialog
+                      Navigator.pop(context);
                     }
                   },
                   child: const Text('Done'),

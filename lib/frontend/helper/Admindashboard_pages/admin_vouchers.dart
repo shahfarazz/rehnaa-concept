@@ -228,9 +228,17 @@ class _AdminVouchersPageState extends State<AdminVouchersPage> {
           .ref('images/vouchers/')
           .listAll();
       List<Voucher> vouchersList = [];
+      List<Future<String>> urlFutures = [];
       for (var ref in listResult.items) {
-        String url = await ref.getDownloadURL();
-        vouchersList.add(Voucher(url, ref));
+        urlFutures.add(ref.getDownloadURL());
+      }
+
+      // await on the list of futures
+      List<String> urls = await Future.wait(urlFutures);
+
+      // add urls and refs to the vouchers list
+      for (var i = 0; i < urls.length; i++) {
+        vouchersList.add(Voucher(urls[i], listResult.items[i]));
       }
 
       // print('reached here');
@@ -286,6 +294,12 @@ class _AdminVouchersPageState extends State<AdminVouchersPage> {
       setState(() {
         vouchers.removeAt(index);
       });
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const AdminVouchersPage(),
+        ),
+      );
     } catch (error) {
       print('Error deleting voucher: $error');
     }

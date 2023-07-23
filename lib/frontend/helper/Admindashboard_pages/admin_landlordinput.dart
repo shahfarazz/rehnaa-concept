@@ -241,6 +241,10 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
     final TextEditingController addressController = TextEditingController(
         text: landlord.address == '' ? '' : landlord.address!);
 
+    // description
+    final TextEditingController descriptionController =
+        TextEditingController(text: landlord.description ?? '');
+
     // print('landlord address is ${landlord.address}');
 
     // final hashedCnic = encryptString(cnicController.text);
@@ -293,6 +297,15 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
     //creditPoints
     final TextEditingController creditPointsController =
         TextEditingController(text: landlord.creditPoints?.toString() ?? '');
+
+    //phoneNumber
+    final TextEditingController phoneNumberController =
+        TextEditingController(text: landlord.phoneNumber?.toString() ?? '');
+
+    //pastTenantTestimonial
+    final TextEditingController pastTenantTestimonialController =
+        TextEditingController(
+            text: landlord.pastTenantTestimonial?.toString() ?? '');
 
     final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
@@ -453,6 +466,12 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
                           }
                         },
                       ),
+                      //description
+                      TextFormField(
+                        controller: descriptionController,
+                        decoration:
+                            const InputDecoration(labelText: 'Description'),
+                      ),
                       TextFormField(
                         controller: addressController,
                         decoration: const InputDecoration(labelText: 'Address'),
@@ -578,6 +597,28 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
                         },
                       ),
                       const SizedBox(height: 20),
+                      TextFormField(
+                        controller: phoneNumberController,
+                        decoration:
+                            const InputDecoration(labelText: 'Phone Number'),
+                        validator: (value) {
+                          //check if value can be parsed
+                          if (value != null &&
+                              int.tryParse(value) == null &&
+                              value != '') {
+                            return 'Please enter valid phone number';
+                          }
+                          // return '';
+                        },
+                      ),
+                      const SizedBox(height: 20),
+
+                      TextFormField(
+                        controller: pastTenantTestimonialController,
+                        decoration: const InputDecoration(
+                            labelText: 'Past Tenant Testimonial'),
+                      ),
+
                       ElevatedButton(
                         style: ButtonStyle(
                           backgroundColor:
@@ -649,6 +690,22 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
                                           creditPointsController.text != 'null'
                                       ? creditPointsController.text
                                       : FieldValue.delete(),
+                              'phoneNumber':
+                                  phoneNumberController.text.isNotEmpty &&
+                                          phoneNumberController.text != 'null'
+                                      ? phoneNumberController.text
+                                      : FieldValue.delete(),
+                              'pastTenantTestimonial':
+                                  pastTenantTestimonialController
+                                              .text.isNotEmpty &&
+                                          pastTenantTestimonialController
+                                                  .text !=
+                                              'null'
+                                      ? pastTenantTestimonialController.text
+                                      : FieldValue.delete(),
+                              'description': descriptionController.text != ''
+                                  ? descriptionController.text
+                                  : FieldValue.delete(),
                             };
 
                             //create a checkpackage that discludes all the document references.
@@ -710,6 +767,22 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
                                           creditPointsController.text != 'null'
                                       ? creditPointsController.text
                                       : 'empty',
+                              'phoneNumber':
+                                  phoneNumberController.text.isNotEmpty &&
+                                          phoneNumberController.text != 'null'
+                                      ? phoneNumberController.text
+                                      : 'empty',
+                              'pastTenantTestimonial':
+                                  pastTenantTestimonialController
+                                              .text.isNotEmpty &&
+                                          pastTenantTestimonialController
+                                                  .text !=
+                                              'null'
+                                      ? pastTenantTestimonialController.text
+                                      : 'empty',
+                              'description': descriptionController.text != ''
+                                  ? descriptionController.text
+                                  : 'empty',
                             };
 
                             // Show contents of package in a dialog and ask if you are sure about this
@@ -993,6 +1066,25 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
                                                                       .text !=
                                                                   'null'
                                                           ? creditPointsController
+                                                              .text
+                                                          : '';
+                                                  landlord.phoneNumber =
+                                                      phoneNumberController.text
+                                                                  .isNotEmpty &&
+                                                              phoneNumberController
+                                                                      .text !=
+                                                                  'null'
+                                                          ? phoneNumberController
+                                                              .text
+                                                          : '';
+                                                  landlord.pastTenantTestimonial =
+                                                      pastTenantTestimonialController
+                                                                  .text
+                                                                  .isNotEmpty &&
+                                                              pastTenantTestimonialController
+                                                                      .text !=
+                                                                  'null'
+                                                          ? pastTenantTestimonialController
                                                               .text
                                                           : '';
                                                 });
