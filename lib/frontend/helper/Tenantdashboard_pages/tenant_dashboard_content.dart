@@ -12,6 +12,7 @@ import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:rehnaa/backend/models/propertymodel.dart';
 import 'package:rehnaa/backend/models/tenantsmodel.dart';
+import 'package:rehnaa/frontend/Screens/Tenant/tenant_dashboard.dart';
 import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenant_form.dart';
 import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenantinvoice.dart';
 
@@ -249,13 +250,6 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                                     //   body: 'Rs${amount}',
                                     // );
 
-                                    FirebaseFirestore.instance
-                                        .collection('Tenants')
-                                        .doc(widget.uid)
-                                        .set({
-                                      'isWithdraw': true,
-                                    }, SetOptions(merge: true));
-
                                     String invoiceNumber =
                                         generateInvoiceNumber();
 
@@ -265,10 +259,6 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                                         .nextInt(999999)
                                         .toString()
                                         .padLeft(6, '0');
-
-                                    setState(() {
-                                      isWithdraw = true;
-                                    });
 
                                     //showdialog box let user select particular landlord and then show pdf editor page
                                     // because we have to use tenant.landlordref.get() and then use that snapshot to get tenant data
@@ -379,21 +369,36 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                                                                             backgroundColor:
                                                                                 Colors.red,
                                                                           );
+
                                                                           Navigator.pop(
                                                                               context);
-                                                                          Navigator.pop(
-                                                                              context);
+
                                                                           return;
                                                                         }
 
                                                                         print(
                                                                             '222 reaached herer proeprty adress is ${property?.address}');
 
+                                                                        FirebaseFirestore
+                                                                            .instance
+                                                                            .collection('Tenants')
+                                                                            .doc(widget.uid)
+                                                                            .set({
+                                                                          'isWithdraw':
+                                                                              true,
+                                                                        }, SetOptions(merge: true));
+
+                                                                        // setState(
+                                                                        //     () {
+                                                                        //   isWithdraw =
+                                                                        //       true;
+                                                                        // });
+
                                                                         pdfinstance
                                                                             .createState()
                                                                             .createPdf(
                                                                                 '${tenant.firstName} ${tenant.lastName}',
-                                                                                '${landlord.firstName} ${landlord.lastName}',
+                                                                                '${landlord.firstName}\n${landlord.lastName}',
                                                                                 landlord.address,
                                                                                 property?.address,
                                                                                 tenant.balance.toDouble(),
@@ -424,26 +429,27 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
 
                                                                           print(
                                                                               '222 we reached till here where we pop');
+
+                                                                          Fluttertoast
+                                                                              .showToast(
+                                                                            msg:
+                                                                                'An admin will contact you soon regarding your payment via: $selectedOption',
+                                                                            toastLength:
+                                                                                Toast.LENGTH_SHORT,
+                                                                            gravity:
+                                                                                ToastGravity.BOTTOM,
+                                                                            timeInSecForIosWeb:
+                                                                                3,
+                                                                            backgroundColor:
+                                                                                const Color(0xff45BF7A),
+                                                                          );
                                                                         });
                                                                       }).catchError(
                                                                               (error) {
                                                                         print(
                                                                             'error222 is $error');
-                                                                        return;
                                                                       });
-                                                                      Fluttertoast
-                                                                          .showToast(
-                                                                        msg:
-                                                                            'An admin will contact you soon regarding your payment via: $selectedOption',
-                                                                        toastLength:
-                                                                            Toast.LENGTH_SHORT,
-                                                                        gravity:
-                                                                            ToastGravity.BOTTOM,
-                                                                        timeInSecForIosWeb:
-                                                                            3,
-                                                                        backgroundColor:
-                                                                            const Color(0xff45BF7A),
-                                                                      );
+                                                                      // throw error;
                                                                       Navigator.pop(
                                                                           context);
                                                                       Navigator.pop(

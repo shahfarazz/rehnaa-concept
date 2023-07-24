@@ -222,8 +222,8 @@ class _PDFEditorTenantPageState extends State<PDFEditorTenantPage> {
 
       //landlord Name
       graphics.drawString(
-          landlordName.length >= 16
-              ? landlordName.substring(0, 16)
+          landlordName.length >= 30
+              ? landlordName.substring(0, 30)
               : landlordName,
           font_main,
           brush: PdfBrushes.black,
