@@ -18,16 +18,16 @@ class _ForgetPasswordPageState extends State<ForgetPasswordPage> {
   final AuthenticationService authService =
       AuthenticationService(); // <--- Here
 
-  Future<void> recoverAccountWithPhoneNumber(
-      String phoneNumber, BuildContext context) async {
-    // Strip the initial "0" if present and prepend "+92" to the start of the phoneNumber.
-    if (phoneNumber.startsWith("0")) {
-      phoneNumber = "+92${phoneNumber.substring(1)}";
-    }
+  // Future<void> recoverAccountWithPhoneNumber(
+  //     String phoneNumber, BuildContext context) async {
+  //   // Strip the initial "0" if present and prepend "+92" to the start of the phoneNumber.
+  //   if (phoneNumber.startsWith("0")) {
+  //     phoneNumber = "+92${phoneNumber.substring(1)}";
+  //   }
 
-    // Call your existing signInWithPhoneNumber function with the adjusted phone number.
-    authService.signInForgetWithPhoneNumber(phoneNumber, context);
-  }
+  //   // Call your existing signInWithPhoneNumber function with the adjusted phone number.
+  //   authService.signInForgetWithPhoneNumber(phoneNumber, context);
+  // }
 
   // Handle password reset
   Future<void> handleForgetPassword(String emailOrPhone) async {
@@ -43,11 +43,13 @@ class _ForgetPasswordPageState extends State<ForgetPasswordPage> {
         context,
         MaterialPageRoute(builder: (context) => LoginPage()),
       );
-    } else if (authService.isPhoneNumber(emailOrPhone)) {
-      recoverAccountWithPhoneNumber(emailOrPhone, context);
-    } else {
+    }
+    // else if (authService.isPhoneNumber(emailOrPhone)) {
+    //   recoverAccountWithPhoneNumber(emailOrPhone, context);
+    // }
+    else {
       authService.showToast(
-        'Invalid email or phone number. Please try again.',
+        'Invalid email. Please try again.',
         Colors.red,
       );
     }

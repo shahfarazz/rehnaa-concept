@@ -71,7 +71,7 @@ class _LoginPageState extends State<LoginPage> {
                               color: Color(0xff33907c),
                             ),
                             decoration: InputDecoration(
-                              labelText: 'Email/Mobile Number',
+                              labelText: 'Email',
                               labelStyle: GoogleFonts.montserrat(
                                 color: const Color(0xff33907c),
                                 fontSize: 18,
@@ -196,23 +196,24 @@ class _LoginPageState extends State<LoginPage> {
                                   String emailOrPhone =
                                       _emailOrPhoneController.text.trim();
 
-                                  if (authService.isPhoneNumber(emailOrPhone)) {
-                                    // Modify the phone number format
-                                    String password =
-                                        _passwordController.text.trim();
+                                  // if (authService.isPhoneNumber(emailOrPhone)) {
+                                  //   // Modify the phone number format
+                                  //   String password =
+                                  //       _passwordController.text.trim();
 
-                                    if (kDebugMode) {
-                                      print('email or phone is:');
-                                      print(emailOrPhone);
-                                    }
+                                  //   if (kDebugMode) {
+                                  //     print('email or phone is:');
+                                  //     print(emailOrPhone);
+                                  //   }
 
-                                    authService.signInWithPhoneNumber(
-                                      emailOrPhone,
-                                      password,
-                                      context,
-                                    );
-                                  } else if (authService
-                                      .isEmail(emailOrPhone)) {
+                                  //   authService.signInWithPhoneNumber(
+                                  //     emailOrPhone,
+                                  //     password,
+                                  //     context,
+                                  //   );
+                                  // } else
+
+                                  if (authService.isEmail(emailOrPhone)) {
                                     // Call the sign-in function using the email and password
                                     String password =
                                         _passwordController.text.trim();
@@ -224,9 +225,10 @@ class _LoginPageState extends State<LoginPage> {
                                   } else {
                                     // Invalid input, show error message to the user
                                     authService.showToast(
-                                      'Invalid email or phone number. Please try again.',
+                                      'Invalid email, please try again.',
                                       Colors.red,
                                     );
+                                    Navigator.pop(context);
                                   }
                                 },
                                 child: Padding(
