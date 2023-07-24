@@ -760,7 +760,7 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
                                                   0.0;
                                               // tenant.landlordRef =
                                               // tenant.landlordRef;
-                                              tenant.landlordRefs =
+                                              tenant.landlordRef =
                                                   selectedLandlordRefs;
                                               tenant.propertyAddress =
                                                   propertyAddressController
@@ -903,10 +903,10 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
                     landlordDocs = snapshot.data!.docs;
 
                     // Pre-select landlords
-                    if (tenant.landlordRefs != null &&
-                        tenant.landlordRefs!.isNotEmpty) {
+                    if (tenant.landlordRef != null &&
+                        tenant.landlordRef!.isNotEmpty) {
                       for (int i = 0; i < landlordDocs.length; i++) {
-                        if (tenant.landlordRefs!
+                        if (tenant.landlordRef!
                             .any((ref) => ref.id == landlordDocs[i].id)) {
                           selectedLandlords.add(i);
                         }

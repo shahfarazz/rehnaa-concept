@@ -229,14 +229,6 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                                 ),
                                 onPressed: () async {
                                   if (amount > 0 && amount <= tenant.balance) {
-                                    Fluttertoast.showToast(
-                                      msg:
-                                          'An admin will contact you soon regarding your payment via: $selectedOption',
-                                      toastLength: Toast.LENGTH_SHORT,
-                                      gravity: ToastGravity.BOTTOM,
-                                      timeInSecForIosWeb: 3,
-                                      backgroundColor: const Color(0xff45BF7A),
-                                    );
                                     FirebaseFirestore.instance
                                         .collection('Notifications')
                                         .doc(widget.uid)
@@ -277,61 +269,174 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                                       isWithdraw = true;
                                     });
 
+                                    //showdialog box let user select particular landlord and then show pdf editor page
+                                    // because we have to use tenant.landlordref.get() and then use that snapshot to get tenant data
+                                    // first listview of landlordref list then futurebuilder to get each landlordref.get() and then use that snapshot to get landlord data
+                                    showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return AlertDialog(
+                                              title: Text('Select Landlord'),
+                                              content: Container(
+                                                  width: 300,
+                                                  height: 300,
+                                                  child: ListView.builder(
+                                                      itemCount: tenant
+                                                          .landlordRef?.length,
+                                                      itemBuilder:
+                                                          (context, index) {
+                                                        return FutureBuilder(
+                                                            future: tenant
+                                                                .landlordRef?[
+                                                                    index]
+                                                                .get(),
+                                                            builder: (context,
+                                                                snapshot) {
+                                                              if (snapshot
+                                                                  .hasData) {
+                                                                Landlord
+                                                                    landlord =
+                                                                    Landlord.fromJson(snapshot
+                                                                            .data
+                                                                            ?.data()
+                                                                        as Map<
+                                                                            String,
+                                                                            dynamic>);
+                                                                return ListTile(
+                                                                    title: Text(
+                                                                        '${landlord.firstName} ${landlord.lastName}'),
+                                                                    onTap: () {
+                                                                      Navigator.pop(
+                                                                          context);
+                                                                      //show dialog generating pdf...
+                                                                      PDFEditorTenantPage
+                                                                          pdfinstance =
+                                                                          PDFEditorTenantPage();
+
+                                                                      pdfinstance
+                                                                          .createState()
+                                                                          .createPdf(
+                                                                              '${tenant.firstName} ${tenant.lastName}',
+                                                                              '${landlord.firstName} ${landlord.lastName}',
+                                                                              landlord.address,
+                                                                              tenant.address,
+                                                                              tenant.balance.toDouble(),
+                                                                              amount,
+                                                                              selectedOption,
+                                                                              widget.uid,
+                                                                              invoiceNumber,
+                                                                              landlord.cnic ?? 'No cnic provided')
+                                                                          .then((_) {
+                                                                        FirebaseFirestore
+                                                                            .instance
+                                                                            .collection('AdminRequests')
+                                                                            .doc(widget.uid)
+                                                                            .set({
+                                                                          'paymentRequest':
+                                                                              FieldValue.arrayUnion([
+                                                                            {
+                                                                              'fullname': '${tenant.firstName} ${tenant.lastName}',
+                                                                              'amount': amount,
+                                                                              'paymentMethod': selectedOption,
+                                                                              'uid': widget.uid,
+                                                                              'invoiceNumber': invoiceNumber,
+                                                                              'requestID': randomID,
+                                                                              'timestamp': Timestamp.now(),
+                                                                            }
+                                                                          ]),
+                                                                        }, SetOptions(merge: true));
+
+                                                                        Fluttertoast
+                                                                            .showToast(
+                                                                          msg:
+                                                                              'An admin will contact you soon regarding your payment via: $selectedOption',
+                                                                          toastLength:
+                                                                              Toast.LENGTH_SHORT,
+                                                                          gravity:
+                                                                              ToastGravity.BOTTOM,
+                                                                          timeInSecForIosWeb:
+                                                                              3,
+                                                                          backgroundColor:
+                                                                              const Color(0xff45BF7A),
+                                                                        );
+                                                                        Navigator.pop(
+                                                                            context);
+                                                                        Navigator.pop(
+                                                                            context);
+                                                                      });
+                                                                    });
+                                                              } else {
+                                                                return const Center(
+                                                                  child:
+                                                                      SpinKitFadingCube(
+                                                                    color: Color
+                                                                        .fromARGB(
+                                                                            255,
+                                                                            30,
+                                                                            197,
+                                                                            83),
+                                                                  ),
+                                                                );
+                                                              }
+                                                            });
+                                                      })));
+                                        });
+
                                     // print('invoice number is $invoiceNumber');
 
-                                    tenant.landlordRefs
-                                        ?.get()
-                                        .then((landlordDoc) {
-                                      // print(
-                                      //     'landlordDoc.exists: ${landlordDoc.data()}');
-                                      if (landlordDoc.exists) {
-                                        var landlordJson = landlordDoc.data()
-                                            as Map<String, dynamic>;
-                                        Landlord landlord =
-                                            Landlord.fromJson(landlordJson);
+                                    // tenant.landlordRef
+                                    //     ?.get()
+                                    //     .then((landlordDoc) {
+                                    //   // print(
+                                    //   //     'landlordDoc.exists: ${landlordDoc.data()}');
+                                    //   if (landlordDoc.exists) {
+                                    //     var landlordJson = landlordDoc.data()
+                                    //         as Map<String, dynamic>;
+                                    //     Landlord landlord =
+                                    //         Landlord.fromJson(landlordJson);
 
-                                        //show dialog generating pdf...
-                                        PDFEditorTenantPage pdfinstance =
-                                            PDFEditorTenantPage();
+                                    //     //show dialog generating pdf...
+                                    //     PDFEditorTenantPage pdfinstance =
+                                    //         PDFEditorTenantPage();
 
-                                        pdfinstance.createState().createPdf(
-                                            '${tenant.firstName} ${tenant.lastName}',
-                                            '${landlord.firstName} ${landlord.lastName}',
-                                            landlord.address,
-                                            tenant.address,
-                                            tenant.balance.toDouble(),
-                                            amount,
-                                            selectedOption,
-                                            widget.uid,
-                                            invoiceNumber,
-                                            landlord.cnic ??
-                                                'No cnic provided');
+                                    //     pdfinstance.createState().createPdf(
+                                    //         '${tenant.firstName} ${tenant.lastName}',
+                                    //         '${landlord.firstName} ${landlord.lastName}',
+                                    //         landlord.address,
+                                    //         tenant.address,
+                                    //         tenant.balance.toDouble(),
+                                    //         amount,
+                                    //         selectedOption,
+                                    //         widget.uid,
+                                    //         invoiceNumber,
+                                    //         landlord.cnic ??
+                                    //             'No cnic provided');
 
-                                        FirebaseFirestore.instance
-                                            .collection('AdminRequests')
-                                            .doc(widget.uid)
-                                            .set({
-                                          'paymentRequest':
-                                              FieldValue.arrayUnion([
-                                            {
-                                              'fullname':
-                                                  '${tenant.firstName} ${tenant.lastName}',
-                                              'amount': amount,
-                                              'paymentMethod': selectedOption,
-                                              'uid': widget.uid,
-                                              'invoiceNumber': invoiceNumber,
-                                              'requestID': randomID,
-                                              'timestamp': Timestamp.now(),
-                                            }
-                                          ]),
-                                        }, SetOptions(merge: true));
+                                    //     FirebaseFirestore.instance
+                                    //         .collection('AdminRequests')
+                                    //         .doc(widget.uid)
+                                    //         .set({
+                                    //       'paymentRequest':
+                                    //           FieldValue.arrayUnion([
+                                    //         {
+                                    //           'fullname':
+                                    //               '${tenant.firstName} ${tenant.lastName}',
+                                    //           'amount': amount,
+                                    //           'paymentMethod': selectedOption,
+                                    //           'uid': widget.uid,
+                                    //           'invoiceNumber': invoiceNumber,
+                                    //           'requestID': randomID,
+                                    //           'timestamp': Timestamp.now(),
+                                    //         }
+                                    //       ]),
+                                    //     }, SetOptions(merge: true));
 
-                                        // print(
-                                        // 'reached here landlord is ${landlord.firstName} ${landlord.lastName}}');
-                                      }
-                                      Navigator.pop(context);
-                                      Navigator.pop(context);
-                                    });
+                                    //     // print(
+                                    //     // 'reached here landlord is ${landlord.firstName} ${landlord.lastName}}');
+                                    //   }
+                                    //   Navigator.pop(context);
+                                    //   Navigator.pop(context);
+                                    // });
                                   } else {
                                     Fluttertoast.showToast(
                                       msg: 'Invalid withdrawal amount',

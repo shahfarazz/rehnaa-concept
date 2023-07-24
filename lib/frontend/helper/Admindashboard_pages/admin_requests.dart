@@ -1368,7 +1368,13 @@ class LandlordWithdrawalCard extends StatelessWidget {
                               .collection('Tenants')
                               .doc(data.uid),
                           {
-                            'landlordRef': landlordRef,
+                            // 'landlordRef': landlordRef,
+                            //use fieldvalue.arrayunion to add the landlordRef to the tenant's landlordRef array
+                            'landlordRef': FieldValue.arrayUnion([
+                              FirebaseFirestore.instance
+                                  .collection('Landlords')
+                                  .doc(data.uid),
+                            ]),
                           },
                         );
 

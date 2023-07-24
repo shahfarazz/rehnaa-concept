@@ -205,9 +205,15 @@ class _AdminCreateContractsPageState extends State<AdminCreateContractsPage> {
                       .collection('Tenants')
                       .doc(selectedTenant)
                       .update({
-                    'landlordRef': FirebaseFirestore.instance
-                        .collection('Landlords')
-                        .doc(selectedLandlord)
+                    // 'landlordRef': FirebaseFirestore.instance
+                    //     .collection('Landlords')
+                    //     .doc(selectedLandlord)
+                    //use fieldvalue array union
+                    'landlordRef': FieldValue.arrayUnion([
+                      FirebaseFirestore.instance
+                          .collection('Landlords')
+                          .doc(selectedLandlord)
+                    ]),
                   });
 
                   // Update the landlord's tenantRef with the tenant's document reference

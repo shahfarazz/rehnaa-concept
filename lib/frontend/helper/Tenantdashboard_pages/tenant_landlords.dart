@@ -19,8 +19,12 @@ class TenantLandlordsPage extends StatefulWidget {
 
 class _TenantLandlordsPageState extends State<TenantLandlordsPage> {
   Tenant? tenant;
+  List<Landlord?> landlords = [];
+  Future<Tenant>? fetchTenantFuture;
 
   Future<Tenant> _fetchTenants() async {
+    landlords.clear();
+
     tenant = await FirebaseFirestore.instance
         .collection('Tenants')
         .doc(widget.uid)
@@ -28,8 +32,21 @@ class _TenantLandlordsPageState extends State<TenantLandlordsPage> {
         .then((value) async {
       if (value.exists) {
         tenant = Tenant.fromJson(value.data()!);
-        // print('tenant.landlordRef: ${tenant!.landlordRef?.id}');
-        tenant?.landlord = await tenant?.getLandlord();
+        //iterate over tenant.landlordref and set landlords
+        print('lenght of landlord ref is ${tenant!.landlordRef!.length}');
+
+        for (var landlordRef in tenant!.landlordRef!) {
+          Landlord landlord = await landlordRef.get().then((value) {
+            return Landlord.fromJson(value.data()!);
+          });
+          print('landlord is ${landlord.firstName}');
+          if (landlords.contains(landlord) == false) {
+            landlords.add(landlord);
+          }
+          print('landlord length is ${landlords.length}');
+          // landlords.add(landlord);
+        }
+
         return tenant!;
       }
     });
@@ -37,13 +54,18 @@ class _TenantLandlordsPageState extends State<TenantLandlordsPage> {
   }
 
   Future<void> _refreshLandlords() async {
-    setState(() {});
+    // setState(() {});
+    // await Future.delayed(Duration(seconds: 2));
+    setState(() {
+      fetchTenantFuture = _fetchTenants();
+    });
   }
 
   @override
   void initState() {
     super.initState();
-    _fetchTenants();
+    // _fetchTenants();
+    fetchTenantFuture = _fetchTenants();
   }
 
   // Build a card widget for a landlord
@@ -142,7 +164,7 @@ class _TenantLandlordsPageState extends State<TenantLandlordsPage> {
     return Scaffold(
       // appBar: _buildAppBar(MediaQuery.sizeOf(context), context),
       body: FutureBuilder(
-        future: _fetchTenants(),
+        future: fetchTenantFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             // While data is being fetched, show a loading indicator or placeholder.
@@ -219,10 +241,14 @@ class _TenantLandlordsPageState extends State<TenantLandlordsPage> {
                       ),
                     ),
                     SizedBox(height: size.height * 0.05),
-                    Container(
-                      width: size.width,
-                      height: size.height * 0.25,
-                      child: _buildLandlordCard(data!.landlord!),
+                    //listview.builder on landlords
+                    ListView.builder(
+                      physics: NeverScrollableScrollPhysics(),
+                      shrinkWrap: true,
+                      itemCount: landlords.length,
+                      itemBuilder: (context, index) {
+                        return _buildLandlordCard(landlords[index]!);
+                      },
                     ),
                   ],
                 ),
