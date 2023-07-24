@@ -278,14 +278,14 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
       }
     }
 
-    ;
-    final TextEditingController monthlyRentController =
-        TextEditingController(text: landlord.monthlyRent?.toString() ?? '');
-    final TextEditingController upfrontBonusController =
-        TextEditingController(text: landlord.upfrontBonus?.toString() ?? '');
+    // ;
+    // final TextEditingController monthlyRentController =
+    //     TextEditingController(text: landlord.monthlyRent?.toString() ?? '');
+    // final TextEditingController upfrontBonusController =
+    //     TextEditingController(text: landlord.upfrontBonus?.toString() ?? '');
 
-    final TextEditingController monthlyProfitController =
-        TextEditingController(text: landlord.monthlyProfit?.toString() ?? '');
+    // final TextEditingController monthlyProfitController =
+    //     TextEditingController(text: landlord.monthlyProfit?.toString() ?? '');
 
     //securityDeposit
     final TextEditingController securityDepositController =
@@ -515,43 +515,43 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
                           ),
                         );
                       }),
-                      TextFormField(
-                        controller: monthlyRentController,
-                        decoration:
-                            const InputDecoration(labelText: 'Monthly Rent'),
-                        validator: (value) {
-                          //check if value can be parsed
-                          if (value != null &&
-                              int.tryParse(value) == null &&
-                              value != '') {
-                            return 'Please enter a valid monthly rent';
-                          }
-                        },
-                      ),
-                      TextFormField(
-                          controller: upfrontBonusController,
-                          decoration:
-                              const InputDecoration(labelText: 'Upfront Bonus'),
-                          validator: (value) {
-                            //check if value can be parsed
-                            if (value != null &&
-                                int.tryParse(value) == null &&
-                                value != '') {
-                              return 'Please enter a valid upfront bonus';
-                            }
-                          }),
-                      TextFormField(
-                          controller: monthlyProfitController,
-                          decoration: const InputDecoration(
-                              labelText: 'Monthly Profit'),
-                          validator: (value) {
-                            //check if value can be parsed
-                            if (value != null &&
-                                int.tryParse(value) == null &&
-                                value != '') {
-                              return 'Please enter a valid monthly profit';
-                            }
-                          }),
+                      // TextFormField(
+                      //   controller: monthlyRentController,
+                      //   decoration:
+                      //       const InputDecoration(labelText: 'Monthly Rent'),
+                      //   validator: (value) {
+                      //     //check if value can be parsed
+                      //     if (value != null &&
+                      //         int.tryParse(value) == null &&
+                      //         value != '') {
+                      //       return 'Please enter a valid monthly rent';
+                      //     }
+                      //   },
+                      // ),
+                      // TextFormField(
+                      //     controller: upfrontBonusController,
+                      //     decoration:
+                      //         const InputDecoration(labelText: 'Upfront Bonus'),
+                      //     validator: (value) {
+                      //       //check if value can be parsed
+                      //       if (value != null &&
+                      //           int.tryParse(value) == null &&
+                      //           value != '') {
+                      //         return 'Please enter a valid upfront bonus';
+                      //       }
+                      //     }),
+                      // TextFormField(
+                      //     controller: monthlyProfitController,
+                      //     decoration: const InputDecoration(
+                      //         labelText: 'Monthly Profit'),
+                      //     validator: (value) {
+                      //       //check if value can be parsed
+                      //       if (value != null &&
+                      //           int.tryParse(value) == null &&
+                      //           value != '') {
+                      //         return 'Please enter a valid monthly profit';
+                      //       }
+                      //     }),
                       TextFormField(
                           controller: securityDepositController,
                           decoration: const InputDecoration(
@@ -663,18 +663,18 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
                               if (contractEndDate != null)
                                 'contractEndDate':
                                     Timestamp.fromDate(contractEndDate!),
-                              'monthlyRent':
-                                  monthlyRentController.text.isNotEmpty
-                                      ? monthlyRentController.text ?? 0.0
-                                      : FieldValue.delete(),
-                              'upfrontBonus':
-                                  upfrontBonusController.text.isNotEmpty
-                                      ? upfrontBonusController.text ?? 0.0
-                                      : FieldValue.delete(),
-                              'monthlyProfit':
-                                  monthlyProfitController.text.isNotEmpty
-                                      ? monthlyProfitController.text ?? 0.0
-                                      : FieldValue.delete(),
+                              // 'monthlyRent':
+                              //     monthlyRentController.text.isNotEmpty
+                              //         ? monthlyRentController.text ?? 0.0
+                              //         : FieldValue.delete(),
+                              // 'upfrontBonus':
+                              //     upfrontBonusController.text.isNotEmpty
+                              //         ? upfrontBonusController.text ?? 0.0
+                              //         : FieldValue.delete(),
+                              // 'monthlyProfit':
+                              //     monthlyProfitController.text.isNotEmpty
+                              //         ? monthlyProfitController.text ?? 0.0
+                              //         : FieldValue.delete(),
                               'securityDeposit': securityDepositController
                                           .text.isNotEmpty &&
                                       securityDepositController.text != 'null'
@@ -740,18 +740,18 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
                               if (contractEndDate != null)
                                 'contractEndDate':
                                     Timestamp.fromDate(contractEndDate!),
-                              'monthlyRent':
-                                  monthlyRentController.text.isNotEmpty
-                                      ? monthlyRentController.text ?? 0.0
-                                      : 'empty',
-                              'upfrontBonus':
-                                  upfrontBonusController.text.isNotEmpty
-                                      ? upfrontBonusController.text ?? 0.0
-                                      : 'empty',
-                              'monthlyProfit':
-                                  monthlyProfitController.text.isNotEmpty
-                                      ? monthlyProfitController.text ?? 0.0
-                                      : 'empty',
+                              // 'monthlyRent':
+                              //     monthlyRentController.text.isNotEmpty
+                              //         ? monthlyRentController.text ?? 0.0
+                              //         : 'empty',
+                              // 'upfrontBonus':
+                              //     upfrontBonusController.text.isNotEmpty
+                              //         ? upfrontBonusController.text ?? 0.0
+                              //         : 'empty',
+                              // 'monthlyProfit':
+                              //     monthlyProfitController.text.isNotEmpty
+                              //         ? monthlyProfitController.text ?? 0.0
+                              //         : 'empty',
                               'securityDeposit': securityDepositController
                                           .text.isNotEmpty &&
                                       securityDepositController.text != 'null'
@@ -1018,27 +1018,27 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
                                                       contractStartDate;
                                                   landlord.contractEndDate =
                                                       contractEndDate;
-                                                  landlord.monthlyRent =
-                                                      monthlyRentController
-                                                              .text.isNotEmpty
-                                                          ? monthlyRentController
-                                                                  .text ??
-                                                              0.0
-                                                          : 0.0;
-                                                  landlord.upfrontBonus =
-                                                      upfrontBonusController
-                                                              .text.isNotEmpty
-                                                          ? upfrontBonusController
-                                                                  .text ??
-                                                              0.0
-                                                          : 0.0;
-                                                  landlord.monthlyProfit =
-                                                      monthlyProfitController
-                                                              .text.isNotEmpty
-                                                          ? monthlyProfitController
-                                                                  .text ??
-                                                              0.0
-                                                          : 0.0;
+                                                  // landlord.monthlyRent =
+                                                  //     monthlyRentController
+                                                  //             .text.isNotEmpty
+                                                  //         ? monthlyRentController
+                                                  //                 .text ??
+                                                  //             0.0
+                                                  //         : 0.0;
+                                                  // landlord.upfrontBonus =
+                                                  //     upfrontBonusController
+                                                  //             .text.isNotEmpty
+                                                  //         ? upfrontBonusController
+                                                  //                 .text ??
+                                                  //             0.0
+                                                  //         : 0.0;
+                                                  // landlord.monthlyProfit =
+                                                  //     monthlyProfitController
+                                                  //             .text.isNotEmpty
+                                                  //         ? monthlyProfitController
+                                                  //                 .text ??
+                                                  //             0.0
+                                                  //         : 0.0;
                                                   landlord.securityDeposit =
                                                       securityDepositController
                                                                   .text

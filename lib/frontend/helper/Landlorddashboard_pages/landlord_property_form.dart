@@ -11,6 +11,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as path;
 
 import '../../../backend/models/landlordmodel.dart';
+import '../../../backend/services/helperfunctions.dart';
 import '../../Screens/Landlord/landlord_dashboard.dart';
 
 class LandlordPropertyForms extends StatefulWidget {

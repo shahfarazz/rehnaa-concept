@@ -14,6 +14,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:rehnaa/backend/models/landlordmodel.dart';
 import 'package:rehnaa/frontend/Screens/faq.dart';
 // import 'package:rehnaa/frontend/helper/Landlorddashboard_pages/landlordinvoice.dart';
+import '../../../backend/services/helperfunctions.dart';
+import '../../Screens/Landlord/landlord_dashboard.dart';
 import 'landlord_dashboard_content.dart';
 // import 'skeleton.dart';
 
@@ -56,7 +58,7 @@ class _InterestFreeLoanPageState extends State<InterestFreeLoanPage>
     final Size size = MediaQuery.of(context).size;
 
     return Scaffold(
-      appBar: _buildAppBar(size, context),
+      appBar: _buildAppBar(size, context, widget.uid),
       body: SingleChildScrollView(
         child: Container(
           color: Colors.grey[200], // Set the background color
@@ -395,42 +397,54 @@ class _InterestFreeLoanPageState extends State<InterestFreeLoanPage>
   }
 }
 
-PreferredSizeWidget _buildAppBar(Size size, context) {
+PreferredSizeWidget _buildAppBar(Size size, context, uid) {
   return AppBar(
     toolbarHeight: 70,
     title: Padding(
       padding: EdgeInsets.only(
-        top: MediaQuery.of(context).size.height * 0.02, // 2% of the page height
         right:
             MediaQuery.of(context).size.width * 0.14, // 55% of the page width
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          Stack(
-            children: [
-              ClipPath(
-                clipper: HexagonClipper(),
-                child: Transform.scale(
-                  scale: 0.87,
-                  child: Container(
-                    color: Colors.white,
-                    width: 60,
-                    height: 60,
+          GestureDetector(
+              onTap: () {
+                // Add your desired logic here
+                // print('tapped');
+
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => LandlordDashboardPage(
+                            uid: uid,
+                          )),
+                );
+              },
+              child: Stack(
+                children: [
+                  ClipPath(
+                    clipper: HexagonClipper(),
+                    child: Transform.scale(
+                      scale: 0.87,
+                      child: Container(
+                        color: Colors.white,
+                        width: 60,
+                        height: 60,
+                      ),
+                    ),
                   ),
-                ),
-              ),
-              ClipPath(
-                clipper: HexagonClipper(),
-                child: Image.asset(
-                  'assets/mainlogo.png',
-                  width: 60,
-                  height: 60,
-                  fit: BoxFit.cover,
-                ),
-              ),
-            ],
-          ),
+                  ClipPath(
+                    clipper: HexagonClipper(),
+                    child: Image.asset(
+                      'assets/mainlogo.png',
+                      width: 60,
+                      height: 60,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ],
+              )),
           // const SizedBox(width: 8),
         ],
       ),

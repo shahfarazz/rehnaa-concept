@@ -8,7 +8,9 @@ import 'package:intl/intl.dart';
 
 import '../../../backend/models/landlordmodel.dart';
 import '../../../backend/models/tenantsmodel.dart';
+import '../../../backend/services/helperfunctions.dart';
 import '../../Screens/Landlord/landlord_dashboard.dart';
+import '../../Screens/Tenant/tenant_dashboard.dart';
 
 class TenantSecurityDepositPage extends StatefulWidget {
   final String uid;
@@ -71,7 +73,7 @@ class _TenantSecurityDepositPageState extends State<TenantSecurityDepositPage> {
     final Size size = MediaQuery.of(context).size;
 
     return Scaffold(
-      appBar: _buildAppBar(size, context),
+      appBar: _buildAppBar(size, context, widget.callerType, widget.uid),
       body: SingleChildScrollView(
         child: Container(
           color: Colors.grey[200], // Set the background color
@@ -384,42 +386,64 @@ class _TenantSecurityDepositPageState extends State<TenantSecurityDepositPage> {
   }
 }
 
-PreferredSizeWidget _buildAppBar(Size size, context) {
+PreferredSizeWidget _buildAppBar(Size size, context, callerType, uid) {
   return AppBar(
     toolbarHeight: 70,
     title: Padding(
       padding: EdgeInsets.only(
-        // top: MediaQuery.of(context).size.height * 0.02, // 2% of the page height
         right:
             MediaQuery.of(context).size.width * 0.14, // 55% of the page width
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          Stack(
-            children: [
-              ClipPath(
-                clipper: HexagonClipper(),
-                child: Transform.scale(
-                  scale: 0.87,
-                  child: Container(
-                    color: Colors.white,
-                    width: 60,
-                    height: 60,
+          GestureDetector(
+              onTap: () {
+                // Add your desired logic here
+                // print('tapped');
+
+                if (callerType == 'Tenants') {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => TenantDashboardPage(
+                              uid: uid,
+                            )),
+                  );
+                } else if (callerType == 'Landlords') {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => LandlordDashboardPage(
+                              uid: uid,
+                            )),
+                  );
+                }
+              },
+              child: Stack(
+                children: [
+                  ClipPath(
+                    clipper: HexagonClipper(),
+                    child: Transform.scale(
+                      scale: 0.87,
+                      child: Container(
+                        color: Colors.white,
+                        width: 60,
+                        height: 60,
+                      ),
+                    ),
                   ),
-                ),
-              ),
-              ClipPath(
-                clipper: HexagonClipper(),
-                child: Image.asset(
-                  'assets/mainlogo.png',
-                  width: 60,
-                  height: 60,
-                  fit: BoxFit.cover,
-                ),
-              ),
-            ],
-          ),
+                  ClipPath(
+                    clipper: HexagonClipper(),
+                    child: Image.asset(
+                      'assets/mainlogo.png',
+                      width: 60,
+                      height: 60,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ],
+              )),
           // const SizedBox(width: 8),
         ],
       ),

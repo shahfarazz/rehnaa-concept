@@ -12,6 +12,8 @@ import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:rehnaa/frontend/helper/Landlorddashboard_pages/landlord_tenants.dart';
 
+import '../../backend/services/helperfunctions.dart';
+
 class Voucher {
   final String url;
   final ImageProvider imageProvider;
@@ -328,26 +330,4 @@ PreferredSizeWidget _buildAppBar(Size size, context) {
       ),
     ),
   );
-}
-
-class HexagonClipper extends CustomClipper<Path> {
-  @override
-  Path getClip(Size size) {
-    final path = Path();
-    final double controlPointOffset = size.height / 6;
-
-    path.moveTo(size.width / 2, 0);
-    path.lineTo(size.width, size.height / 2 - controlPointOffset);
-    path.lineTo(size.width, size.height / 2 + controlPointOffset);
-    path.lineTo(size.width / 2, size.height);
-    path.lineTo(0, size.height / 2 + controlPointOffset);
-    path.lineTo(0, size.height / 2 - controlPointOffset);
-    path.close();
-    return path;
-  }
-
-  @override
-  bool shouldReclip(CustomClipper<Path> oldClipper) {
-    return false;
-  }
 }

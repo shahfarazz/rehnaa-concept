@@ -10,20 +10,29 @@ import 'package:rehnaa/frontend/Screens/rentpayment_info.dart';
 import '../../backend/models/tenantsmodel.dart';
 
 import '../helper/Landlorddashboard_pages/landlord_tenants.dart';
+import 'Landlord/landlord_dashboard.dart';
+import 'Tenant/tenant_dashboard.dart';
 import 'new_vouchers.dart';
 
 class ContractPage extends StatelessWidget {
   // final String identifier;
   final contractFields;
+  final String uid;
+  final String callerType;
 
-  const ContractPage({Key? key, this.contractFields}) : super(key: key);
+  const ContractPage(
+      {Key? key,
+      this.contractFields,
+      required this.uid,
+      required this.callerType})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: MyScreen(
         // identifier: identifier,
-        contractFields: contractFields,
+        contractFields: contractFields, callerType: callerType, uid: uid,
       ),
     );
   }
@@ -32,8 +41,15 @@ class ContractPage extends StatelessWidget {
 class MyScreen extends StatelessWidget {
   // final String identifier;
   final contractFields;
+  final String uid;
+  final String callerType;
 
-  const MyScreen({Key? key, this.contractFields}) : super(key: key);
+  const MyScreen(
+      {Key? key,
+      this.contractFields,
+      required this.uid,
+      required this.callerType})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +63,7 @@ class MyScreen extends StatelessWidget {
       final Size size = MediaQuery.of(context).size;
 
       return Scaffold(
-        appBar: _buildAppBar(size, context),
+        appBar: _buildAppBar(size, context, callerType, uid),
         body: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -123,7 +139,8 @@ class MyScreen extends StatelessWidget {
     }
 
     return Scaffold(
-      appBar: _buildAppBar(MediaQuery.of(context).size, context),
+      appBar:
+          _buildAppBar(MediaQuery.of(context).size, context, callerType, uid),
       body: Column(
         children: [
           (pdfUrl != null)
@@ -548,7 +565,7 @@ class _ZoomedScreenState extends State<ZoomedScreen> {
   }
 }
 
-PreferredSizeWidget _buildAppBar(Size size, context) {
+PreferredSizeWidget _buildAppBar(Size size, context, callerType, uid) {
   return AppBar(
     toolbarHeight: 70,
     title: Padding(
@@ -559,30 +576,53 @@ PreferredSizeWidget _buildAppBar(Size size, context) {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          Stack(
-            children: [
-              ClipPath(
-                clipper: HexagonClipper(),
-                child: Transform.scale(
-                  scale: 0.87,
-                  child: Container(
-                    color: Colors.white,
-                    width: 60,
-                    height: 60,
+          GestureDetector(
+              onTap: () {
+                // Add your desired logic here
+                // print('tapped');
+
+                if (callerType == 'Tenants') {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => TenantDashboardPage(
+                              uid: uid,
+                            )),
+                  );
+                } else if (callerType == 'Landlords') {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => LandlordDashboardPage(
+                              uid: uid,
+                            )),
+                  );
+                }
+              },
+              child: Stack(
+                children: [
+                  ClipPath(
+                    clipper: HexagonClipper(),
+                    child: Transform.scale(
+                      scale: 0.87,
+                      child: Container(
+                        color: Colors.white,
+                        width: 60,
+                        height: 60,
+                      ),
+                    ),
                   ),
-                ),
-              ),
-              ClipPath(
-                clipper: HexagonClipper(),
-                child: Image.asset(
-                  'assets/mainlogo.png',
-                  width: 60,
-                  height: 60,
-                  fit: BoxFit.cover,
-                ),
-              ),
-            ],
-          ),
+                  ClipPath(
+                    clipper: HexagonClipper(),
+                    child: Image.asset(
+                      'assets/mainlogo.png',
+                      width: 60,
+                      height: 60,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ],
+              )),
           // const SizedBox(width: 8),
         ],
       ),

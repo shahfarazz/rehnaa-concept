@@ -13,6 +13,7 @@ import 'package:rehnaa/frontend/Screens/login_page.dart';
 import 'package:rehnaa/frontend/helper/Landlorddashboard_pages/landlord_dashboard_content.dart';
 import 'package:rehnaa/frontend/helper/Landlorddashboard_pages/landlord_profile.dart';
 import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenant_renthistory.dart';
+import '../../../backend/services/helperfunctions.dart';
 import '../../helper/Landlorddashboard_pages/landlord_advance_rent.dart';
 import '../../helper/Landlorddashboard_pages/landlord_interestfreeloan.dart';
 import '../../helper/Landlorddashboard_pages/landlord_tenants.dart';
@@ -528,7 +529,10 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => const NewVouchersPage(),
+                                builder: (context) => NewVouchersPage(
+                                  callerType: 'Landlords',
+                                  uid: widget.uid,
+                                ),
                               ),
                             );
                           },
@@ -559,7 +563,10 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const PrivacyPolicyPage(),
+                            builder: (context) => PrivacyPolicyPage(
+                              callerType: 'Landlords',
+                              uid: widget.uid,
+                            ),
                           ),
                         );
                         // _closeSidebar();
@@ -572,7 +579,10 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const FAQPage(),
+                            builder: (context) => FAQPage(
+                              callerType: 'Landlords',
+                              uid: widget.uid,
+                            ),
                           ),
                         );
                         // _closeSidebar();
@@ -1088,27 +1098,5 @@ class _LandlordDashboardPageState extends State<LandlordDashboardPage>
         ],
       ),
     );
-  }
-}
-
-class HexagonClipper extends CustomClipper<Path> {
-  @override
-  Path getClip(Size size) {
-    final path = Path();
-    final double controlPointOffset = size.height / 6;
-
-    path.moveTo(size.width / 2, 0);
-    path.lineTo(size.width, size.height / 2 - controlPointOffset);
-    path.lineTo(size.width, size.height / 2 + controlPointOffset);
-    path.lineTo(size.width / 2, size.height);
-    path.lineTo(0, size.height / 2 + controlPointOffset);
-    path.lineTo(0, size.height / 2 - controlPointOffset);
-    path.close();
-    return path;
-  }
-
-  @override
-  bool shouldReclip(CustomClipper<Path> oldClipper) {
-    return false;
   }
 }

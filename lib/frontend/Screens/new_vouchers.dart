@@ -6,12 +6,19 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:rehnaa/frontend/Screens/Dealer/dealer_dashboard.dart';
 // import 'package:easy_image_viewer/easy_image_viewer.dart';
 
+import '../../backend/services/helperfunctions.dart';
 import '../helper/Tenantdashboard_pages/tenant_propertyinfo.dart';
+import 'Landlord/landlord_dashboard.dart';
+import 'Tenant/tenant_dashboard.dart';
 
 class NewVouchersPage extends StatefulWidget {
-  const NewVouchersPage({super.key});
+  final String uid;
+  final String callerType;
+  const NewVouchersPage(
+      {super.key, required this.uid, required this.callerType});
 
   @override
   State<NewVouchersPage> createState() => _NewVouchersPageState();
@@ -69,7 +76,7 @@ class _NewVouchersPageState extends State<NewVouchersPage> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
-      appBar: _buildAppBar(size, context),
+      appBar: _buildAppBar(size, context, widget.callerType, widget.uid),
       body: isLoading
           ? Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -217,40 +224,73 @@ class _NewVouchersPageState extends State<NewVouchersPage> {
   }
 }
 
-PreferredSizeWidget _buildAppBar(Size size, context) {
+PreferredSizeWidget _buildAppBar(Size size, context, callerType, uid) {
   return AppBar(
     toolbarHeight: 70,
     title: Padding(
       padding: EdgeInsets.only(
-        right: MediaQuery.of(context).size.width * 0.14,
+        right:
+            MediaQuery.of(context).size.width * 0.14, // 55% of the page width
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          Stack(
-            children: [
-              ClipPath(
-                clipper: HexagonClipper(),
-                child: Transform.scale(
-                  scale: 0.87,
-                  child: Container(
-                    color: Colors.white,
-                    width: 60,
-                    height: 60,
+          GestureDetector(
+              onTap: () {
+                // Add your desired logic here
+                // print('tapped');
+
+                if (callerType == 'Tenants') {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => TenantDashboardPage(
+                              uid: uid,
+                            )),
+                  );
+                } else if (callerType == 'Landlords') {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => LandlordDashboardPage(
+                              uid: uid,
+                            )),
+                  );
+                } else if (callerType == 'Dealers') {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => DealerDashboardPage(
+                              uid: uid,
+                            )),
+                  );
+                }
+              },
+              child: Stack(
+                children: [
+                  ClipPath(
+                    clipper: HexagonClipper(),
+                    child: Transform.scale(
+                      scale: 0.87,
+                      child: Container(
+                        color: Colors.white,
+                        width: 60,
+                        height: 60,
+                      ),
+                    ),
                   ),
-                ),
-              ),
-              ClipPath(
-                clipper: HexagonClipper(),
-                child: Image.asset(
-                  'assets/mainlogo.png',
-                  width: 60,
-                  height: 60,
-                  fit: BoxFit.cover,
-                ),
-              ),
-            ],
-          ),
+                  ClipPath(
+                    clipper: HexagonClipper(),
+                    child: Image.asset(
+                      'assets/mainlogo.png',
+                      width: 60,
+                      height: 60,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ],
+              )),
+          // const SizedBox(width: 8),
         ],
       ),
     ),
@@ -268,34 +308,12 @@ PreferredSizeWidget _buildAppBar(Size size, context) {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            Color(0xFF0FA697),
-            Color(0xFF45BF7A),
-            Color(0xFF0DF205),
+            Color(0xff0FA697),
+            Color(0xff45BF7A),
+            Color(0xff0DF205),
           ],
         ),
       ),
     ),
   );
-}
-
-class HexagonClipper extends CustomClipper<Path> {
-  @override
-  Path getClip(Size size) {
-    final path = Path();
-    final double controlPointOffset = size.height / 6;
-
-    path.moveTo(size.width / 2, 0);
-    path.lineTo(size.width, size.height / 2 - controlPointOffset);
-    path.lineTo(size.width, size.height / 2 + controlPointOffset);
-    path.lineTo(size.width / 2, size.height);
-    path.lineTo(0, size.height / 2 + controlPointOffset);
-    path.lineTo(0, size.height / 2 - controlPointOffset);
-    path.close();
-    return path;
-  }
-
-  @override
-  bool shouldReclip(CustomClipper<Path> oldClipper) {
-    return false;
-  }
 }

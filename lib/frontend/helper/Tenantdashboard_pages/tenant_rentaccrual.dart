@@ -5,8 +5,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:rehnaa/frontend/Screens/Tenant/tenant_dashboard.dart';
 
 import '../../../backend/models/tenantsmodel.dart';
+import '../../../backend/services/helperfunctions.dart';
 import '../../Screens/Landlord/landlord_dashboard.dart';
 
 class TenantRentAccrualPage extends StatefulWidget {
@@ -51,7 +53,7 @@ class _TenantRentAccrualPageState extends State<TenantRentAccrualPage> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
-      appBar: _buildAppBar(size, context),
+      appBar: _buildAppBar(size, context, widget.uid),
       body: SingleChildScrollView(
         child: Container(
           color: Colors.grey[200], // Set the background color
@@ -298,7 +300,7 @@ class _TenantRentAccrualPageState extends State<TenantRentAccrualPage> {
   }
 }
 
-PreferredSizeWidget _buildAppBar(Size size, context) {
+PreferredSizeWidget _buildAppBar(Size size, context, uid) {
   return AppBar(
     toolbarHeight: 70,
     title: Padding(
@@ -309,30 +311,43 @@ PreferredSizeWidget _buildAppBar(Size size, context) {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          Stack(
-            children: [
-              ClipPath(
-                clipper: HexagonClipper(),
-                child: Transform.scale(
-                  scale: 0.87,
-                  child: Container(
-                    color: Colors.white,
-                    width: 60,
-                    height: 60,
+          GestureDetector(
+              onTap: () {
+                // Add your desired logic here
+                // print('tapped');
+
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => TenantDashboardPage(
+                            uid: uid,
+                          )),
+                );
+              },
+              child: Stack(
+                children: [
+                  ClipPath(
+                    clipper: HexagonClipper(),
+                    child: Transform.scale(
+                      scale: 0.87,
+                      child: Container(
+                        color: Colors.white,
+                        width: 60,
+                        height: 60,
+                      ),
+                    ),
                   ),
-                ),
-              ),
-              ClipPath(
-                clipper: HexagonClipper(),
-                child: Image.asset(
-                  'assets/mainlogo.png',
-                  width: 60,
-                  height: 60,
-                  fit: BoxFit.cover,
-                ),
-              ),
-            ],
-          ),
+                  ClipPath(
+                    clipper: HexagonClipper(),
+                    child: Image.asset(
+                      'assets/mainlogo.png',
+                      width: 60,
+                      height: 60,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ],
+              )),
           // const SizedBox(width: 8),
         ],
       ),

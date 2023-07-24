@@ -210,7 +210,10 @@ class _DealerLandlordOnboardedPageState
                         child: ListView.builder(
                           itemCount: filteredLandlords.length,
                           itemBuilder: (context, index) {
-                            final landlord = filteredLandlords[index];
+                            // final landlord = filteredLandlords[index];
+                            //reverse
+                            final landlord = filteredLandlords[
+                                filteredLandlords.length - index - 1];
                             return GestureDetector(
                               onTap: () {
                                 if (dealer?.landlordMap?[landlord.tempID]

@@ -2,9 +2,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:rehnaa/frontend/Screens/Dealer/dealer_dashboard.dart';
 
 import '../../../backend/models/dealermodel.dart';
 import '../../../backend/models/landlordmodel.dart';
+import '../../../backend/services/helperfunctions.dart';
 import '../../Screens/Landlord/landlord_dashboard.dart';
 import '../../Screens/contract.dart';
 import 'dealer_estamp_info.dart';
@@ -121,7 +123,7 @@ class _DealerEstampPageState extends State<DealerEstampPage> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
-      appBar: _buildAppBar(size, context),
+      appBar: _buildAppBar(size, context, widget.uid),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
@@ -218,9 +220,13 @@ class _DealerEstampPageState extends State<DealerEstampPage> {
                     : RefreshIndicator(
                         onRefresh: _refreshFunction,
                         child: ListView.builder(
+                          // reverse: true,
                           itemCount: filteredLandlords.length,
                           itemBuilder: (context, index) {
-                            final landlord = filteredLandlords[index];
+                            // final landlord = filteredLandlords[index];
+                            //reverse the list
+                            final landlord = filteredLandlords[
+                                filteredLandlords.length - index - 1];
                             return GestureDetector(
                               onTap: () {
                                 if (!(landlord.hasEstamp)) {
@@ -308,42 +314,54 @@ class _DealerEstampPageState extends State<DealerEstampPage> {
   }
 }
 
-PreferredSizeWidget _buildAppBar(Size size, context) {
+PreferredSizeWidget _buildAppBar(Size size, context, uid) {
   return AppBar(
     toolbarHeight: 70,
     title: Padding(
       padding: EdgeInsets.only(
-        // top: MediaQuery.of(context).size.height * 0.02, // 2% of the page height
         right:
             MediaQuery.of(context).size.width * 0.14, // 55% of the page width
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          Stack(
-            children: [
-              ClipPath(
-                clipper: HexagonClipper(),
-                child: Transform.scale(
-                  scale: 0.87,
-                  child: Container(
-                    color: Colors.white,
-                    width: 60,
-                    height: 60,
+          GestureDetector(
+              onTap: () {
+                // Add your desired logic here
+                // print('tapped');
+
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => DealerDashboardPage(
+                            uid: uid,
+                          )),
+                );
+              },
+              child: Stack(
+                children: [
+                  ClipPath(
+                    clipper: HexagonClipper(),
+                    child: Transform.scale(
+                      scale: 0.87,
+                      child: Container(
+                        color: Colors.white,
+                        width: 60,
+                        height: 60,
+                      ),
+                    ),
                   ),
-                ),
-              ),
-              ClipPath(
-                clipper: HexagonClipper(),
-                child: Image.asset(
-                  'assets/mainlogo.png',
-                  width: 60,
-                  height: 60,
-                  fit: BoxFit.cover,
-                ),
-              ),
-            ],
-          ),
+                  ClipPath(
+                    clipper: HexagonClipper(),
+                    child: Image.asset(
+                      'assets/mainlogo.png',
+                      width: 60,
+                      height: 60,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ],
+              )),
           // const SizedBox(width: 8),
         ],
       ),
