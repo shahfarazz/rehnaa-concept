@@ -4,6 +4,8 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:rehnaa/frontend/Screens/contract.dart';
 
+import 'Tenant/tenant_dashboard.dart';
+
 // import '../helper/Landlorddashboard_pages/landlord_advance_rent.dart';
 
 class AllContractsPage extends StatefulWidget {
@@ -117,7 +119,7 @@ class _AllContractsPageState extends State<AllContractsPage> {
     final Size size = MediaQuery.of(context).size;
 
     return Scaffold(
-      appBar: _buildAppBar(size, context),
+      appBar: _buildAppBar(size, context, widget.callerType, widget.uid),
       body: Column(
         children: <Widget>[
           Padding(
@@ -128,14 +130,15 @@ class _AllContractsPageState extends State<AllContractsPage> {
                 _filterContracts(value);
               },
               decoration: InputDecoration(
-                labelText: 'Search',
-                hintText: 'Search',
-                prefixIcon: Icon(Icons.search),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(25.0),
-                  ),
+                focusedBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: Colors.green),
                 ),
+                hintText: 'Search',
+                hintStyle: TextStyle(
+                  color: Colors.green,
+                  fontFamily: GoogleFonts.montserrat().fontFamily,
+                ),
+                prefixIcon: Icon(Icons.search, color: Colors.green),
               ),
             ),
           ),
@@ -157,21 +160,53 @@ class _AllContractsPageState extends State<AllContractsPage> {
                   }
 
                   if (contracts.isEmpty) {
-                    return Column(
+                    return Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(
-                          Icons.description,
-                          size: 48.0,
-                          color: Color(0xff33907c),
-                        ),
-                        SizedBox(height: 16.0),
-                        Text(
-                          'No contracts to show',
-                          style: GoogleFonts.montserrat(
-                            fontSize: 20.0,
-                            color: const Color(0xff33907c),
-                          ),
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Column(
+                              children: [
+                                // const SizedBox(height: 50),
+                                Padding(
+                                    padding: EdgeInsets.only(
+                                        top: size.height * 0.1)),
+                                Card(
+                                  elevation: 4.0,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20.0),
+                                  ),
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(20.0),
+                                      color: Colors.white,
+                                    ),
+                                    padding: const EdgeInsets.all(16.0),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        const Icon(
+                                          Icons.description,
+                                          size: 48.0,
+                                          color: Color(0xff33907c),
+                                        ),
+                                        const SizedBox(height: 16.0),
+                                        Text(
+                                          'No Contracts to show',
+                                          style: GoogleFonts.montserrat(
+                                            fontSize: 20.0,
+                                            color: const Color(0xff33907c),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                )
+                              ],
+                            ),
+                          ],
                         ),
                       ],
                     );
@@ -272,7 +307,7 @@ class _AllContractsPageState extends State<AllContractsPage> {
   }
 }
 
-PreferredSizeWidget _buildAppBar(Size size, context) {
+PreferredSizeWidget _buildAppBar(Size size, context, callerType, uid) {
   return AppBar(
     toolbarHeight: 70,
     title: Padding(
@@ -283,30 +318,45 @@ PreferredSizeWidget _buildAppBar(Size size, context) {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          Stack(
-            children: [
-              ClipPath(
-                clipper: HexagonClipper(),
-                child: Transform.scale(
-                  scale: 0.87,
-                  child: Container(
-                    color: Colors.white,
-                    width: 60,
-                    height: 60,
+          GestureDetector(
+              onTap: () {
+                // Add your desired logic here
+                // print('tapped');
+
+                if (callerType == 'Tenants') {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => TenantDashboardPage(
+                              uid: uid,
+                            )),
+                  );
+                }
+              },
+              child: Stack(
+                children: [
+                  ClipPath(
+                    clipper: HexagonClipper(),
+                    child: Transform.scale(
+                      scale: 0.87,
+                      child: Container(
+                        color: Colors.white,
+                        width: 60,
+                        height: 60,
+                      ),
+                    ),
                   ),
-                ),
-              ),
-              ClipPath(
-                clipper: HexagonClipper(),
-                child: Image.asset(
-                  'assets/mainlogo.png',
-                  width: 60,
-                  height: 60,
-                  fit: BoxFit.cover,
-                ),
-              ),
-            ],
-          ),
+                  ClipPath(
+                    clipper: HexagonClipper(),
+                    child: Image.asset(
+                      'assets/mainlogo.png',
+                      width: 60,
+                      height: 60,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ],
+              )),
           // const SizedBox(width: 8),
         ],
       ),

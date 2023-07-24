@@ -10,6 +10,7 @@ import 'package:rehnaa/frontend/Screens/rentpayment_info.dart';
 import '../../backend/models/tenantsmodel.dart';
 
 import '../helper/Landlorddashboard_pages/landlord_tenants.dart';
+import 'new_vouchers.dart';
 
 class ContractPage extends StatelessWidget {
   // final String identifier;
@@ -608,26 +609,4 @@ PreferredSizeWidget _buildAppBar(Size size, context) {
       ),
     ),
   );
-}
-
-class HexagonClipper extends CustomClipper<Path> {
-  @override
-  Path getClip(Size size) {
-    final path = Path();
-    final double controlPointOffset = size.height / 6;
-
-    path.moveTo(size.width / 2, 0);
-    path.lineTo(size.width, size.height / 2 - controlPointOffset);
-    path.lineTo(size.width, size.height / 2 + controlPointOffset);
-    path.lineTo(size.width / 2, size.height);
-    path.lineTo(0, size.height / 2 + controlPointOffset);
-    path.lineTo(0, size.height / 2 - controlPointOffset);
-    path.close();
-    return path;
-  }
-
-  @override
-  bool shouldReclip(CustomClipper<Path> oldClipper) {
-    return false;
-  }
 }

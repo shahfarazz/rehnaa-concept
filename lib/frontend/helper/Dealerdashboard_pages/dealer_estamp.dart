@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../backend/models/dealermodel.dart';
 import '../../../backend/models/landlordmodel.dart';
+import '../../Screens/Landlord/landlord_dashboard.dart';
 import '../../Screens/contract.dart';
 import 'dealer_estamp_info.dart';
 
