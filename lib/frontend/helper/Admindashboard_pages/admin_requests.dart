@@ -1397,10 +1397,7 @@ class LandlordWithdrawalCard extends StatelessWidget {
                           FirebaseFirestore.instance
                               .collection('Properties')
                               .doc(data.propertyID),
-                          {
-                            'isRequestedByTenants':
-                                FieldValue.arrayRemove([data.uid])
-                          },
+                          {'isRequestedByTenants': []},
                         );
 
                         // // Navigate to the AdminPropertyContractsPage

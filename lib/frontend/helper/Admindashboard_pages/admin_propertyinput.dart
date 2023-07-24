@@ -178,8 +178,14 @@ class _AdminPropertyInputPageState extends State<AdminPropertyInputPage> {
                             onTap: () async {
                               //check if property has a tenantref and landlordref and if so go to those documents and remove propertyref from their propertyRef array
                               if (property.tenantRef != null) {
-                                await property.tenantRef!
-                                    .update({'propertyRef': null});
+                                await property.tenantRef!.update({
+                                  'propertyRef': FieldValue.arrayRemove([
+                                    FirebaseFirestore.instance
+                                        .collection('Properties')
+                                        .doc(property.propertyID)
+                                  ]),
+                                  // 'address': null,
+                                });
                               }
                               if (property.landlordRef != null) {
                                 await property.landlordRef!.update({

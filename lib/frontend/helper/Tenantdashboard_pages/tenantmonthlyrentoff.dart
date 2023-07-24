@@ -219,7 +219,7 @@ class _TenantMonthlyRentOffPageState extends State<TenantMonthlyRentOffPage>
                       child: Stack(
                         children: [
                           Container(
-                            height: size.height * 0.5,
+                            height: 550,
                             child: ClipPath(
                               clipper: DiagonalClipper(),
                               child: Container(

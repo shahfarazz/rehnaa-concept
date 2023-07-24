@@ -2,17 +2,21 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:rehnaa/backend/services/helperfunctions.dart';
 
+import '../../../backend/models/propertymodel.dart';
+
 class AdminPropertyContractsPage extends StatefulWidget {
   final String tenantID;
   final String landlordID;
   String? landlordName;
   String? tenantName;
+  final String? propertyID;
   AdminPropertyContractsPage(
       {Key? key,
       required this.tenantID,
       required this.landlordID,
       this.landlordName,
-      this.tenantName})
+      this.tenantName,
+      this.propertyID})
       : super(key: key);
 
   @override
@@ -156,6 +160,20 @@ class _AdminPropertyContractsPageState
     final String rehnaaSecurity = _rehnaaSecurityController.text;
     final String additionalInformation = _additionalInformationController.text;
 
+    //use propertyID to get the property details from the database
+    var currentProperty;
+
+    FirebaseFirestore.instance
+        .collection('Properties')
+        .doc(widget.propertyID)
+        .get()
+        .then((value) {
+      if (value.exists) {
+        currentProperty = Property.fromJson(value.data()!);
+        currentProperty.propertyID = value.id;
+      }
+    });
+
     //Make a new document in the Contracts collection for the new contract
     var newContractID;
     FirebaseFirestore.instance.collection('Contracts').add({
@@ -191,6 +209,8 @@ class _AdminPropertyContractsPageState
       'additionalInformation': additionalInformation,
       'landlordID': widget.landlordID,
       'tenantID': widget.tenantID,
+      'propertyID': currentProperty.propertyID,
+      'propertyTitle': currentProperty.title,
     }).then((value) {
       newContractID = value.id;
       //add newContractID to contractIDs list in Landlords and Tenants

@@ -803,7 +803,7 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
                               },
                               child: Text(
                                 description == '' || description == null
-                                    ? 'N/A'
+                                    ? ''
                                     : description!,
                                 textAlign: TextAlign.center,
                                 maxLines: 1,

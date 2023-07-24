@@ -112,7 +112,7 @@ class _TenantLandlordsPageState extends State<TenantLandlordsPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      'Landlord Name: ',
+                      'Landlord Name ',
                       style: GoogleFonts.montserrat(
                         fontSize: 16.0,
                         fontWeight: FontWeight.w600,

@@ -190,7 +190,8 @@ class _ContractCardState extends State<ContractCard>
     final contractData = widget.contractData;
     final landlordName = contractData?['landlordName'] as String;
     final tenantName = contractData?['tenantName'] as String;
-    final propertyAddress = contractData?['propertyAddress'] as String;
+    // final propertyAddress = contractData?['propertyAddress'] as String;
+    final propertyTitle = contractData?['propertyTitle'] ?? 'No Title';
     final allFields = contractData?.entries.map((entry) {
       final fieldName = entry.key;
       final fieldValue = entry.value.toString();
@@ -260,7 +261,7 @@ class _ContractCardState extends State<ContractCard>
                     ],
                   ),
                   Text('Tenant: $tenantName'),
-                  Text('Address: $propertyAddress'),
+                  Text('Title: $propertyTitle'),
                 ],
               ),
             ),

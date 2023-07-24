@@ -12,6 +12,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:rehnaa/backend/models/landlordmodel.dart';
 import 'package:rehnaa/frontend/helper/Landlorddashboard_pages/landlordinvoice.dart';
 import 'package:responsive_framework/responsive_scaled_box.dart';
+import '../../../backend/models/propertymodel.dart';
 import '../../../backend/models/tenantsmodel.dart';
 import '../../Screens/pdf_landlord.dart';
 import 'landlord_form.dart';
@@ -304,12 +305,55 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
                                                           title: Text(
                                                               '${tenant.firstName} ${tenant.lastName}'),
                                                           onTap: () {
+                                                            Property? property;
                                                             Navigator.pop(
                                                                 context);
                                                             PDFEditorPage
                                                                 pdfinstance =
                                                                 PDFEditorPage();
                                                             //showdialog generating pdf...
+
+                                                            //find the property where landlordref is equal to the landlordref of the tenant
+                                                            // and tenantref is equal to the tenantref of the tenant
+                                                            FirebaseFirestore
+                                                                .instance
+                                                                .collection(
+                                                                    'Properties')
+                                                                .get()
+                                                                .then((value) {
+                                                              // String propertyID = '';
+
+                                                              value.docs.forEach(
+                                                                  (element) {
+                                                                if (element.data()[
+                                                                            'landlordRef'] ==
+                                                                        tenant.landlordRef?[
+                                                                            index] &&
+                                                                    element.data()[
+                                                                            'tenantRef'] ==
+                                                                        widget
+                                                                            .uid) {
+                                                                  // propertyID = element.id;
+                                                                  property = Property.fromJson(element
+                                                                          .data()
+                                                                      as Map<
+                                                                          String,
+                                                                          dynamic>);
+                                                                } else {
+                                                                  property =
+                                                                      null;
+                                                                  //snackbar you dont have any property with this landlord
+                                                                  ScaffoldMessenger.of(
+                                                                          context)
+                                                                      .showSnackBar(
+                                                                          SnackBar(
+                                                                    content: Text(
+                                                                        'You dont have any property with this tenant'),
+                                                                  ));
+                                                                  return;
+                                                                }
+                                                              });
+                                                            });
 
                                                             pdfinstance
                                                                 .createState()
@@ -324,8 +368,8 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
                                                                             .lastName,
                                                                     landlord
                                                                         .address,
-                                                                    tenant
-                                                                        .address,
+                                                                    property
+                                                                        ?.address,
                                                                     landlord
                                                                         .balance
                                                                         .toDouble(),

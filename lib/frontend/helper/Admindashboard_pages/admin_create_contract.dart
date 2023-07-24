@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:rehnaa/backend/models/propertymodel.dart';
 import 'package:rehnaa/frontend/helper/Admindashboard_pages/admin_requests_property_contracts.dart';
 
 import '../../Screens/Admin/admindashboard.dart';
@@ -174,6 +175,22 @@ class _AdminCreateContractsPageState extends State<AdminCreateContractsPage> {
                     ])
                   });
 
+                  var propertyData = await FirebaseFirestore.instance
+                      .collection('Properties')
+                      .doc(selectedProperty)
+                      .get();
+
+                  if (propertyData == null) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Property does not exist'),
+                      ),
+                    );
+                    return;
+                  }
+
+                  Property property = Property.fromJson(propertyData.data()!);
+
                   // Set the tenant's isWithdraw to false and set propertyRef and address
                   await FirebaseFirestore.instance
                       .collection('Tenants')
@@ -183,11 +200,7 @@ class _AdminCreateContractsPageState extends State<AdminCreateContractsPage> {
                     'propertyRef': FirebaseFirestore.instance
                         .collection('Properties')
                         .doc(selectedProperty),
-                    // 'address': FirebaseFirestore.instance
-                    //     .collection('Properties')
-                    //     .doc(selectedProperty)
-                    //     .get()
-                    //     .then((value) => value['address']),
+                    'address': property.address,
                   });
 
                   // Set the property's tenantRef to the tenant's document reference
@@ -234,7 +247,7 @@ class _AdminCreateContractsPageState extends State<AdminCreateContractsPage> {
                       .collection('Properties')
                       .doc(selectedProperty)
                       .update({
-                    'isRequestedByTenants': false,
+                    'isRequestedByTenants': [],
                   });
 
                   Navigator.push(
@@ -245,6 +258,7 @@ class _AdminCreateContractsPageState extends State<AdminCreateContractsPage> {
                               tenantID: selectedTenant,
                               landlordName: selectLandlordText,
                               tenantName: selectTenantText,
+                              propertyID: selectedProperty,
                             )),
                   );
                 } else {

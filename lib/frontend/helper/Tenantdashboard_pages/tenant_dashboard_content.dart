@@ -10,6 +10,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:rehnaa/backend/models/propertymodel.dart';
 import 'package:rehnaa/backend/models/tenantsmodel.dart';
 import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenant_form.dart';
 import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenantinvoice.dart';
@@ -292,6 +293,8 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                                                                 .get(),
                                                             builder: (context,
                                                                 snapshot) {
+                                                              Property?
+                                                                  property;
                                                               if (snapshot
                                                                   .hasData) {
                                                                 Landlord
@@ -302,6 +305,10 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                                                                         as Map<
                                                                             String,
                                                                             dynamic>);
+                                                                landlord.tempID =
+                                                                    snapshot
+                                                                        .data!
+                                                                        .id;
                                                                 return ListTile(
                                                                     title: Text(
                                                                         '${landlord.firstName} ${landlord.lastName}'),
@@ -313,57 +320,134 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                                                                           pdfinstance =
                                                                           PDFEditorTenantPage();
 
-                                                                      pdfinstance
-                                                                          .createState()
-                                                                          .createPdf(
-                                                                              '${tenant.firstName} ${tenant.lastName}',
-                                                                              '${landlord.firstName} ${landlord.lastName}',
-                                                                              landlord.address,
-                                                                              tenant.address,
-                                                                              tenant.balance.toDouble(),
-                                                                              amount,
-                                                                              selectedOption,
-                                                                              widget.uid,
-                                                                              invoiceNumber,
-                                                                              landlord.cnic ?? 'No cnic provided')
-                                                                          .then((_) {
-                                                                        FirebaseFirestore
-                                                                            .instance
-                                                                            .collection('AdminRequests')
-                                                                            .doc(widget.uid)
-                                                                            .set({
-                                                                          'paymentRequest':
-                                                                              FieldValue.arrayUnion([
-                                                                            {
-                                                                              'fullname': '${tenant.firstName} ${tenant.lastName}',
-                                                                              'amount': amount,
-                                                                              'paymentMethod': selectedOption,
-                                                                              'uid': widget.uid,
-                                                                              'invoiceNumber': invoiceNumber,
-                                                                              'requestID': randomID,
-                                                                              'timestamp': Timestamp.now(),
-                                                                            }
-                                                                          ]),
-                                                                        }, SetOptions(merge: true));
+                                                                      //find the property where landlordref is equal to the landlordref of the tenant
+                                                                      // and tenantref is equal to the tenantref of the tenant
+                                                                      FirebaseFirestore
+                                                                          .instance
+                                                                          .collection(
+                                                                              'Properties')
+                                                                          .get()
+                                                                          .then(
+                                                                              (value) {
+                                                                        // String propertyID = '';
 
-                                                                        Fluttertoast
-                                                                            .showToast(
-                                                                          msg:
-                                                                              'An admin will contact you soon regarding your payment via: $selectedOption',
-                                                                          toastLength:
-                                                                              Toast.LENGTH_SHORT,
-                                                                          gravity:
-                                                                              ToastGravity.BOTTOM,
-                                                                          timeInSecForIosWeb:
-                                                                              3,
-                                                                          backgroundColor:
-                                                                              const Color(0xff45BF7A),
-                                                                        );
-                                                                        Navigator.pop(
-                                                                            context);
-                                                                        Navigator.pop(
-                                                                            context);
+                                                                        value
+                                                                            .docs
+                                                                            .forEach((element) {
+                                                                          // print(
+                                                                          //     '222element landlord ref is ${element.data()['landlordRef'].path}');
+                                                                          // print(
+                                                                          //     '222element tenant ref is ${element.data()['tenantRef'].path}');
+                                                                          // print(
+                                                                          //     '222my landlord ref is ${FirebaseFirestore.instance.collection('Landlords').doc(landlord.tempID).path}');
+
+                                                                          // print(
+                                                                          //     '222my tenant ref is ${FirebaseFirestore.instance.collection('Tenants').doc(tenant.tempID).path}');
+                                                                          var landlordRef =
+                                                                              element.data()['landlordRef'];
+                                                                          var tenantRef =
+                                                                              element.data()['tenantRef'];
+                                                                          if (landlordRef != null &&
+                                                                              landlordRef.path == FirebaseFirestore.instance.collection('Landlords').doc(landlord.tempID).path &&
+                                                                              tenantRef != null &&
+                                                                              tenantRef.path == FirebaseFirestore.instance.collection('Tenants').doc(tenant.tempID).path) {
+                                                                            // propertyID = element.id;
+                                                                            // print('222foundrpoperty');
+                                                                            property =
+                                                                                Property.fromJson(element.data() as Map<String, dynamic>);
+                                                                            return;
+                                                                          }
+                                                                        });
+                                                                      }).then(
+                                                                              (_) {
+                                                                        // print(
+                                                                        //     '222idheragayabhaii');
+                                                                        if (property ==
+                                                                            null) {
+                                                                          // print(
+                                                                          //     '222 property was null');
+                                                                          Fluttertoast
+                                                                              .showToast(
+                                                                            msg:
+                                                                                'No property found with this landlord',
+                                                                            toastLength:
+                                                                                Toast.LENGTH_SHORT,
+                                                                            gravity:
+                                                                                ToastGravity.BOTTOM,
+                                                                            timeInSecForIosWeb:
+                                                                                3,
+                                                                            backgroundColor:
+                                                                                Colors.red,
+                                                                          );
+                                                                          Navigator.pop(
+                                                                              context);
+                                                                          Navigator.pop(
+                                                                              context);
+                                                                          return;
+                                                                        }
+
+                                                                        print(
+                                                                            '222 reaached herer proeprty adress is ${property?.address}');
+
+                                                                        pdfinstance
+                                                                            .createState()
+                                                                            .createPdf(
+                                                                                '${tenant.firstName} ${tenant.lastName}',
+                                                                                '${landlord.firstName} ${landlord.lastName}',
+                                                                                landlord.address,
+                                                                                property?.address,
+                                                                                tenant.balance.toDouble(),
+                                                                                amount,
+                                                                                selectedOption,
+                                                                                widget.uid,
+                                                                                invoiceNumber,
+                                                                                landlord.cnic ?? 'No cnic provided')
+                                                                            .then((_) {
+                                                                          FirebaseFirestore
+                                                                              .instance
+                                                                              .collection('AdminRequests')
+                                                                              .doc(widget.uid)
+                                                                              .set({
+                                                                            'paymentRequest':
+                                                                                FieldValue.arrayUnion([
+                                                                              {
+                                                                                'fullname': '${tenant.firstName} ${tenant.lastName}',
+                                                                                'amount': amount,
+                                                                                'paymentMethod': selectedOption,
+                                                                                'uid': widget.uid,
+                                                                                'invoiceNumber': invoiceNumber,
+                                                                                'requestID': randomID,
+                                                                                'timestamp': Timestamp.now(),
+                                                                              }
+                                                                            ]),
+                                                                          }, SetOptions(merge: true));
+
+                                                                          print(
+                                                                              '222 we reached till here where we pop');
+                                                                        });
+                                                                      }).catchError(
+                                                                              (error) {
+                                                                        print(
+                                                                            'error222 is $error');
+                                                                        return;
                                                                       });
+                                                                      Fluttertoast
+                                                                          .showToast(
+                                                                        msg:
+                                                                            'An admin will contact you soon regarding your payment via: $selectedOption',
+                                                                        toastLength:
+                                                                            Toast.LENGTH_SHORT,
+                                                                        gravity:
+                                                                            ToastGravity.BOTTOM,
+                                                                        timeInSecForIosWeb:
+                                                                            3,
+                                                                        backgroundColor:
+                                                                            const Color(0xff45BF7A),
+                                                                      );
+                                                                      Navigator.pop(
+                                                                          context);
+                                                                      Navigator.pop(
+                                                                          context);
                                                                     });
                                                               } else {
                                                                 return const Center(
@@ -381,62 +465,6 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                                                             });
                                                       })));
                                         });
-
-                                    // print('invoice number is $invoiceNumber');
-
-                                    // tenant.landlordRef
-                                    //     ?.get()
-                                    //     .then((landlordDoc) {
-                                    //   // print(
-                                    //   //     'landlordDoc.exists: ${landlordDoc.data()}');
-                                    //   if (landlordDoc.exists) {
-                                    //     var landlordJson = landlordDoc.data()
-                                    //         as Map<String, dynamic>;
-                                    //     Landlord landlord =
-                                    //         Landlord.fromJson(landlordJson);
-
-                                    //     //show dialog generating pdf...
-                                    //     PDFEditorTenantPage pdfinstance =
-                                    //         PDFEditorTenantPage();
-
-                                    //     pdfinstance.createState().createPdf(
-                                    //         '${tenant.firstName} ${tenant.lastName}',
-                                    //         '${landlord.firstName} ${landlord.lastName}',
-                                    //         landlord.address,
-                                    //         tenant.address,
-                                    //         tenant.balance.toDouble(),
-                                    //         amount,
-                                    //         selectedOption,
-                                    //         widget.uid,
-                                    //         invoiceNumber,
-                                    //         landlord.cnic ??
-                                    //             'No cnic provided');
-
-                                    //     FirebaseFirestore.instance
-                                    //         .collection('AdminRequests')
-                                    //         .doc(widget.uid)
-                                    //         .set({
-                                    //       'paymentRequest':
-                                    //           FieldValue.arrayUnion([
-                                    //         {
-                                    //           'fullname':
-                                    //               '${tenant.firstName} ${tenant.lastName}',
-                                    //           'amount': amount,
-                                    //           'paymentMethod': selectedOption,
-                                    //           'uid': widget.uid,
-                                    //           'invoiceNumber': invoiceNumber,
-                                    //           'requestID': randomID,
-                                    //           'timestamp': Timestamp.now(),
-                                    //         }
-                                    //       ]),
-                                    //     }, SetOptions(merge: true));
-
-                                    //     // print(
-                                    //     // 'reached here landlord is ${landlord.firstName} ${landlord.lastName}}');
-                                    //   }
-                                    //   Navigator.pop(context);
-                                    //   Navigator.pop(context);
-                                    // });
                                   } else {
                                     Fluttertoast.showToast(
                                       msg: 'Invalid withdrawal amount',
@@ -548,6 +576,7 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
               snapshot.data?.data() as Map<String, dynamic>;
           // Fetch tenant
           Tenant tenant = Tenant.fromJson(json);
+          tenant.tempID = snapshot.data!.id;
           if (json['isWithdraw'] != null && json['isWithdraw'] == true) {
             SchedulerBinding.instance!.addPostFrameCallback((_) {
               if (mounted) {
