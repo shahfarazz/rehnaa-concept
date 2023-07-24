@@ -205,20 +205,9 @@ class _AdminDealerInputPageState extends State<AdminDealerInputPage> {
         TextEditingController(text: dealer.lastName);
     final TextEditingController balanceController =
         TextEditingController(text: dealer.balance.toString());
-    // final TextEditingController rentController =
-    //     TextEditingController(text: dealer.rent.toString());
-    // final TextEditingController creditPointsController =
-    //     TextEditingController(text: dealer.creditPoints.toString());
-    // final TextEditingController cnicNumberController =
-    //     TextEditingController(text: dealer.cnicNumber);
-    // final TextEditingController emailOrPhoneController =
-    //     TextEditingController(text: dealer.emailOrPhone);
-    // final TextEditingController familyMembersController =
-    //     TextEditingController(text: dealer.familyMembers.toString());
-    // final TextEditingController ratingController =
-    // TextEditingController(text: dealer.rating.toString());
-
-    // final hashedCnic = hashString(cnicNumberController.text);
+    //description
+    final TextEditingController descriptionController =
+        TextEditingController(text: dealer.description.toString());
 
     showDialog(
       context: context,
@@ -244,6 +233,10 @@ class _AdminDealerInputPageState extends State<AdminDealerInputPage> {
                   decoration:
                       const InputDecoration(labelText: 'Dealer Balance'),
                 ),
+                TextField(
+                  controller: descriptionController,
+                  decoration: const InputDecoration(labelText: 'Description'),
+                ),
                 const SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: () async {
@@ -258,6 +251,7 @@ class _AdminDealerInputPageState extends State<AdminDealerInputPage> {
                       'firstName': firstNameController.text,
                       'lastName': lastNameController.text,
                       'balance': balanceInt,
+                      'description': descriptionController.text,
                     });
 
                     if (dealer.balance >
@@ -294,7 +288,7 @@ class _AdminDealerInputPageState extends State<AdminDealerInputPage> {
                             {
                               // 'amount': data.requestedAmount,
                               'title':
-                                  'Your account has been debited by ${-(double.tryParse(balanceController.text) ?? 0.0) + dealer.balance}',
+                                  'Your account has been debited by Rs${-(double.tryParse(balanceController.text) ?? 0.0) + dealer.balance}',
                             }
                           ])
                         });
@@ -333,7 +327,7 @@ class _AdminDealerInputPageState extends State<AdminDealerInputPage> {
                             {
                               // 'amount': data.requestedAmount,
                               'title':
-                                  'Your account has been credited by ${((double.tryParse(balanceController.text) ?? 0.0) - dealer.balance)}',
+                                  'Your account has been credited by Rs${((double.tryParse(balanceController.text) ?? 0.0) - dealer.balance)}',
                             }
                           ])
                         });

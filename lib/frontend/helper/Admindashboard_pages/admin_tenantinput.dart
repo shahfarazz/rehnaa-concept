@@ -661,7 +661,7 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
                                                     {
                                                       // 'amount': data.requestedAmount,
                                                       'title':
-                                                          'Your account has been debited by ${-(double.tryParse(rentController.text) ?? 0.0) + (tenant.balance)}',
+                                                          'Your account has been debited by Rs${-(double.tryParse(rentController.text) ?? 0.0) + (tenant.balance)}',
                                                     }
                                                   ])
                                                 });
@@ -709,7 +709,7 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
                                                     {
                                                       // 'amount': data.requestedAmount,
                                                       'title':
-                                                          '${tenant.firstName}, you owe\n PKR${((double.tryParse(rentController.text) ?? 0.0) - tenant.balance)}, Thanks!',
+                                                          '${tenant.firstName}, you owe\n Rs${((double.tryParse(rentController.text) ?? 0.0) - tenant.balance)}, Thanks!',
                                                     }
                                                   ])
                                                 }, SetOptions(merge: true));

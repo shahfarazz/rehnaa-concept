@@ -892,7 +892,7 @@ class LandlordWithdrawalCard extends StatelessWidget {
                             {
                               'notifications': FieldValue.arrayUnion([
                                 {
-                                  'amount': data.requestedAmount,
+                                  'amount': 'Rs${data.requestedAmount}',
                                   'title': 'Withdrawal Request Accepted',
                                 }
                               ])
@@ -1074,7 +1074,7 @@ class LandlordWithdrawalCard extends StatelessWidget {
                             {
                               'notifications': FieldValue.arrayUnion([
                                 {
-                                  'amount': data.requestedAmount,
+                                  'amount': 'Rs${data.requestedAmount}',
                                   'title': 'Withdrawal Request Accepted',
                                 }
                               ])
