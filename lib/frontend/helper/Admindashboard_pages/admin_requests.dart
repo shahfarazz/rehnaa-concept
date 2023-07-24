@@ -892,7 +892,7 @@ class LandlordWithdrawalCard extends StatelessWidget {
                             {
                               'notifications': FieldValue.arrayUnion([
                                 {
-                                  'amount': data.requestedAmount,
+                                  'amount': 'Rs${data.requestedAmount}',
                                   'title': 'Withdrawal Request Accepted',
                                 }
                               ])
@@ -1074,7 +1074,7 @@ class LandlordWithdrawalCard extends StatelessWidget {
                             {
                               'notifications': FieldValue.arrayUnion([
                                 {
-                                  'amount': data.requestedAmount,
+                                  'amount': 'Rs${data.requestedAmount}',
                                   'title': 'Withdrawal Request Accepted',
                                 }
                               ])
@@ -1368,7 +1368,13 @@ class LandlordWithdrawalCard extends StatelessWidget {
                               .collection('Tenants')
                               .doc(data.uid),
                           {
-                            'landlordRef': landlordRef,
+                            // 'landlordRef': landlordRef,
+                            //use fieldvalue.arrayunion to add the landlordRef to the tenant's landlordRef array
+                            'landlordRef': FieldValue.arrayUnion([
+                              FirebaseFirestore.instance
+                                  .collection('Landlords')
+                                  .doc(data.uid),
+                            ]),
                           },
                         );
 
@@ -1391,10 +1397,7 @@ class LandlordWithdrawalCard extends StatelessWidget {
                           FirebaseFirestore.instance
                               .collection('Properties')
                               .doc(data.propertyID),
-                          {
-                            'isRequestedByTenants':
-                                FieldValue.arrayRemove([data.uid])
-                          },
+                          {'isRequestedByTenants': []},
                         );
 
                         // // Navigate to the AdminPropertyContractsPage

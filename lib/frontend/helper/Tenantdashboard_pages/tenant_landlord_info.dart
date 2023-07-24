@@ -95,17 +95,17 @@ class TenantLandlordInfoPage extends StatelessWidget {
                     backgroundColor: Colors.white,
                     radius: 75,
                     child: ClipOval(
-                      child: tenant.landlord?.pathToImage != null &&
-                              tenant.landlord!.pathToImage!.isNotEmpty
-                          ? (tenant.landlord!.pathToImage!.startsWith('assets')
+                      child: landlord.pathToImage != null &&
+                              landlord.pathToImage!.isNotEmpty
+                          ? (landlord.pathToImage!.startsWith('assets')
                               ? Image.asset(
-                                  tenant.landlord!.pathToImage!,
+                                  landlord.pathToImage!,
                                   width: 150,
                                   height: 150,
                                 )
                               : Image.network(
                                   fit: BoxFit.fill,
-                                  tenant.landlord!.pathToImage!,
+                                  landlord.pathToImage!,
                                   width: 150,
                                   height: 150,
                                   loadingBuilder:
@@ -127,7 +127,7 @@ class TenantLandlordInfoPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 20.0),
                   Text(
-                    '${tenant.landlord?.firstName} ${tenant.landlord?.lastName}',
+                    '${landlord.firstName} ${landlord.lastName}',
                     style: GoogleFonts.montserrat(
                       fontSize: 20.0,
                       fontWeight: FontWeight.bold,
@@ -225,14 +225,14 @@ class TenantLandlordInfoPage extends StatelessWidget {
                         children: [
                           const SizedBox(height: 10.0),
                           // Rest of your card's content...
-                          tenant.landlord?.creditPoints != ""
+                          landlord.creditPoints != ""
                               ? Center(
                                   child: WhiteBox(
                                     icon: Icons.star,
                                     iconColor: const Color(0xff33907c),
                                     label: 'Credit Score',
-                                    value: '${tenant.landlord?.creditScore}',
-                                    points: '${tenant.landlord?.creditPoints}',
+                                    value: '${landlord.creditScore}',
+                                    points: '${landlord.creditPoints}',
                                     pointsIcon: Icons.star_border,
                                   ),
                                 )

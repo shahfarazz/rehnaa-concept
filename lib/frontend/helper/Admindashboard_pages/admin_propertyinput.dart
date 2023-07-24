@@ -176,29 +176,62 @@ class _AdminPropertyInputPageState extends State<AdminPropertyInputPage> {
                           trailing: //delete icon with gesture detector
                               GestureDetector(
                             onTap: () async {
-                              //check if property has a tenantref and landlordref and if so go to those documents and remove propertyref from their propertyRef array
-                              if (property.tenantRef != null) {
-                                await property.tenantRef!
-                                    .update({'propertyRef': null});
-                              }
-                              if (property.landlordRef != null) {
-                                await property.landlordRef!.update({
-                                  'propertyRef': FieldValue.arrayRemove([
-                                    FirebaseFirestore.instance
-                                        .collection('Properties')
-                                        .doc(property.propertyID)
-                                  ])
+                              bool? shouldDelete = await showDialog<bool>(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    title: Text('Confirmation'),
+                                    content: Text(
+                                        'Are you sure you want to delete?'),
+                                    actions: <Widget>[
+                                      TextButton(
+                                        child: Text('Yes'),
+                                        onPressed: () {
+                                          Navigator.of(context).pop(true);
+                                        },
+                                      ),
+                                      TextButton(
+                                        child: Text('No'),
+                                        onPressed: () {
+                                          Navigator.of(context).pop(false);
+                                        },
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+
+                              if (shouldDelete == true) {
+                                //check if property has a tenantref and landlordref and if so go to those documents and remove propertyref from their propertyRef array
+                                if (property.tenantRef != null) {
+                                  await property.tenantRef!.update({
+                                    'propertyRef': FieldValue.arrayRemove([
+                                      FirebaseFirestore.instance
+                                          .collection('Properties')
+                                          .doc(property.propertyID)
+                                    ]),
+                                    // 'address': null,
+                                  });
+                                }
+                                if (property.landlordRef != null) {
+                                  await property.landlordRef!.update({
+                                    'propertyRef': FieldValue.arrayRemove([
+                                      FirebaseFirestore.instance
+                                          .collection('Properties')
+                                          .doc(property.propertyID)
+                                    ])
+                                  });
+                                }
+
+                                await FirebaseFirestore.instance
+                                    .collection('Properties')
+                                    .doc(property.propertyID)
+                                    .delete();
+                                setState(() {
+                                  properties.remove(property);
+                                  filteredProperties.remove(property);
                                 });
                               }
-
-                              await FirebaseFirestore.instance
-                                  .collection('Properties')
-                                  .doc(property.propertyID)
-                                  .delete();
-                              setState(() {
-                                properties.remove(property);
-                                filteredProperties.remove(property);
-                              });
                             },
                             child: const Icon(Icons.delete),
                           ),
@@ -575,7 +608,7 @@ class _PropertyCardWidgetState extends State<PropertyCardWidget> {
                   style: const TextStyle(color: Colors.red),
                 ),
               TextField(
-                decoration: const InputDecoration(labelText: 'Price'),
+                decoration: const InputDecoration(labelText: 'Rent Demand'),
                 keyboardType:
                     const TextInputType.numberWithOptions(decimal: true),
                 inputFormatters: [
@@ -896,7 +929,7 @@ class _PropertyCardWidgetState extends State<PropertyCardWidget> {
 
     if (price <= 0) {
       setState(() {
-        priceError = 'Price must be greater than zero.';
+        priceError = 'Rent Demand must be greater than zero.';
         isValid = false;
       });
     } else {

@@ -21,6 +21,7 @@ import '../../helper/Admindashboard_pages/admin_rentoffwinner.dart';
 import '../../helper/Admindashboard_pages/admin_requests_property_contracts.dart';
 import '../../helper/Admindashboard_pages/admin_reviews.dart';
 import '../../helper/Admindashboard_pages/admin_send_monthlyprofit.dart';
+import '../../helper/Admindashboard_pages/admin_tenant_form_view.dart';
 import '../../helper/Admindashboard_pages/admin_vouchers.dart';
 
 class AdminDashboard extends StatefulWidget {
@@ -721,6 +722,41 @@ class _AdminDashboardState extends State<AdminDashboard> {
                       );
                     },
                   ),
+                ],
+              ),
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CustomButton(
+                    //choose appropriate color and icon
+                    color: Colors.blue.shade600,
+                    icon: Icons.auto_fix_high_outlined,
+
+                    text: 'View Tenant Forms',
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => AdminTenantFormsViewPage(),
+                        ),
+                      );
+                    },
+                  ),
+                  // const SizedBox(width: 20),
+                  // CustomButton(
+                  //   color: Colors.pink.shade700,
+                  //   icon: Icons.auto_fix_high_outlined,
+                  //   text: 'Send Monthly Estamp Profit',
+                  //   onPressed: () {
+                  //     Navigator.push(
+                  //       context,
+                  //       MaterialPageRoute(
+                  //         builder: (context) => AdminSendMonthlyProfitsPage(),
+                  //       ),
+                  //     );
+                  //   },
+                  // ),
                 ],
               ),
               SizedBox(height: 30)

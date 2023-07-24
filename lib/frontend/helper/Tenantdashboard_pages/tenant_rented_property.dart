@@ -77,48 +77,6 @@ class _TenantRentedPropertyPageState extends State<TenantRentedPropertyPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: //add a gradient app bar with gradient backhround with a white back button
-      //     AppBar(
-      //   backgroundColor: Colors.transparent,
-      //   elevation: 0,
-      //   leading: GestureDetector(
-      //     onTap: () {
-      //       Navigator.pop(context);
-      //     },
-      //     child: Container(
-      //       width: 40,
-      //       height: 40,
-      //       decoration: const BoxDecoration(
-      //         shape: BoxShape.circle,
-      //         color: Color(0xFF33907C),
-      //         gradient: LinearGradient(
-      //           begin: Alignment.topLeft,
-      //           end: Alignment.bottomRight,
-      //           colors: [
-      //             Color(0xff0FA697),
-      //             Color(0xff45BF7A),
-      //             Color(0xff0DF205),
-      //           ],
-      //         ),
-      //       ),
-      //       child: const Icon(
-      //         Icons.arrow_back,
-      //         size: 20,
-      //         color: Colors.white,
-      //       ),
-      //     ),
-      //   ),
-      //   title: Text(
-      //     'Rented Property',
-      //     style: GoogleFonts.montserrat(
-      //       fontSize: 24,
-      //       color: Colors.green,
-      //       fontWeight: FontWeight.bold,
-      //     ),
-      //   ),
-      //   centerTitle: true,
-      // ),
-
       body: StreamBuilder(
           stream: stream,
           builder: ((context, snapshot) {
@@ -183,29 +141,62 @@ class _TenantRentedPropertyPageState extends State<TenantRentedPropertyPage> {
                 ),
               );
             } else {
-              //get data from snapshot
+              // Map each document to a ListTile and wrap in a Card
+              List<Widget> propertyCards =
+                  snapshot.data!.docs.map<Widget>((doc) {
+                // Convert document to a Property instance
+                Property property =
+                    Property.fromJson(doc.data() as Map<String, dynamic>);
 
-              // print('data is ${snapshot.data!.docs[0].data()}}}');
-              var propData = snapshot.data!.docs[0].data();
-              Property property =
-                  Property.fromJson(propData as Map<String, dynamic>);
+                return Card(
+                  child: ListTile(
+                    title: Text(
+                      property.title,
+                      textAlign: TextAlign.left,
+                      style: GoogleFonts.montserrat(
+                        fontSize: 20.0,
+                        color: const Color(0xff33907c),
+                      ),
+                    ),
+                    leading: Icon(
+                      Icons.house,
+                    ),
+                    onTap: () {
+                      // Navigate to the property page on tap
+                      Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => PropertyPage(
+                          property: property,
+                          firstName: firstName,
+                          lastName: lastName,
+                          pathToImage: pathToImage,
+                          location: property.location,
+                          address: property.address,
+                          emailOrPhone: emailOrPhone,
+                          isTenantCall: true,
+                        ),
+                      ));
+                    },
+                  ),
+                );
+              }).toList();
 
-              // var propertyID = snapshot.data!.docs[0].id;
-              // var uid = widget.uid;
-              var location = property.location;
-              var address = property.address;
-              // var isWithdraw = false;
-
-              return PropertyPage(
-                property: property,
-                firstName: firstName,
-                lastName: lastName,
-                pathToImage: pathToImage,
-                location: location,
-                address: address,
-                emailOrPhone: emailOrPhone,
-                isTenantCall: true,
-              );
+              return Scaffold(
+                  appBar: _buildAppBar(MediaQuery.of(context).size, context),
+                  body: Column(
+                    children: [
+                      const SizedBox(height: 20),
+                      Text('Rented Properties',
+                          style: GoogleFonts.montserrat(
+                            fontSize: 20.0,
+                            color: const Color(0xff33907c),
+                          )),
+                      Expanded(
+                          child: ListView(
+                        padding: EdgeInsets.all(20),
+                        children: propertyCards.reversed.toList(),
+                      )),
+                    ],
+                  ));
             }
           })),
     );

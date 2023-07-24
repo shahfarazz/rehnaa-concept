@@ -4,6 +4,8 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:rehnaa/frontend/Screens/contract.dart';
 
+import 'Tenant/tenant_dashboard.dart';
+
 // import '../helper/Landlorddashboard_pages/landlord_advance_rent.dart';
 
 class AllContractsPage extends StatefulWidget {
@@ -18,9 +20,31 @@ class AllContractsPage extends StatefulWidget {
 
 class _AllContractsPageState extends State<AllContractsPage> {
   List<Widget> contractWidgets = [];
-  Future<List<Widget>> getContracts() async {
+  var oneTime = false;
+  // Declare a text editing controller for the search field.
+  final TextEditingController _searchController = TextEditingController();
+  List<Contract> contracts = [];
+  List<Contract> filteredContracts = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _searchController.addListener(() {
+      _filterContracts(_searchController.text);
+    });
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  // List<Widget> contractWidgets = [];
+  List<Widget> filteredContractWidgets = [];
+  Future<List<Contract>> getContracts() async {
     if (widget.callerType == 'Tenants') {
-      //similar logic to getContracts for Landlords
+      // similar logic to getContracts for Landlords
       return await FirebaseFirestore.instance
           .collection('Tenants')
           .doc(widget.uid)
@@ -38,60 +62,18 @@ class _AllContractsPageState extends State<AllContractsPage> {
               .get());
         }
         return await Future.wait(contractFutures).then((value) {
-          contractWidgets = [];
+          List<Contract> contracts = [];
           for (var contract in value) {
-            // print('contract is ${contract.data()}');
-            contractWidgets.add(
-              GestureDetector(
-                onTap: () {
-                  print('tapped');
-                  Navigator.push(context, MaterialPageRoute(builder: (context) {
-                    return ContractPage(contractFields: contract.data());
-                  }));
-                },
-                child: Card(
-                  elevation: 5.0, // set the elevation
-                  margin: EdgeInsets.all(10.0), // set the margin
-                  child: Padding(
-                    // add padding to ListTile
-                    padding: const EdgeInsets.all(8.0),
-                    child: ListTile(
-                      contentPadding: EdgeInsets.symmetric(
-                          horizontal: 10.0), // set content padding
-                      title: Column(
-                        mainAxisAlignment:
-                            MainAxisAlignment.center, // central alignment
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Text(
-                            'Landlord Name: ${contract.data()?['landlordName'] ?? ''}',
-                            style: TextStyle(fontSize: 16.0),
-                            textAlign: TextAlign.left, // align text to the left
-                          ),
-                        ],
-                      ),
-                      subtitle: Column(
-                        mainAxisAlignment:
-                            MainAxisAlignment.center, // central alignment
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Text(
-                            'Tenant Name: ${contract.data()?['tenantName'] ?? ''}',
-                            style: TextStyle(fontSize: 16.0),
-                            textAlign: TextAlign.left, // align text to the left
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            );
+            contracts.add(Contract(
+              id: contract.id,
+              landlordName: contract.data()?['landlordName'] ?? '',
+              tenantName: contract.data()?['tenantName'] ?? '',
+              allFields: contract.data(),
+            ));
           }
 
-          return contractWidgets;
+          return contracts;
         });
-        // return contractWidgets;
       });
     } else if (widget.callerType == 'Landlords') {
       //get list of contractIDs from contractIDs field in landlord document
@@ -100,10 +82,7 @@ class _AllContractsPageState extends State<AllContractsPage> {
           .doc(widget.uid)
           .get()
           .then((value) async {
-        // print('reached here');
         var contractIDs = value.data()?['contractIDs'];
-        // print('value data is ${value.data()}');
-        print('contractIds are $contractIDs');
         if (contractIDs == null) {
           return [];
         }
@@ -117,168 +96,218 @@ class _AllContractsPageState extends State<AllContractsPage> {
         }
         //when all futures are complete, get the data from each future and add it to a list
         return await Future.wait(contractFutures).then((value) {
-          contractWidgets = [];
+          List<Contract> contracts = [];
           for (var contract in value) {
-            // print('contract is ${contract.data()}');
-            contractWidgets.add(
-              GestureDetector(
-                onTap: () {
-                  print('tapped');
-                  Navigator.push(context, MaterialPageRoute(builder: (context) {
-                    return ContractPage(contractFields: contract.data());
-                  }));
-                },
-                child: Card(
-                  elevation: 5.0, // set the elevation
-                  margin: EdgeInsets.all(10.0), // set the margin
-                  child: Padding(
-                    // add padding to ListTile
-                    padding: const EdgeInsets.all(8.0),
-                    child: ListTile(
-                      contentPadding: EdgeInsets.symmetric(
-                          horizontal: 10.0), // set content padding
-                      title: Column(
-                        mainAxisAlignment:
-                            MainAxisAlignment.center, // central alignment
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Text(
-                            'Landlord Name: ${contract.data()?['landlordName'] ?? ''}',
-                            style: TextStyle(fontSize: 16.0),
-                            textAlign: TextAlign.left, // align text to the left
-                          ),
-                        ],
-                      ),
-                      subtitle: Column(
-                        mainAxisAlignment:
-                            MainAxisAlignment.center, // central alignment
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Text(
-                            'Tenant Name: ${contract.data()?['tenantName'] ?? ''}',
-                            style: TextStyle(fontSize: 16.0),
-                            textAlign: TextAlign.left, // align text to the left
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            );
+            contracts.add(Contract(
+              id: contract.id,
+              landlordName: contract.data()?['landlordName'] ?? '',
+              tenantName: contract.data()?['tenantName'] ?? '',
+              allFields: contract.data(),
+            ));
           }
 
-          return contractWidgets;
+          return contracts;
         });
-        // return contractWidgets;
       });
     }
     return [];
   }
 
   @override
+  @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
 
     return Scaffold(
-      appBar: _buildAppBar(size, context),
-      body: FutureBuilder(
-        future: getContracts(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            contractWidgets = snapshot.data as List<Widget>;
-            if (contractWidgets.isEmpty) {
-              return Scaffold(
-                body: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Column(
-                      // mainAxisAlignment: MainAxisAlignment.start,
+      appBar: _buildAppBar(size, context, widget.callerType, widget.uid),
+      body: Column(
+        children: <Widget>[
+          Padding(
+            padding: EdgeInsets.only(left: 10.0, right: 10.0, top: 20.0),
+            child: TextField(
+              controller: _searchController,
+              onChanged: (value) {
+                _filterContracts(value);
+              },
+              decoration: InputDecoration(
+                focusedBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: Colors.green),
+                ),
+                hintText: 'Search',
+                hintStyle: TextStyle(
+                  color: Colors.green,
+                  fontFamily: GoogleFonts.montserrat().fontFamily,
+                ),
+                prefixIcon: Icon(Icons.search, color: Colors.green),
+              ),
+            ),
+          ),
+          Expanded(
+            child: FutureBuilder<List<Contract>>(
+              future: getContracts(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.done) {
+                  contracts = snapshot.data ?? [];
+                  // _filterContracts(_searchController.text);
+
+                  if (filteredContracts.isEmpty && !oneTime) {
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      setState(() {
+                        filteredContracts = contracts;
+                      });
+                    });
+                    oneTime = true;
+                  }
+
+                  if (contracts.isEmpty) {
+                    return Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Padding(padding: EdgeInsets.only(top: 40)),
-                        Text(
-                          'Contracts: ',
-                          textAlign: TextAlign.center,
-                          style: GoogleFonts.montserrat(
-                            fontSize: 30.0,
-                            color: const Color(0xff33907c),
-                          ),
-                        ),
-                        const SizedBox(height: 30),
-                        Card(
-                          elevation: 4.0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20.0),
-                          ),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(20.0),
-                              color: Colors.white,
-                            ),
-                            padding: const EdgeInsets.all(16.0),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Column(
                               children: [
-                                const Icon(
-                                  Icons.description,
-                                  size: 48.0,
-                                  color: Color(0xff33907c),
-                                ),
-                                const SizedBox(height: 16.0),
-                                Text(
-                                  'No contracts to show',
-                                  style: GoogleFonts.montserrat(
-                                    fontSize: 20.0,
-                                    color: const Color(0xff33907c),
+                                // const SizedBox(height: 50),
+                                Padding(
+                                    padding: EdgeInsets.only(
+                                        top: size.height * 0.1)),
+                                Card(
+                                  elevation: 4.0,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20.0),
                                   ),
-                                ),
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(20.0),
+                                      color: Colors.white,
+                                    ),
+                                    padding: const EdgeInsets.all(16.0),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        const Icon(
+                                          Icons.description,
+                                          size: 48.0,
+                                          color: Color(0xff33907c),
+                                        ),
+                                        const SizedBox(height: 16.0),
+                                        Text(
+                                          'No Contracts to show',
+                                          style: GoogleFonts.montserrat(
+                                            fontSize: 20.0,
+                                            color: const Color(0xff33907c),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                )
                               ],
                             ),
-                          ),
-                        )
+                          ],
+                        ),
                       ],
+                    );
+                  }
+
+                  return Column(
+                    children: <Widget>[
+                      Padding(
+                        padding: EdgeInsets.only(top: 40),
+                      ),
+                      Text(
+                        'Contracts',
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.montserrat(
+                          fontSize: 26.0,
+                          color: const Color(0xff33907c),
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const SizedBox(height: 30),
+                      Expanded(
+                        child: ListView.builder(
+                          itemCount: filteredContracts.length,
+                          itemBuilder: (context, index) {
+                            //reverse the list so that the latest contract is shown first
+                            final contract = filteredContracts[
+                                filteredContracts.length - index - 1];
+                            // final contract = filteredContracts[index];
+                            return GestureDetector(
+                              onTap: () {
+                                Navigator.push(context,
+                                    MaterialPageRoute(builder: (context) {
+                                  return ContractPage(
+                                      contractFields: contract.allFields);
+                                }));
+                              },
+                              child: Card(
+                                elevation: 4.0,
+                                margin: const EdgeInsets.all(20.0),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20.0),
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: ListTile(
+                                    contentPadding:
+                                        EdgeInsets.symmetric(horizontal: 10.0),
+                                    title: Text(
+                                      'Landlord Name: ${contract.landlordName}',
+                                      style: TextStyle(fontSize: 16.0),
+                                    ),
+                                    subtitle: Text(
+                                      'Tenant Name: ${contract.tenantName}',
+                                      style: TextStyle(fontSize: 16.0),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  );
+                } else {
+                  return Center(
+                    child: SpinKitFadingCube(
+                      color: Color.fromARGB(255, 30, 197, 83),
                     ),
-                  ],
-                ),
-              );
-            }
-            return Column(
-              children: <Widget>[
-                Padding(
-                  padding: EdgeInsets.only(top: 40),
-                ),
-                Text(
-                  'Contracts: ',
-                  textAlign: TextAlign.center,
-                  style: GoogleFonts.montserrat(
-                    fontSize: 26.0,
-                    color: const Color(0xff33907c),
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                const SizedBox(height: 30),
-                Expanded(
-                  child: ListView(
-                    children: contractWidgets,
-                  ),
-                ),
-              ],
-            );
-          } else {
-            return Center(
-              child: SpinKitFadingCube(
-                color: Color.fromARGB(255, 30, 197, 83),
-              ),
-            );
-          }
-        },
+                  );
+                }
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
+
+  void _filterContracts(String searchText) {
+    if (searchText.isEmpty) {
+      setState(() {
+        filteredContracts = contracts;
+      });
+    } else {
+      List<Contract> temp = [];
+      for (Contract contract in contracts) {
+        if (contract.tenantName
+            .toLowerCase()
+            .contains(searchText.toLowerCase())) {
+          temp.add(contract);
+        }
+      }
+      setState(() {
+        filteredContracts = temp;
+      });
+    }
+  }
 }
 
-PreferredSizeWidget _buildAppBar(Size size, context) {
+PreferredSizeWidget _buildAppBar(Size size, context, callerType, uid) {
   return AppBar(
     toolbarHeight: 70,
     title: Padding(
@@ -289,30 +318,45 @@ PreferredSizeWidget _buildAppBar(Size size, context) {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          Stack(
-            children: [
-              ClipPath(
-                clipper: HexagonClipper(),
-                child: Transform.scale(
-                  scale: 0.87,
-                  child: Container(
-                    color: Colors.white,
-                    width: 60,
-                    height: 60,
+          GestureDetector(
+              onTap: () {
+                // Add your desired logic here
+                // print('tapped');
+
+                if (callerType == 'Tenants') {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => TenantDashboardPage(
+                              uid: uid,
+                            )),
+                  );
+                }
+              },
+              child: Stack(
+                children: [
+                  ClipPath(
+                    clipper: HexagonClipper(),
+                    child: Transform.scale(
+                      scale: 0.87,
+                      child: Container(
+                        color: Colors.white,
+                        width: 60,
+                        height: 60,
+                      ),
+                    ),
                   ),
-                ),
-              ),
-              ClipPath(
-                clipper: HexagonClipper(),
-                child: Image.asset(
-                  'assets/mainlogo.png',
-                  width: 60,
-                  height: 60,
-                  fit: BoxFit.cover,
-                ),
-              ),
-            ],
-          ),
+                  ClipPath(
+                    clipper: HexagonClipper(),
+                    child: Image.asset(
+                      'assets/mainlogo.png',
+                      width: 60,
+                      height: 60,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ],
+              )),
           // const SizedBox(width: 8),
         ],
       ),
@@ -339,4 +383,17 @@ PreferredSizeWidget _buildAppBar(Size size, context) {
       ),
     ),
   );
+}
+
+class Contract {
+  final String id;
+  final String landlordName;
+  final String tenantName;
+  final allFields;
+
+  Contract(
+      {required this.id,
+      required this.landlordName,
+      required this.tenantName,
+      required this.allFields});
 }

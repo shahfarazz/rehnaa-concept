@@ -157,7 +157,11 @@ class _PDFEditorPageState extends State<PDFEditorPage> {
         format: PdfStringFormat(alignment: PdfTextAlignment.left));
 
     //Property Rented Address
-    graphics.drawString(tenantAddress ?? '', font_small,
+    graphics.drawString(
+        tenantAddress!.length >= 25
+            ? tenantAddress.substring(0, 25)
+            : tenantAddress,
+        font_small,
         brush: PdfBrushes.black,
         bounds: Rect.fromLTWH(
             248, 255, page.getClientSize().width, page.getClientSize().height),
@@ -171,7 +175,11 @@ class _PDFEditorPageState extends State<PDFEditorPage> {
         format: PdfStringFormat(alignment: PdfTextAlignment.left));
 
     //cash received by
-    graphics.drawString(landlordName, font,
+    graphics.drawString(
+        landlordName.length >= 30
+            ? landlordName.substring(0, 30)
+            : landlordName,
+        font,
         brush: PdfBrushes.black,
         bounds: Rect.fromLTWH(
             200, 295, page.getClientSize().width, page.getClientSize().height),

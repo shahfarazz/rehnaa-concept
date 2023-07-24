@@ -109,9 +109,20 @@ class _AdminEstampsEditorPageState extends State<AdminEstampsEditorPage> {
               landlordData['eStampMonthlyProfit'] ?? '';
           eStampCostController.text =
               landlordData['eStampCost'].toString() ?? '';
+          try {
+            contractStartDate = landlordData['eStampContractStartDate'] != null
+                ? landlordData['eStampContractStartDate'].toDate()
+                : null;
 
-          contractStartDate = landlordData['eStampContractStartDate'].toDate();
-          contractEndDate = landlordData['eStampContractEndDate'].toDate();
+            contractEndDate = landlordData['eStampContractEndDate'] != null
+                ? landlordData['eStampContractEndDate'].toDate()
+                : null;
+          } catch (e) {
+            print('error in loading dates');
+            landlordData['eStampContractStartDate'] = null;
+            landlordData['eStampContractEndDate'] = null;
+          }
+
           isFilled = landlordData['isFilled'];
           // oldCost:
           // landlordData['eStampCost'];
@@ -197,7 +208,7 @@ class _AdminEstampsEditorPageState extends State<AdminEstampsEditorPage> {
           'LandlordRef': FirebaseFirestore.instance
               .collection('Dealers')
               .doc(dealer.tempID),
-          'amount': int.tryParse(eStampMonthlyProfitController.text) ??
+          'amount': int.tryParse(eStampUpfrontBonusController.text) ??
               0, //convert to int later
           'date': DateTime.now(),
           'isMinus': true,
@@ -229,11 +240,11 @@ class _AdminEstampsEditorPageState extends State<AdminEstampsEditorPage> {
               //     FieldValue.increment(
               //         -(int.tryParse(eStampCostController.text) ?? 0)),
               //change the balance based on estampcost estampmonthlyprofit and estampupfrontbonus
-              'balance': FieldValue.increment(-(int.tryParse(
-                      eStampCostController.text) ??
-                  0 +
+              'balance': FieldValue.increment(
+                  -(((int.tryParse(eStampCostController.text) ?? 0) +
                       (int.tryParse(eStampMonthlyProfitController.text) ?? 0) +
-                      (int.tryParse(eStampUpfrontBonusController.text) ?? 0))),
+                      (int.tryParse(eStampUpfrontBonusController.text) ?? 0)))),
+
               // 'rentpaymentRef':
               //     FieldValue.arrayUnion([val])
               //add val newval1 and newval2 to rentpaymentref
@@ -505,10 +516,9 @@ class _AdminEstampsEditorPageState extends State<AdminEstampsEditorPage> {
                           setState(() {});
                         },
                         decoration: InputDecoration(
-                            labelText:
-                                'eStamp Cost (if editing the estamp set to 0)',
+                            labelText: 'eStamp Cost',
                             labelStyle: TextStyle(
-                              color: Colors.red,
+                              color: Colors.grey,
                               fontWeight: FontWeight.bold,
                             )),
                       ),

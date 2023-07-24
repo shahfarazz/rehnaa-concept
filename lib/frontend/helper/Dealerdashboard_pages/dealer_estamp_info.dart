@@ -201,7 +201,9 @@ class DealerEstampInfoPage extends StatelessWidget {
                                   ),
                               SizedBox(height: 16),
                               ContractCard(
-                                  icon: Icons.sell,
+                                  //appropriate logo
+                                  // icon: Icons.badge
+                                  icon: Icons.local_police,
                                   label: 'Police Verification:',
                                   data: dealer.landlordMap?[landlord.tempID]
                                       ?['eStampPoliceVerification']

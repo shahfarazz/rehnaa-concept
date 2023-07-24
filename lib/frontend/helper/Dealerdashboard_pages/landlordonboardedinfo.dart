@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -107,14 +108,40 @@ class LandlordsOnboardedInfoPage extends StatelessWidget {
                                 icon: Icons.calendar_today,
                                 label: 'Contract Start Date:',
                                 data: dealer?.landlordMap?[landlord.tempID]
-                                    ?['eStampContractStartDate'],
+                                            ?['eStampContractStartDate'] ==
+                                        null
+                                    ? ''
+                                    : dealer?.landlordMap?[landlord.tempID]
+                                                ?['eStampContractStartDate']
+                                            is Timestamp
+                                        ? (dealer?.landlordMap?[landlord.tempID]
+                                                    ?['eStampContractStartDate']
+                                                as Timestamp)
+                                            .toDate()
+                                            .toString()
+                                            .substring(0, 10)
+                                        : dealer?.landlordMap?[landlord.tempID]
+                                            ?['eStampContractStartDate'],
                               ),
                               SizedBox(height: 16),
                               ContractCard(
                                 icon: Icons.calendar_today,
                                 label: 'Contract End Date:',
                                 data: dealer?.landlordMap?[landlord.tempID]
-                                    ?['eStampContractEndDate'],
+                                            ?['eStampContractEndDate'] ==
+                                        null
+                                    ? ''
+                                    : dealer?.landlordMap?[landlord.tempID]
+                                                ?['eStampContractEndDate']
+                                            is Timestamp
+                                        ? (dealer?.landlordMap?[landlord.tempID]
+                                                    ?['eStampContractEndDate']
+                                                as Timestamp)
+                                            .toDate()
+                                            .toString()
+                                            .substring(0, 10)
+                                        : dealer?.landlordMap?[landlord.tempID]
+                                            ?['eStampContractEndDate'],
                               ),
                               SizedBox(height: 16),
                               ContractCard(

@@ -34,7 +34,9 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
   TextEditingController searchController = TextEditingController();
   int currentPage = 1;
   int itemsPerPage = 10;
-  DocumentReference<Map<String, dynamic>>? landlordRef;
+  // DocumentReference<Map<String, dynamic>>? landlordRef;
+  // List<DocumentReference<Map<String, dynamic>>> selectedLandlords = [];
+  List<DocumentReference<Map<String, dynamic>>> selectedLandlordRefs = [];
 
   bool _isLoading = true;
 
@@ -457,11 +459,10 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
                   StatefulBuilder(
                     builder: (BuildContext context, StateSetter setState) {
                       return ListTile(
-                        title: const Text('Select Landlord'),
+                        title: const Text('Select Landlords'),
                         subtitle: Text(
-                          tenant.landlordRef != null
-                              ? 'Landlord Selected: ${tenant.landlordRef == null ? 'Not selected' : 'Yes'}'
-                              : 'Not selected',
+                          selectedLandlordRefs.length.toString() +
+                              ' landlords selected',
                           style: const TextStyle(
                             color: Colors.grey,
                           ),
@@ -471,7 +472,8 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
                             _showLandlordSelectionDialog(tenant, () {
                               setState(() {
                                 // Update the tenant's landlordRef directly
-                                tenant.landlordRef = landlordRef;
+                                // tenant.landlordRef = landlordRef;
+                                // tenant.landlordRefs = selectedLandlordRefs;
                               });
                             });
                           });
@@ -479,6 +481,7 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
                       );
                     },
                   ),
+
                   ElevatedButton(
                     onPressed: () async {
                       if (_formKey.currentState!.validate()) {
@@ -504,7 +507,7 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
                               int.tryParse(familyMembersController.text) ?? 0,
                           'rating':
                               double.tryParse(ratingController.text) ?? 0.0,
-                          'landlordRef': tenant.landlordRef,
+                          'landlordRef': selectedLandlordRefs,
                           'propertyAddress': propertyAddressController.text,
                           'address': addressController.text,
                           if (contractStartDate != null)
@@ -658,7 +661,7 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
                                                     {
                                                       // 'amount': data.requestedAmount,
                                                       'title':
-                                                          'Your account has been debited by ${-(double.tryParse(rentController.text) ?? 0.0) + (tenant.balance)}',
+                                                          'Your account has been debited by Rs${-(double.tryParse(rentController.text) ?? 0.0) + (tenant.balance)}',
                                                     }
                                                   ])
                                                 });
@@ -695,8 +698,8 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
                                                       FieldValue.arrayUnion(
                                                           [value])
                                                 });
-                                                tenant.landlord =
-                                                    await tenant.getLandlord();
+                                                // tenant.landlord =
+                                                //     await tenant.getLandlord();
                                                 FirebaseFirestore.instance
                                                     .collection('Notifications')
                                                     .doc(tenant.tempID)
@@ -705,11 +708,8 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
                                                       FieldValue.arrayUnion([
                                                     {
                                                       // 'amount': data.requestedAmount,
-                                                      'title': tenant.landlord
-                                                                  ?.firstName !=
-                                                              null
-                                                          ? '${tenant.firstName}, you owe\n PKR${((double.tryParse(rentController.text) ?? 0.0) - tenant.balance)} to ${tenant.landlord?.firstName}. Thanks!'
-                                                          : '${tenant.firstName}, you owe\n PKR${((double.tryParse(rentController.text) ?? 0.0) - tenant.balance)}, Thanks!',
+                                                      'title':
+                                                          '${tenant.firstName}, you owe\n Rs${((double.tryParse(rentController.text) ?? 0.0) - tenant.balance)}, Thanks!',
                                                     }
                                                   ])
                                                 }, SetOptions(merge: true));
@@ -758,8 +758,10 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
                                               tenant.rating = double.tryParse(
                                                       ratingController.text) ??
                                                   0.0;
+                                              // tenant.landlordRef =
+                                              // tenant.landlordRef;
                                               tenant.landlordRef =
-                                                  tenant.landlordRef;
+                                                  selectedLandlordRefs;
                                               tenant.propertyAddress =
                                                   propertyAddressController
                                                           .text ??
@@ -847,16 +849,18 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
     showDialog(
       context: context,
       builder: (context) {
-        int? selectedLandlordIndex;
         List<QueryDocumentSnapshot<Map<String, dynamic>>> landlordDocs = [];
         String searchString = '';
+
+        // Initialize selectedLandlords set
+        Set<int> selectedLandlords = {};
 
         return StatefulBuilder(
           builder: (context, setState) {
             return AlertDialog(
               title: Column(
                 children: [
-                  const Text('Select a Landlord'),
+                  const Text('Select Landlords'),
                   Padding(
                     padding: const EdgeInsets.only(top: 8.0),
                     child: TextField(
@@ -897,52 +901,53 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
                     }
 
                     landlordDocs = snapshot.data!.docs;
-                    //use tenant.landlorfred to set the selected landlord index
-                    if (tenant.landlordRef != null) {
-                      //find the index of the landlordRef in the landlordDocs
+
+                    // Pre-select landlords
+                    if (tenant.landlordRef != null &&
+                        tenant.landlordRef!.isNotEmpty) {
                       for (int i = 0; i < landlordDocs.length; i++) {
-                        if (landlordDocs[i].id == tenant.landlordRef?.id) {
-                          selectedLandlordIndex = i;
-                          break;
+                        if (tenant.landlordRef!
+                            .any((ref) => ref.id == landlordDocs[i].id)) {
+                          selectedLandlords.add(i);
                         }
                       }
                     }
 
                     return SingleChildScrollView(
                       child: Column(
-                        children: landlordDocs
-                            .map((doc) {
-                              Map<String, dynamic>? landlordData = doc.data();
-                              Landlord landlord =
-                                  Landlord.fromJson(landlordData);
-                              bool isSelected = selectedLandlordIndex ==
-                                  landlordDocs.indexOf(doc);
+                        children: landlordDocs.map((doc) {
+                          Map<String, dynamic>? landlordData = doc.data();
+                          Landlord landlord = Landlord.fromJson(landlordData);
 
-                              String fullName =
-                                  '${landlord.firstName} ${landlord.lastName}'
-                                      .toLowerCase();
+                          String fullName =
+                              '${landlord.firstName} ${landlord.lastName}'
+                                  .toLowerCase();
 
-                              // Filter based on search string
-                              if (fullName.contains(searchString)) {
-                                return RadioListTile<int>(
-                                  title: Text(
-                                      '${landlord.firstName} ${landlord.lastName}'),
-                                  value: landlordDocs.indexOf(doc),
-                                  groupValue: selectedLandlordIndex,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      selectedLandlordIndex = value!;
-                                    });
-                                  },
-                                  selected: isSelected,
-                                );
-                              } else {
-                                return Container(); // Empty container if not matched
-                              }
-                            })
-                            .toList()
-                            .where((widget) => widget != null)
-                            .toList(), // Remove null widgets
+                          // Filter based on search string
+                          if (fullName.contains(searchString)) {
+                            bool isSelected = selectedLandlords
+                                .contains(landlordDocs.indexOf(doc));
+
+                            return CheckboxListTile(
+                              title: Text(
+                                  '${landlord.firstName} ${landlord.lastName}'),
+                              value: isSelected,
+                              onChanged: (selected) {
+                                setState(() {
+                                  if (selected == true) {
+                                    selectedLandlords
+                                        .add(landlordDocs.indexOf(doc));
+                                  } else {
+                                    selectedLandlords
+                                        .remove(landlordDocs.indexOf(doc));
+                                  }
+                                });
+                              },
+                            );
+                          } else {
+                            return Container(); // Empty container if not matched
+                          }
+                        }).toList(),
                       ),
                     );
                   },
@@ -957,21 +962,18 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
                 ),
                 TextButton(
                   onPressed: () {
-                    if (selectedLandlordIndex != null) {
-                      QueryDocumentSnapshot<Map<String, dynamic>>
-                          selectedLandlordDoc =
-                          landlordDocs[selectedLandlordIndex!];
-                      setState(() {
-                        landlordRef = FirebaseFirestore.instance
-                            .collection('Landlords')
-                            .doc(selectedLandlordDoc.id);
-                      });
-                      onSelectionDone();
-                      Navigator.pop(context);
-                    } else {
-                      onSelectionDone();
-                      Navigator.pop(context);
+                    // Clear the old references
+                    selectedLandlordRefs.clear();
+
+                    // Add the selected landlords to the selectedLandlordRefs list
+                    for (var index in selectedLandlords) {
+                      selectedLandlordRefs.add(FirebaseFirestore.instance
+                          .collection('Landlords')
+                          .doc(landlordDocs[index].id));
                     }
+
+                    onSelectionDone();
+                    Navigator.pop(context);
                   },
                   child: const Text('Done'),
                 ),

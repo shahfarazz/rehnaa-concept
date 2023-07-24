@@ -26,6 +26,7 @@ class _PropertyEditPageState extends State<PropertyEditPage> {
   DocumentReference<Map<String, dynamic>>? tenantRef;
 
   bool isLoading = false;
+  int? selectedTenantIndex;
 
   @override
   void initState() {
@@ -41,6 +42,22 @@ class _PropertyEditPageState extends State<PropertyEditPage> {
 
     areaController =
         TextEditingController(text: widget.property.area.toString());
+
+    FirebaseFirestore.instance.collection('Tenants').get().then((snapshot) {
+      List<QueryDocumentSnapshot<Map<String, dynamic>>> tenantDocs =
+          snapshot.docs;
+      for (int i = 0; i < tenantDocs.length; i++) {
+        // print('tenantDocs[${i}].id: ${tenantDocs[i].id}');
+        // print('tenantRef?.id: ${widget.property.tenantRef?.id}');
+        if (tenantDocs[i].id == widget.property.tenantRef?.id) {
+          // print('LOOLOOLOL');
+          setState(() {
+            selectedTenantIndex = i;
+          });
+          break;
+        }
+      }
+    });
 
     setState(() {
       isLoading = false;
@@ -116,86 +133,124 @@ class _PropertyEditPageState extends State<PropertyEditPage> {
     showDialog(
       context: context,
       builder: (context) {
-        int? selectedTenantIndex;
-        // Declare the selectedTenantIndex variable inside the builder function
-
-        List<QueryDocumentSnapshot<Map<String, dynamic>>> tenantDocs =
-            []; // Declare the tenantDocs list outside the builder function
-
+        // int? selectedTenantIndex;
+        List<QueryDocumentSnapshot<Map<String, dynamic>>> tenantDocs = [];
+        String searchQuery = '';
         return StatefulBuilder(
           builder: (context, setState) {
             return AlertDialog(
-              title: const Text('Select a property'),
+              title: const Text('Select a Tenant'),
               content: Container(
                 constraints: BoxConstraints(maxHeight: 300),
-                child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-                  stream: FirebaseFirestore.instance
-                      .collection('Tenants')
-                      .snapshots(),
-                  builder: (context, snapshot) {
-                    if (!snapshot.hasData) {
-                      return const SpinKitFadingCube(
-                        color: Color.fromARGB(255, 30, 197, 83),
-                      );
-                    }
-
-                    tenantDocs =
-                        snapshot.data!.docs; // Assign value to tenantDocs
-
-                    return SingleChildScrollView(
-                      child: Column(
-                        children: tenantDocs.map((doc) {
-                          Map<String, dynamic>? tenantData = doc.data();
-                          Tenant tenant = Tenant.fromJson(tenantData);
-                          bool isSelected =
-                              selectedTenantIndex == tenantDocs.indexOf(doc);
-
-                          return RadioListTile<int>(
-                            title:
-                                Text('${tenant.firstName} ${tenant.lastName}'),
-                            value: tenantDocs.indexOf(doc),
-                            groupValue: selectedTenantIndex,
-                            onChanged: (value) {
-                              setState(() {
-                                selectedTenantIndex = value!;
-                              });
-                            },
-                            selected: isSelected,
-                          );
-                        }).toList(),
+                child: Column(
+                  children: <Widget>[
+                    TextField(
+                      onChanged: (value) {
+                        setState(() {
+                          searchQuery = value;
+                        });
+                      },
+                      decoration: InputDecoration(
+                        labelText: 'Search',
+                        hintText: 'Enter tenant name',
+                        prefixIcon: Icon(Icons.search),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(25.0),
+                          ),
+                        ),
                       ),
-                    );
-                  },
+                    ),
+                    Expanded(
+                      child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                        stream: FirebaseFirestore.instance
+                            .collection('Tenants')
+                            .snapshots(),
+                        builder: (context, snapshot) {
+                          if (!snapshot.hasData) {
+                            return const SpinKitFadingCube(
+                              color: Color.fromARGB(255, 30, 197, 83),
+                            );
+                          }
+                          tenantDocs = snapshot.data!.docs;
+
+                          // Filtering the tenantDocs based on the searchQuery.
+                          final results = tenantDocs.where((tenantDoc) {
+                            final tenantData = tenantDoc.data();
+                            final tenant = Tenant.fromJson(tenantData);
+                            final tenantName =
+                                '${tenant.firstName} ${tenant.lastName}';
+                            return tenantName
+                                .toLowerCase()
+                                .contains(searchQuery.toLowerCase());
+                          }).toList();
+
+                          return SingleChildScrollView(
+                            child: Column(
+                              children: [
+                                RadioListTile<int>(
+                                  title: Text('No tenant'),
+                                  value: -1,
+                                  groupValue: selectedTenantIndex,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      selectedTenantIndex = value;
+                                    });
+                                  },
+                                  selected: selectedTenantIndex == -1,
+                                )
+                              ]..addAll(results.map((doc) {
+                                  Map<String, dynamic>? tenantData = doc.data();
+                                  Tenant tenant = Tenant.fromJson(tenantData);
+                                  bool isSelected = selectedTenantIndex ==
+                                      tenantDocs.indexOf(doc);
+
+                                  return RadioListTile<int>(
+                                    title: Text(
+                                        '${tenant.firstName} ${tenant.lastName}'),
+                                    value: tenantDocs.indexOf(doc),
+                                    groupValue: selectedTenantIndex,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        selectedTenantIndex = value!;
+                                      });
+                                    },
+                                    selected: isSelected,
+                                  );
+                                }).toList()),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
                 ),
               ),
               actions: [
                 TextButton(
                   onPressed: () {
-                    Navigator.pop(context); // Close the dialog
+                    Navigator.pop(context);
                   },
                   child: const Text('Cancel'),
                 ),
                 TextButton(
                   onPressed: () {
-                    if (selectedTenantIndex != null) {
+                    if (selectedTenantIndex != null &&
+                        selectedTenantIndex != -1) {
                       QueryDocumentSnapshot<Map<String, dynamic>>
                           selectedTenantDoc = tenantDocs[selectedTenantIndex!];
-                      // Map<String, dynamic> propertyData =
-                      //     selectedTenantDoc.data();
-                      // // Property selectedproperty =
-                      // //     Property.fromJson(propertyData);
-
                       setState(() {
                         tenantRef = FirebaseFirestore.instance
                             .collection('Tenants')
                             .doc(selectedTenantDoc.id);
                       });
-                      onSelectionDone();
-                      Navigator.pop(context); // Close the dialog
                     } else {
-                      onSelectionDone();
-                      Navigator.pop(context); // Close the dialog
+                      setState(() {
+                        tenantRef = null;
+                      });
                     }
+                    onSelectionDone();
+                    Navigator.pop(context);
                   },
                   child: const Text('Done'),
                 ),

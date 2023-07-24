@@ -12,6 +12,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:rehnaa/backend/models/landlordmodel.dart';
 import 'package:rehnaa/frontend/helper/Landlorddashboard_pages/landlordinvoice.dart';
 import 'package:responsive_framework/responsive_scaled_box.dart';
+import '../../../backend/models/propertymodel.dart';
 import '../../../backend/models/tenantsmodel.dart';
 import '../../Screens/pdf_landlord.dart';
 import 'landlord_form.dart';
@@ -105,6 +106,8 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
 
   void showOptionDialog(
       Function callback, Landlord landlord, BuildContext maincontext) {
+    bool isError = false;
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -300,10 +303,14 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
                                                                     ?.data()
                                                                 as Map<String,
                                                                     dynamic>);
+                                                        tenant.tempID = snapshot
+                                                            .data?.id
+                                                            .toString();
                                                         return ListTile(
                                                           title: Text(
                                                               '${tenant.firstName} ${tenant.lastName}'),
                                                           onTap: () {
+                                                            Property? property;
                                                             Navigator.pop(
                                                                 context);
                                                             PDFEditorPage
@@ -311,180 +318,259 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
                                                                 PDFEditorPage();
                                                             //showdialog generating pdf...
 
-                                                            pdfinstance
-                                                                .createState()
-                                                                .createPdf(
-                                                                    tenant.firstName +
-                                                                        ' ' +
-                                                                        tenant
-                                                                            .lastName,
-                                                                    landlord.firstName +
-                                                                        ' ' +
-                                                                        landlord
-                                                                            .lastName,
-                                                                    landlord
-                                                                        .address,
-                                                                    tenant
-                                                                        .address,
-                                                                    landlord
-                                                                        .balance
-                                                                        .toDouble(),
-                                                                    withdrawalAmount,
-                                                                    selectedOption,
-                                                                    widget.uid,
-                                                                    invoiceNumber)
+                                                            //find the property where landlordref is equal to the landlordref of the tenant
+                                                            // and tenantref is equal to the tenantref of the tenant
+                                                            FirebaseFirestore
+                                                                .instance
+                                                                .collection(
+                                                                    'Properties')
+                                                                .get()
                                                                 .then((value) {
-                                                              // //snackbar pdf created
-                                                              // ScaffoldMessenger.of(
-                                                              //         maincontext)
-                                                              //     .showSnackBar(
-                                                              //   SnackBar(
-                                                              //     content: Text(
-                                                              //         "PDF has been created"),
-                                                              //     duration:
-                                                              //         Duration(
-                                                              //             seconds:
-                                                              //                 2),
-                                                              //   ),
-                                                              // );
-                                                            });
+                                                              // String propertyID = '';
 
-                                                            Fluttertoast
-                                                                .showToast(
-                                                              msg:
-                                                                  'An admin will contact you soon regarding your payment request via: $selectedOption',
-                                                              toastLength: Toast
-                                                                  .LENGTH_SHORT,
-                                                              gravity:
-                                                                  ToastGravity
-                                                                      .BOTTOM,
-                                                              timeInSecForIosWeb:
-                                                                  3,
-                                                              backgroundColor:
-                                                                  const Color(
-                                                                      0xff45BF7A),
-                                                            );
-                                                            FirebaseFirestore
-                                                                .instance
-                                                                .collection(
-                                                                    'Notifications')
-                                                                .doc(widget.uid)
-                                                                .set(
-                                                                    {
-                                                                  'notifications':
-                                                                      FieldValue
-                                                                          .arrayUnion([
-                                                                    {
-                                                                      'title':
-                                                                          'Withdraw Request by ${'${landlord.firstName} ${landlord.lastName}'}',
-                                                                      'amount':
-                                                                          'Rs${withdrawalAmount}',
-                                                                    }
-                                                                  ]),
-                                                                },
-                                                                    SetOptions(
-                                                                        merge:
-                                                                            true));
-                                                            FirebaseFirestore
-                                                                .instance
-                                                                .collection(
-                                                                    'Landlords')
-                                                                .doc(widget.uid)
-                                                                .set(
-                                                                    {
-                                                                  'isWithdraw':
-                                                                      true,
-                                                                },
-                                                                    SetOptions(
-                                                                        merge:
-                                                                            true));
+                                                              value.docs.forEach(
+                                                                  (element) {
+                                                                // print(
+                                                                //     '222element landlord ref is ${element.data()['landlordRef'].path}');
+                                                                // print(
+                                                                //     '222element tenant ref is ${element.data()['tenantRef'].path}');
+                                                                // print(
+                                                                //     '222my landlord ref is ${FirebaseFirestore.instance.collection('Landlords').doc(landlord.tempID).path}');
 
-                                                            // Generate a random ID
-                                                            final Random
-                                                                random =
-                                                                Random();
-                                                            final String
-                                                                randomID =
-                                                                random
-                                                                    .nextInt(
-                                                                        999999)
-                                                                    .toString()
-                                                                    .padLeft(
-                                                                        6, '0');
+                                                                // print(
+                                                                //     '222my tenant ref is ${FirebaseFirestore.instance.collection('Tenants').doc(tenant.tempID).path}');
+                                                                var landlordRef =
+                                                                    element.data()[
+                                                                        'landlordRef'];
+                                                                var tenantRef =
+                                                                    element.data()[
+                                                                        'tenantRef'];
+                                                                if (landlordRef != null &&
+                                                                    tenantRef !=
+                                                                        null &&
+                                                                    landlordRef
+                                                                            .path ==
+                                                                        FirebaseFirestore
+                                                                            .instance
+                                                                            .collection(
+                                                                                'Landlords')
+                                                                            .doc(landlord
+                                                                                .tempID)
+                                                                            .path &&
+                                                                    tenantRef
+                                                                            .path ==
+                                                                        FirebaseFirestore
+                                                                            .instance
+                                                                            .collection('Tenants')
+                                                                            .doc(tenant.tempID)
+                                                                            .path) {
+                                                                  // propertyID = element.id;
+                                                                  // print('222foundrpoperty');
+                                                                  property = Property.fromJson(element
+                                                                          .data()
+                                                                      as Map<
+                                                                          String,
+                                                                          dynamic>);
+                                                                  return;
+                                                                }
+                                                              });
+                                                            }).then((_) {
+                                                              print(
+                                                                  '222idheragayabhaii');
+                                                              if (property ==
+                                                                  null) {
+                                                                print(
+                                                                    '222 property was null');
+                                                                Fluttertoast
+                                                                    .showToast(
+                                                                  msg:
+                                                                      'No property found with this landlord',
+                                                                  toastLength: Toast
+                                                                      .LENGTH_SHORT,
+                                                                  gravity:
+                                                                      ToastGravity
+                                                                          .BOTTOM,
+                                                                  timeInSecForIosWeb:
+                                                                      3,
+                                                                  backgroundColor:
+                                                                      Colors
+                                                                          .red,
+                                                                );
 
-                                                            FirebaseFirestore
-                                                                .instance
-                                                                .collection(
-                                                                    'AdminRequests')
-                                                                .doc(widget.uid)
-                                                                .set(
-                                                                    {
-                                                                  'withdrawRequest':
-                                                                      FieldValue
-                                                                          .arrayUnion([
-                                                                    {
-                                                                      'fullname':
-                                                                          '${landlord.firstName} ${landlord.lastName}',
-                                                                      'amount':
-                                                                          withdrawalAmount,
-                                                                      'paymentMethod':
-                                                                          selectedOption,
-                                                                      'uid': widget
+                                                                Navigator.pop(
+                                                                    context);
+                                                                Navigator.pop(
+                                                                    context);
+
+                                                                return;
+                                                              }
+
+                                                              pdfinstance
+                                                                  .createState()
+                                                                  .createPdf(
+                                                                      tenant.firstName +
+                                                                          '\n' +
+                                                                          tenant
+                                                                              .lastName,
+                                                                      landlord.firstName +
+                                                                          ' ' +
+                                                                          landlord
+                                                                              .lastName,
+                                                                      landlord
+                                                                          .address,
+                                                                      property
+                                                                          ?.address,
+                                                                      landlord
+                                                                          .balance
+                                                                          .toDouble(),
+                                                                      withdrawalAmount,
+                                                                      selectedOption,
+                                                                      widget
                                                                           .uid,
-                                                                      'invoiceNumber':
-                                                                          invoiceNumber,
-                                                                      'tenantname':
-                                                                          '${tenant.firstName} ${tenant.lastName}',
-                                                                      'requestID':
-                                                                          randomID,
-                                                                      'timestamp':
-                                                                          Timestamp
-                                                                              .now(),
-                                                                    }
-                                                                  ]),
-                                                                },
-                                                                    SetOptions(
-                                                                        merge:
-                                                                            true));
+                                                                      invoiceNumber)
+                                                                  .then(
+                                                                      (value) {
+                                                                // //snackbar pdf created
+                                                                // ScaffoldMessenger.of(
+                                                                //         maincontext)
+                                                                //     .showSnackBar(
+                                                                //   SnackBar(
+                                                                //     content: Text(
+                                                                //         "PDF has been created"),
+                                                                //     duration:
+                                                                //         Duration(
+                                                                //             seconds:
+                                                                //                 2),
+                                                                //   ),
+                                                                // );
+                                                              });
 
-                                                            setState(() {
-                                                              isWithdraw = true;
+                                                              FirebaseFirestore
+                                                                  .instance
+                                                                  .collection(
+                                                                      'Notifications')
+                                                                  .doc(widget
+                                                                      .uid)
+                                                                  .set(
+                                                                      {
+                                                                    'notifications':
+                                                                        FieldValue
+                                                                            .arrayUnion([
+                                                                      {
+                                                                        'title':
+                                                                            'Withdraw Request by ${'${landlord.firstName} ${landlord.lastName}'}',
+                                                                        'amount':
+                                                                            'Rs${withdrawalAmount}',
+                                                                      }
+                                                                    ]),
+                                                                  },
+                                                                      SetOptions(
+                                                                          merge:
+                                                                              true));
+                                                              FirebaseFirestore
+                                                                  .instance
+                                                                  .collection(
+                                                                      'Landlords')
+                                                                  .doc(widget
+                                                                      .uid)
+                                                                  .set(
+                                                                      {
+                                                                    'isWithdraw':
+                                                                        true,
+                                                                  },
+                                                                      SetOptions(
+                                                                          merge:
+                                                                              true));
+
+                                                              // Generate a random ID
+                                                              final Random
+                                                                  random =
+                                                                  Random();
+                                                              final String
+                                                                  randomID =
+                                                                  random
+                                                                      .nextInt(
+                                                                          999999)
+                                                                      .toString()
+                                                                      .padLeft(
+                                                                          6,
+                                                                          '0');
+
+                                                              FirebaseFirestore
+                                                                  .instance
+                                                                  .collection(
+                                                                      'AdminRequests')
+                                                                  .doc(widget
+                                                                      .uid)
+                                                                  .set(
+                                                                      {
+                                                                    'withdrawRequest':
+                                                                        FieldValue
+                                                                            .arrayUnion([
+                                                                      {
+                                                                        'fullname':
+                                                                            '${landlord.firstName} ${landlord.lastName}',
+                                                                        'amount':
+                                                                            withdrawalAmount,
+                                                                        'paymentMethod':
+                                                                            selectedOption,
+                                                                        'uid': widget
+                                                                            .uid,
+                                                                        'invoiceNumber':
+                                                                            invoiceNumber,
+                                                                        'tenantname':
+                                                                            '${tenant.firstName} ${tenant.lastName}',
+                                                                        'requestID':
+                                                                            randomID,
+                                                                        'timestamp':
+                                                                            Timestamp.now(),
+                                                                      }
+                                                                    ]),
+                                                                  },
+                                                                      SetOptions(
+                                                                          merge:
+                                                                              true));
+
+                                                              Fluttertoast
+                                                                  .showToast(
+                                                                msg:
+                                                                    'An admin will contact you soon regarding your payment via: $selectedOption',
+                                                                toastLength: Toast
+                                                                    .LENGTH_SHORT,
+                                                                gravity:
+                                                                    ToastGravity
+                                                                        .BOTTOM,
+                                                                timeInSecForIosWeb:
+                                                                    3,
+                                                                backgroundColor:
+                                                                    const Color(
+                                                                        0xff45BF7A),
+                                                              );
+                                                            }).catchError(
+                                                                    (error) {
+                                                              print(
+                                                                  '222errorlal is $error');
+
+                                                              return;
                                                             });
-                                                            try {
-                                                              Navigator.pop(
-                                                                  context);
-                                                              Navigator.pop(
-                                                                  context);
-                                                            } catch (e) {
-                                                              // TODO
-                                                            }
 
-                                                            // Navigator.push(
-                                                            //   context,
-                                                            //   MaterialPageRoute(
-                                                            //       builder:
-                                                            //           (context) =>
-                                                            //               PDFEditorPage(
-                                                            //                 tenantName:
-                                                            //                     '${tenant.firstName} ${tenant.lastName}',
-                                                            //                 balance:
-                                                            //                     tenant.rent.toDouble(),
-                                                            //                 landlordName:
-                                                            //                     '${landlord.firstName} ${landlord.lastName}',
-                                                            //                 amount:
-                                                            //                     withdrawalAmount,
-                                                            //                 paymentMode:
-                                                            //                     selectedOption,
-                                                            //                 uid:
-                                                            //                     widget.uid,
-                                                            //                 landlordAddress:
-                                                            //                     landlord.address,
-                                                            //                 tenantAddress:
-                                                            //                     tenant.address,
-                                                            //                 invoiceNumber:
-                                                            //                     invoiceNumber,
-                                                            //               )),
-                                                            // );
+                                                            if (!isError) {
+                                                              print(
+                                                                  '222isError is ${isError}');
+
+                                                              // setState(() {
+                                                              //   isWithdraw =
+                                                              //       true;
+                                                              // });
+                                                              try {
+                                                                Navigator.pop(
+                                                                    context);
+                                                                Navigator.pop(
+                                                                    context);
+                                                              } catch (e) {
+                                                                // TODO
+                                                              }
+                                                            }
                                                           },
                                                         );
                                                       } else {
@@ -626,6 +712,7 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
           }
           // Use the Landlord.fromJson method to create a Landlord instance
           Landlord landlord = Landlord.fromJson(json);
+          landlord.tempID = snapshot.data!.id.toString();
 
           if (json['isWithdraw'] != null && json['isWithdraw'] == true) {
             SchedulerBinding.instance!.addPostFrameCallback((_) {

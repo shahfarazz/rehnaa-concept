@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../backend/models/dealermodel.dart';
 import '../../../backend/models/landlordmodel.dart';
+import '../../Screens/Landlord/landlord_dashboard.dart';
 import '../../Screens/contract.dart';
 import 'dealer_estamp_info.dart';
 
@@ -261,7 +262,8 @@ class _DealerEstampPageState extends State<DealerEstampPage> {
                                               " " +
                                               landlord.lastName,
                                           style: TextStyle(
-                                              color: Colors.green,
+                                              // color: Colors.green,
+                                              color: const Color(0xff33907c),
                                               fontFamily:
                                                   GoogleFonts.montserrat()
                                                       .fontFamily,
@@ -271,14 +273,14 @@ class _DealerEstampPageState extends State<DealerEstampPage> {
                                           dealer?.landlordMap?[landlord.tempID]
                                               ?['eStampAddress'],
                                           style: TextStyle(
-                                              color: Colors.green,
-                                              fontFamily:
-                                                  GoogleFonts.montserrat()
-                                                      .fontFamily,
-                                              fontWeight: FontWeight.bold),
+                                            color: Colors.green,
+                                            fontFamily: GoogleFonts.montserrat()
+                                                .fontFamily,
+                                            // fontWeight: FontWeight.bold
+                                          ),
                                         ),
                                         trailing: Text(
-                                          '${dealer?.landlordMap?[landlord.tempID]?['eStampDate']}\n\nRs.${dealer?.landlordMap?[landlord.tempID]?['eStampCharges']}',
+                                          '${dealer?.landlordMap?[landlord.tempID]?['eStampDate']}\n\nRs.${dealer?.landlordMap?[landlord.tempID]?['eStampCost']}',
                                           // landlord.contractStartDate == ''
                                           //     ? 'No Contract\n\n${landlord.monthlyRent == "" ? "No Rent" : landlord.monthlyRent}'
                                           //     : '${landlord.contractStartDate!}\n ${landlord.monthlyRent == "" ? "No Rent" : landlord.monthlyRent}',

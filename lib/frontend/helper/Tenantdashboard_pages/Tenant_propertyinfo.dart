@@ -339,6 +339,9 @@ class PropertyDetails extends StatelessWidget {
           bool isRequested = false;
           var isRequestedByTenants = (snapshot.data!.data()
               as Map<String, dynamic>)['isRequestedByTenants'];
+          if (isRequestedByTenants == false || isRequestedByTenants == null) {
+            isRequestedByTenants = [];
+          }
           if (isRequestedByTenants != null &&
               isRequestedByTenants.contains(uid)) {
             isRequested = true;

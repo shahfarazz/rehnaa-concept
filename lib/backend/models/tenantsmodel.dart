@@ -14,10 +14,10 @@ class Tenant {
   bool? tasdeeqVerification;
   bool? policeVerification;
   num? familyMembers;
-  DocumentReference<Map<String, dynamic>>? landlordRef;
-  DocumentReference<Map<String, dynamic>>? propertyRef;
+  List<DocumentReference<Map<String, dynamic>>>? landlordRef;
+  List<DocumentReference<Map<String, dynamic>>>? propertyRef;
   List<DocumentReference<Map<String, dynamic>>>? rentpaymentRef;
-  Landlord? landlord;
+  List<Landlord>? landlord;
   String? pathToImage;
   String? tempID;
   Timestamp? dateJoined;
@@ -41,6 +41,11 @@ class Tenant {
   var pastLandlordTestimonial;
   Property? property;
   var contractIDs;
+  var whatAreYouLookingFor;
+  var estimatedTimetoShift;
+  var estimatedBudget;
+  var isDetailsFilled;
+  var isFormDeleted;
 
   Tenant({
     required this.firstName,
@@ -79,9 +84,27 @@ class Tenant {
     this.pastLandlordTestimonial,
     this.property,
     this.contractIDs,
+    this.whatAreYouLookingFor,
+    this.estimatedTimetoShift,
+    this.estimatedBudget,
+    this.isDetailsFilled,
+    this.isFormDeleted,
   });
 
   factory Tenant.fromJson(Map<String, dynamic> json) {
+    //check if json['landlordRef'] is a single reference or a list of references
+    //if it is a single reference, convert it to a list of references
+    if (json['landlordRef'] != null &&
+        json['landlordRef'] is DocumentReference) {
+      json['landlordRef'] = [json['landlordRef']];
+    }
+
+    //similarly for propertyRef
+    if (json['propertyRef'] != null &&
+        json['propertyRef'] is DocumentReference) {
+      json['propertyRef'] = [json['propertyRef']];
+    }
+
     return Tenant(
       firstName: json['firstName'],
       lastName: json['lastName'],
@@ -94,7 +117,10 @@ class Tenant {
       emailOrPhone: json['emailOrPhone'] ?? 'N/A',
       tasdeeqVerification: json['tasdeeqVerification'] ?? null,
       familyMembers: json['familyMembers'] ?? 0,
-      landlordRef: json['landlordRef'],
+      landlordRef: json['landlordRef'] != null
+          ? List<DocumentReference<Map<String, dynamic>>>.from(
+              json['landlordRef'].map((ref) => ref as DocumentReference))
+          : null,
       pathToImage: json['pathToImage'] ?? 'assets/defaulticon.png',
       policeVerification: json['policeVerification'] ?? null,
       dateJoined: json['dateJoined'],
@@ -121,6 +147,15 @@ class Tenant {
       phoneNumber: json['phoneNumber'] ?? '',
       pastLandlordTestimonial: json['pastLandlordTestimonial'] ?? '',
       contractIDs: json['contractIDs'] ?? '',
+      whatAreYouLookingFor: json['whatAreYouLookingFor'] ?? '',
+      estimatedTimetoShift: json['estimatedTimetoShift'] ?? '',
+      estimatedBudget: json['estimatedBudget'] ?? '',
+      isDetailsFilled: json['isDetailsFilled'] ?? false,
+      isFormDeleted: json['isFormDeleted'] ?? false,
+      propertyRef: json['propertyRef'] != null
+          ? List<DocumentReference<Map<String, dynamic>>>.from(
+              json['propertyRef'].map((ref) => ref as DocumentReference))
+          : [],
     );
   }
 
@@ -143,30 +178,30 @@ class Tenant {
     };
   }
 
-  Future<Landlord?> getLandlord() async {
-    if (landlordRef != null) {
-      DocumentSnapshot<Map<String, dynamic>> snapshot =
-          await landlordRef!.get();
+  // Future<Landlord?> getLandlord() async {
+  //   if (landlordRef != null) {
+  //     DocumentSnapshot<Map<String, dynamic>> snapshot =
+  //         await landlordRef!.get();
 
-      landlord = Landlord.fromJson(snapshot.data());
-      landlord?.tempID = snapshot.id;
-      return landlord;
-    }
-    return null;
-  }
+  //     landlord = Landlord.fromJson(snapshot.data());
+  //     landlord?.tempID = snapshot.id;
+  //     return landlord;
+  //   }
+  //   return null;
+  // }
 
-  Future<Property?> getProperty() async {
-    print('propertyRef: $propertyRef');
-    if (propertyRef != null) {
-      DocumentSnapshot<Map<String, dynamic>> snapshot =
-          await propertyRef!.get();
+  // Future<Property?> getProperty() async {
+  //   print('propertyRef: $propertyRef');
+  //   if (propertyRef != null) {
+  //     DocumentSnapshot<Map<String, dynamic>> snapshot =
+  //         await propertyRef!.get();
 
-      property = Property.fromJson(snapshot.data()!);
-      // property!.tempID = snapshot.id;
-      return property!;
-    }
-    return null;
-  }
+  //     property = Property.fromJson(snapshot.data()!);
+  //     // property!.tempID = snapshot.id;
+  //     return property!;
+  //   }
+  //   return null;
+  // }
 
   static void addDummyTenant() async {
     // Create a new instance of Firestore

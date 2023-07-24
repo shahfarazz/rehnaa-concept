@@ -110,7 +110,7 @@ class _TenantPropertiesPageState extends State<TenantPropertiesPage>
     print('returned properties with length ${properties.length}');
 
     _isLoading = false;
-    if (notShownList.length > 3) {
+    if (notShownList.length >= 3) {
       _loadMoreProperties();
     }
 
