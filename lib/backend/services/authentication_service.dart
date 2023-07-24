@@ -45,416 +45,416 @@ class AuthenticationService extends ChangeNotifier {
     return regex.hasMatch(digitsOnly);
   }
 
-  Future<void> loginWithPhoneNumberAndPasswordFromFirestore(
-      String phoneNumber, String password, BuildContext context) async {
-    try {
-      // Get the user document from Firestore based on the phone number
-      print(phoneNumber);
-      final userDoc = await FirebaseFirestore.instance
-          .collection('users')
-          .where('emailOrPhone', isEqualTo: phoneNumber)
-          .get();
+  // Future<void> loginWithPhoneNumberAndPasswordFromFirestore(
+  //     String phoneNumber, String password, BuildContext context) async {
+  //   try {
+  //     // Get the user document from Firestore based on the phone number
+  //     print(phoneNumber);
+  //     final userDoc = await FirebaseFirestore.instance
+  //         .collection('users')
+  //         .where('emailOrPhone', isEqualTo: phoneNumber)
+  //         .get();
 
-      //show error if userDoc is empty
-      if (userDoc.size == 0) {
-        Navigator.pop(context);
+  //     //show error if userDoc is empty
+  //     if (userDoc.size == 0) {
+  //       Navigator.pop(context);
 
-        showToast('Phone number not found. Please register first.', Colors.red);
-        return;
-      }
+  //       showToast('Phone number not found. Please register first.', Colors.red);
+  //       return;
+  //     }
 
-      if (userDoc.size == 1) {
-        final user = userDoc.docs.first;
-        phoneNumber = '+92${phoneNumber.substring(1)}';
+  //     if (userDoc.size == 1) {
+  //       final user = userDoc.docs.first;
+  //       phoneNumber = '+92${phoneNumber.substring(1)}';
 
-        // Get the password stored in Firestore for the user
-        final storedPassword = user.data()['password'];
+  //       // Get the password stored in Firestore for the user
+  //       final storedPassword = user.data()['password'];
 
-        if (storedPassword == password) {
-          // Use Firebase Authentication to sign in with phone number and password
-          final credential = PhoneAuthProvider.credential(
-            verificationId: '', // Empty verification ID
-            smsCode: '', // Empty SMS code
-          );
+  //       if (storedPassword == password) {
+  //         // Use Firebase Authentication to sign in with phone number and password
+  //         final credential = PhoneAuthProvider.credential(
+  //           verificationId: '', // Empty verification ID
+  //           smsCode: '', // Empty SMS code
+  //         );
 
-          final authResult =
-              await FirebaseAuth.instance.signInWithCredential(credential);
+  //         final authResult =
+  //             await FirebaseAuth.instance.signInWithCredential(credential);
 
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) =>
-                    LandlordDashboardPage(uid: _auth.currentUser!.uid)),
-          );
+  //         Navigator.push(
+  //           context,
+  //           MaterialPageRoute(
+  //               builder: (context) =>
+  //                   LandlordDashboardPage(uid: _auth.currentUser!.uid)),
+  //         );
 
-          // User is successfully authenticated
-          print('User authenticated');
-        } else {
-          // Incorrect password
-          print('Incorrect password');
-        }
-      } else {
-        // User not found in Firestore
-        print('User not found');
-      }
-    } catch (e) {
-      // Error occurred during login process
-      print('Login error: $e');
-      return;
-    }
-  }
+  //         // User is successfully authenticated
+  //         print('User authenticated');
+  //       } else {
+  //         // Incorrect password
+  //         print('Incorrect password');
+  //       }
+  //     } else {
+  //       // User not found in Firestore
+  //       print('User not found');
+  //     }
+  //   } catch (e) {
+  //     // Error occurred during login process
+  //     print('Login error: $e');
+  //     return;
+  //   }
+  // }
 
-  Future<void> signInWithPhoneNumber(
-    String phoneNumber,
-    String password,
-    BuildContext context,
-  ) async {
-    bool isSignInCompleted = false; // Flag to track sign-in completion
+  // Future<void> signInWithPhoneNumber(
+  //   String phoneNumber,
+  //   String password,
+  //   BuildContext context,
+  // ) async {
+  //   bool isSignInCompleted = false; // Flag to track sign-in completion
 
-    print(phoneNumber);
-    final userDoc = await FirebaseFirestore.instance
-        .collection('users')
-        .where('emailOrPhone', isEqualTo: phoneNumber)
-        .get();
+  //   print(phoneNumber);
+  //   final userDoc = await FirebaseFirestore.instance
+  //       .collection('users')
+  //       .where('emailOrPhone', isEqualTo: phoneNumber)
+  //       .get();
 
-    // check in users if account is disabled
-    if (userDoc.size == 1) {
-      final user = userDoc.docs.first;
-      if (user.data()['isDisabled'] == true) {
-        showToast('Your account is disabled. Please contact admin.',
-            Colors.redAccent);
-        return;
-      }
-    }
+  //   // check in users if account is disabled
+  //   if (userDoc.size == 1) {
+  //     final user = userDoc.docs.first;
+  //     if (user.data()['isDisabled'] == true) {
+  //       showToast('Your account is disabled. Please contact admin.',
+  //           Colors.redAccent);
+  //       return;
+  //     }
+  //   }
 
-    //show error if userDoc is empty
-    if (userDoc.size == 0) {
-      Navigator.pop(context);
+  //   //show error if userDoc is empty
+  //   if (userDoc.size == 0) {
+  //     Navigator.pop(context);
 
-      showToast('Phone number not found. Please register first.', Colors.red);
-      return;
-    }
+  //     showToast('Phone number not found. Please register first.', Colors.red);
+  //     return;
+  //   }
 
-    if (userDoc.size == 1) {
-      final user = userDoc.docs.first;
-      // String phoneNumber;
+  //   if (userDoc.size == 1) {
+  //     final user = userDoc.docs.first;
+  //     // String phoneNumber;
 
-      if (phoneNumber.startsWith('0')) {
-        phoneNumber = phoneNumber.replaceFirst(RegExp('^0'), '+92');
-        // phoneNumber = '+92${phoneNumber.substring(1)}';
-      } else if (phoneNumber.startsWith('+92')) {
-        phoneNumber = phoneNumber;
-      } else {
-        // Handle invalid cases or default behavior
-        // flutter taost error
-        Fluttertoast.showToast(
-            msg: 'Invalid Phone Number',
-            textColor: Colors.red,
-            backgroundColor: Colors.white);
+  //     if (phoneNumber.startsWith('0')) {
+  //       phoneNumber = phoneNumber.replaceFirst(RegExp('^0'), '+92');
+  //       // phoneNumber = '+92${phoneNumber.substring(1)}';
+  //     } else if (phoneNumber.startsWith('+92')) {
+  //       phoneNumber = phoneNumber;
+  //     } else {
+  //       // Handle invalid cases or default behavior
+  //       // flutter taost error
+  //       Fluttertoast.showToast(
+  //           msg: 'Invalid Phone Number',
+  //           textColor: Colors.red,
+  //           backgroundColor: Colors.white);
 
-        return;
-      }
+  //       return;
+  //     }
 
-      print('phone number is $phoneNumber');
+  //     print('phone number is $phoneNumber');
 
-      // Get the password stored in Firestore for the user
-      final storedPassword = user.data()['password'];
-      final hashpass = hashString(password);
+  //     // Get the password stored in Firestore for the user
+  //     final storedPassword = user.data()['password'];
+  //     final hashpass = hashString(password);
 
-      if (hashpass == storedPassword) {
-        await _auth.verifyPhoneNumber(
-          phoneNumber: phoneNumber,
-          verificationCompleted: (PhoneAuthCredential credential) async {
-            await _auth.signInWithCredential(credential);
-            if (kDebugMode) {
-              print(
-                  "Phone number automatically verified and user signed in: ${_auth.currentUser?.uid}");
-            }
+  //     if (hashpass == storedPassword) {
+  //       await _auth.verifyPhoneNumber(
+  //         phoneNumber: phoneNumber,
+  //         verificationCompleted: (PhoneAuthCredential credential) async {
+  //           await _auth.signInWithCredential(credential);
+  //           if (kDebugMode) {
+  //             print(
+  //                 "Phone number automatically verified and user signed in: ${_auth.currentUser?.uid}");
+  //           }
 
-            // Notify listeners to update
-            notifyListeners();
-            final userDoc = await FirebaseFirestore.instance
-                .collection('users')
-                .doc(_auth.currentUser!.uid)
-                .get();
+  //           // Notify listeners to update
+  //           notifyListeners();
+  //           final userDoc = await FirebaseFirestore.instance
+  //               .collection('users')
+  //               .doc(_auth.currentUser!.uid)
+  //               .get();
 
-            print('userDoc.data is ${userDoc.data()}');
+  //           print('userDoc.data is ${userDoc.data()}');
 
-            if (userDoc.data()!['type'] == 'Tenant') {
-              //push to tenant dashboard
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) =>
-                        TenantDashboardPage(uid: _auth.currentUser!.uid)),
-              );
-            } else if (userDoc.data()!['type'] == 'Landlord') {
-              //push to landlord dashboard
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) =>
-                        LandlordDashboardPage(uid: _auth.currentUser!.uid)),
-              );
-            } else if (userDoc.data()!['type'] == 'Dealer') {
-              //push to dealer dashboard
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) =>
-                        DealerDashboardPage(uid: _auth.currentUser!.uid)),
-              );
-            }
-            isSignInCompleted = true; // Mark sign-in as completed
-          },
-          verificationFailed: (FirebaseAuthException e) {
-            if (kDebugMode) {
-              print(
-                  "Phone number verification failed. Code: ${e.code}. Message: ${e.message}");
-            }
-            showToast('Phone number verification failed. Please try again.',
-                Colors.red);
-            Navigator.of(context).pop();
-          },
-          codeSent: (String verificationId, int? resendToken) {
-            showDialog(
-              context: context,
-              barrierDismissible: false,
-              builder: (context) {
-                TextEditingController smsController = TextEditingController();
-                return AlertDialog(
-                  title: const Text('Enter SMS Code'),
-                  content: TextField(
-                    controller: smsController,
-                    keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(
-                      labelText: 'SMS Code',
-                    ),
-                  ),
-                  actions: [
-                    TextButton(
-                      child: const Text('Verify'),
-                      onPressed: () async {
-                        String smsCode = smsController.text.trim();
-                        try {
-                          PhoneAuthCredential credential =
-                              PhoneAuthProvider.credential(
-                                  verificationId: verificationId,
-                                  smsCode: smsCode);
-                          await _auth.signInWithCredential(credential);
-                          if (kDebugMode) {
-                            print(
-                                "Phone number verified and user signed in: ${_auth.currentUser?.uid}");
-                          }
-                          // Navigator.of(context).pop();
+  //           if (userDoc.data()!['type'] == 'Tenant') {
+  //             //push to tenant dashboard
+  //             Navigator.push(
+  //               context,
+  //               MaterialPageRoute(
+  //                   builder: (context) =>
+  //                       TenantDashboardPage(uid: _auth.currentUser!.uid)),
+  //             );
+  //           } else if (userDoc.data()!['type'] == 'Landlord') {
+  //             //push to landlord dashboard
+  //             Navigator.push(
+  //               context,
+  //               MaterialPageRoute(
+  //                   builder: (context) =>
+  //                       LandlordDashboardPage(uid: _auth.currentUser!.uid)),
+  //             );
+  //           } else if (userDoc.data()!['type'] == 'Dealer') {
+  //             //push to dealer dashboard
+  //             Navigator.push(
+  //               context,
+  //               MaterialPageRoute(
+  //                   builder: (context) =>
+  //                       DealerDashboardPage(uid: _auth.currentUser!.uid)),
+  //             );
+  //           }
+  //           isSignInCompleted = true; // Mark sign-in as completed
+  //         },
+  //         verificationFailed: (FirebaseAuthException e) {
+  //           if (kDebugMode) {
+  //             print(
+  //                 "Phone number verification failed. Code: ${e.code}. Message: ${e.message}");
+  //           }
+  //           showToast('Phone number verification failed. Please try again.',
+  //               Colors.red);
+  //           Navigator.of(context).pop();
+  //         },
+  //         codeSent: (String verificationId, int? resendToken) {
+  //           showDialog(
+  //             context: context,
+  //             barrierDismissible: false,
+  //             builder: (context) {
+  //               TextEditingController smsController = TextEditingController();
+  //               return AlertDialog(
+  //                 title: const Text('Enter SMS Code'),
+  //                 content: TextField(
+  //                   controller: smsController,
+  //                   keyboardType: TextInputType.number,
+  //                   decoration: const InputDecoration(
+  //                     labelText: 'SMS Code',
+  //                   ),
+  //                 ),
+  //                 actions: [
+  //                   TextButton(
+  //                     child: const Text('Verify'),
+  //                     onPressed: () async {
+  //                       String smsCode = smsController.text.trim();
+  //                       try {
+  //                         PhoneAuthCredential credential =
+  //                             PhoneAuthProvider.credential(
+  //                                 verificationId: verificationId,
+  //                                 smsCode: smsCode);
+  //                         await _auth.signInWithCredential(credential);
+  //                         if (kDebugMode) {
+  //                           print(
+  //                               "Phone number verified and user signed in: ${_auth.currentUser?.uid}");
+  //                         }
+  //                         // Navigator.of(context).pop();
 
-                          //check if signed in user is tenant or landlord
-                          //which is stored in the type field in doc of user
-                          final userDoc = await FirebaseFirestore.instance
-                              .collection('users')
-                              .doc(_auth.currentUser!.uid)
-                              .get();
+  //                         //check if signed in user is tenant or landlord
+  //                         //which is stored in the type field in doc of user
+  //                         final userDoc = await FirebaseFirestore.instance
+  //                             .collection('users')
+  //                             .doc(_auth.currentUser!.uid)
+  //                             .get();
 
-                          print('userDoc.data is ${userDoc.data()}');
+  //                         print('userDoc.data is ${userDoc.data()}');
 
-                          if (userDoc.data()!['type'] == 'Tenant') {
-                            //push to tenant dashboard
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => TenantDashboardPage(
-                                      uid: _auth.currentUser!.uid)),
-                            );
-                          } else if (userDoc.data()!['type'] == 'Landlord') {
-                            //push to landlord dashboard
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => LandlordDashboardPage(
-                                      uid: _auth.currentUser!.uid)),
-                            );
-                          } else if (userDoc.data()!['type'] == 'Dealer') {
-                            //push to dealer dashboard
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => DealerDashboardPage(
-                                      uid: _auth.currentUser!.uid)),
-                            );
-                          }
+  //                         if (userDoc.data()!['type'] == 'Tenant') {
+  //                           //push to tenant dashboard
+  //                           Navigator.push(
+  //                             context,
+  //                             MaterialPageRoute(
+  //                                 builder: (context) => TenantDashboardPage(
+  //                                     uid: _auth.currentUser!.uid)),
+  //                           );
+  //                         } else if (userDoc.data()!['type'] == 'Landlord') {
+  //                           //push to landlord dashboard
+  //                           Navigator.push(
+  //                             context,
+  //                             MaterialPageRoute(
+  //                                 builder: (context) => LandlordDashboardPage(
+  //                                     uid: _auth.currentUser!.uid)),
+  //                           );
+  //                         } else if (userDoc.data()!['type'] == 'Dealer') {
+  //                           //push to dealer dashboard
+  //                           Navigator.push(
+  //                             context,
+  //                             MaterialPageRoute(
+  //                                 builder: (context) => DealerDashboardPage(
+  //                                     uid: _auth.currentUser!.uid)),
+  //                           );
+  //                         }
 
-                          isSignInCompleted = true; // Mark sign-in as completed
-                        } catch (e) {
-                          showToast('Invalid SMS code. Please try again.',
-                              Colors.red);
+  //                         isSignInCompleted = true; // Mark sign-in as completed
+  //                       } catch (e) {
+  //                         showToast('Invalid SMS code. Please try again.',
+  //                             Colors.red);
 
-                          print('error is $e');
-                          return;
+  //                         print('error is $e');
+  //                         return;
 
-                          // Navigator.of(context).pop();
-                        }
-                      },
-                    ),
-                  ],
-                );
-              },
-            );
-          },
-          codeAutoRetrievalTimeout: (String verificationId) {
-            if (!isSignInCompleted) {
-              // Check if sign-in is not completed
-              showToast(
-                  'Phone number verification timed out. Please try again.',
-                  Colors.red);
-              Navigator.of(context).pop();
-            }
-          },
-        );
-      } else {
-        // toast
-        showToast('Incorrect password. Please try again.', Colors.red);
-      }
-    }
-  }
+  //                         // Navigator.of(context).pop();
+  //                       }
+  //                     },
+  //                   ),
+  //                 ],
+  //               );
+  //             },
+  //           );
+  //         },
+  //         codeAutoRetrievalTimeout: (String verificationId) {
+  //           if (!isSignInCompleted) {
+  //             // Check if sign-in is not completed
+  //             showToast(
+  //                 'Phone number verification timed out. Please try again.',
+  //                 Colors.red);
+  //             Navigator.of(context).pop();
+  //           }
+  //         },
+  //       );
+  //     } else {
+  //       // toast
+  //       showToast('Incorrect password. Please try again.', Colors.red);
+  //     }
+  //   }
+  // }
 
-  Future<void> signInForgetWithPhoneNumber(
-    String phoneNumber,
-    BuildContext context,
-  ) async {
-    bool isSignInCompleted = false; // Flag to track sign-in completion
+  // Future<void> signInForgetWithPhoneNumber(
+  //   String phoneNumber,
+  //   BuildContext context,
+  // ) async {
+  //   bool isSignInCompleted = false; // Flag to track sign-in completion
 
-    await _auth.verifyPhoneNumber(
-      phoneNumber: phoneNumber,
-      verificationCompleted: (PhoneAuthCredential credential) async {
-        await _auth.signInWithCredential(credential);
-        if (kDebugMode) {
-          print(
-              "Phone number automatically verified and user signed in: ${_auth.currentUser?.uid}");
-        }
-        final userDoc = await FirebaseFirestore.instance
-            .collection('users')
-            .doc(_auth.currentUser!.uid)
-            .get();
+  //   await _auth.verifyPhoneNumber(
+  //     phoneNumber: phoneNumber,
+  //     verificationCompleted: (PhoneAuthCredential credential) async {
+  //       await _auth.signInWithCredential(credential);
+  //       if (kDebugMode) {
+  //         print(
+  //             "Phone number automatically verified and user signed in: ${_auth.currentUser?.uid}");
+  //       }
+  //       final userDoc = await FirebaseFirestore.instance
+  //           .collection('users')
+  //           .doc(_auth.currentUser!.uid)
+  //           .get();
 
-        if (userDoc.data()!['type'] == 'Tenant') {
-          //push to tenant dashboard
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) =>
-                    TenantDashboardPage(uid: _auth.currentUser!.uid)),
-          );
-        } else if (userDoc.data()!['type'] == 'Landlord') {
-          //push to landlord dashboard
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) =>
-                    LandlordDashboardPage(uid: _auth.currentUser!.uid)),
-          );
-        } else if (userDoc.data()!['type'] == 'Dealer') {
-          //push to dealer dashboard
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) =>
-                    DealerDashboardPage(uid: _auth.currentUser!.uid)),
-          );
-        }
-        isSignInCompleted = true; // Mark sign-in as completed
-      },
-      verificationFailed: (FirebaseAuthException e) {
-        if (kDebugMode) {
-          print(
-              "Phone number verification failed. Code: ${e.code}. Message: ${e.message}");
-        }
-        showToast(
-            'Phone number verification failed. Please try again.', Colors.red);
-        Navigator.of(context).pop();
-      },
-      codeSent: (String verificationId, int? resendToken) {
-        showDialog(
-          context: context,
-          barrierDismissible: false,
-          builder: (context) {
-            TextEditingController smsController = TextEditingController();
-            return AlertDialog(
-              title: const Text('Enter SMS Code'),
-              content: TextField(
-                controller: smsController,
-                keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
-                  labelText: 'SMS Code',
-                ),
-              ),
-              actions: [
-                TextButton(
-                  child: const Text('Verify'),
-                  onPressed: () async {
-                    String smsCode = smsController.text.trim();
-                    try {
-                      PhoneAuthCredential credential =
-                          PhoneAuthProvider.credential(
-                              verificationId: verificationId, smsCode: smsCode);
-                      await _auth.signInWithCredential(credential);
-                      if (kDebugMode) {
-                        print(
-                            "Phone number verified and user signed in: ${_auth.currentUser?.uid}");
-                      }
-                      // Navigator.of(context).pop();
-                      final userDoc = await FirebaseFirestore.instance
-                          .collection('users')
-                          .doc(_auth.currentUser!.uid)
-                          .get();
+  //       if (userDoc.data()!['type'] == 'Tenant') {
+  //         //push to tenant dashboard
+  //         Navigator.push(
+  //           context,
+  //           MaterialPageRoute(
+  //               builder: (context) =>
+  //                   TenantDashboardPage(uid: _auth.currentUser!.uid)),
+  //         );
+  //       } else if (userDoc.data()!['type'] == 'Landlord') {
+  //         //push to landlord dashboard
+  //         Navigator.push(
+  //           context,
+  //           MaterialPageRoute(
+  //               builder: (context) =>
+  //                   LandlordDashboardPage(uid: _auth.currentUser!.uid)),
+  //         );
+  //       } else if (userDoc.data()!['type'] == 'Dealer') {
+  //         //push to dealer dashboard
+  //         Navigator.push(
+  //           context,
+  //           MaterialPageRoute(
+  //               builder: (context) =>
+  //                   DealerDashboardPage(uid: _auth.currentUser!.uid)),
+  //         );
+  //       }
+  //       isSignInCompleted = true; // Mark sign-in as completed
+  //     },
+  //     verificationFailed: (FirebaseAuthException e) {
+  //       if (kDebugMode) {
+  //         print(
+  //             "Phone number verification failed. Code: ${e.code}. Message: ${e.message}");
+  //       }
+  //       showToast(
+  //           'Phone number verification failed. Please try again.', Colors.red);
+  //       Navigator.of(context).pop();
+  //     },
+  //     codeSent: (String verificationId, int? resendToken) {
+  //       showDialog(
+  //         context: context,
+  //         barrierDismissible: false,
+  //         builder: (context) {
+  //           TextEditingController smsController = TextEditingController();
+  //           return AlertDialog(
+  //             title: const Text('Enter SMS Code'),
+  //             content: TextField(
+  //               controller: smsController,
+  //               keyboardType: TextInputType.number,
+  //               decoration: const InputDecoration(
+  //                 labelText: 'SMS Code',
+  //               ),
+  //             ),
+  //             actions: [
+  //               TextButton(
+  //                 child: const Text('Verify'),
+  //                 onPressed: () async {
+  //                   String smsCode = smsController.text.trim();
+  //                   try {
+  //                     PhoneAuthCredential credential =
+  //                         PhoneAuthProvider.credential(
+  //                             verificationId: verificationId, smsCode: smsCode);
+  //                     await _auth.signInWithCredential(credential);
+  //                     if (kDebugMode) {
+  //                       print(
+  //                           "Phone number verified and user signed in: ${_auth.currentUser?.uid}");
+  //                     }
+  //                     // Navigator.of(context).pop();
+  //                     final userDoc = await FirebaseFirestore.instance
+  //                         .collection('users')
+  //                         .doc(_auth.currentUser!.uid)
+  //                         .get();
 
-                      if (userDoc.data()!['type'] == 'Tenant') {
-                        //push to tenant dashboard
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => TenantDashboardPage(
-                                  uid: _auth.currentUser!.uid)),
-                        );
-                      } else if (userDoc.data()!['type'] == 'Landlord') {
-                        //push to landlord dashboard
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => LandlordDashboardPage(
-                                  uid: _auth.currentUser!.uid)),
-                        );
-                      } else if (userDoc.data()!['type'] == 'Dealer') {
-                        //push to dealer dashboard
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => DealerDashboardPage(
-                                  uid: _auth.currentUser!.uid)),
-                        );
-                      }
-                      isSignInCompleted = true; // Mark sign-in as completed
-                    } catch (e) {
-                      showToast(
-                          'Invalid SMS code. Please try again.', Colors.red);
-                      return;
-                      // Navigator.of(context).pop();
-                    }
-                  },
-                ),
-              ],
-            );
-          },
-        );
-      },
-      codeAutoRetrievalTimeout: (String verificationId) {
-        // if (!isSignInCompleted) {
-        //   // Check if sign-in is not completed
-        // showToast('Phone number verification timed out. Please try again.',
-        //     Colors.red);
-        // Navigator.of(context).pop();
-      },
-    );
-  }
+  //                     if (userDoc.data()!['type'] == 'Tenant') {
+  //                       //push to tenant dashboard
+  //                       Navigator.push(
+  //                         context,
+  //                         MaterialPageRoute(
+  //                             builder: (context) => TenantDashboardPage(
+  //                                 uid: _auth.currentUser!.uid)),
+  //                       );
+  //                     } else if (userDoc.data()!['type'] == 'Landlord') {
+  //                       //push to landlord dashboard
+  //                       Navigator.push(
+  //                         context,
+  //                         MaterialPageRoute(
+  //                             builder: (context) => LandlordDashboardPage(
+  //                                 uid: _auth.currentUser!.uid)),
+  //                       );
+  //                     } else if (userDoc.data()!['type'] == 'Dealer') {
+  //                       //push to dealer dashboard
+  //                       Navigator.push(
+  //                         context,
+  //                         MaterialPageRoute(
+  //                             builder: (context) => DealerDashboardPage(
+  //                                 uid: _auth.currentUser!.uid)),
+  //                       );
+  //                     }
+  //                     isSignInCompleted = true; // Mark sign-in as completed
+  //                   } catch (e) {
+  //                     showToast(
+  //                         'Invalid SMS code. Please try again.', Colors.red);
+  //                     return;
+  //                     // Navigator.of(context).pop();
+  //                   }
+  //                 },
+  //               ),
+  //             ],
+  //           );
+  //         },
+  //       );
+  //     },
+  //     codeAutoRetrievalTimeout: (String verificationId) {
+  //       // if (!isSignInCompleted) {
+  //       //   // Check if sign-in is not completed
+  //       // showToast('Phone number verification timed out. Please try again.',
+  //       //     Colors.red);
+  //       // Navigator.of(context).pop();
+  //     },
+  //   );
+  // }
 
   Future<void> signInWithEmailAndPassword(
       String email, String password, BuildContext context) async {
