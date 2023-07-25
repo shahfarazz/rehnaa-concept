@@ -104,7 +104,7 @@ class _LandlordAdvanceRentPageState extends State<LandlordAdvanceRentPage> {
                   child: Column(
                     children: [
                       Text(
-                        'Rent advance',
+                        'Advance Rent',
                         style: TextStyle(
                           fontSize: 22,
                           fontFamily: GoogleFonts.montserrat().fontFamily,

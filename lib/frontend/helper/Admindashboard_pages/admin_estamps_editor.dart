@@ -9,13 +9,15 @@ import '../../Screens/Admin/admindashboard.dart';
 import 'admin_estamps.dart';
 
 class AdminEstampsEditorPage extends StatefulWidget {
-  final Landlord landlord;
+  // final Landlord landlord;
   final Dealer dealer;
+  final String docID;
 
   const AdminEstampsEditorPage({
     Key? key,
-    required this.landlord,
+    // required this.landlord,
     required this.dealer,
+    required this.docID,
   }) : super(key: key);
 
   @override
@@ -47,9 +49,8 @@ class _AdminEstampsEditorPageState extends State<AdminEstampsEditorPage> {
   DateTime? contractStartDate;
   DateTime? contractEndDate;
   bool? isFilled;
-  // var oldCost;/
-  // var oldMonthlyProfit;
-  // var oldUpfrontBonus;
+  //eStampLanldordName
+  TextEditingController eStampLandlordNameController = TextEditingController();
   Future<void> _selectDate(bool isStartDate, StateSetter setState1) async {
     final DateTime? picked = await showDatePicker(
       context: context,
@@ -75,70 +76,61 @@ class _AdminEstampsEditorPageState extends State<AdminEstampsEditorPage> {
     loadOldValues();
   }
 
-  void loadOldValues() {
-    Map<String, Map<String, dynamic>>? landlordMap = widget.dealer.landlordMap;
-    if (landlordMap != null) {
-      Map<String, dynamic>? landlordData = landlordMap[widget.landlord.tempID];
-      if (landlordData != null) {
-        try {
-          contractStartDate = landlordData['eStampContractStartDate'].toDate();
-          contractEndDate = landlordData['eStampContractEndDate'].toDate();
-        } catch (e) {
-          print('error in loading dates');
-          landlordData['eStampContractStartDate'] = null;
-          landlordData['eStampContractEndDate'] = null;
-        }
-        setState(() {
-          eStampAddressController.text = landlordData['eStampAddress'] ?? '';
-          eStampDateController.text = landlordData['eStampDate'] ?? '';
-          eStampChargesController.text = landlordData['eStampCharges'] ?? '';
-          eStampTenantNameController.text =
-              landlordData['eStampTenantName'] ?? '';
-          eStampValueController.text = landlordData['eStampValue'] ?? '';
-          eStampDeliveredDateController.text =
-              landlordData['eStampDeliveredDate'] ?? '';
-          eStampPoliceVerificationController.text =
-              landlordData['eStampPoliceVerification'] ?? '';
-          eStampPropertyAddressController.text =
-              landlordData['eStampPropertyAddress'] ?? '';
-          eStampPropertyRentAmountController.text =
-              landlordData['eStampPropertyRentAmount'] ?? '';
-          eStampUpfrontBonusController.text =
-              landlordData['eStampUpfrontBonus'] ?? '';
-          eStampMonthlyProfitController.text =
-              landlordData['eStampMonthlyProfit'] ?? '';
-          eStampCostController.text =
-              landlordData['eStampCost'].toString() ?? '';
-          try {
-            contractStartDate = landlordData['eStampContractStartDate'] != null
-                ? landlordData['eStampContractStartDate'].toDate()
-                : null;
-
-            contractEndDate = landlordData['eStampContractEndDate'] != null
-                ? landlordData['eStampContractEndDate'].toDate()
-                : null;
-          } catch (e) {
-            print('error in loading dates');
-            landlordData['eStampContractStartDate'] = null;
-            landlordData['eStampContractEndDate'] = null;
-          }
-
-          isFilled = landlordData['isFilled'];
-          // oldCost:
-          // landlordData['eStampCost'];
-          // oldMonthlyProfit:
-          // landlordData['eStampMonthlyProfit'];
-          // oldUpfrontBonus:
-          // landlordData['eStampUpfrontBonus'];
-        });
-      }
+  Future<void> loadOldValues() async {
+    if (widget.docID == 'empty') {
+      return;
     }
+    var dealerId = widget.dealer.tempID;
+    var landlordData = await FirebaseFirestore.instance
+        .collection('Dealers')
+        .doc(dealerId)
+        .collection('Estamps')
+        .doc(widget.docID)
+        .get()
+        .then((value) {
+      return value.data()!['landlordData'];
+    });
+
+    setState(() {
+      eStampAddressController.text = landlordData['eStampAddress'];
+      eStampDateController.text = landlordData['eStampDate'];
+      eStampChargesController.text = landlordData['eStampCharges'];
+      eStampTenantNameController.text = landlordData['eStampTenantName'];
+      eStampValueController.text = landlordData['eStampValue'];
+      eStampDeliveredDateController.text = landlordData['eStampDeliveredDate'];
+      eStampPoliceVerificationController.text =
+          landlordData['eStampPoliceVerification'];
+      // eStampContractStartDateController.text =
+      //     landlordData['eStampContractStartDate'];
+      // eStampContractEndDateController.text =
+      //     landlordData['eStampContractEndDate'];
+      eStampPropertyAddressController.text =
+          landlordData['eStampPropertyAddress'];
+      eStampPropertyRentAmountController.text =
+          landlordData['eStampPropertyRentAmount'];
+      eStampUpfrontBonusController.text = landlordData['eStampUpfrontBonus'];
+      eStampMonthlyProfitController.text = landlordData['eStampMonthlyProfit'];
+      eStampCostController.text = landlordData['eStampCost'].toString();
+      isFilled = landlordData['isFilled'];
+      eStampLandlordNameController.text = landlordData['landlordName'];
+    });
   }
 
   void saveLandlordMap(String dealerId) {
     Dealer dealer = widget.dealer;
     if (dealer.landlordMap == null) {
       dealer.landlordMap = {};
+    }
+
+    if (eStampLandlordNameController.text == '') {
+      //show snackbar that its a required field
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: Colors.red,
+          content: Text('Please enter eStamp Landlord Name'),
+        ),
+      );
+      return;
     }
 
     Map<String, dynamic> landlordData = {
@@ -161,14 +153,16 @@ class _AdminEstampsEditorPageState extends State<AdminEstampsEditorPage> {
       if (contractEndDate != null)
         'eStampContractEndDate': Timestamp.fromDate(contractEndDate!),
       'isFilled': true,
+      'landlordName':
+          eStampLandlordNameController.text, // key - value pairs Ali Ahmed
     };
 
-    Map<String, Map<String, dynamic>> updatedLandlordMap = {
-      widget.landlord.tempID: landlordData,
-    };
+    // Map<String, Map<String, dynamic>> updatedLandlordMap = {
+    //   widget.landlord.tempID: landlordData,
+    // };
 
     // to the dealer.landlordmap add the new map of landlord data mapped to the landlord id
-    dealer.landlordMap!.addAll(updatedLandlordMap);
+    // dealer.landlordMap!.addAll(updatedLandlordMap);
 
     //show spinkitfadingcube loading indicator as dialog
     showDialog(
@@ -189,8 +183,7 @@ class _AdminEstampsEditorPageState extends State<AdminEstampsEditorPage> {
       // }
 
       FirebaseFirestore.instance.collection('rentPayments').add({
-        'tenantname':
-            widget.landlord.firstName + ' ' + widget.landlord.lastName,
+        'tenantname': eStampLandlordNameController.text,
         'LandlordRef':
             FirebaseFirestore.instance.collection('Dealers').doc(dealer.tempID),
         'amount': int.tryParse(eStampMonthlyProfitController.text) ??
@@ -202,9 +195,10 @@ class _AdminEstampsEditorPageState extends State<AdminEstampsEditorPage> {
         'eStampType': 'Monthly Profit',
         'paymentType': '',
       }).then((newval1) {
+        int monthlyProfit =
+            int.tryParse(eStampMonthlyProfitController.text) ?? 0;
         FirebaseFirestore.instance.collection('rentPayments').add({
-          'tenantname':
-              widget.landlord.firstName + ' ' + widget.landlord.lastName,
+          'tenantname': eStampLandlordNameController.text,
           'LandlordRef': FirebaseFirestore.instance
               .collection('Dealers')
               .doc(dealer.tempID),
@@ -217,9 +211,11 @@ class _AdminEstampsEditorPageState extends State<AdminEstampsEditorPage> {
           'eStampType': 'Upfront Bonus',
           'paymentType': '',
         }).then((newval2) {
+          int upfrontBonus =
+              int.tryParse(eStampUpfrontBonusController.text) ?? 0;
+
           FirebaseFirestore.instance.collection('rentPayments').add({
-            'tenantname':
-                widget.landlord.firstName + ' ' + widget.landlord.lastName,
+            'tenantname': eStampLandlordNameController.text,
             'LandlordRef':
                 FirebaseFirestore.instance.collection('Dealers').doc(dealerId),
             'amount': int.tryParse(eStampCostController.text) ??
@@ -231,11 +227,38 @@ class _AdminEstampsEditorPageState extends State<AdminEstampsEditorPage> {
             'eStampType': 'Estamp Charges',
             'paymentType': '',
           }).then((val) {
+            int eStampCost = int.tryParse(eStampCostController.text) ?? 0;
+
+            List<DocumentReference> paymentRefs = [];
+            if (monthlyProfit != 0) {
+              paymentRefs.add(newval1);
+            }
+            if (upfrontBonus != 0) {
+              paymentRefs.add(newval2);
+            }
+            if (eStampCost != 0) {
+              paymentRefs.add(val);
+            }
+
+            // FirebaseFirestore.instance.collection('Estamps').doc(dealerId).set({
+            //   'landlordMap': dealer.landlordMap,
+            //   'landlordName':
+            //       widget.landlord.firstName + ' ' + widget.landlord.lastName,
+            // }, SetOptions(merge: true));
+            FirebaseFirestore.instance
+                .collection('Contracts')
+                .doc(dealerId)
+                .collection('Estamps')
+                .doc('LandlordMap')
+                .set({
+              'landlordMap': dealer.landlordMap,
+            }, SetOptions(merge: true));
+
             FirebaseFirestore.instance
                 .collection('Dealers')
                 .doc(dealerId)
                 .update({
-              'landlordMap': dealer.landlordMap,
+              // 'landlordMap': dealer.landlordMap,
               // 'balance': //subtract amount from balance
               //     FieldValue.increment(
               //         -(int.tryParse(eStampCostController.text) ?? 0)),
@@ -248,11 +271,19 @@ class _AdminEstampsEditorPageState extends State<AdminEstampsEditorPage> {
               // 'rentpaymentRef':
               //     FieldValue.arrayUnion([val])
               //add val newval1 and newval2 to rentpaymentref
+              //check if estamp cost estamp monthly profit and estamp upfront bonus are 0 individually and that way set the array union
               'rentpaymentRef': FieldValue.arrayUnion(
-                  [val, newval1, newval2]) // key - value pairs Ali Ahmed
+                  paymentRefs) // key - value pairs Ali Ahmed
             }).then((_) {
-              // Navigator.pop(context);
-              // Navigator.pop(context);
+              FirebaseFirestore.instance
+                  .collection('Dealers')
+                  .doc(dealerId)
+                  .collection('Estamps')
+                  .add({
+                // 'landlordMap': dealer.landlordMap,
+                'landlordData': landlordData,
+              });
+
               Navigator.push(context, MaterialPageRoute(builder: (context) {
                 return AdminEstampsPage();
               }));
@@ -276,14 +307,15 @@ class _AdminEstampsEditorPageState extends State<AdminEstampsEditorPage> {
         });
       });
     } else {
-      FirebaseFirestore.instance.collection('Dealers').doc(dealerId).update({
-        'landlordMap': dealer.landlordMap,
-        // 'balance': //subtract amount from balance
-        //     FieldValue.increment(
-        //         -(int.tryParse(eStampCostController.text) ?? 0)),
-        // 'rentpaymentRef':
-        //     FieldValue.arrayUnion([val]) // key - value pairs Ali Ahmed
+      FirebaseFirestore.instance
+          .collection('Dealers')
+          .doc(dealerId)
+          .collection('Estamps')
+          .add({
+        // 'landlordMap': dealer.landlordMap,
+        'landlordData': landlordData,
       });
+
       Navigator.push(context, MaterialPageRoute(builder: (context) {
         return AdminEstampsPage();
       }));
@@ -325,6 +357,15 @@ class _AdminEstampsEditorPageState extends State<AdminEstampsEditorPage> {
             padding: EdgeInsets.all(16.0),
             child: Column(
               children: [
+                TextField(
+                  controller: eStampLandlordNameController,
+                  onChanged: (value) {
+                    setState(() {});
+                  },
+                  decoration: InputDecoration(
+                    labelText: 'eStamp Landlord Name',
+                  ),
+                ),
                 TextField(
                   controller: eStampAddressController,
                   onChanged: (value) {

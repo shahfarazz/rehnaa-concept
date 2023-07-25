@@ -10,6 +10,7 @@ import '../../../backend/services/helperfunctions.dart';
 import '../../Screens/Landlord/landlord_dashboard.dart';
 import '../../Screens/contract.dart';
 import 'dealer_estamp_info.dart';
+import 'dealerlandlordonboarded.dart';
 
 class DealerEstampPage extends StatefulWidget {
   final String uid;
@@ -25,28 +26,49 @@ class _DealerEstampPageState extends State<DealerEstampPage> {
   final searchController = TextEditingController();
   bool isTyping = false;
   List<Landlord> filteredLandlords = [];
+  List<Estamp> filteredEstamps = [];
   List<Landlord> landlords = [];
+  List<Estamp> estamps = [];
   bool isLoading = true;
   Dealer? dealer;
   bool _noEstamp = true;
   @override
   void initState() {
     super.initState();
-    filteredLandlords = List.from(landlords);
+    // filteredLandlords = List.from(landlords);
+    filteredEstamps = List.from(estamps);
     searchFocusNode = FocusNode();
     searchController.addListener(onSearchTextChanged);
-    fetchLandlords();
+    // fetchLandlords();
+    fetchEstamps().then((_) {
+      setState(() {
+        filteredEstamps = List.from(estamps);
+      });
+    });
   }
 
   void onSearchTextChanged() {
     final query = searchController.text;
-    filterLandlords(query);
+    // filterLandlords(query);
+    filterEstamps(query);
   }
 
-  void filterLandlords(String query) {
+  // void filterLandlords(String query) {
+  //   setState(() {
+  //     filteredLandlords = landlords.where((landlord) {
+  //       final nameLower = landlord.firstName.toLowerCase();
+  //       final queryLower = query.toLowerCase();
+  //       return nameLower.contains(queryLower);
+  //     }).toList();
+  //     isTyping = query.isNotEmpty;
+  //   });
+  // }
+
+  void filterEstamps(String query) {
     setState(() {
-      filteredLandlords = landlords.where((landlord) {
-        final nameLower = landlord.firstName.toLowerCase();
+      filteredEstamps = estamps.where((estamp) {
+        final nameLower =
+            estamp.landlordData['landlordData']['landlordName'].toLowerCase();
         final queryLower = query.toLowerCase();
         return nameLower.contains(queryLower);
       }).toList();
@@ -57,7 +79,12 @@ class _DealerEstampPageState extends State<DealerEstampPage> {
   Future<void> _refreshFunction() async {
     setState(() {
       isLoading = true;
-      fetchLandlords();
+      // fetchLandlords();
+      fetchEstamps().then((value) {
+        setState(() {
+          filteredEstamps = List.from(estamps);
+        });
+      });
     });
   }
 
@@ -119,6 +146,27 @@ class _DealerEstampPageState extends State<DealerEstampPage> {
     }
   }
 
+  Future<List<Estamp>> fetchEstamps() async {
+    estamps = [];
+    try {
+      await FirebaseFirestore.instance
+          .collection('Dealers')
+          .doc(widget.uid)
+          .collection('Estamps')
+          .get()
+          .then((value) {
+        value.docs.forEach((element) {
+          estamps.add(Estamp(id: element.id, landlordData: element.data()));
+        });
+      });
+
+      return estamps;
+    } catch (e) {
+      print(e);
+      return [];
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -174,7 +222,7 @@ class _DealerEstampPageState extends State<DealerEstampPage> {
                 ),
               ),
               Expanded(
-                child: filteredLandlords.isEmpty || _noEstamp
+                child: filteredEstamps.isEmpty
                     ? RefreshIndicator(
                         onRefresh: _refreshFunction,
                         child: SingleChildScrollView(
@@ -221,87 +269,81 @@ class _DealerEstampPageState extends State<DealerEstampPage> {
                         onRefresh: _refreshFunction,
                         child: ListView.builder(
                           // reverse: true,
-                          itemCount: filteredLandlords.length,
+                          itemCount: filteredEstamps.length,
                           itemBuilder: (context, index) {
                             // final landlord = filteredLandlords[index];
                             //reverse the list
-                            final landlord = filteredLandlords[
-                                filteredLandlords.length - index - 1];
+                            // final landlord = filteredLandlords[
+                            //     filteredLandlords.length - index - 1];
+                            final estamp = filteredEstamps[
+                                filteredEstamps.length - index - 1];
                             return GestureDetector(
-                              onTap: () {
-                                if (!(landlord.hasEstamp)) {
-                                  //flutter toast no estamp found
-                                  Fluttertoast.showToast(
-                                      msg: "No E-Stamp Papers Found",
-                                      toastLength: Toast.LENGTH_SHORT,
-                                      gravity: ToastGravity.BOTTOM,
-                                      timeInSecForIosWeb: 1,
-                                      backgroundColor: Colors.red,
-                                      textColor: Colors.white,
-                                      fontSize: 16.0);
-                                  return;
-                                }
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => DealerEstampInfoPage(
-                                      landlord: landlord,
-                                      dealer: dealer!,
+                                onTap: () {
+                                  // if (!(landlord.hasEstamp)) {
+                                  //   //flutter toast no estamp found
+                                  //   Fluttertoast.showToast(
+                                  //       msg: "No E-Stamp Papers Found",
+                                  //       toastLength: Toast.LENGTH_SHORT,
+                                  //       gravity: ToastGravity.BOTTOM,
+                                  //       timeInSecForIosWeb: 1,
+                                  //       backgroundColor: Colors.red,
+                                  //       textColor: Colors.white,
+                                  //       fontSize: 16.0);
+                                  //   return;
+                                  // }
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          DealerEstampInfoPage(
+                                              landlordData: estamp.landlordData[
+                                                  'landlordData']),
                                     ),
+                                  );
+                                },
+                                child: Card(
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10.0),
                                   ),
-                                );
-                              },
-                              child: landlord.hasEstamp
-                                  ? Card(
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(10.0),
+                                  elevation: 5.0,
+                                  child: ListTile(
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        horizontal: 20.0, vertical: 10.0),
+                                    title: Text(
+                                      estamp.landlordData['landlordData']
+                                          ['landlordName'],
+                                      style: TextStyle(
+                                          // color: Colors.green,
+                                          color: const Color(0xff33907c),
+                                          fontFamily: GoogleFonts.montserrat()
+                                              .fontFamily,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    subtitle: Text(
+                                      estamp.landlordData?['landlordData']
+                                          ?['eStampAddress'],
+                                      style: TextStyle(
+                                        color: Colors.green,
+                                        fontFamily:
+                                            GoogleFonts.montserrat().fontFamily,
+                                        // fontWeight: FontWeight.bold
                                       ),
-                                      elevation: 5.0,
-                                      child: ListTile(
-                                        contentPadding:
-                                            const EdgeInsets.symmetric(
-                                                horizontal: 20.0,
-                                                vertical: 10.0),
-                                        title: Text(
-                                          landlord.firstName +
-                                              " " +
-                                              landlord.lastName,
-                                          style: TextStyle(
-                                              // color: Colors.green,
-                                              color: const Color(0xff33907c),
-                                              fontFamily:
-                                                  GoogleFonts.montserrat()
-                                                      .fontFamily,
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                        subtitle: Text(
-                                          dealer?.landlordMap?[landlord.tempID]
-                                              ?['eStampAddress'],
-                                          style: TextStyle(
-                                            color: Colors.green,
-                                            fontFamily: GoogleFonts.montserrat()
-                                                .fontFamily,
-                                            // fontWeight: FontWeight.bold
-                                          ),
-                                        ),
-                                        trailing: Text(
-                                          '${dealer?.landlordMap?[landlord.tempID]?['eStampDate']}\n\nRs.${dealer?.landlordMap?[landlord.tempID]?['eStampCost']}',
-                                          // landlord.contractStartDate == ''
-                                          //     ? 'No Contract\n\n${landlord.monthlyRent == "" ? "No Rent" : landlord.monthlyRent}'
-                                          //     : '${landlord.contractStartDate!}\n ${landlord.monthlyRent == "" ? "No Rent" : landlord.monthlyRent}',
-                                          style: TextStyle(
-                                            color: Colors.black,
-                                            fontFamily: GoogleFonts.montserrat()
-                                                .fontFamily,
-                                          ),
-                                        ),
+                                    ),
+                                    trailing: Text(
+                                      '${estamp.landlordData?['landlordData']?['eStampDate']}\n\nRs.${estamp.landlordData?['landlordData']?['eStampCost']}',
+                                      // landlord.contractStartDate == ''
+                                      //     ? 'No Contract\n\n${landlord.monthlyRent == "" ? "No Rent" : landlord.monthlyRent}'
+                                      //     : '${landlord.contractStartDate!}\n ${landlord.monthlyRent == "" ? "No Rent" : landlord.monthlyRent}',
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontFamily:
+                                            GoogleFonts.montserrat().fontFamily,
+                                      ),
+                                    ),
 
-                                        // subtitle: Text('dummy'),
-                                      ),
-                                    )
-                                  : Container(),
-                            );
+                                    // subtitle: Text('dummy'),
+                                  ),
+                                ));
                           },
                         ),
                       ),
