@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:rehnaa/frontend/Screens/Dealer/dealer_dashboard.dart';
@@ -32,6 +33,7 @@ class _DealerEstampPageState extends State<DealerEstampPage> {
   bool isLoading = true;
   Dealer? dealer;
   bool _noEstamp = true;
+  Future<List<Estamp>>? _fetchEstampsFuture;
   @override
   void initState() {
     super.initState();
@@ -40,11 +42,7 @@ class _DealerEstampPageState extends State<DealerEstampPage> {
     searchFocusNode = FocusNode();
     searchController.addListener(onSearchTextChanged);
     // fetchLandlords();
-    fetchEstamps().then((_) {
-      setState(() {
-        filteredEstamps = List.from(estamps);
-      });
-    });
+    _fetchEstampsFuture = fetchEstamps();
   }
 
   void onSearchTextChanged() {
@@ -79,12 +77,7 @@ class _DealerEstampPageState extends State<DealerEstampPage> {
   Future<void> _refreshFunction() async {
     setState(() {
       isLoading = true;
-      // fetchLandlords();
-      fetchEstamps().then((value) {
-        setState(() {
-          filteredEstamps = List.from(estamps);
-        });
-      });
+      _fetchEstampsFuture = fetchEstamps();
     });
   }
 
@@ -222,132 +215,156 @@ class _DealerEstampPageState extends State<DealerEstampPage> {
                 ),
               ),
               Expanded(
-                child: filteredEstamps.isEmpty
-                    ? RefreshIndicator(
-                        onRefresh: _refreshFunction,
-                        child: SingleChildScrollView(
-                            physics: const AlwaysScrollableScrollPhysics(),
-                            child: Column(
-                              children: [
-                                SizedBox(height: size.height * 0.05),
-                                Card(
-                                  elevation: 4.0,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(20.0),
-                                  ),
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(20.0),
-                                      color: Colors.white,
-                                    ),
-                                    padding: const EdgeInsets.all(16.0),
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        const Icon(
-                                          Icons.error_outline,
-                                          size: 48.0,
-                                          color: Color(0xff33907c),
+                child: FutureBuilder(
+                  future: _fetchEstampsFuture,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(
+                          child: SpinKitFadingCube(
+                        color: Color.fromARGB(255, 30, 197, 83),
+                      ));
+                    } else {
+                      filteredEstamps = snapshot.data as List<Estamp>;
+                      return filteredEstamps.isEmpty
+                          ? RefreshIndicator(
+                              onRefresh: _refreshFunction,
+                              child: SingleChildScrollView(
+                                  physics:
+                                      const AlwaysScrollableScrollPhysics(),
+                                  child: Column(
+                                    children: [
+                                      SizedBox(height: size.height * 0.05),
+                                      Card(
+                                        elevation: 4.0,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(20.0),
                                         ),
-                                        const SizedBox(height: 16.0),
-                                        Text(
-                                          'No E-Stamp Papers Found.',
-                                          textAlign: TextAlign.center,
-                                          style: GoogleFonts.montserrat(
-                                            fontSize: 20.0,
-                                            // fontWeight: FontWeight.bold,
-                                            color: const Color(0xff33907c),
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(20.0),
+                                            color: Colors.white,
+                                          ),
+                                          padding: const EdgeInsets.all(16.0),
+                                          child: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              const Icon(
+                                                Icons.error_outline,
+                                                size: 48.0,
+                                                color: Color(0xff33907c),
+                                              ),
+                                              const SizedBox(height: 16.0),
+                                              Text(
+                                                'No E-Stamp Papers Found.',
+                                                textAlign: TextAlign.center,
+                                                style: GoogleFonts.montserrat(
+                                                  fontSize: 20.0,
+                                                  // fontWeight: FontWeight.bold,
+                                                  color:
+                                                      const Color(0xff33907c),
+                                                ),
+                                              ),
+                                            ],
                                           ),
                                         ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(height: 200),
-                              ],
-                            )))
-                    : RefreshIndicator(
-                        onRefresh: _refreshFunction,
-                        child: ListView.builder(
-                          // reverse: true,
-                          itemCount: filteredEstamps.length,
-                          itemBuilder: (context, index) {
-                            // final landlord = filteredLandlords[index];
-                            //reverse the list
-                            // final landlord = filteredLandlords[
-                            //     filteredLandlords.length - index - 1];
-                            final estamp = filteredEstamps[
-                                filteredEstamps.length - index - 1];
-                            return GestureDetector(
-                                onTap: () {
-                                  // if (!(landlord.hasEstamp)) {
-                                  //   //flutter toast no estamp found
-                                  //   Fluttertoast.showToast(
-                                  //       msg: "No E-Stamp Papers Found",
-                                  //       toastLength: Toast.LENGTH_SHORT,
-                                  //       gravity: ToastGravity.BOTTOM,
-                                  //       timeInSecForIosWeb: 1,
-                                  //       backgroundColor: Colors.red,
-                                  //       textColor: Colors.white,
-                                  //       fontSize: 16.0);
-                                  //   return;
-                                  // }
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          DealerEstampInfoPage(
-                                              landlordData: estamp.landlordData[
-                                                  'landlordData']),
-                                    ),
-                                  );
-                                },
-                                child: Card(
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10.0),
-                                  ),
-                                  elevation: 5.0,
-                                  child: ListTile(
-                                    contentPadding: const EdgeInsets.symmetric(
-                                        horizontal: 20.0, vertical: 10.0),
-                                    title: Text(
-                                      estamp.landlordData['landlordData']
-                                          ['landlordName'],
-                                      style: TextStyle(
-                                          // color: Colors.green,
-                                          color: const Color(0xff33907c),
-                                          fontFamily: GoogleFonts.montserrat()
-                                              .fontFamily,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                    subtitle: Text(
-                                      estamp.landlordData?['landlordData']
-                                          ?['eStampAddress'],
-                                      style: TextStyle(
-                                        color: Colors.green,
-                                        fontFamily:
-                                            GoogleFonts.montserrat().fontFamily,
-                                        // fontWeight: FontWeight.bold
                                       ),
-                                    ),
-                                    trailing: Text(
-                                      '${estamp.landlordData?['landlordData']?['eStampDate']}\n\nRs.${estamp.landlordData?['landlordData']?['eStampCost']}',
-                                      // landlord.contractStartDate == ''
-                                      //     ? 'No Contract\n\n${landlord.monthlyRent == "" ? "No Rent" : landlord.monthlyRent}'
-                                      //     : '${landlord.contractStartDate!}\n ${landlord.monthlyRent == "" ? "No Rent" : landlord.monthlyRent}',
-                                      style: TextStyle(
-                                        color: Colors.black,
-                                        fontFamily:
-                                            GoogleFonts.montserrat().fontFamily,
-                                      ),
-                                    ),
+                                      SizedBox(height: 200),
+                                    ],
+                                  )))
+                          : RefreshIndicator(
+                              onRefresh: _refreshFunction,
+                              child: ListView.builder(
+                                // reverse: true,
+                                itemCount: filteredEstamps.length,
+                                itemBuilder: (context, index) {
+                                  // final landlord = filteredLandlords[index];
+                                  //reverse the list
+                                  // final landlord = filteredLandlords[
+                                  //     filteredLandlords.length - index - 1];
+                                  final estamp = filteredEstamps[
+                                      filteredEstamps.length - index - 1];
+                                  return GestureDetector(
+                                      onTap: () {
+                                        // if (!(landlord.hasEstamp)) {
+                                        //   //flutter toast no estamp found
+                                        //   Fluttertoast.showToast(
+                                        //       msg: "No E-Stamp Papers Found",
+                                        //       toastLength: Toast.LENGTH_SHORT,
+                                        //       gravity: ToastGravity.BOTTOM,
+                                        //       timeInSecForIosWeb: 1,
+                                        //       backgroundColor: Colors.red,
+                                        //       textColor: Colors.white,
+                                        //       fontSize: 16.0);
+                                        //   return;
+                                        // }
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                DealerEstampInfoPage(
+                                                    landlordData:
+                                                        estamp.landlordData[
+                                                            'landlordData']),
+                                          ),
+                                        );
+                                      },
+                                      child: Card(
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(10.0),
+                                        ),
+                                        elevation: 5.0,
+                                        child: ListTile(
+                                          contentPadding:
+                                              const EdgeInsets.symmetric(
+                                                  horizontal: 20.0,
+                                                  vertical: 10.0),
+                                          title: Text(
+                                            estamp.landlordData['landlordData']
+                                                ['landlordName'],
+                                            style: TextStyle(
+                                                // color: Colors.green,
+                                                color: const Color(0xff33907c),
+                                                fontFamily:
+                                                    GoogleFonts.montserrat()
+                                                        .fontFamily,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                          subtitle: Text(
+                                            estamp.landlordData?['landlordData']
+                                                ?['eStampAddress'],
+                                            style: TextStyle(
+                                              color: Colors.green,
+                                              fontFamily:
+                                                  GoogleFonts.montserrat()
+                                                      .fontFamily,
+                                              // fontWeight: FontWeight.bold
+                                            ),
+                                          ),
+                                          trailing: Text(
+                                            '${estamp.landlordData?['landlordData']?['eStampDate']}\n\nRs.${estamp.landlordData?['landlordData']?['eStampCost']}',
+                                            // landlord.contractStartDate == ''
+                                            //     ? 'No Contract\n\n${landlord.monthlyRent == "" ? "No Rent" : landlord.monthlyRent}'
+                                            //     : '${landlord.contractStartDate!}\n ${landlord.monthlyRent == "" ? "No Rent" : landlord.monthlyRent}',
+                                            style: TextStyle(
+                                              color: Colors.black,
+                                              fontFamily:
+                                                  GoogleFonts.montserrat()
+                                                      .fontFamily,
+                                            ),
+                                          ),
 
-                                    // subtitle: Text('dummy'),
-                                  ),
-                                ));
-                          },
-                        ),
-                      ),
+                                          // subtitle: Text('dummy'),
+                                        ),
+                                      ));
+                                },
+                              ),
+                            );
+                    }
+                  },
+                ),
               )
             ],
           ),

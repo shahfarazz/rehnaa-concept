@@ -185,40 +185,39 @@ class _AdminEstampsPageState extends State<AdminEstampsPage> {
                                                                     context,
                                                                 builder:
                                                                     (context) {
-                                                                  return AlertDialog(
-                                                                    title: Text(
-                                                                        'Delete Estamp'),
-                                                                    content: Text(
-                                                                        'Are you sure you want to delete this estamp?'),
-                                                                    actions: [
-                                                                      TextButton(
-                                                                        onPressed:
-                                                                            () {
-                                                                          Navigator.pop(
-                                                                              context);
-                                                                        },
-                                                                        child: Text(
-                                                                            'No'),
-                                                                      ),
-                                                                      TextButton(
-                                                                        onPressed:
-                                                                            () {
-                                                                          //delete the estamp
-                                                                          FirebaseFirestore
-                                                                              .instance
-                                                                              .collection('Dealers')
-                                                                              .doc(dealers[index].tempID)
-                                                                              .collection('Estamps')
-                                                                              .doc(eStampList[index2].id)
-                                                                              .delete();
+                                                                  return StatefulBuilder(
+                                                                    builder: (BuildContext
+                                                                            context,
+                                                                        setState2) {
+                                                                      return AlertDialog(
+                                                                        title: Text(
+                                                                            'Delete Estamp'),
+                                                                        content:
+                                                                            Text('Are you sure you want to delete this estamp?'),
+                                                                        actions: [
+                                                                          TextButton(
+                                                                            onPressed:
+                                                                                () {
+                                                                              Navigator.pop(context);
+                                                                            },
+                                                                            child:
+                                                                                Text('No'),
+                                                                          ),
+                                                                          TextButton(
+                                                                            onPressed:
+                                                                                () {
+                                                                              //delete the estamp
+                                                                              FirebaseFirestore.instance.collection('Dealers').doc(dealers[index].tempID).collection('Estamps').doc(eStampList[index2].id).delete();
 
-                                                                          Navigator.pop(
-                                                                              context);
-                                                                        },
-                                                                        child: Text(
-                                                                            'Yes'),
-                                                                      ),
-                                                                    ],
+                                                                              Navigator.pop(context);
+                                                                              Navigator.pop(context);
+                                                                            },
+                                                                            child:
+                                                                                Text('Yes'),
+                                                                          ),
+                                                                        ],
+                                                                      );
+                                                                    },
                                                                   );
                                                                 },
                                                               );

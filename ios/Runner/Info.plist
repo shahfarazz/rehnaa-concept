@@ -21,6 +21,8 @@
 	<string>This app needs access to your location.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>This app needs access to microphone to record audio.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>This app needs access to galery to upload photos.</string>
 
 	<string>rehnaa</string>
 	<key>CFBundlePackageType</key>

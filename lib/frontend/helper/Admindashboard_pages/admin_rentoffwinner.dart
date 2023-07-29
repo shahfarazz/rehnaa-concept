@@ -303,7 +303,7 @@ class _AdminRentOffWinnerPageState extends State<AdminRentOffWinnerPage> {
                             );
                           },
                         );
-                        if (discount != null) {
+                        if (discount != null && discount != 0) {
                           // Apply the discount to the tenant's rent
                           print('discount is $discount');
                           print('newTotal is $newTotal');

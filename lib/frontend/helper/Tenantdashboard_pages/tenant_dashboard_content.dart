@@ -542,6 +542,15 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
         backgroundColor: Colors.red,
       );
       return;
+    } else if (tenant.balance == 0) {
+      Fluttertoast.showToast(
+        msg: 'No balance',
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 3,
+        backgroundColor: Colors.red,
+      );
+      return;
     }
     showOptionDialog(() {
       // setState(() {

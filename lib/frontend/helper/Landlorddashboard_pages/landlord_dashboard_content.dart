@@ -679,6 +679,26 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
   }
 
   void someFunction(Landlord landlord, BuildContext maincontext) {
+    if (landlord.tenantRef?.length == 0) {
+      Fluttertoast.showToast(
+        msg: 'No tenant found',
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 3,
+        backgroundColor: Colors.red,
+      );
+      return;
+    } else if (landlord.balance == 0) {
+      Fluttertoast.showToast(
+        msg: 'No balance to withdraw',
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 3,
+        backgroundColor: Colors.red,
+      );
+      return;
+    }
+
     showOptionDialog(() {
       // setState(() {
       //   isWithdraw = true;

@@ -224,9 +224,9 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
     //propertyAddress
     final TextEditingController propertyAddressController =
         TextEditingController(text: tenant.propertyAddress ?? '');
-    // monthlyRent
-    final TextEditingController monthlyRentController =
-        TextEditingController(text: tenant.monthlyRent.toString());
+    // // monthlyRent
+    // final TextEditingController monthlyRentController =
+    //     TextEditingController(text: tenant.monthlyRent.toString());
 
     //securityDeposit
     final TextEditingController securityDepositController =
@@ -367,19 +367,19 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
                     decoration:
                         const InputDecoration(labelText: 'Property Address'),
                   ),
-                  TextFormField(
-                    controller: monthlyRentController,
-                    decoration:
-                        const InputDecoration(labelText: 'Monthly Rent'),
-                    validator: (value) {
-                      //check if value can be parsed
-                      if (value != null &&
-                          int.tryParse(value) == null &&
-                          value != '') {
-                        return 'Please enter a valid monthly rent';
-                      }
-                    },
-                  ),
+                  // TextFormField(
+                  //   controller: monthlyRentController,
+                  //   decoration:
+                  //       const InputDecoration(labelText: 'Monthly Rent'),
+                  //   validator: (value) {
+                  //     //check if value can be parsed
+                  //     if (value != null &&
+                  //         int.tryParse(value) == null &&
+                  //         value != '') {
+                  //       return 'Please enter a valid monthly rent';
+                  //     }
+                  //   },
+                  // ),
                   TextFormField(
                     controller: otherInfoController,
                     decoration:
@@ -519,7 +519,7 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
                           if (contractEndDate != null)
                             'contractEndDate':
                                 Timestamp.fromDate(contractEndDate!),
-                          'monthlyRent': monthlyRentController.text ?? '',
+                          // 'monthlyRent': monthlyRentController.text ?? '',
                           'policeVerification': policeVerification,
                           'tasdeeqVerification': tasdeeqVerification,
                           'securityDeposit':
@@ -549,9 +549,9 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
                           if (contractEndDate != null)
                             'contractEndDate':
                                 Timestamp.fromDate(contractEndDate!),
-                          'monthlyRent': monthlyRentController.text.isNotEmpty
-                              ? monthlyRentController.text ?? 0.0
-                              : 'empty',
+                          // 'monthlyRent': monthlyRentController.text.isNotEmpty
+                          //     ? monthlyRentController.text ?? 0.0
+                          //     : 'empty',
                           'securityDeposit':
                               securityDepositController.text.isNotEmpty &&
                                       securityDepositController.text != 'null'
@@ -775,9 +775,9 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
                                                   contractStartDate;
                                               tenant.contractEndDate =
                                                   contractEndDate;
-                                              tenant.monthlyRent =
-                                                  monthlyRentController.text ??
-                                                      '';
+                                              // tenant.monthlyRent =
+                                              //     monthlyRentController.text ??
+                                              //         '';
                                               tenant.policeVerification =
                                                   policeVerification;
                                               tenant.tasdeeqVerification =

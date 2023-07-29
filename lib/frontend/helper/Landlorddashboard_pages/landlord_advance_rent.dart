@@ -156,8 +156,29 @@ class _LandlordAdvanceRentPageState extends State<LandlordAdvanceRentPage> {
                               borderRadius: BorderRadius.circular(30.0),
                               onTap: () {
                                 if (isApplied) {
+                                  // show in green snackbar that the request has been sent
+
                                   return;
                                 }
+                                if (landlord?.tenantRef == null ||
+                                    landlord!.tenantRef!.length == 0) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      backgroundColor: Colors.red,
+                                      content: Text(
+                                        'You need to have a tenant to apply for rent advance.',
+                                        style: TextStyle(
+                                          fontSize: 18,
+                                          fontFamily: GoogleFonts.montserrat()
+                                              .fontFamily,
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                  return;
+                                }
+                                // print(
+                                //     'landlord.tenantRef: ${landlord?.tenantRef}');
                                 // Handle button press
                                 setState(() {
                                   isApplied = true;

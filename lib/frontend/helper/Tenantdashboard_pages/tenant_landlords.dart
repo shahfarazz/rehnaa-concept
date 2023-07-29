@@ -29,31 +29,29 @@ class _TenantLandlordsPageState extends State<TenantLandlordsPage> {
         .collection('Tenants')
         .doc(widget.uid)
         .get()
-        .then((value) async {
+        .then((DocumentSnapshot value) async {
       if (value.exists) {
-        // print('222 valuedata is ${value.data()}');
-        tenant = Tenant.fromJson(value.data()!);
-        //iterate over tenant.landlordref and set landlords
-        print('222lenght of landlord ref is ${tenant!.landlordRef!.length}');
+        tenant = Tenant.fromJson(value.data()! as Map<String, dynamic>);
 
-        for (var landlordRef in tenant?.landlordRef?.toList() ?? []) {
-          print('222landlord ref is $landlordRef');
+        // Create a list of futures
+        var futures = tenant?.landlordRef?.toList()?.map((landlordRef) async {
+              return landlordRef.get().then((DocumentSnapshot value) {
+                return Landlord.fromJson(
+                    (value.data() ?? {}) as Map<String, dynamic>);
+              });
+            }).toList() ??
+            [];
 
-          Landlord landlord = await landlordRef.get().then((value) {
-            print('222 landlord data is ${value.data()}');
-            return Landlord.fromJson(value.data() ?? {});
-          });
-          print('landlord is ${landlord.firstName}');
-          if (landlords.contains(landlord) == false) {
-            landlords.add(landlord);
-          }
-          print('landlord length is ${landlords.length}');
-          // landlords.add(landlord);
-        }
+        // Wait for all futures to complete
+        List<Landlord> fetchedLandlords = await Future.wait(futures);
+        landlords.addAll(fetchedLandlords
+            .where((landlord) => !landlords.contains(landlord)));
 
+        print('landlord length is ${landlords.length}');
         return tenant;
       }
     });
+
     return tenant!;
   }
 

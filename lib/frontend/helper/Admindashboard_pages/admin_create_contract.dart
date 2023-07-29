@@ -218,6 +218,16 @@ class _AdminCreateContractsPageState extends State<AdminCreateContractsPage> {
                         .doc(selectedTenant),
                   });
 
+                  // Set the property's tenantRef to the tenant's document reference
+                  FirebaseFirestore.instance
+                      .collection('Properties')
+                      .doc(selectedProperty)
+                      .update({
+                    'landlordRef': FirebaseFirestore.instance
+                        .collection('Landlords')
+                        .doc(selectedLandlord),
+                  });
+
                   // Set the tenant's landlordRef to the property's landlordRef
                   FirebaseFirestore.instance
                       .collection('Tenants')

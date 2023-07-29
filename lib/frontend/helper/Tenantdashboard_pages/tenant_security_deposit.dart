@@ -113,45 +113,15 @@ class _TenantSecurityDepositPageState extends State<TenantSecurityDepositPage> {
                     padding: const EdgeInsets.all(16.0),
                     child: Column(
                       children: [
-                        Container(
-                          width: MediaQuery.of(context).size.width * 0.6,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(30.0),
-                            gradient: const LinearGradient(
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                              colors: [
-                                Color(0xff0FA697),
-                                Color(0xff45BF7A),
-                                Color(0xff0DF205),
-                              ],
-                            ),
-                          ),
-                          child: Material(
-                            color: Colors.transparent,
-                            child: InkWell(
-                              borderRadius: BorderRadius.circular(30.0),
-                              onTap: //nothing
-                                  () {},
-                              child: Ink(
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 16.0,
-                                  horizontal: 32.0,
-                                ),
-                                child: Center(
-                                  child: Text(
-                                    // isApplySecurity ? 'Applied' :
-                                    'PKR ${NumberFormat('#,##0').format(depositAmount)}',
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                      fontFamily:
-                                          GoogleFonts.montserrat().fontFamily,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ),
-                              ),
+                        Center(
+                          child: Text(
+                            // isApplySecurity ? 'Applied' :
+                            'PKR ${NumberFormat('#,##0').format(depositAmount)}',
+                            style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.w600,
+                              fontFamily: GoogleFonts.montserrat().fontFamily,
+                              color: Colors.green,
                             ),
                           ),
                         ),
@@ -232,6 +202,16 @@ class _TenantSecurityDepositPageState extends State<TenantSecurityDepositPage> {
                                     .nextInt(999999)
                                     .toString()
                                     .padLeft(6, '0');
+                                var fullname;
+                                if (widget.callerType == 'Tenants') {
+                                  fullname = tenant!.firstName +
+                                      ' ' +
+                                      tenant!.lastName;
+                                } else if (widget.callerType == 'Landlords') {
+                                  fullname = landlord!.firstName +
+                                      ' ' +
+                                      landlord!.lastName;
+                                }
                                 FirebaseFirestore.instance
                                     .collection('AdminRequests')
                                     .doc(widget.uid)
@@ -240,8 +220,7 @@ class _TenantSecurityDepositPageState extends State<TenantSecurityDepositPage> {
                                       'securityDepositRequest':
                                           FieldValue.arrayUnion([
                                         {
-                                          'fullname':
-                                              '${landlord?.firstName} ${landlord?.lastName}',
+                                          'fullname': fullname,
                                           'uid': widget.uid,
                                           'timestamp': Timestamp.now(),
                                           'requestID': randomID,

@@ -397,6 +397,16 @@ class _DealerDashboardContentState extends State<DealerDashboardContent>
   }
 
   void someFunction(Dealer dealer) {
+    if (dealer.balance == 0) {
+      Fluttertoast.showToast(
+        msg: 'No balance to withdraw',
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 3,
+        backgroundColor: Colors.red,
+      );
+      return;
+    }
     showOptionDialog(() {
       // setState(() {
       //   isWithdraw = true;
