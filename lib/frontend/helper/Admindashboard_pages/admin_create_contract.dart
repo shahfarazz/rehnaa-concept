@@ -4,6 +4,8 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:rehnaa/backend/models/propertymodel.dart';
 import 'package:rehnaa/frontend/helper/Admindashboard_pages/admin_requests_property_contracts.dart';
 
+import '../../../backend/models/landlordmodel.dart';
+import '../../../backend/models/tenantsmodel.dart';
 import '../../Screens/Admin/admindashboard.dart';
 
 class AdminCreateContractsPage extends StatefulWidget {
@@ -18,6 +20,9 @@ class _AdminCreateContractsPageState extends State<AdminCreateContractsPage> {
   var selectLandlordText = 'Select Landlord';
   var selectTenantText = 'Select Tenant';
   var selectPropertyText = 'Select Property';
+  List<DropdownMenuItem> filteredLandlordList = [];
+  Landlord? myLandlord;
+  Tenant? myTenant;
 
   var selectedLandlord;
   var selectedTenant;
@@ -213,6 +218,16 @@ class _AdminCreateContractsPageState extends State<AdminCreateContractsPage> {
                         .doc(selectedTenant),
                   });
 
+                  // Set the property's tenantRef to the tenant's document reference
+                  FirebaseFirestore.instance
+                      .collection('Properties')
+                      .doc(selectedProperty)
+                      .update({
+                    'landlordRef': FirebaseFirestore.instance
+                        .collection('Landlords')
+                        .doc(selectedLandlord),
+                  });
+
                   // Set the tenant's landlordRef to the property's landlordRef
                   FirebaseFirestore.instance
                       .collection('Tenants')
@@ -250,16 +265,18 @@ class _AdminCreateContractsPageState extends State<AdminCreateContractsPage> {
                     'isRequestedByTenants': [],
                   });
 
+                  print('proeprty id is ${selectedProperty}');
+
                   Navigator.push(
                     context,
                     MaterialPageRoute(
                         builder: (context) => AdminPropertyContractsPage(
-                              landlordID: selectedLandlord,
-                              tenantID: selectedTenant,
-                              landlordName: selectLandlordText,
-                              tenantName: selectTenantText,
-                              propertyID: selectedProperty,
-                            )),
+                            landlordID: selectedLandlord,
+                            tenantID: selectedTenant,
+                            landlordName: selectLandlordText,
+                            tenantName: selectTenantText,
+                            propertyID: selectedProperty,
+                            landlordCNIC: selectedLandlord)),
                   );
                 } else {
                   //if they are null, show a snackbar saying that all fields are required
@@ -280,7 +297,6 @@ class _AdminCreateContractsPageState extends State<AdminCreateContractsPage> {
 
   Future<void> selectLandlordFunc(StateSetter outsideSetState) {
     TextEditingController searchController = TextEditingController();
-    List<DropdownMenuItem> filteredLandlordList = [];
     bool isSearching = false;
 
     return FirebaseFirestore.instance
@@ -294,6 +310,8 @@ class _AdminCreateContractsPageState extends State<AdminCreateContractsPage> {
           value: doc.id,
         ));
       });
+      filteredLandlordList = landlordList;
+
       //map ids to names with ids as keys and names as values
       Map landlordMap = Map.fromIterables(
         snapshot.docs.map((doc) => doc.id),
@@ -313,30 +331,43 @@ class _AdminCreateContractsPageState extends State<AdminCreateContractsPage> {
                     TextField(
                       controller: searchController,
                       onChanged: (value) {
+                        print('value is changing');
                         setState(() {
+                          print('Initial value: $value');
                           if (value.isNotEmpty) {
-                            filteredLandlordList = landlordList
-                                .where((item) =>
-                                    item.child
-                                        .toString()
-                                        .toLowerCase()
-                                        .contains(value.toLowerCase()) ==
-                                    true)
-                                .toList();
+                            // print(
+                            //     'Initial filteredLandlordList: $filteredLandlordList');
+                            filteredLandlordList = landlordList.where((item) {
+                              Text textWidget = item.child as Text;
+                              String itemText = textWidget.data!;
+                              // print('Item: $itemText');
+                              // print(
+                              //     'Comparison: ${itemText.toLowerCase().contains(value.toLowerCase())}');
+                              return itemText
+                                  .toLowerCase()
+                                  .contains(value.toLowerCase());
+                            }).toList();
+
+                            // print(
+                            //     'FilteredLandlordList after filtering: $filteredLandlordList');
                             isSearching = true;
+                            // print('isSearching: $isSearching');
                           } else {
                             filteredLandlordList = landlordList;
                             isSearching = false;
                           }
 
-                          // Check if selectedLandlord is still valid after filtering
-                          if (selectedLandlord != null &&
-                              !filteredLandlordList.any(
-                                  (item) => item.value == selectedLandlord)) {
-                            selectedLandlord = filteredLandlordList.isEmpty
-                                ? null
-                                : filteredLandlordList[0].value;
-                          }
+                          // // Check if selectedLandlord is still valid after filtering
+                          // if (selectedLandlord != null &&
+                          //     !filteredLandlordList.any(
+                          //         (item) => item.value == selectedLandlord)) {
+                          //   filteredLandlordList.forEach((element) {
+                          //     print(element.value);
+                          //   });
+                          //   selectedLandlord = filteredLandlordList.isEmpty
+                          //       ? null
+                          //       : filteredLandlordList[0].value;
+                          // }
                         });
                       },
                       decoration: InputDecoration(
@@ -395,6 +426,7 @@ class _AdminCreateContractsPageState extends State<AdminCreateContractsPage> {
           value: doc.id,
         ));
       });
+      filteredTenantList = tenantList;
       //map ids to names with ids as keys and names as values
       Map tenantMap = Map.fromIterables(
         snapshot.docs.map((doc) => doc.id),
@@ -416,14 +448,13 @@ class _AdminCreateContractsPageState extends State<AdminCreateContractsPage> {
                       onChanged: (value) {
                         setState(() {
                           if (value.isNotEmpty) {
-                            filteredTenantList = tenantList
-                                .where((item) =>
-                                    item.child
-                                        .toString()
-                                        .toLowerCase()
-                                        .contains(value.toLowerCase()) ==
-                                    true)
-                                .toList();
+                            filteredTenantList = tenantList.where((item) {
+                              Text textWidget = item.child as Text;
+                              return textWidget.data
+                                  .toString()
+                                  .toLowerCase()
+                                  .contains(value.toLowerCase());
+                            }).toList();
                             isSearching = true;
                           } else {
                             filteredTenantList = tenantList;
@@ -496,6 +527,8 @@ class _AdminCreateContractsPageState extends State<AdminCreateContractsPage> {
           value: doc.id,
         ));
       });
+      filteredPropertyList = propertyList;
+
       //map ids to names with ids as keys and names as values
       Map propertyMap = Map.fromIterables(
         snapshot.docs.map((doc) => doc.id),
@@ -517,14 +550,13 @@ class _AdminCreateContractsPageState extends State<AdminCreateContractsPage> {
                       onChanged: (value) {
                         setState(() {
                           if (value.isNotEmpty) {
-                            filteredPropertyList = propertyList
-                                .where((item) =>
-                                    item.child
-                                        .toString()
-                                        .toLowerCase()
-                                        .contains(value.toLowerCase()) ==
-                                    true)
-                                .toList();
+                            filteredPropertyList = propertyList.where((item) {
+                              Text textWidget = item.child as Text;
+                              return textWidget.data
+                                  .toString()
+                                  .toLowerCase()
+                                  .contains(value.toLowerCase());
+                            }).toList();
                             isSearching = true;
                           } else {
                             filteredPropertyList = propertyList;

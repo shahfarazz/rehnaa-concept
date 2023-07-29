@@ -2,8 +2,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:rehnaa/frontend/Screens/Landlord/landlord_dashboard.dart';
 import 'package:rehnaa/frontend/Screens/contract.dart';
 
+import '../../backend/services/helperfunctions.dart';
 import 'Tenant/tenant_dashboard.dart';
 
 // import '../helper/Landlorddashboard_pages/landlord_advance_rent.dart';
@@ -240,7 +242,10 @@ class _AllContractsPageState extends State<AllContractsPage> {
                                 Navigator.push(context,
                                     MaterialPageRoute(builder: (context) {
                                   return ContractPage(
-                                      contractFields: contract.allFields);
+                                    contractFields: contract.allFields,
+                                    callerType: widget.callerType,
+                                    uid: widget.uid,
+                                  );
                                 }));
                               },
                               child: Card(
@@ -292,11 +297,16 @@ class _AllContractsPageState extends State<AllContractsPage> {
         filteredContracts = contracts;
       });
     } else {
+      var strToCompare = '';
+
       List<Contract> temp = [];
       for (Contract contract in contracts) {
-        if (contract.tenantName
-            .toLowerCase()
-            .contains(searchText.toLowerCase())) {
+        if (widget.callerType == 'Tenants') {
+          strToCompare = contract.landlordName;
+        } else if (widget.callerType == 'Landlords') {
+          strToCompare = contract.tenantName;
+        }
+        if (strToCompare.toLowerCase().contains(searchText.toLowerCase())) {
           temp.add(contract);
         }
       }
@@ -328,6 +338,14 @@ PreferredSizeWidget _buildAppBar(Size size, context, callerType, uid) {
                     context,
                     MaterialPageRoute(
                         builder: (context) => TenantDashboardPage(
+                              uid: uid,
+                            )),
+                  );
+                } else if (callerType == 'Landlords') {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => LandlordDashboardPage(
                               uid: uid,
                             )),
                   );

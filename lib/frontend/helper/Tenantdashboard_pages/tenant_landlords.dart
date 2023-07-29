@@ -29,27 +29,29 @@ class _TenantLandlordsPageState extends State<TenantLandlordsPage> {
         .collection('Tenants')
         .doc(widget.uid)
         .get()
-        .then((value) async {
+        .then((DocumentSnapshot value) async {
       if (value.exists) {
-        tenant = Tenant.fromJson(value.data()!);
-        //iterate over tenant.landlordref and set landlords
-        print('lenght of landlord ref is ${tenant!.landlordRef!.length}');
+        tenant = Tenant.fromJson(value.data()! as Map<String, dynamic>);
 
-        for (var landlordRef in tenant!.landlordRef!) {
-          Landlord landlord = await landlordRef.get().then((value) {
-            return Landlord.fromJson(value.data()!);
-          });
-          print('landlord is ${landlord.firstName}');
-          if (landlords.contains(landlord) == false) {
-            landlords.add(landlord);
-          }
-          print('landlord length is ${landlords.length}');
-          // landlords.add(landlord);
-        }
+        // Create a list of futures
+        var futures = tenant?.landlordRef?.toList()?.map((landlordRef) async {
+              return landlordRef.get().then((DocumentSnapshot value) {
+                return Landlord.fromJson(
+                    (value.data() ?? {}) as Map<String, dynamic>);
+              });
+            }).toList() ??
+            [];
 
-        return tenant!;
+        // Wait for all futures to complete
+        List<Landlord> fetchedLandlords = await Future.wait(futures);
+        landlords.addAll(fetchedLandlords
+            .where((landlord) => !landlords.contains(landlord)));
+
+        print('landlord length is ${landlords.length}');
+        return tenant;
       }
     });
+
     return tenant!;
   }
 
@@ -175,12 +177,13 @@ class _TenantLandlordsPageState extends State<TenantLandlordsPage> {
             );
           } else if (snapshot.hasError) {
             // If an error occurs during data fetching, display an error message.
-            return Center(
-              child: Text(
-                'Error: ${snapshot.error}',
-                style: TextStyle(color: Colors.red),
-              ),
-            );
+            // return Center(
+            //     child: Text(
+            //   'Error: ${snapshot.error}',
+            //   style: TextStyle(color: Colors.red),
+            // ));
+            // throw snapshot.error!;
+            throw Exception('Error: ${snapshot.error}');
           } else {
             var data = snapshot.data;
             if (data?.landlordRef == null) {

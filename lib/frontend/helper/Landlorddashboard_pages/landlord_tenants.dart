@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
 import 'package:rehnaa/backend/models/tenantsmodel.dart';
 import 'package:rehnaa/frontend/helper/Landlorddashboard_pages/skeleton.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
@@ -131,15 +132,59 @@ class _LandlordTenantsPageState extends State<LandlordTenantsPage>
             Map<String, dynamic>? tenantData = tenantSnapshot.data();
 
             if (tenantData != null) {
-              fetchedTenants.add(Tenant.fromJson(
-                  tenantData)); // Create a TenantModel object from the tenantData
+              Tenant tenant = Tenant.fromJson(tenantData);
+
+              if (tenant.contractIDs.isNotEmpty) {
+                for (var value in tenant.contractIDs) {
+                  print('setting state for loop called');
+                  if (landlordData['contractIDs'].contains(value)) {
+                    try {
+                      var contractSnapshot = await FirebaseFirestore.instance
+                          .collection('Contracts')
+                          .doc(value)
+                          .get();
+
+                      if (contractSnapshot.exists) {
+                        Map<String, dynamic>? contractData =
+                            contractSnapshot.data();
+                        if (contractData != null) {
+                          print(
+                              'reached here setting state now value is $value');
+                          tenant.monthlyRent = contractData['monthlyRent'];
+                          tenant.contractStartDate =
+                              contractData['contractStartDate'].toDate();
+                          tenant.contractEndDate =
+                              contractData['contractEndDate'].toDate();
+                          tenant.propertyAddress =
+                              contractData['propertyAddress'];
+                        }
+                      }
+                    } catch (e) {
+                      print('Failed to get contract with id $value: $e');
+                    }
+                  } else {
+                    // tenant.monthlyRent = '';
+                    // tenant.contractStartDate = null;
+                    // tenant.contractEndDate = null;
+                    // tenant.propertyAddress = '';
+                  }
+                }
+              } else {
+                // tenant.monthlyRent = '';
+                // tenant.contractStartDate = null;
+                // tenant.contractEndDate = null;
+                // tenant.propertyAddress = '';
+              }
+
+              print('setting state and adding tenants');
+
+              fetchedTenants.add(tenant);
             }
           }
         }
 
-        // print('reached here');
-
         if (mounted) {
+          print('setting state now');
           setState(() {
             _tenants = fetchedTenants;
             _isLoading = false;
@@ -234,14 +279,25 @@ class _LandlordTenantsPageState extends State<LandlordTenantsPage>
                       color: Colors.black,
                     ),
                   ),
-                  Text(
-                    ' PKR ${tenant.balance}',
-                    style: GoogleFonts.montserrat(
-                      fontSize: 14.0,
-                      fontWeight: FontWeight.bold,
-                      color: const Color(0xff33907c),
-                    ),
-                  ),
+                  tenant.monthlyRent == null || tenant.monthlyRent!.isEmpty
+                      ? Text(
+                          ' N/A',
+                          style: GoogleFonts.montserrat(
+                            fontSize: 14.0,
+                            fontWeight: FontWeight.bold,
+                            color: const Color(0xff33907c),
+                          ),
+                        )
+                      : Text(
+                          ' PKR ' +
+                              NumberFormat('#,##0')
+                                  .format(double.tryParse(tenant.monthlyRent!)),
+                          style: GoogleFonts.montserrat(
+                            fontSize: 14.0,
+                            fontWeight: FontWeight.bold,
+                            color: const Color(0xff33907c),
+                          ),
+                        ),
                 ],
               )
             ],

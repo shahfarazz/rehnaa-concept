@@ -13,11 +13,13 @@ import 'package:rehnaa/frontend/Screens/faq.dart';
 import 'package:rehnaa/frontend/Screens/login_page.dart';
 // import 'package:rehnaa/frontend/Screens/vouchers.dart';
 import 'package:rehnaa/frontend/helper/Dealerdashboard_pages/dealer_dashboard_content.dart';
+import 'package:rehnaa/frontend/helper/Dealerdashboard_pages/dealer_events.dart';
 // import 'package:rehnaa/frontend/helper/Dealerdashboard_pages/dealer_renthistory.dart';
 // import 'package:rehnaa/frontend/helper/Landlorddashboard_pages/landlord_dashboard_content.dart';
 import 'package:rehnaa/frontend/helper/Landlorddashboard_pages/landlord_profile.dart';
 import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenant_renthistory.dart';
 // import '../../helper/Dealerdashboard_pages/dealer_profile.dart';
+import '../../../backend/services/helperfunctions.dart';
 import '../../helper/Dealerdashboard_pages/dealer_estamp.dart';
 import '../../helper/Dealerdashboard_pages/dealerlandlordonboarded.dart';
 // import '../../helper/Landlorddashboard_pages/landlord_renthistory.dart';
@@ -494,11 +496,28 @@ class _DealerDashboardPageState extends State<DealerDashboardPage>
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const NewVouchersPage(),
+                            builder: (context) => NewVouchersPage(
+                              callerType: 'Dealers',
+                              uid: widget.uid,
+                            ),
                           ),
                         );
                       },
                       showBadge: isNewVoucher,
+                    ),
+                    _buildSidebarItem(
+                      icon: Icons.event,
+                      label: 'Events',
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                DealerEventsPage(uid: widget.uid),
+                          ),
+                        );
+                        // _closeSidebar();
+                      },
                     ),
                     _buildSidebarItem(
                       icon: Icons.lock,
@@ -507,7 +526,8 @@ class _DealerDashboardPageState extends State<DealerDashboardPage>
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const PrivacyPolicyPage(),
+                            builder: (context) => PrivacyPolicyPage(
+                                callerType: 'Dealers', uid: widget.uid),
                           ),
                         );
                         // _closeSidebar();
@@ -520,7 +540,8 @@ class _DealerDashboardPageState extends State<DealerDashboardPage>
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const FAQPage(),
+                            builder: (context) =>
+                                FAQPage(callerType: 'Dealers', uid: widget.uid),
                           ),
                         );
                         // _closeSidebar();
@@ -1039,27 +1060,5 @@ class _DealerDashboardPageState extends State<DealerDashboardPage>
         ],
       ),
     );
-  }
-}
-
-class HexagonClipper extends CustomClipper<Path> {
-  @override
-  Path getClip(Size size) {
-    final path = Path();
-    final double controlPointOffset = size.height / 6;
-
-    path.moveTo(size.width / 2, 0);
-    path.lineTo(size.width, size.height / 2 - controlPointOffset);
-    path.lineTo(size.width, size.height / 2 + controlPointOffset);
-    path.lineTo(size.width / 2, size.height);
-    path.lineTo(0, size.height / 2 + controlPointOffset);
-    path.lineTo(0, size.height / 2 - controlPointOffset);
-    path.close();
-    return path;
-  }
-
-  @override
-  bool shouldReclip(CustomClipper<Path> oldClipper) {
-    return false;
   }
 }

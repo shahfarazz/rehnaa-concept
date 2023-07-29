@@ -796,53 +796,53 @@ class LandlordWithdrawalCard extends StatelessWidget {
                       String? propAddress;
                       DocumentReference? landlordRef;
 
-                      // reads required for Tenant Rental Request
-                      if (data.txnType == 'rentalRequest') {
-                        // Get the necessary data
-                        tenantSnapshot = await transaction.get(FirebaseFirestore
-                            .instance
-                            .collection('Tenants')
-                            .doc(data.uid));
-                        propertySnapshot = await transaction.get(
-                            FirebaseFirestore.instance
-                                .collection('Properties')
-                                .doc(data.propertyID));
+                      // // reads required for Tenant Rental Request
+                      // if (data.txnType == 'rentalRequest') {
+                      //   // Get the necessary data
+                      //   tenantSnapshot = await transaction.get(FirebaseFirestore
+                      //       .instance
+                      //       .collection('Tenants')
+                      //       .doc(data.uid));
+                      //   propertySnapshot = await transaction.get(
+                      //       FirebaseFirestore.instance
+                      //           .collection('Properties')
+                      //           .doc(data.propertyID));
 
-                        // Extract the needed data
-                        propAddress = propertySnapshot.get('address');
-                        landlordRef = propertySnapshot.get('landlordRef');
+                      //   // Extract the needed data
+                      //   propAddress = propertySnapshot.get('address');
+                      //   landlordRef = propertySnapshot.get('landlordRef');
 
-                        newRentalAmount = await showDialog<String?>(
-                          context: context,
-                          builder: (context) => AlertDialog(
-                            title: const Text('Enter New Rental Amount'),
-                            content: TextField(
-                              controller: _newRentalAmountController,
-                              keyboardType: TextInputType.number,
-                              decoration: const InputDecoration(
-                                labelText: 'New Rental Amount',
-                              ),
-                            ),
-                            actions: [
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                },
-                                child: const Text('Cancel'),
-                              ),
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.pop(context,
-                                      _newRentalAmountController?.text);
-                                },
-                                child: const Text('Submit'),
-                              ),
-                            ],
-                          ),
-                        );
-                        rentalAmount = newRentalAmount ?? data.requestedAmount!;
-                        newBalance = int.parse(rentalAmount);
-                      }
+                      //   newRentalAmount = await showDialog<String?>(
+                      //     context: context,
+                      //     builder: (context) => AlertDialog(
+                      //       title: const Text('Enter New Rental Amount'),
+                      //       content: TextField(
+                      //         controller: _newRentalAmountController,
+                      //         keyboardType: TextInputType.number,
+                      //         decoration: const InputDecoration(
+                      //           labelText: 'New Rental Amount',
+                      //         ),
+                      //       ),
+                      //       actions: [
+                      //         TextButton(
+                      //           onPressed: () {
+                      //             Navigator.pop(context);
+                      //           },
+                      //           child: const Text('Cancel'),
+                      //         ),
+                      //         TextButton(
+                      //           onPressed: () {
+                      //             Navigator.pop(context,
+                      //                 _newRentalAmountController?.text);
+                      //           },
+                      //           child: const Text('Submit'),
+                      //         ),
+                      //       ],
+                      //     ),
+                      //   );
+                      //   rentalAmount = newRentalAmount ?? data.requestedAmount!;
+                      //   newBalance = int.parse(rentalAmount);
+                      // }
 
                       if (requestSnapshot.exists) {
                         final List<dynamic> withdrawRequestArray =
@@ -1237,6 +1237,73 @@ class LandlordWithdrawalCard extends StatelessWidget {
                                       return ListTile(
                                         title: Text(key),
                                         subtitle: Text(value.toString()),
+                                        trailing: //image.network of data.dataFields.values.elementAt(index)['imagePath']
+                                            key == 'imagePath'
+                                                ? //value is a list of strings
+                                                value.length == 1
+                                                    ? Image.network(
+                                                        value[0],
+                                                        fit: BoxFit.cover,
+                                                        loadingBuilder: (context,
+                                                            child,
+                                                            loadingProgress) {
+                                                          if (loadingProgress ==
+                                                              null)
+                                                            return child;
+                                                          return Center(
+                                                            child:
+                                                                SpinKitFadingCube(
+                                                              color: Color
+                                                                  .fromARGB(
+                                                                      255,
+                                                                      30,
+                                                                      197,
+                                                                      83),
+                                                            ),
+                                                          );
+                                                        },
+                                                      )
+                                                    : SizedBox(
+                                                        height: 100,
+                                                        child: ListView.builder(
+                                                          shrinkWrap: true,
+                                                          scrollDirection:
+                                                              Axis.horizontal,
+                                                          itemCount:
+                                                              value.length,
+                                                          itemBuilder:
+                                                              (BuildContext
+                                                                      context,
+                                                                  int index) {
+                                                            return Image.network(
+                                                                value[index],
+                                                                loadingBuilder: (BuildContext
+                                                                        context,
+                                                                    Widget
+                                                                        child,
+                                                                    ImageChunkEvent?
+                                                                        loadingProgress) {
+                                                              if (loadingProgress ==
+                                                                  null)
+                                                                return child;
+                                                              return Center(
+                                                                child:
+                                                                    SpinKitFadingCube(
+                                                                  color: Color
+                                                                      .fromARGB(
+                                                                          255,
+                                                                          30,
+                                                                          197,
+                                                                          83),
+                                                                ),
+                                                              );
+                                                            },
+                                                                fit: BoxFit
+                                                                    .cover);
+                                                          },
+                                                        ),
+                                                      )
+                                                : null,
                                       );
                                     },
                                   ),
@@ -1312,14 +1379,14 @@ class LandlordWithdrawalCard extends StatelessWidget {
                         // Update the tenant's balance with the requested or new rental amount
                         // final rentalAmount =
                         //     newRentalAmount ?? data.requestedAmount!;
-                        await transaction.update(
-                          FirebaseFirestore.instance
-                              .collection('Tenants')
-                              .doc(data.uid),
-                          {
-                            'balance': FieldValue.increment(newBalance),
-                          },
-                        );
+                        // await transaction.update(
+                        //   FirebaseFirestore.instance
+                        //       .collection('Tenants')
+                        //       .doc(data.uid),
+                        //   {
+                        //     'balance': FieldValue.increment(newBalance),
+                        //   },
+                        // );
 
                         // Send a notification to the tenant
                         await transaction.update(
@@ -1336,61 +1403,61 @@ class LandlordWithdrawalCard extends StatelessWidget {
                           },
                         );
 
-                        // Set the tenant's isWithdraw to false and set propertyRef and address
-                        await transaction.set(
-                            FirebaseFirestore.instance
-                                .collection('Tenants')
-                                .doc(data.uid),
-                            {
-                              'isWithdraw': false,
-                              'propertyRef': FirebaseFirestore.instance
-                                  .collection('Properties')
-                                  .doc(data.propertyID),
-                              'address': propAddress ?? 'No address provided',
-                            },
-                            SetOptions(merge: true));
+                        // // Set the tenant's isWithdraw to false and set propertyRef and address
+                        // await transaction.set(
+                        //     FirebaseFirestore.instance
+                        //         .collection('Tenants')
+                        //         .doc(data.uid),
+                        //     {
+                        //       'isWithdraw': false,
+                        //       'propertyRef': FirebaseFirestore.instance
+                        //           .collection('Properties')
+                        //           .doc(data.propertyID),
+                        //       'address': propAddress ?? 'No address provided',
+                        //     },
+                        //     SetOptions(merge: true));
 
-                        // Set the property's tenantRef to the tenant's document reference
-                        await transaction.update(
-                          FirebaseFirestore.instance
-                              .collection('Properties')
-                              .doc(data.propertyID),
-                          {
-                            'tenantRef': FirebaseFirestore.instance
-                                .collection('Tenants')
-                                .doc(data.uid),
-                          },
-                        );
+                        // // Set the property's tenantRef to the tenant's document reference
+                        // await transaction.update(
+                        //   FirebaseFirestore.instance
+                        //       .collection('Properties')
+                        //       .doc(data.propertyID),
+                        //   {
+                        //     'tenantRef': FirebaseFirestore.instance
+                        //         .collection('Tenants')
+                        //         .doc(data.uid),
+                        //   },
+                        // );
 
-                        // Set the tenant's landlordRef to the property's landlordRef
-                        await transaction.update(
-                          FirebaseFirestore.instance
-                              .collection('Tenants')
-                              .doc(data.uid),
-                          {
-                            // 'landlordRef': landlordRef,
-                            //use fieldvalue.arrayunion to add the landlordRef to the tenant's landlordRef array
-                            'landlordRef': FieldValue.arrayUnion([
-                              FirebaseFirestore.instance
-                                  .collection('Landlords')
-                                  .doc(data.uid),
-                            ]),
-                          },
-                        );
+                        // // Set the tenant's landlordRef to the property's landlordRef
+                        // await transaction.update(
+                        //   FirebaseFirestore.instance
+                        //       .collection('Tenants')
+                        //       .doc(data.uid),
+                        //   {
+                        //     // 'landlordRef': landlordRef,
+                        //     //use fieldvalue.arrayunion to add the landlordRef to the tenant's landlordRef array
+                        //     'landlordRef': FieldValue.arrayUnion([
+                        //       FirebaseFirestore.instance
+                        //           .collection('Landlords')
+                        //           .doc(data.uid),
+                        //     ]),
+                        //   },
+                        // );
 
-                        // Update the landlord's tenantRef with the tenant's document reference
-                        await transaction.update(
-                          FirebaseFirestore.instance
-                              .collection('Landlords')
-                              .doc(landlordRef!.id),
-                          {
-                            'tenantRef': FieldValue.arrayUnion([
-                              FirebaseFirestore.instance
-                                  .collection('Tenants')
-                                  .doc(data.uid),
-                            ])
-                          },
-                        );
+                        // // Update the landlord's tenantRef with the tenant's document reference
+                        // await transaction.update(
+                        //   FirebaseFirestore.instance
+                        //       .collection('Landlords')
+                        //       .doc(landlordRef!.id),
+                        //   {
+                        //     'tenantRef': FieldValue.arrayUnion([
+                        //       FirebaseFirestore.instance
+                        //           .collection('Tenants')
+                        //           .doc(data.uid),
+                        //     ])
+                        //   },
+                        // );
 
                         // Update the property's isRequestedByTenants field
                         await transaction.update(

@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 import '../../Screens/Admin/admindashboard.dart';
+import '../Dealerdashboard_pages/dealerlandlordonboarded.dart';
 
 class AdminSendMonthlyProfitsPage extends StatefulWidget {
   const AdminSendMonthlyProfitsPage({super.key});
@@ -13,30 +14,43 @@ class AdminSendMonthlyProfitsPage extends StatefulWidget {
 
 class _AdminSendMonthlyProfitsPageState
     extends State<AdminSendMonthlyProfitsPage> {
-  List estamps = [];
+  // List estamps = [];
   // Map dealerToEstamps = {};
+  List<Estamp> estamps = [];
+  List<String> dealerIds = [];
 
-  Future showAllEstamps() async {
-    //an estamp is basically the mapping called landlordmap of a dealer where the key is the landlord id and the value are dynamic fields
-    var dealerdata;
-    dealerdata = await FirebaseFirestore.instance.collection('Dealers').get();
+  final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
-    //add each estamp to the estamps list
-    // where estamp is called landlordMap
+  Future<void> fetchAllEstamps() async {
+    QuerySnapshot dealerSnapshot = await firestore.collection('Dealers').get();
+    List<QueryDocumentSnapshot> dealerDocuments = dealerSnapshot.docs;
 
-    for (var element in dealerdata.docs) {
-      var landlordmap = element.data()['landlordMap'];
-      for (var landlord in landlordmap.keys) {
-        estamps.add({
-          'dealerId': element.id, // Add dealer id here
-          'uid': landlord,
-          'data': landlordmap[landlord],
-          'dealerName': element.data()['firstName'] ?? 'Unknown Dealer',
-        });
-      }
-    }
+    List<Future<List<Map<String, dynamic>>>> allEstampsDataFutures =
+        dealerDocuments.map((dealerDoc) async {
+      QuerySnapshot estampSnapshot =
+          await dealerDoc.reference.collection('Estamps').get();
 
-    // return estamps;
+      // Add the dealer id to the list of dealer ids
+      dealerIds.add(dealerDoc.id);
+
+      return estampSnapshot.docs
+          .map((estampDoc) => {'id': estampDoc.id, 'data': estampDoc.data()})
+          .toList();
+    }).toList();
+
+    List<List<Map<String, dynamic>>> allEstampsDataNested =
+        await Future.wait(allEstampsDataFutures);
+
+    // Flatten the nested list
+    List<Map<String, dynamic>> allEstampsData =
+        allEstampsDataNested.expand((x) => x).toList();
+
+    // Now allEstampsData contains the data of all documents in the 'Estamps' subcollections
+    // of all documents in the 'Dealers' collection
+    allEstampsData.forEach((element) {
+      estamps.add(Estamp(id: element['id'], landlordData: element['data']));
+    });
+    return;
   }
 
   @override
@@ -72,119 +86,152 @@ class _AdminSendMonthlyProfitsPageState
           // eStampTenantName which is a string
           // eStampLandlordName which is a string
           FutureBuilder(
-        future: showAllEstamps(),
+        future: fetchAllEstamps(),
         builder: (context, snapshot) {
           print('estamps are $estamps');
 
           if (snapshot.connectionState == ConnectionState.done) {
-            //save all the keys of the estamps in a list
-            // List estampKeys = estamps.keys.toList();
-            // List estampKeys = estamps.map((e) => e.keys).toList();
-            // estampKeys where key is the landlord id
-            // List estampKeys = estamps.expand((e) => e.keys).toList();
-            List estampKeys = estamps.map((e) => e['uid']).toList();
-
-            //instead of index we use the key of the estamp
-            print('estampKeys are $estampKeys');
-
             return ListView.builder(
-                itemCount: estampKeys.length,
+                itemCount: estamps.length,
                 itemBuilder: (context, index) {
-                  var estamp =
-                      estamps.firstWhere((e) => e['uid'] == estampKeys[index]);
-                  final startDate =
-                      (estamp['data']['eStampContractStartDate'] as Timestamp)
-                          .toDate();
-                  final now = DateTime.now();
+                  var startDate;
+                  var now;
+                  var daysPassed;
+                  var daysLeft;
 
-                  final daysPassed = now.difference(startDate).inDays;
-                  final daysLeft = 30 - daysPassed;
+                  if (estamps[index].landlordData['daysPassed'] != null &&
+                      estamps[index].landlordData['daysLeft'] != null) {
+                    daysPassed = estamps[index].landlordData['daysPassed'];
+                    daysLeft = estamps[index].landlordData['daysLeft'];
+                    // now = DateTime.now();
+                  } else {
+                    startDate = (estamps[index].landlordData['landlordData']
+                            ['eStampContractStartDate'] as Timestamp)
+                        .toDate();
+                    now = DateTime.now();
+
+                    daysPassed = now.difference(startDate).inDays;
+                    daysLeft = 30 - daysPassed;
+                  }
+
                   return Card(
-                    child: ListTile(
-                      title: Text(estamp['data']['eStampTenantName'] ??
-                          'Unknown tenant'),
-                      subtitle: Text('Start date: ' +
-                              (estamp['data']['eStampContractStartDate']
-                                      as Timestamp)
-                                  .toDate()
-                                  .toString()
-                                  .substring(0, 10) ??
-                          'Unknown Date'),
-                      leading: Text(estamp['dealerName'] ?? 'Unknown Dealer'),
-                      onTap: () async {
-                        // check if days passed is 30 or more
-                        if (daysPassed >= 30) {
-                          // send amount eStampMonthlyProfit to Dealer
+                      child: ListTile(
+                    onTap: () async {
+                      // check if days passed is 30 or more
+                      if (daysPassed >= 30) {
+                        // send amount eStampMonthlyProfit to Dealer
 
-                          //try parse cieling of eStampMonthlyProfit
-                          var correctBalance;
+                        //try parse cieling of eStampMonthlyProfit
+                        var correctBalance;
 
-                          try {
-                            correctBalance = int.tryParse(
-                                estamp['data']['eStampMonthlyProfit']);
-                          } catch (e) {
-                            print('reached ehre');
-                            correctBalance = 0;
-                          }
+                        try {
+                          correctBalance = int.tryParse(
+                              estamps[index].landlordData['landlordData']
+                                  ['eStampMonthlyProfit']);
+                        } catch (e) {
+                          print('reached ehre');
+                          correctBalance = 0;
+                        }
 
-                          var landlordName = //get landlord name by calling the current key on firebase
-                              await FirebaseFirestore.instance
-                                  .collection('Landlords')
-                                  .doc(estamp['uid'])
-                                  .get()
-                                  .then((value) =>
-                                      value.data()?['firstName'] +
-                                      ' ' +
-                                      value.data()?['lastName']);
+                        var landlordName = estamps[index]
+                            .landlordData['landlordData']['landlordName'];
 
-                          print('landlordName is $landlordName');
-                          print('dealerid is ${estamp['dealerId']}');
+                        print('landlordName is $landlordName');
+                        // print('dealerid is ${estamp['dealerId']}');
 
+                        var currentDealerID = dealerIds[index];
+
+                        FirebaseFirestore.instance
+                            .collection('rentPayments')
+                            .add({
+                          'tenantname': landlordName,
+                          'LandlordRef': FirebaseFirestore.instance
+                              .collection('Dealers')
+                              .doc(currentDealerID),
+                          'amount': correctBalance,
+                          'date': DateTime.now(),
+                          'isMinus': false,
+                          'isNoPdf': true,
+                          'isEstamp': true,
+                          'eStampType': 'Monthly Profit',
+                          'paymentType': '',
+                        }).then((value) {
                           FirebaseFirestore.instance
-                              .collection('rentPayments')
-                              .add({
-                            'tenantname': landlordName,
-                            'LandlordRef': FirebaseFirestore.instance
-                                .collection('Dealers')
-                                .doc(estamp['dealerId']),
-                            'amount': correctBalance,
-                            'date': DateTime.now(),
-                            'isMinus': true,
-                            'isNoPdf': true,
-                            'isEstamp': true,
-                            'eStampType': 'Monthly Profit',
-                            'paymentType': '',
-                          }).then((value) {
-                            FirebaseFirestore.instance
-                                .collection('Dealers')
-                                .doc(estamp['dealerId'])
-                                .update({
-                              'rentpaymentRef': FieldValue.arrayUnion([value]),
-                              'balance': FieldValue.increment(correctBalance),
-                            });
-                            //Snackbar to show that the amount has been sent
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Amount sent to dealer'),
-                              ),
-                            );
+                              .collection('Dealers')
+                              .doc(currentDealerID)
+                              .update({
+                            'rentpaymentRef': FieldValue.arrayUnion([value]),
+                            'balance': FieldValue.increment(correctBalance),
                           });
-                        } else {
+                          //Snackbar to show that the amount has been sent
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                              content: Text('Days passed are less than 30'),
+                              content: Text('Amount sent to dealer'),
                             ),
                           );
-                        }
-                      },
-                      trailing: Column(
-                        children: [
-                          Text('Days passed: $daysPassed'),
-                          Text('Days left: $daysLeft'),
-                        ],
+
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    AdminSendMonthlyProfitsPage(),
+                              ));
+
+                          //i need a way to reset the days passed to 0 without updating the estamp
+                          //this can be done by adding a new field called days passed and days left
+                          //and then updating them when the amount is sent
+                          FirebaseFirestore.instance
+                              .collection('Dealers')
+                              .doc(currentDealerID)
+                              .collection('Estamps')
+                              .doc(estamps[index].id)
+                              .update({
+                            'daysPassed': 0,
+                            'daysLeft': 30,
+                          });
+                        });
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Days passed are less than 30'),
+                          ),
+                        );
+                      }
+                    },
+                    trailing: Column(
+                      children: [
+                        Text('Days passed: $daysPassed'),
+                        Text('Days left: $daysLeft'),
+                      ],
+                    ),
+                    title: Text(
+                      estamps[index].landlordData['landlordData']
+                          ['eStampTenantName'],
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
-                  );
+                    subtitle: Text(
+                      estamps[index].landlordData['landlordData']
+                          ['landlordName'],
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    // trailing: Text(
+                    //   estamps[index]
+                    //       .landlordData['landlordData']
+                    //           ['eStampContractEndDate']
+                    //       .toDate()
+                    //       .toString(),
+                    //   style: const TextStyle(
+                    //     fontSize: 15,
+                    //     fontWeight: FontWeight.bold,
+                    //   ),
+                    // ),
+                  ));
                 });
           } else {
             return const Center(

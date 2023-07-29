@@ -198,97 +198,107 @@ class _LandlordPropertiesPageState extends State<LandlordPropertiesPage>
           } else if (isEmptyList ||
               !snapshot.hasData ||
               snapshot.data!.isEmpty) {
-            return Column(
-              children: [
-                SizedBox(height: size.height * 0.03),
-                Container(
-                  padding: const EdgeInsets.symmetric(vertical: 16.0),
-                  alignment: Alignment.center,
-                  child: Text(
-                    'Properties',
-                    style: GoogleFonts.montserrat(
-                      fontSize: 24.0,
-                      fontWeight: FontWeight.bold,
-                      color: const Color(0xff33907c),
-                    ),
-                  ),
-                ),
-                SizedBox(height: size.height * 0.03),
-                Card(
-                  elevation: 4.0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20.0),
-                  ),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20.0),
-                      color: Colors.white,
-                    ),
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(
-                          Icons.house,
-                          size: 48.0,
-                          color: Color(0xff33907c),
-                        ),
-                        const SizedBox(height: 16.0),
-                        Text(
-                          'No properties to show',
-                          style: GoogleFonts.montserrat(
-                            fontSize: 20.0,
-                            color: const Color(0xff33907c),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                SizedBox(height: size.height * 0.3),
-                Visibility(
-                  visible: true, // Ensure the "+" button is always visible
-                  child: Material(
-                    elevation: 4.0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(28.0),
-                    ),
-                    child: InkWell(
-                      onTap: () {
-                        // Handle floating action button tap
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) =>
-                                LandlordPropertyForms(uid: widget.uid),
-                          ),
-                        );
-                      },
-                      borderRadius: BorderRadius.circular(28.0),
-                      child: Container(
-                        padding: EdgeInsets.all(16.0),
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              const Color(0xff0FA697),
-                              const Color(0xff45BF7A),
-                              const Color(0xff0DF205),
-                            ],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
-                          borderRadius: BorderRadius.circular(28.0),
-                        ),
-                        child: Icon(
-                          Icons.add,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            );
+            return Scaffold(
+                backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+                body: RefreshIndicator(
+                    onRefresh: () async {
+                      await _updatePropertyStream();
+                    },
+                    child: SingleChildScrollView(
+                        physics: AlwaysScrollableScrollPhysics(),
+                        child: Column(
+                          children: [
+                            SizedBox(height: size.height * 0.03),
+                            Container(
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 16.0),
+                              alignment: Alignment.center,
+                              child: Text(
+                                'Properties',
+                                style: GoogleFonts.montserrat(
+                                  fontSize: 24.0,
+                                  fontWeight: FontWeight.bold,
+                                  color: const Color(0xff33907c),
+                                ),
+                              ),
+                            ),
+                            SizedBox(height: size.height * 0.03),
+                            Card(
+                              elevation: 4.0,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20.0),
+                              ),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(20.0),
+                                  color: Colors.white,
+                                ),
+                                padding: const EdgeInsets.all(16.0),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const Icon(
+                                      Icons.house,
+                                      size: 48.0,
+                                      color: Color(0xff33907c),
+                                    ),
+                                    const SizedBox(height: 16.0),
+                                    Text(
+                                      'No properties to show',
+                                      style: GoogleFonts.montserrat(
+                                        fontSize: 20.0,
+                                        color: const Color(0xff33907c),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            SizedBox(height: size.height * 0.3),
+                            Visibility(
+                              visible:
+                                  true, // Ensure the "+" button is always visible
+                              child: Material(
+                                elevation: 4.0,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(28.0),
+                                ),
+                                child: InkWell(
+                                  onTap: () {
+                                    // Handle floating action button tap
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => LandlordPropertyForms(
+                                            uid: widget.uid),
+                                      ),
+                                    );
+                                  },
+                                  borderRadius: BorderRadius.circular(28.0),
+                                  child: Container(
+                                    padding: EdgeInsets.all(16.0),
+                                    decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        colors: [
+                                          const Color(0xff0FA697),
+                                          const Color(0xff45BF7A),
+                                          const Color(0xff0DF205),
+                                        ],
+                                        begin: Alignment.topLeft,
+                                        end: Alignment.bottomRight,
+                                      ),
+                                      borderRadius: BorderRadius.circular(28.0),
+                                    ),
+                                    child: Icon(
+                                      Icons.add,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ))));
           } else {
             return Stack(
               children: [

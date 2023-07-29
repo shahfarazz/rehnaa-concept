@@ -11,6 +11,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as path;
 
 import '../../../backend/models/landlordmodel.dart';
+import '../../../backend/services/helperfunctions.dart';
 import '../../Screens/Landlord/landlord_dashboard.dart';
 
 class LandlordPropertyForms extends StatefulWidget {
@@ -948,14 +949,24 @@ class _LandlordPropertyFormsState extends State<LandlordPropertyForms> {
       final List<XFile>? selectedImages = await picker.pickMultiImage();
 
       if (selectedImages != null && selectedImages.isNotEmpty) {
-        if (selectedImages.length > 10 ||
-            imagePath.length > 10 ||
-            pathToImage.length > 10) {
-          Fluttertoast.showToast(
-            msg: 'You can select up to 10 images',
-            gravity: ToastGravity.BOTTOM,
-            backgroundColor: Colors.red,
-            textColor: Colors.white,
+        print('selectedimageslength is ${selectedImages.length}');
+        print('imagepath length is ${imagePath.length}');
+        print('pathToaimagelength is ${pathToImage.length}');
+        if (selectedImages.length >= 10 ||
+            imagePath.length >= 10 ||
+            pathToImage.length >= 10) {
+          // Fluttertoast.showToast(
+          //   msg: 'You can select up to 10 images',
+          //   gravity: ToastGravity.BOTTOM,
+          //   backgroundColor: Colors.red,
+          //   textColor: Colors.white,
+          // );
+          //show snackbar
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('You can select up to 10 images'),
+              backgroundColor: Colors.red,
+            ),
           );
           return false;
         }

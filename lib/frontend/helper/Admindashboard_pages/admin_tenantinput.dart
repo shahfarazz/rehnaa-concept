@@ -189,6 +189,9 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
     final TextEditingController addressController =
         TextEditingController(text: tenant.address ?? '');
 
+    // selectedLandlordRefs = List.from(te)
+    selectedLandlordRefs = List.from(tenant.landlordRef ?? []);
+
     //phoneNumber
     final TextEditingController phoneNumberController =
         TextEditingController(text: tenant.phoneNumber ?? '');
@@ -221,9 +224,9 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
     //propertyAddress
     final TextEditingController propertyAddressController =
         TextEditingController(text: tenant.propertyAddress ?? '');
-    // monthlyRent
-    final TextEditingController monthlyRentController =
-        TextEditingController(text: tenant.monthlyRent.toString());
+    // // monthlyRent
+    // final TextEditingController monthlyRentController =
+    //     TextEditingController(text: tenant.monthlyRent.toString());
 
     //securityDeposit
     final TextEditingController securityDepositController =
@@ -364,19 +367,19 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
                     decoration:
                         const InputDecoration(labelText: 'Property Address'),
                   ),
-                  TextFormField(
-                    controller: monthlyRentController,
-                    decoration:
-                        const InputDecoration(labelText: 'Monthly Rent'),
-                    validator: (value) {
-                      //check if value can be parsed
-                      if (value != null &&
-                          int.tryParse(value) == null &&
-                          value != '') {
-                        return 'Please enter a valid monthly rent';
-                      }
-                    },
-                  ),
+                  // TextFormField(
+                  //   controller: monthlyRentController,
+                  //   decoration:
+                  //       const InputDecoration(labelText: 'Monthly Rent'),
+                  //   validator: (value) {
+                  //     //check if value can be parsed
+                  //     if (value != null &&
+                  //         int.tryParse(value) == null &&
+                  //         value != '') {
+                  //       return 'Please enter a valid monthly rent';
+                  //     }
+                  //   },
+                  // ),
                   TextFormField(
                     controller: otherInfoController,
                     decoration:
@@ -516,7 +519,7 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
                           if (contractEndDate != null)
                             'contractEndDate':
                                 Timestamp.fromDate(contractEndDate!),
-                          'monthlyRent': monthlyRentController.text ?? '',
+                          // 'monthlyRent': monthlyRentController.text ?? '',
                           'policeVerification': policeVerification,
                           'tasdeeqVerification': tasdeeqVerification,
                           'securityDeposit':
@@ -546,9 +549,9 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
                           if (contractEndDate != null)
                             'contractEndDate':
                                 Timestamp.fromDate(contractEndDate!),
-                          'monthlyRent': monthlyRentController.text.isNotEmpty
-                              ? monthlyRentController.text ?? 0.0
-                              : 'empty',
+                          // 'monthlyRent': monthlyRentController.text.isNotEmpty
+                          //     ? monthlyRentController.text ?? 0.0
+                          //     : 'empty',
                           'securityDeposit':
                               securityDepositController.text.isNotEmpty &&
                                       securityDepositController.text != 'null'
@@ -772,9 +775,9 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
                                                   contractStartDate;
                                               tenant.contractEndDate =
                                                   contractEndDate;
-                                              tenant.monthlyRent =
-                                                  monthlyRentController.text ??
-                                                      '';
+                                              // tenant.monthlyRent =
+                                              //     monthlyRentController.text ??
+                                              //         '';
                                               tenant.policeVerification =
                                                   policeVerification;
                                               tenant.tasdeeqVerification =
@@ -849,12 +852,6 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
     showDialog(
       context: context,
       builder: (context) {
-        List<QueryDocumentSnapshot<Map<String, dynamic>>> landlordDocs = [];
-        String searchString = '';
-
-        // Initialize selectedLandlords set
-        Set<int> selectedLandlords = {};
-
         return StatefulBuilder(
           builder: (context, setState) {
             return AlertDialog(
@@ -866,9 +863,7 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
                     child: TextField(
                       controller: searchController,
                       onChanged: (value) {
-                        setState(() {
-                          searchString = value.toLowerCase();
-                        });
+                        setState(() {});
                       },
                       decoration: InputDecoration(
                         labelText: "Search",
@@ -900,18 +895,19 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
                       );
                     }
 
-                    landlordDocs = snapshot.data!.docs;
+                    List<QueryDocumentSnapshot<Map<String, dynamic>>>
+                        landlordDocs = snapshot.data!.docs;
 
-                    // Pre-select landlords
-                    if (tenant.landlordRef != null &&
-                        tenant.landlordRef!.isNotEmpty) {
-                      for (int i = 0; i < landlordDocs.length; i++) {
-                        if (tenant.landlordRef!
-                            .any((ref) => ref.id == landlordDocs[i].id)) {
-                          selectedLandlords.add(i);
-                        }
-                      }
-                    }
+                    // // If tenant.landlordRef is not null or empty, then pre-select landlords
+                    // if (tenant.landlordRef != null &&
+                    //     tenant.landlordRef!.isNotEmpty) {
+                    //   for (var doc in landlordDocs) {
+                    //     if (tenant.landlordRef!
+                    //         .any((ref) => ref.id == doc.id)) {
+                    //       selectedLandlordRefs.add(doc.reference);
+                    //     }
+                    //   }
+                    // }
 
                     return SingleChildScrollView(
                       child: Column(
@@ -924,9 +920,10 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
                                   .toLowerCase();
 
                           // Filter based on search string
-                          if (fullName.contains(searchString)) {
-                            bool isSelected = selectedLandlords
-                                .contains(landlordDocs.indexOf(doc));
+                          if (fullName
+                              .contains(searchController.text.toLowerCase())) {
+                            bool isSelected =
+                                selectedLandlordRefs.contains(doc.reference);
 
                             return CheckboxListTile(
                               title: Text(
@@ -935,11 +932,10 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
                               onChanged: (selected) {
                                 setState(() {
                                   if (selected == true) {
-                                    selectedLandlords
-                                        .add(landlordDocs.indexOf(doc));
+                                    selectedLandlordRefs.add(doc.reference);
                                   } else {
-                                    selectedLandlords
-                                        .remove(landlordDocs.indexOf(doc));
+                                    print('removing ${doc.id}');
+                                    selectedLandlordRefs.remove(doc.reference);
                                   }
                                 });
                               },
@@ -962,16 +958,6 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
                 ),
                 TextButton(
                   onPressed: () {
-                    // Clear the old references
-                    selectedLandlordRefs.clear();
-
-                    // Add the selected landlords to the selectedLandlordRefs list
-                    for (var index in selectedLandlords) {
-                      selectedLandlordRefs.add(FirebaseFirestore.instance
-                          .collection('Landlords')
-                          .doc(landlordDocs[index].id));
-                    }
-
                     onSelectionDone();
                     Navigator.pop(context);
                   },

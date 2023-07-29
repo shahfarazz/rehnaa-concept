@@ -1,13 +1,17 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:rehnaa/frontend/Screens/Dealer/dealer_dashboard.dart';
 
 import '../../../backend/models/dealermodel.dart';
 import '../../../backend/models/landlordmodel.dart';
+import '../../../backend/services/helperfunctions.dart';
 import '../../Screens/Landlord/landlord_dashboard.dart';
 import '../../Screens/contract.dart';
 import 'dealer_estamp_info.dart';
+import 'dealerlandlordonboarded.dart';
 
 class DealerEstampPage extends StatefulWidget {
   final String uid;
@@ -23,28 +27,46 @@ class _DealerEstampPageState extends State<DealerEstampPage> {
   final searchController = TextEditingController();
   bool isTyping = false;
   List<Landlord> filteredLandlords = [];
+  List<Estamp> filteredEstamps = [];
   List<Landlord> landlords = [];
+  List<Estamp> estamps = [];
   bool isLoading = true;
   Dealer? dealer;
   bool _noEstamp = true;
+  Future<List<Estamp>>? _fetchEstampsFuture;
   @override
   void initState() {
     super.initState();
-    filteredLandlords = List.from(landlords);
+    // filteredLandlords = List.from(landlords);
+    filteredEstamps = List.from(estamps);
     searchFocusNode = FocusNode();
     searchController.addListener(onSearchTextChanged);
-    fetchLandlords();
+    // fetchLandlords();
+    _fetchEstampsFuture = fetchEstamps();
   }
 
   void onSearchTextChanged() {
     final query = searchController.text;
-    filterLandlords(query);
+    // filterLandlords(query);
+    filterEstamps(query);
   }
 
-  void filterLandlords(String query) {
+  // void filterLandlords(String query) {
+  //   setState(() {
+  //     filteredLandlords = landlords.where((landlord) {
+  //       final nameLower = landlord.firstName.toLowerCase();
+  //       final queryLower = query.toLowerCase();
+  //       return nameLower.contains(queryLower);
+  //     }).toList();
+  //     isTyping = query.isNotEmpty;
+  //   });
+  // }
+
+  void filterEstamps(String query) {
     setState(() {
-      filteredLandlords = landlords.where((landlord) {
-        final nameLower = landlord.firstName.toLowerCase();
+      filteredEstamps = estamps.where((estamp) {
+        final nameLower =
+            estamp.landlordData['landlordData']['landlordName'].toLowerCase();
         final queryLower = query.toLowerCase();
         return nameLower.contains(queryLower);
       }).toList();
@@ -55,7 +77,7 @@ class _DealerEstampPageState extends State<DealerEstampPage> {
   Future<void> _refreshFunction() async {
     setState(() {
       isLoading = true;
-      fetchLandlords();
+      _fetchEstampsFuture = fetchEstamps();
     });
   }
 
@@ -117,11 +139,32 @@ class _DealerEstampPageState extends State<DealerEstampPage> {
     }
   }
 
+  Future<List<Estamp>> fetchEstamps() async {
+    estamps = [];
+    try {
+      await FirebaseFirestore.instance
+          .collection('Dealers')
+          .doc(widget.uid)
+          .collection('Estamps')
+          .get()
+          .then((value) {
+        value.docs.forEach((element) {
+          estamps.add(Estamp(id: element.id, landlordData: element.data()));
+        });
+      });
+
+      return estamps;
+    } catch (e) {
+      print(e);
+      return [];
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
-      appBar: _buildAppBar(size, context),
+      appBar: _buildAppBar(size, context, widget.uid),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
@@ -172,133 +215,156 @@ class _DealerEstampPageState extends State<DealerEstampPage> {
                 ),
               ),
               Expanded(
-                child: filteredLandlords.isEmpty || _noEstamp
-                    ? RefreshIndicator(
-                        onRefresh: _refreshFunction,
-                        child: SingleChildScrollView(
-                            physics: const AlwaysScrollableScrollPhysics(),
-                            child: Column(
-                              children: [
-                                SizedBox(height: size.height * 0.05),
-                                Card(
-                                  elevation: 4.0,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(20.0),
-                                  ),
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(20.0),
-                                      color: Colors.white,
-                                    ),
-                                    padding: const EdgeInsets.all(16.0),
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        const Icon(
-                                          Icons.error_outline,
-                                          size: 48.0,
-                                          color: Color(0xff33907c),
+                child: FutureBuilder(
+                  future: _fetchEstampsFuture,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(
+                          child: SpinKitFadingCube(
+                        color: Color.fromARGB(255, 30, 197, 83),
+                      ));
+                    } else {
+                      filteredEstamps = snapshot.data as List<Estamp>;
+                      return filteredEstamps.isEmpty
+                          ? RefreshIndicator(
+                              onRefresh: _refreshFunction,
+                              child: SingleChildScrollView(
+                                  physics:
+                                      const AlwaysScrollableScrollPhysics(),
+                                  child: Column(
+                                    children: [
+                                      SizedBox(height: size.height * 0.05),
+                                      Card(
+                                        elevation: 4.0,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(20.0),
                                         ),
-                                        const SizedBox(height: 16.0),
-                                        Text(
-                                          'No E-Stamp Papers Found.',
-                                          textAlign: TextAlign.center,
-                                          style: GoogleFonts.montserrat(
-                                            fontSize: 20.0,
-                                            // fontWeight: FontWeight.bold,
-                                            color: const Color(0xff33907c),
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(20.0),
+                                            color: Colors.white,
+                                          ),
+                                          padding: const EdgeInsets.all(16.0),
+                                          child: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              const Icon(
+                                                Icons.error_outline,
+                                                size: 48.0,
+                                                color: Color(0xff33907c),
+                                              ),
+                                              const SizedBox(height: 16.0),
+                                              Text(
+                                                'No E-Stamp Papers Found.',
+                                                textAlign: TextAlign.center,
+                                                style: GoogleFonts.montserrat(
+                                                  fontSize: 20.0,
+                                                  // fontWeight: FontWeight.bold,
+                                                  color:
+                                                      const Color(0xff33907c),
+                                                ),
+                                              ),
+                                            ],
                                           ),
                                         ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            )))
-                    : RefreshIndicator(
-                        onRefresh: _refreshFunction,
-                        child: ListView.builder(
-                          itemCount: filteredLandlords.length,
-                          itemBuilder: (context, index) {
-                            final landlord = filteredLandlords[index];
-                            return GestureDetector(
-                              onTap: () {
-                                if (!(landlord.hasEstamp)) {
-                                  //flutter toast no estamp found
-                                  Fluttertoast.showToast(
-                                      msg: "No E-Stamp Papers Found",
-                                      toastLength: Toast.LENGTH_SHORT,
-                                      gravity: ToastGravity.BOTTOM,
-                                      timeInSecForIosWeb: 1,
-                                      backgroundColor: Colors.red,
-                                      textColor: Colors.white,
-                                      fontSize: 16.0);
-                                  return;
-                                }
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => DealerEstampInfoPage(
-                                      landlord: landlord,
-                                      dealer: dealer!,
-                                    ),
-                                  ),
-                                );
-                              },
-                              child: landlord.hasEstamp
-                                  ? Card(
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(10.0),
                                       ),
-                                      elevation: 5.0,
-                                      child: ListTile(
-                                        contentPadding:
-                                            const EdgeInsets.symmetric(
-                                                horizontal: 20.0,
-                                                vertical: 10.0),
-                                        title: Text(
-                                          landlord.firstName +
-                                              " " +
-                                              landlord.lastName,
-                                          style: TextStyle(
-                                              // color: Colors.green,
-                                              color: const Color(0xff33907c),
+                                      SizedBox(height: 200),
+                                    ],
+                                  )))
+                          : RefreshIndicator(
+                              onRefresh: _refreshFunction,
+                              child: ListView.builder(
+                                // reverse: true,
+                                itemCount: filteredEstamps.length,
+                                itemBuilder: (context, index) {
+                                  // final landlord = filteredLandlords[index];
+                                  //reverse the list
+                                  // final landlord = filteredLandlords[
+                                  //     filteredLandlords.length - index - 1];
+                                  final estamp = filteredEstamps[
+                                      filteredEstamps.length - index - 1];
+                                  return GestureDetector(
+                                      onTap: () {
+                                        // if (!(landlord.hasEstamp)) {
+                                        //   //flutter toast no estamp found
+                                        //   Fluttertoast.showToast(
+                                        //       msg: "No E-Stamp Papers Found",
+                                        //       toastLength: Toast.LENGTH_SHORT,
+                                        //       gravity: ToastGravity.BOTTOM,
+                                        //       timeInSecForIosWeb: 1,
+                                        //       backgroundColor: Colors.red,
+                                        //       textColor: Colors.white,
+                                        //       fontSize: 16.0);
+                                        //   return;
+                                        // }
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                DealerEstampInfoPage(
+                                                    landlordData:
+                                                        estamp.landlordData[
+                                                            'landlordData']),
+                                          ),
+                                        );
+                                      },
+                                      child: Card(
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(10.0),
+                                        ),
+                                        elevation: 5.0,
+                                        child: ListTile(
+                                          contentPadding:
+                                              const EdgeInsets.symmetric(
+                                                  horizontal: 20.0,
+                                                  vertical: 10.0),
+                                          title: Text(
+                                            estamp.landlordData['landlordData']
+                                                ['landlordName'],
+                                            style: TextStyle(
+                                                // color: Colors.green,
+                                                color: const Color(0xff33907c),
+                                                fontFamily:
+                                                    GoogleFonts.montserrat()
+                                                        .fontFamily,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                          subtitle: Text(
+                                            estamp.landlordData?['landlordData']
+                                                ?['eStampAddress'],
+                                            style: TextStyle(
+                                              color: Colors.green,
                                               fontFamily:
                                                   GoogleFonts.montserrat()
                                                       .fontFamily,
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                        subtitle: Text(
-                                          dealer?.landlordMap?[landlord.tempID]
-                                              ?['eStampAddress'],
-                                          style: TextStyle(
-                                            color: Colors.green,
-                                            fontFamily: GoogleFonts.montserrat()
-                                                .fontFamily,
-                                            // fontWeight: FontWeight.bold
+                                              // fontWeight: FontWeight.bold
+                                            ),
                                           ),
-                                        ),
-                                        trailing: Text(
-                                          '${dealer?.landlordMap?[landlord.tempID]?['eStampDate']}\n\nRs.${dealer?.landlordMap?[landlord.tempID]?['eStampCost']}',
-                                          // landlord.contractStartDate == ''
-                                          //     ? 'No Contract\n\n${landlord.monthlyRent == "" ? "No Rent" : landlord.monthlyRent}'
-                                          //     : '${landlord.contractStartDate!}\n ${landlord.monthlyRent == "" ? "No Rent" : landlord.monthlyRent}',
-                                          style: TextStyle(
-                                            color: Colors.black,
-                                            fontFamily: GoogleFonts.montserrat()
-                                                .fontFamily,
+                                          trailing: Text(
+                                            '${estamp.landlordData?['landlordData']?['eStampDate']}\n\nRs.${estamp.landlordData?['landlordData']?['eStampCost']}',
+                                            // landlord.contractStartDate == ''
+                                            //     ? 'No Contract\n\n${landlord.monthlyRent == "" ? "No Rent" : landlord.monthlyRent}'
+                                            //     : '${landlord.contractStartDate!}\n ${landlord.monthlyRent == "" ? "No Rent" : landlord.monthlyRent}',
+                                            style: TextStyle(
+                                              color: Colors.black,
+                                              fontFamily:
+                                                  GoogleFonts.montserrat()
+                                                      .fontFamily,
+                                            ),
                                           ),
-                                        ),
 
-                                        // subtitle: Text('dummy'),
-                                      ),
-                                    )
-                                  : Container(),
+                                          // subtitle: Text('dummy'),
+                                        ),
+                                      ));
+                                },
+                              ),
                             );
-                          },
-                        ),
-                      ),
+                    }
+                  },
+                ),
               )
             ],
           ),
@@ -308,42 +374,54 @@ class _DealerEstampPageState extends State<DealerEstampPage> {
   }
 }
 
-PreferredSizeWidget _buildAppBar(Size size, context) {
+PreferredSizeWidget _buildAppBar(Size size, context, uid) {
   return AppBar(
     toolbarHeight: 70,
     title: Padding(
       padding: EdgeInsets.only(
-        // top: MediaQuery.of(context).size.height * 0.02, // 2% of the page height
         right:
             MediaQuery.of(context).size.width * 0.14, // 55% of the page width
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          Stack(
-            children: [
-              ClipPath(
-                clipper: HexagonClipper(),
-                child: Transform.scale(
-                  scale: 0.87,
-                  child: Container(
-                    color: Colors.white,
-                    width: 60,
-                    height: 60,
+          GestureDetector(
+              onTap: () {
+                // Add your desired logic here
+                // print('tapped');
+
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => DealerDashboardPage(
+                            uid: uid,
+                          )),
+                );
+              },
+              child: Stack(
+                children: [
+                  ClipPath(
+                    clipper: HexagonClipper(),
+                    child: Transform.scale(
+                      scale: 0.87,
+                      child: Container(
+                        color: Colors.white,
+                        width: 60,
+                        height: 60,
+                      ),
+                    ),
                   ),
-                ),
-              ),
-              ClipPath(
-                clipper: HexagonClipper(),
-                child: Image.asset(
-                  'assets/mainlogo.png',
-                  width: 60,
-                  height: 60,
-                  fit: BoxFit.cover,
-                ),
-              ),
-            ],
-          ),
+                  ClipPath(
+                    clipper: HexagonClipper(),
+                    child: Image.asset(
+                      'assets/mainlogo.png',
+                      width: 60,
+                      height: 60,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ],
+              )),
           // const SizedBox(width: 8),
         ],
       ),

@@ -9,14 +9,18 @@ class AdminPropertyContractsPage extends StatefulWidget {
   final String landlordID;
   String? landlordName;
   String? tenantName;
-  final String? propertyID;
+  String? landlordCNIC;
+  String? tenantCNIC;
+  final String propertyID;
   AdminPropertyContractsPage(
       {Key? key,
       required this.tenantID,
       required this.landlordID,
       this.landlordName,
       this.tenantName,
-      this.propertyID})
+      this.landlordCNIC,
+      this.tenantCNIC,
+      required this.propertyID})
       : super(key: key);
 
   @override
@@ -88,7 +92,8 @@ class _AdminPropertyContractsPageState
   final TextEditingController _additionalInformationController =
       TextEditingController();
 
-  void _addContractToDatabase() {
+  Future<void> _addContractToDatabase() async {
+    print('property id is asdknsa: ${widget.propertyID}');
     if (contractStartDate == null || contractEndDate == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -163,7 +168,7 @@ class _AdminPropertyContractsPageState
     //use propertyID to get the property details from the database
     var currentProperty;
 
-    FirebaseFirestore.instance
+    await FirebaseFirestore.instance
         .collection('Properties')
         .doc(widget.propertyID)
         .get()
@@ -209,8 +214,9 @@ class _AdminPropertyContractsPageState
       'additionalInformation': additionalInformation,
       'landlordID': widget.landlordID,
       'tenantID': widget.tenantID,
-      'propertyID': currentProperty.propertyID,
+      'propertyID': widget.propertyID,
       'propertyTitle': currentProperty.title,
+      'createdTimestamp': FieldValue.serverTimestamp(),
     }).then((value) {
       newContractID = value.id;
       //add newContractID to contractIDs list in Landlords and Tenants
@@ -228,33 +234,33 @@ class _AdminPropertyContractsPageState
       });
     });
 
-    FirebaseFirestore.instance
-        .collection('Tenants')
-        .doc(widget.tenantID)
-        .update({
-      'contractStartDate': contractStartDate != null
-          ? Timestamp.fromDate(contractStartDate!)
-          : 'empty',
-      'contractEndDate': contractEndDate != null
-          ? Timestamp.fromDate(contractEndDate!)
-          : 'empty',
-      'propertyAddress': propertyAddress,
-      'monthlyRent': monthlyRent,
-    });
+    // FirebaseFirestore.instance
+    //     .collection('Tenants')
+    //     .doc(widget.tenantID)
+    //     .update({
+    //   'contractStartDate': contractStartDate != null
+    //       ? Timestamp.fromDate(contractStartDate!)
+    //       : 'empty',
+    //   'contractEndDate': contractEndDate != null
+    //       ? Timestamp.fromDate(contractEndDate!)
+    //       : 'empty',
+    //   'propertyAddress': propertyAddress,
+    //   'monthlyRent': monthlyRent,
+    // });
 
-    FirebaseFirestore.instance
-        .collection('Landlords')
-        .doc(widget.landlordID)
-        .update({
-      'contractStartDate': contractStartDate != null
-          ? Timestamp.fromDate(contractStartDate!)
-          : 'empty',
-      'contractEndDate': contractEndDate != null
-          ? Timestamp.fromDate(contractEndDate!)
-          : 'empty',
-      'propertyAddress': propertyAddress,
-      'monthlyRent': monthlyRent,
-    });
+    // FirebaseFirestore.instance
+    //     .collection('Landlords')
+    //     .doc(widget.landlordID)
+    //     .update({
+    //   'contractStartDate': contractStartDate != null
+    //       ? Timestamp.fromDate(contractStartDate!)
+    //       : 'empty',
+    //   'contractEndDate': contractEndDate != null
+    //       ? Timestamp.fromDate(contractEndDate!)
+    //       : 'empty',
+    //   'propertyAddress': propertyAddress,
+    //   'monthlyRent': monthlyRent,
+    // });
 
     //snackbar to show that the contract has been added
     ScaffoldMessenger.of(context).showSnackBar(
@@ -302,6 +308,7 @@ class _AdminPropertyContractsPageState
   Widget build(BuildContext context) {
     _landlordNameController.text = widget.landlordName ?? '';
     _tenantNameController.text = widget.tenantName ?? '';
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Property Contracts'),

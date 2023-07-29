@@ -6,10 +6,13 @@ import '../../../backend/models/dealermodel.dart';
 import '../../../backend/models/landlordmodel.dart';
 
 class LandlordsOnboardedInfoPage extends StatelessWidget {
-  final Landlord landlord;
-  final Dealer dealer;
-  const LandlordsOnboardedInfoPage(
-      {super.key, required this.landlord, required this.dealer});
+  // final Landlord landlord;
+  // final Dealer dealer;
+  final landlordData;
+  const LandlordsOnboardedInfoPage({
+    super.key,
+    required this.landlordData,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -93,95 +96,82 @@ class LandlordsOnboardedInfoPage extends StatelessWidget {
                               ContractCard(
                                 icon: Icons.person,
                                 label: 'LandLord Name:',
-                                data:
-                                    "${landlord.firstName} ${landlord.lastName}",
+                                data: "${landlordData?['landlordName']} ",
                               ),
                               SizedBox(height: 16),
                               ContractCard(
                                 icon: Icons.person,
                                 label: 'Tenant Name:',
-                                data: dealer?.landlordMap?[landlord.tempID]
-                                    ?['eStampTenantName'],
+                                data: landlordData?['eStampTenantName'],
                               ),
                               SizedBox(height: 16),
                               ContractCard(
                                 icon: Icons.calendar_today,
                                 label: 'Contract Start Date:',
-                                data: dealer?.landlordMap?[landlord.tempID]
-                                            ?['eStampContractStartDate'] ==
+                                data: landlordData?[
+                                            'eStampContractStartDate'] ==
                                         null
                                     ? ''
-                                    : dealer?.landlordMap?[landlord.tempID]
-                                                ?['eStampContractStartDate']
+                                    : landlordData?['eStampContractStartDate']
                                             is Timestamp
-                                        ? (dealer?.landlordMap?[landlord.tempID]
-                                                    ?['eStampContractStartDate']
+                                        ? (landlordData?[
+                                                    'eStampContractStartDate']
                                                 as Timestamp)
                                             .toDate()
                                             .toString()
                                             .substring(0, 10)
-                                        : dealer?.landlordMap?[landlord.tempID]
-                                            ?['eStampContractStartDate'],
+                                        : landlordData?[
+                                            'eStampContractStartDate'],
                               ),
                               SizedBox(height: 16),
                               ContractCard(
                                 icon: Icons.calendar_today,
                                 label: 'Contract End Date:',
-                                data: dealer?.landlordMap?[landlord.tempID]
-                                            ?['eStampContractEndDate'] ==
+                                data: landlordData?['eStampContractEndDate'] ==
                                         null
                                     ? ''
-                                    : dealer?.landlordMap?[landlord.tempID]
-                                                ?['eStampContractEndDate']
+                                    : landlordData?['eStampContractEndDate']
                                             is Timestamp
-                                        ? (dealer?.landlordMap?[landlord.tempID]
-                                                    ?['eStampContractEndDate']
+                                        ? (landlordData?[
+                                                    'eStampContractEndDate']
                                                 as Timestamp)
                                             .toDate()
                                             .toString()
                                             .substring(0, 10)
-                                        : dealer?.landlordMap?[landlord.tempID]
-                                            ?['eStampContractEndDate'],
+                                        : landlordData?[
+                                            'eStampContractEndDate'],
                               ),
                               SizedBox(height: 16),
                               ContractCard(
                                 icon: Icons.place,
                                 label: 'Property Address:',
-                                data: dealer?.landlordMap?[landlord.tempID]
-                                    ?['eStampPropertyAddress'],
+                                data: landlordData?['eStampPropertyAddress'],
                               ),
                               SizedBox(height: 16),
                               ContractCard(
                                 icon: Icons.sell,
                                 label: 'Property rent amount:',
-                                data: dealer?.landlordMap?[landlord.tempID]
-                                    ?['eStampPropertyRentAmount'],
+                                data: landlordData?['eStampPropertyRentAmount'],
                               ),
                               SizedBox(height: 16),
                               ContractCard(
                                 icon: Icons.sell,
                                 label: 'Upfront Bonus:',
-                                data: dealer?.landlordMap?[landlord.tempID]
-                                    ?['eStampUpfrontBonus'],
+                                data: landlordData?['eStampUpfrontBonus'],
                               ),
                               SizedBox(height: 16),
                               ContractCard(
                                 icon: Icons.sell,
                                 label: 'Monthly Profit:',
-                                data: dealer?.landlordMap?[landlord.tempID]
-                                    ?['eStampMonthlyProfit'],
+                                data: landlordData?['eStampMonthlyProfit'],
                               ),
                               SizedBox(height: 24),
                               ContractCard(
                                 icon: Icons.sell,
                                 label: 'Estamp Cost',
-                                data: dealer?.landlordMap?[landlord.tempID]
-                                            ?['eStampCost'] !=
-                                        null
-                                    ? dealer?.landlordMap?[landlord.tempID]
-                                                ?['eStampCost']
-                                            .toString() ??
-                                        '0'
+                                data: landlordData?['eStampCost'] != null
+                                    ? (landlordData?['eStampCost'].toString() ??
+                                        '0')
                                     : '0',
                               ),
                             ],

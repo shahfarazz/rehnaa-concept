@@ -19,6 +19,7 @@ import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenant_renthistory.
 import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenant_dashboard_content.dart';
 import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenantmonthlyrentoff.dart';
 
+import '../../../backend/services/helperfunctions.dart';
 import '../../helper/Tenantdashboard_pages/tenant_landlords.dart';
 import '../../helper/Tenantdashboard_pages/tenant_rented_property.dart';
 import '../../helper/Tenantdashboard_pages/tenant_security_deposit.dart';
@@ -551,7 +552,10 @@ class _DashboardPageState extends State<TenantDashboardPage>
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => const NewVouchersPage(),
+                                builder: (context) => NewVouchersPage(
+                                  callerType: 'Tenants',
+                                  uid: widget.uid,
+                                ),
                               ),
                             );
                           },
@@ -627,7 +631,10 @@ class _DashboardPageState extends State<TenantDashboardPage>
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const PrivacyPolicyPage(),
+                            builder: (context) => PrivacyPolicyPage(
+                              callerType: 'Tenants',
+                              uid: widget.uid,
+                            ),
                           ),
                         );
                         // _closeSidebar();
@@ -640,7 +647,10 @@ class _DashboardPageState extends State<TenantDashboardPage>
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const FAQPage(),
+                            builder: (context) => FAQPage(
+                              callerType: 'Tenants',
+                              uid: widget.uid,
+                            ),
                           ),
                         );
                         // _closeSidebar();
@@ -1130,24 +1140,3 @@ class _DashboardPageState extends State<TenantDashboardPage>
 }
 
 // Custom Clipper for hexagonal shape
-class HexagonClipper extends CustomClipper<Path> {
-  @override
-  Path getClip(Size size) {
-    final path = Path();
-    final double controlPointOffset = size.height / 6;
-
-    path.moveTo(size.width / 2, 0);
-    path.lineTo(size.width, size.height / 2 - controlPointOffset);
-    path.lineTo(size.width, size.height / 2 + controlPointOffset);
-    path.lineTo(size.width / 2, size.height);
-    path.lineTo(0, size.height / 2 + controlPointOffset);
-    path.lineTo(0, size.height / 2 - controlPointOffset);
-    path.close();
-    return path;
-  }
-
-  @override
-  bool shouldReclip(CustomClipper<Path> oldClipper) {
-    return false;
-  }
-}

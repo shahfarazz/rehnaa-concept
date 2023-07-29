@@ -6,6 +6,7 @@ import 'package:rehnaa/frontend/helper/Dealerdashboard_pages/landlordonboardedin
 
 import '../../../backend/models/dealermodel.dart';
 import '../../../backend/models/landlordmodel.dart';
+// import '../Admindashboard_pages/admin_estamps.dart';
 
 class DealerLandlordOnboardedPage extends StatefulWidget {
   final String uid;
@@ -17,10 +18,18 @@ class DealerLandlordOnboardedPage extends StatefulWidget {
       _DealerLandlordOnboardedPageState();
 }
 
+class Estamp {
+  final String id;
+  final landlordData;
+
+  Estamp({required this.id, required this.landlordData});
+}
+
 class _DealerLandlordOnboardedPageState
     extends State<DealerLandlordOnboardedPage> {
   List<Landlord> landlords = [];
   Dealer? dealer;
+  List<Estamp> estampList = [];
 
   bool isLoading = true;
 
@@ -50,7 +59,7 @@ class _DealerLandlordOnboardedPageState
 
       setState(() {
         landlords = landlordList;
-        filteredLandlords = List.from(landlords);
+        // filteredLandlords = List.from(landlords);
         isLoading = false;
       });
       return landlords;
@@ -64,7 +73,29 @@ class _DealerLandlordOnboardedPageState
     }
   }
 
-  List<Landlord> filteredLandlords = [];
+  Future<List<Estamp>> fetchEstamps() async {
+    estampList = [];
+    try {
+      await FirebaseFirestore.instance
+          .collection('Dealers')
+          .doc(widget.uid)
+          .collection('Estamps')
+          .get()
+          .then((value) {
+        value.docs.forEach((element) {
+          estampList.add(Estamp(id: element.id, landlordData: element.data()));
+        });
+      });
+
+      return estampList;
+    } catch (e) {
+      print(e);
+      return [];
+    }
+  }
+
+  // List<Landlord> filteredLandlords = [];
+  List<Estamp> filteredEstamps = [];
   late FocusNode searchFocusNode;
   final searchController = TextEditingController();
   bool isTyping = false;
@@ -72,21 +103,40 @@ class _DealerLandlordOnboardedPageState
   @override
   void initState() {
     super.initState();
-    filteredLandlords = List.from(landlords);
+    // filteredLandlords = List.from(landlords);
+    filteredEstamps = List.from(estampList);
     searchFocusNode = FocusNode();
     searchController.addListener(onSearchTextChanged);
-    fetchLandlords();
+    // fetchLandlords();
+    fetchEstamps().then((_) {
+      setState(() {
+        filteredEstamps = List.from(estampList);
+      });
+    });
   }
 
   void onSearchTextChanged() {
     final query = searchController.text;
-    filterLandlords(query);
+    // filterLandlords(query);
+    filterEstamps(query);
   }
 
-  void filterLandlords(String query) {
+  // void filterLandlords(String query) {
+  //   setState(() {
+  //     filteredLandlords = landlords.where((landlord) {
+  //       final nameLower = landlord.firstName.toLowerCase();
+  //       final queryLower = query.toLowerCase();
+  //       return nameLower.contains(queryLower);
+  //     }).toList();
+  //     isTyping = query.isNotEmpty;
+  //   });
+  // }
+
+  void filterEstamps(String query) {
     setState(() {
-      filteredLandlords = landlords.where((landlord) {
-        final nameLower = landlord.firstName.toLowerCase();
+      filteredEstamps = estampList.where((estamp) {
+        final nameLower =
+            estamp.landlordData['landlordData']['landlordName'].toLowerCase();
         final queryLower = query.toLowerCase();
         return nameLower.contains(queryLower);
       }).toList();
@@ -97,7 +147,12 @@ class _DealerLandlordOnboardedPageState
   Future<void> _refreshFunction() async {
     setState(() {
       isLoading = true;
-      fetchLandlords();
+      // fetchLandlords();
+      fetchEstamps().then((_) {
+        setState(() {
+          filteredEstamps = List.from(estampList);
+        });
+      });
     });
   }
 
@@ -162,7 +217,7 @@ class _DealerLandlordOnboardedPageState
                 ),
               ),
               Expanded(
-                child: filteredLandlords.isEmpty
+                child: filteredEstamps.isEmpty
                     ? RefreshIndicator(
                         onRefresh: _refreshFunction,
                         child: SingleChildScrollView(
@@ -203,17 +258,24 @@ class _DealerLandlordOnboardedPageState
                                     ),
                                   ),
                                 ),
+                                SizedBox(height: 200),
                               ],
                             )))
                     : RefreshIndicator(
                         onRefresh: _refreshFunction,
                         child: ListView.builder(
-                          itemCount: filteredLandlords.length,
+                          itemCount: estampList.length,
                           itemBuilder: (context, index) {
-                            final landlord = filteredLandlords[index];
+                            // final landlord = filteredLandlords[index];
+                            //reverse
+                            // final landlord = filteredLandlords[
+                            //     filteredLandlords.length - index - 1];
+                            // final estamp = estampList[index];//reverse
+                            final estamp = filteredEstamps[
+                                filteredEstamps.length - index - 1]; //reverse
                             return GestureDetector(
                               onTap: () {
-                                if (dealer?.landlordMap?[landlord.tempID]
+                                if (estamp.landlordData?['landlordData']
                                         ?['eStampTenantName'] ==
                                     null) {
                                   //flutter toast here
@@ -231,12 +293,11 @@ class _DealerLandlordOnboardedPageState
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) =>
-                                        LandlordsOnboardedInfoPage(
-                                      landlord: landlord,
-                                      dealer: dealer!,
-                                    ),
-                                  ),
+                                      builder: (context) =>
+                                          LandlordsOnboardedInfoPage(
+                                            landlordData: estamp
+                                                .landlordData?['landlordData'],
+                                          )),
                                 );
                               },
                               child: Card(
@@ -248,9 +309,8 @@ class _DealerLandlordOnboardedPageState
                                   contentPadding: const EdgeInsets.symmetric(
                                       horizontal: 20.0, vertical: 10.0),
                                   title: Text(
-                                    landlord.firstName +
-                                        " " +
-                                        landlord.lastName,
+                                    estamp.landlordData['landlordData']
+                                        ['landlordName'],
                                     style: TextStyle(
                                         color: Colors.green,
                                         fontFamily:
@@ -258,10 +318,10 @@ class _DealerLandlordOnboardedPageState
                                         fontWeight: FontWeight.bold),
                                   ),
                                   trailing: Text(
-                                    dealer?.landlordMap?[landlord.tempID]
+                                    estamp.landlordData?['landlordData']
                                                 ?['eStampContractStartDate'] !=
                                             null
-                                        ? dealer?.landlordMap?[landlord.tempID]
+                                        ? estamp.landlordData?['landlordData']
                                                     ?['eStampContractStartDate']
                                                 .toDate()
                                                 .toString()

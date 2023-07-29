@@ -62,10 +62,8 @@ class ContractCard extends StatelessWidget {
 }
 
 class DealerEstampInfoPage extends StatelessWidget {
-  final Landlord landlord;
-  final Dealer dealer;
-  const DealerEstampInfoPage(
-      {super.key, required this.landlord, required this.dealer});
+  final landlordData;
+  const DealerEstampInfoPage({super.key, required this.landlordData});
 
   @override
   Widget build(BuildContext context) {
@@ -149,15 +147,13 @@ class DealerEstampInfoPage extends StatelessWidget {
                               ContractCard(
                                 icon: Icons.person,
                                 label: 'LandLords Name:',
-                                data:
-                                    "${landlord.firstName} ${landlord.lastName}",
+                                data: "${landlordData?['landlordName']}",
                               ),
                               SizedBox(height: 16),
                               ContractCard(
                                   icon: Icons.person,
                                   label: 'Tenant Name:',
-                                  data: dealer.landlordMap?[landlord.tempID]
-                                      ?['eStampTenantName']
+                                  data: landlordData?['eStampTenantName']
                                   // landlord.tenant == null ||
                                   //         landlord.tenant!.isEmpty
                                   //     ? 'No tenant yet'
@@ -167,22 +163,19 @@ class DealerEstampInfoPage extends StatelessWidget {
                               ContractCard(
                                 icon: Icons.calendar_today,
                                 label: 'Request Date:',
-                                data: dealer.landlordMap?[landlord.tempID]
-                                    ?['eStampDate'],
+                                data: landlordData?['eStampDate'],
                               ),
                               SizedBox(height: 16),
                               ContractCard(
                                 icon: Icons.calendar_today,
                                 label: 'E-stamp Value:',
-                                data: dealer.landlordMap?[landlord.tempID]
-                                    ?['eStampValue'],
+                                data: landlordData?['eStampValue'],
                               ),
                               SizedBox(height: 16),
                               ContractCard(
                                 icon: Icons.calendar_today,
                                 label: 'Delivered Date:',
-                                data: dealer.landlordMap?[landlord.tempID]
-                                    ?['eStampDeliveredDate'],
+                                data: landlordData?['eStampDeliveredDate'],
 
                                 // landlord.property.isEmpty
                                 //     ? ''
@@ -192,8 +185,7 @@ class DealerEstampInfoPage extends StatelessWidget {
                               ContractCard(
                                   icon: Icons.sell,
                                   label: 'Charges:',
-                                  data: dealer.landlordMap?[landlord.tempID]
-                                      ?['eStampCharges']
+                                  data: landlordData?['eStampCharges']
                                   // landlord.property.isEmpty
                                   //     ? ''
                                   //     : landlord.property[0].price.toString()
@@ -205,8 +197,8 @@ class DealerEstampInfoPage extends StatelessWidget {
                                   // icon: Icons.badge
                                   icon: Icons.local_police,
                                   label: 'Police Verification:',
-                                  data: dealer.landlordMap?[landlord.tempID]
-                                      ?['eStampPoliceVerification']
+                                  data:
+                                      landlordData?['eStampPoliceVerification']
                                   // landlord.tenant == null ||
                                   //         landlord.tenant!.isEmpty
                                   //     ? 'No tenant yet'
