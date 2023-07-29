@@ -21,6 +21,7 @@ import '../../helper/Admindashboard_pages/admin_rentoffwinner.dart';
 import '../../helper/Admindashboard_pages/admin_requests_property_contracts.dart';
 import '../../helper/Admindashboard_pages/admin_reviews.dart';
 import '../../helper/Admindashboard_pages/admin_send_monthlyprofit.dart';
+import '../../helper/Admindashboard_pages/admin_set_dealer_events.dart';
 import '../../helper/Admindashboard_pages/admin_tenant_form_view.dart';
 import '../../helper/Admindashboard_pages/admin_vouchers.dart';
 
@@ -743,20 +744,20 @@ class _AdminDashboardState extends State<AdminDashboard> {
                       );
                     },
                   ),
-                  // const SizedBox(width: 20),
-                  // CustomButton(
-                  //   color: Colors.pink.shade700,
-                  //   icon: Icons.auto_fix_high_outlined,
-                  //   text: 'Send Monthly Estamp Profit',
-                  //   onPressed: () {
-                  //     Navigator.push(
-                  //       context,
-                  //       MaterialPageRoute(
-                  //         builder: (context) => AdminSendMonthlyProfitsPage(),
-                  //       ),
-                  //     );
-                  //   },
-                  // ),
+                  const SizedBox(width: 20),
+                  CustomButton(
+                    color: Colors.orange.shade700,
+                    icon: Icons.auto_fix_high_outlined,
+                    text: 'Set Dealer Events Text',
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => AdminSetsDealerEventsPage(),
+                        ),
+                      );
+                    },
+                  ),
                 ],
               ),
               SizedBox(height: 30)

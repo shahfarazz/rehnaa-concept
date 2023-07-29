@@ -12,6 +12,7 @@ import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:rehnaa/backend/models/propertymodel.dart';
 import 'package:rehnaa/backend/models/tenantsmodel.dart';
+import 'package:rehnaa/backend/services/helperfunctions.dart';
 import 'package:rehnaa/frontend/Screens/Tenant/tenant_dashboard.dart';
 import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenant_form.dart';
 import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenantinvoice.dart';
@@ -43,6 +44,7 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
     with AutomaticKeepAliveClientMixin<TenantDashboardContent> {
   late Future<Tenant> _tenantFuture;
   late Stream<DocumentSnapshot<Map<String, dynamic>>> _tenantStream;
+  final TextEditingController _controller = TextEditingController();
 
   @override
   bool get wantKeepAlive => true;
@@ -58,6 +60,30 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
         .doc(widget.uid)
         .snapshots();
     _firebaseApi.initNotifications();
+
+    final formatter = NumberFormat("#,###");
+
+    _controller.addListener(() {
+      final text = _controller.text;
+      double? number = double.tryParse(text.replaceAll(',', ''));
+
+      if (number != null) {
+        final formattedText = formatter.format(number);
+
+        if (text != formattedText) {
+          int offset = (formattedText.length - text.length);
+
+          int newStart = _controller.selection.start + offset;
+          int newEnd = _controller.selection.end + offset;
+
+          _controller.text = formattedText;
+          _controller.selection = TextSelection(
+            baseOffset: newStart.clamp(0, _controller.text.length),
+            extentOffset: newEnd.clamp(0, _controller.text.length),
+          );
+        }
+      }
+    });
   }
 
   String generateInvoiceNumber() {
@@ -184,6 +210,7 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                         context: context,
                         builder: (BuildContext context) {
                           double amount = 0.0;
+                          _controller.clear();
 
                           return AlertDialog(
                             title: Text(
@@ -197,8 +224,12 @@ class _TenantDashboardContentState extends State<TenantDashboardContent>
                             ),
                             content: TextField(
                               keyboardType: TextInputType.number,
+                              controller: _controller,
                               onChanged: (value) {
-                                amount = double.tryParse(value) ?? 0.0;
+                                String valueWithoutCommas =
+                                    value.replaceAll(',', '');
+                                amount =
+                                    double.tryParse(valueWithoutCommas) ?? 0.0;
                               },
                               decoration: InputDecoration(
                                 focusedBorder: UnderlineInputBorder(

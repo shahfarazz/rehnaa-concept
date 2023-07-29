@@ -263,6 +263,7 @@ class _DealerEstampPageState extends State<DealerEstampPage> {
                                     ),
                                   ),
                                 ),
+                                SizedBox(height: 200),
                               ],
                             )))
                     : RefreshIndicator(

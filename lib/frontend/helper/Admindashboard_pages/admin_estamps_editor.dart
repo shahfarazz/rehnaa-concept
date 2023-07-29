@@ -113,6 +113,8 @@ class _AdminEstampsEditorPageState extends State<AdminEstampsEditorPage> {
       eStampCostController.text = landlordData['eStampCost'].toString();
       isFilled = landlordData['isFilled'];
       eStampLandlordNameController.text = landlordData['landlordName'];
+      contractStartDate = landlordData['eStampContractStartDate']?.toDate();
+      contractEndDate = landlordData['eStampContractEndDate']?.toDate();
     });
   }
 
@@ -189,7 +191,7 @@ class _AdminEstampsEditorPageState extends State<AdminEstampsEditorPage> {
         'amount': int.tryParse(eStampMonthlyProfitController.text) ??
             0, //convert to int later
         'date': DateTime.now(),
-        'isMinus': true,
+        'isMinus': false,
         'isNoPdf': true,
         'isEstamp': true,
         'eStampType': 'Monthly Profit',
@@ -205,7 +207,7 @@ class _AdminEstampsEditorPageState extends State<AdminEstampsEditorPage> {
           'amount': int.tryParse(eStampUpfrontBonusController.text) ??
               0, //convert to int later
           'date': DateTime.now(),
-          'isMinus': true,
+          'isMinus': false,
           'isNoPdf': true,
           'isEstamp': true,
           'eStampType': 'Upfront Bonus',
@@ -264,8 +266,8 @@ class _AdminEstampsEditorPageState extends State<AdminEstampsEditorPage> {
               //         -(int.tryParse(eStampCostController.text) ?? 0)),
               //change the balance based on estampcost estampmonthlyprofit and estampupfrontbonus
               'balance': FieldValue.increment(
-                  -(((int.tryParse(eStampCostController.text) ?? 0) +
-                      (int.tryParse(eStampMonthlyProfitController.text) ?? 0) +
+                  -(((int.tryParse(eStampCostController.text) ?? 0) -
+                      (int.tryParse(eStampMonthlyProfitController.text) ?? 0) -
                       (int.tryParse(eStampUpfrontBonusController.text) ?? 0)))),
 
               // 'rentpaymentRef':
@@ -311,8 +313,8 @@ class _AdminEstampsEditorPageState extends State<AdminEstampsEditorPage> {
           .collection('Dealers')
           .doc(dealerId)
           .collection('Estamps')
-          .add({
-        // 'landlordMap': dealer.landlordMap,
+          .doc(widget.docID)
+          .update({
         'landlordData': landlordData,
       });
 

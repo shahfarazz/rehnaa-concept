@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 // import 'package:rehnaa/frontend/Screens/Tenant/tenant_dashboard.dart';
 // import 'package:rehnaa/frontend/helper/Tenantdashboard_pages/tenant_dashboard_content.dart';
 // import 'package:photo_view/photo_view.dart';
@@ -693,7 +694,8 @@ class PropertyDetails extends StatelessWidget {
                       child: Padding(
                         padding: const EdgeInsets.all(16.0),
                         child: Text(
-                          'PKR.${property.price.toString()}',
+                          // 'PKR.${property.price.toString()}',
+                          'PKR.' + NumberFormat('#,##0').format(property.price),
                           style: GoogleFonts.montserrat(),
                         ),
                       ),

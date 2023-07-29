@@ -220,36 +220,36 @@ class _ContractEditPageState extends State<ContractEditPage> {
           ),
         );
 
-        String? landlordID = widget.contractData['landlordID'];
-        String? tenantID = widget.contractData['tenantID'];
+        // String? landlordID = widget.contractData['landlordID'];
+        // String? tenantID = widget.contractData['tenantID'];
 
-        if (landlordID != null) {
-          FirebaseFirestore.instance
-              .collection('Landlords')
-              .doc(landlordID)
-              .update({
-            if (contractStartDate != null)
-              'contractStartDate': Timestamp.fromDate(contractStartDate!),
-            if (contractEndDate != null)
-              'contractEndDate': Timestamp.fromDate(contractEndDate!),
-            'propertyAddress': _propertyAddressController.text,
-            'monthlyRent': _monthlyRentController.text,
-          });
-        }
+        // if (landlordID != null) {
+        //   FirebaseFirestore.instance
+        //       .collection('Landlords')
+        //       .doc(landlordID)
+        //       .update({
+        //     if (contractStartDate != null)
+        //       'contractStartDate': Timestamp.fromDate(contractStartDate!),
+        //     if (contractEndDate != null)
+        //       'contractEndDate': Timestamp.fromDate(contractEndDate!),
+        //     'propertyAddress': _propertyAddressController.text,
+        //     'monthlyRent': _monthlyRentController.text,
+        //   });
+        // }
 
-        if (tenantID != null) {
-          FirebaseFirestore.instance
-              .collection('Tenants')
-              .doc(tenantID)
-              .update({
-            if (contractStartDate != null)
-              'contractStartDate': Timestamp.fromDate(contractStartDate!),
-            if (contractEndDate != null)
-              'contractEndDate': Timestamp.fromDate(contractEndDate!),
-            'propertyAddress': _propertyAddressController.text,
-            'monthlyRent': _monthlyRentController.text,
-          });
-        }
+        // if (tenantID != null) {
+        //   FirebaseFirestore.instance
+        //       .collection('Tenants')
+        //       .doc(tenantID)
+        //       .update({
+        //     if (contractStartDate != null)
+        //       'contractStartDate': Timestamp.fromDate(contractStartDate!),
+        //     if (contractEndDate != null)
+        //       'contractEndDate': Timestamp.fromDate(contractEndDate!),
+        //     'propertyAddress': _propertyAddressController.text,
+        //     'monthlyRent': _monthlyRentController.text,
+        //   });
+        // }
 
         Navigator.push(context, MaterialPageRoute(builder: (context) {
           return const AdminContractsViewPage();

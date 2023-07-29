@@ -271,15 +271,6 @@ class MyScreen extends StatelessWidget {
                             label: 'Contract Start Date:',
                             data: contractFields?['contractStartDate']
                                     .toDate()
-                                    .toString() ??
-                                '',
-                          ),
-                          SizedBox(height: 16),
-                          ContractCard(
-                            icon: Icons.calendar_today,
-                            label: 'Contract End Date:',
-                            data: contractFields?['contractEndDate']
-                                    .toDate()
                                     .toString()
                                     .substring(0, 10) ??
                                 '',
@@ -294,6 +285,16 @@ class MyScreen extends StatelessWidget {
                                     .substring(0, 10) ??
                                 '',
                           ),
+                          // SizedBox(height: 16),
+                          // ContractCard(
+                          //   icon: Icons.calendar_today,
+                          //   label: 'Contract End Date:',
+                          //   data: contractFields?['contractEndDate']
+                          //           .toDate()
+                          //           .toString()
+                          //           .substring(0, 10) ??
+                          //       '',
+                          // ),
                           SizedBox(height: 16),
                           ContractCard(
                             icon: Icons.calendar_today,

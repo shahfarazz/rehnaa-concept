@@ -328,7 +328,7 @@ class _AdminRentOffWinnerPageState extends State<AdminRentOffWinnerPage> {
                               {
                                 // 'amount': data.requestedAmount,
                                 'title':
-                                    "Congratulations! You are the deserving winner of this month's  15 % Rent Off jackpot! 🎉🌟",
+                                    "Congratulations! You are the deserving winner of this month's ${discount}% Rent Off jackpot! 🎉🌟",
                               }
                             ])
                           }, SetOptions(merge: true));

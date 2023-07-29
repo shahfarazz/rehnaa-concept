@@ -130,6 +130,7 @@ class RentPaymentInfoPage extends StatelessWidget {
                   child: Column(
                     children: [
                       const SizedBox(height: 10.0),
+                      rentPayment.paymentType == '' ? Container() :
                       Center(
                         child: WhiteBox(
                           icon: _getPaymentIcon(rentPayment.paymentType),

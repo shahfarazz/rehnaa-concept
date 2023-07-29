@@ -13,6 +13,7 @@ import 'package:rehnaa/frontend/Screens/faq.dart';
 import 'package:rehnaa/frontend/Screens/login_page.dart';
 // import 'package:rehnaa/frontend/Screens/vouchers.dart';
 import 'package:rehnaa/frontend/helper/Dealerdashboard_pages/dealer_dashboard_content.dart';
+import 'package:rehnaa/frontend/helper/Dealerdashboard_pages/dealer_events.dart';
 // import 'package:rehnaa/frontend/helper/Dealerdashboard_pages/dealer_renthistory.dart';
 // import 'package:rehnaa/frontend/helper/Landlorddashboard_pages/landlord_dashboard_content.dart';
 import 'package:rehnaa/frontend/helper/Landlorddashboard_pages/landlord_profile.dart';
@@ -503,6 +504,20 @@ class _DealerDashboardPageState extends State<DealerDashboardPage>
                         );
                       },
                       showBadge: isNewVoucher,
+                    ),
+                    _buildSidebarItem(
+                      icon: Icons.event,
+                      label: 'Events',
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                DealerEventsPage(uid: widget.uid),
+                          ),
+                        );
+                        // _closeSidebar();
+                      },
                     ),
                     _buildSidebarItem(
                       icon: Icons.lock,

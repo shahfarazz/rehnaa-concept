@@ -206,6 +206,7 @@ class TenantLandlordInfoPage extends StatelessWidget {
               ),
             ],
           ),
+          SizedBox(height: 20.0),
           Expanded(
             child: FractionallySizedBox(
               widthFactor: 0.9,
@@ -237,7 +238,7 @@ class TenantLandlordInfoPage extends StatelessWidget {
                                   ),
                                 )
                               : const SizedBox.shrink(),
-                          const SizedBox(height: 10.0),
+                          // const SizedBox(height: 10.0),
 
                           Center(
                             child: WhiteBox(
@@ -249,7 +250,7 @@ class TenantLandlordInfoPage extends StatelessWidget {
                             ),
                           ),
 
-                          const SizedBox(height: 10.0),
+                          // const SizedBox(height: 10.0),
 
                           landlord.cnic != '' && landlord.cnic != null
                               ? Center(
@@ -262,7 +263,11 @@ class TenantLandlordInfoPage extends StatelessWidget {
                                   ),
                                 )
                               : const SizedBox.shrink(),
-                          const SizedBox(height: 10.0),
+
+                          // landlord.cnic != '' && landlord.cnic != null
+                          //     ? const SizedBox(height: 10.0)
+                          //     : const SizedBox.shrink(),
+                          // const SizedBox(height: 10.0),
 
                           landlord.property != null &&
                                   landlord.property!.length != 0 &&
@@ -276,7 +281,13 @@ class TenantLandlordInfoPage extends StatelessWidget {
                                   ),
                                 )
                               : const SizedBox.shrink(),
-                          const SizedBox(height: 10.0),
+
+                          // landlord.property != null &&
+                          //         landlord.property!.length != 0 &&
+                          //         landlord.property?[0].address != ''
+                          //     ? const SizedBox(height: 10.0)
+                          //     : const SizedBox.shrink(),
+                          // const SizedBox(height: 10.0),
 
                           //TODO add new phone number field in landlord model
 

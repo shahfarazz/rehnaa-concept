@@ -31,7 +31,7 @@ class _SplashScreenState extends State<SplashScreen> {
     FirebaseAuth.instance.authStateChanges().listen((User? user) async {
       if (user != null) {
         // If the user is logged in, navigate to the main page.
-        FirebaseCrashlytics.instance.setUserIdentifier(user.uid);
+        // FirebaseCrashlytics.instance.setUserIdentifier(user.uid);
 
         DocumentSnapshot documentSnapshot = await FirebaseFirestore.instance
             .collection('users')
@@ -54,9 +54,13 @@ class _SplashScreenState extends State<SplashScreen> {
               builder: (context) => DealerDashboardPage(uid: user.uid),
             ));
           } else {
-            print('User type not found');
+            //edge case , go to login page
+            Navigator.of(context).pushReplacement(MaterialPageRoute(
+              builder: (context) => LoginPage(),
+            ));
           }
         } else {
+          print('idher agaya bahii');
           //edge case , go to login page
           Navigator.of(context).pushReplacement(MaterialPageRoute(
             builder: (context) => LoginPage(),

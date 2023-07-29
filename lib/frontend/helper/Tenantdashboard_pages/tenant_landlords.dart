@@ -31,13 +31,17 @@ class _TenantLandlordsPageState extends State<TenantLandlordsPage> {
         .get()
         .then((value) async {
       if (value.exists) {
+        // print('222 valuedata is ${value.data()}');
         tenant = Tenant.fromJson(value.data()!);
         //iterate over tenant.landlordref and set landlords
-        print('lenght of landlord ref is ${tenant!.landlordRef!.length}');
+        print('222lenght of landlord ref is ${tenant!.landlordRef!.length}');
 
-        for (var landlordRef in tenant!.landlordRef!) {
+        for (var landlordRef in tenant?.landlordRef?.toList() ?? []) {
+          print('222landlord ref is $landlordRef');
+
           Landlord landlord = await landlordRef.get().then((value) {
-            return Landlord.fromJson(value.data()!);
+            print('222 landlord data is ${value.data()}');
+            return Landlord.fromJson(value.data() ?? {});
           });
           print('landlord is ${landlord.firstName}');
           if (landlords.contains(landlord) == false) {
@@ -47,7 +51,7 @@ class _TenantLandlordsPageState extends State<TenantLandlordsPage> {
           // landlords.add(landlord);
         }
 
-        return tenant!;
+        return tenant;
       }
     });
     return tenant!;
@@ -175,12 +179,13 @@ class _TenantLandlordsPageState extends State<TenantLandlordsPage> {
             );
           } else if (snapshot.hasError) {
             // If an error occurs during data fetching, display an error message.
-            return Center(
-              child: Text(
-                'Error: ${snapshot.error}',
-                style: TextStyle(color: Colors.red),
-              ),
-            );
+            // return Center(
+            //     child: Text(
+            //   'Error: ${snapshot.error}',
+            //   style: TextStyle(color: Colors.red),
+            // ));
+            // throw snapshot.error!;
+            throw Exception('Error: ${snapshot.error}');
           } else {
             var data = snapshot.data;
             if (data?.landlordRef == null) {

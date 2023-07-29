@@ -297,11 +297,16 @@ class _AllContractsPageState extends State<AllContractsPage> {
         filteredContracts = contracts;
       });
     } else {
+      var strToCompare = '';
+
       List<Contract> temp = [];
       for (Contract contract in contracts) {
-        if (contract.tenantName
-            .toLowerCase()
-            .contains(searchText.toLowerCase())) {
+        if (widget.callerType == 'Tenants') {
+          strToCompare = contract.landlordName;
+        } else if (widget.callerType == 'Landlords') {
+          strToCompare = contract.tenantName;
+        }
+        if (strToCompare.toLowerCase().contains(searchText.toLowerCase())) {
           temp.add(contract);
         }
       }

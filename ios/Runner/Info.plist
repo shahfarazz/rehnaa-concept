@@ -19,6 +19,8 @@
 	<string>This app needs access to location when open.</string>
 	<key>NSLocationAlwaysUsageDescription</key>
 	<string>This app needs access to your location.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>This app needs access to microphone to record audio.</string>
 
 	<string>rehnaa</string>
 	<key>CFBundlePackageType</key>

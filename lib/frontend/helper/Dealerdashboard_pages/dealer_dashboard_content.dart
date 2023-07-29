@@ -41,6 +41,7 @@ class _DealerDashboardContentState extends State<DealerDashboardContent>
     with AutomaticKeepAliveClientMixin<DealerDashboardContent> {
   late Future<Dealer> _dealerFuture;
   late Stream<DocumentSnapshot<Map<String, dynamic>>> _dealerStream;
+  final TextEditingController _controller = TextEditingController();
 
   @override
   bool get wantKeepAlive => true;
@@ -57,6 +58,29 @@ class _DealerDashboardContentState extends State<DealerDashboardContent>
         .collection('Dealers')
         .doc(widget.uid)
         .snapshots();
+    final formatter = NumberFormat("#,###");
+
+    _controller.addListener(() {
+      final text = _controller.text;
+      double? number = double.tryParse(text.replaceAll(',', ''));
+
+      if (number != null) {
+        final formattedText = formatter.format(number);
+
+        if (text != formattedText) {
+          int offset = (formattedText.length - text.length);
+
+          int newStart = _controller.selection.start + offset;
+          int newEnd = _controller.selection.end + offset;
+
+          _controller.text = formattedText;
+          _controller.selection = TextSelection(
+            baseOffset: newStart.clamp(0, _controller.text.length),
+            extentOffset: newEnd.clamp(0, _controller.text.length),
+          );
+        }
+      }
+    });
   }
 
   String generateInvoiceNumber() {
@@ -218,6 +242,7 @@ class _DealerDashboardContentState extends State<DealerDashboardContent>
                         context: context,
                         builder: (BuildContext context) {
                           double withdrawalAmount = 0.0;
+                          _controller.clear();
 
                           return AlertDialog(
                             title: Text(
@@ -231,9 +256,12 @@ class _DealerDashboardContentState extends State<DealerDashboardContent>
                             ),
                             content: TextField(
                               keyboardType: TextInputType.number,
+                              controller: _controller,
                               onChanged: (value) {
+                                String valueWithoutCommas =
+                                    value.replaceAll(',', '');
                                 withdrawalAmount =
-                                    double.tryParse(value) ?? 0.0;
+                                    double.tryParse(valueWithoutCommas) ?? 0.0;
                               },
                               decoration: const InputDecoration(
                                 focusedBorder: UnderlineInputBorder(

@@ -651,6 +651,9 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
           // final isPhoneNumber = authService.isPhoneNumber(emailOrPhone);
           String contactInfo = '';
 
+          var creditPoints = docData['creditPoints'].toString();
+          var creditScore = docData['creditScore'].toString();
+
           if (isEmail) {
             contactInfo = '$emailOrPhone';
           } else {
@@ -830,6 +833,22 @@ class _LandlordProfilePageState extends State<LandlordProfilePage> {
                                     title: 'CNIC Number',
                                     subtitle: formatCNIC(
                                         decryptString(docData['cnic'])))
+                                : Container(),
+
+                            docData['creditPoints'] != null &&
+                                    docData['creditPoints'] != ''
+                                ? ProfileInfoItem(
+                                    icon: Icons.star,
+                                    title: 'Credit Points',
+                                    subtitle: creditPoints.toString())
+                                : Container(),
+
+                            docData['creditScore'] != null &&
+                                    docData['creditScore'] != ''
+                                ? ProfileInfoItem(
+                                    icon: Icons.star_border,
+                                    title: 'Credit Score',
+                                    subtitle: creditScore.toString())
                                 : Container(),
 
                             docData['address'] != '' &&

@@ -24,8 +24,12 @@ class _AdminContractsViewPageState extends State<AdminContractsViewPage> {
   }
 
   Future<List<DocumentSnapshot<Map<String, dynamic>>>> fetchContracts() async {
-    final querySnapshot =
-        await FirebaseFirestore.instance.collection('Contracts').get();
+    final querySnapshot = await FirebaseFirestore.instance
+        .collection('Contracts')
+        .orderBy('createdTimestamp',
+            descending:
+                true) // orders documents by creation timestamp in descending order
+        .get();
     return querySnapshot.docs;
   }
 
@@ -120,13 +124,19 @@ class _AdminContractsViewPageState extends State<AdminContractsViewPage> {
                     );
                   }
                   return ListView.builder(
-                    reverse: true,
+                    // reverse: true,
                     itemCount: contracts?.length,
                     itemBuilder: (context, index) {
                       return ContractCard(
                         contractData: contracts?[index].data(),
                         id: contracts?[index].id,
                       );
+                      // //reverse the list
+                      // return ContractCard(
+                      //   contractData:
+                      //       contracts?[contracts.length - index - 1].data(),
+                      //   id: contracts?[contracts.length - index - 1].id,
+                      // );
                     },
                   );
                 }

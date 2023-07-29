@@ -39,7 +39,7 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
 
   List<DocumentReference<Map<String, dynamic>>> selectedTenants = [];
   List<DocumentReference<Map<String, dynamic>>> selectedRentPayments = [];
-  List<DocumentReference<Map<String, dynamic>>> selectedDealers = [];
+  // List<DocumentReference<Map<String, dynamic>>> selectedDealers = [];
 
   bool _isLoading = true;
 
@@ -224,7 +224,7 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
     selectedProperties = List.from(landlord.propertyRef ?? []);
     selectedTenants = List.from(landlord.tenantRef ?? []);
     selectedRentPayments = List.from(landlord.rentpaymentRef ?? []);
-    selectedDealers = List.from(landlord.dealerRef ?? []);
+    // selectedDealers = List.from(landlord.dealerRef ?? []);
 
     final TextEditingController dealerRefController =
         TextEditingController(text: landlord.dealerRef?.toString() ?? '');
@@ -256,27 +256,27 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
     // final TextEditingController contractStartDateController =
     //     TextEditingController(
     //         text: landlord.contractStartDate?.toString() ?? '');
-    DateTime? contractStartDate = landlord.contractStartDate;
-    DateTime? contractEndDate = landlord.contractEndDate;
+    // DateTime? contractStartDate = landlord.contractStartDate;
+    // DateTime? contractEndDate = landlord.contractEndDate;
 
-    Future<void> _selectDate(bool isStartDate, StateSetter setState1) async {
-      final DateTime? picked = await showDatePicker(
-        context: context,
-        initialDate: DateTime.now(),
-        firstDate: DateTime(2020),
-        lastDate: DateTime(2025),
-      );
+    // Future<void> _selectDate(bool isStartDate, StateSetter setState1) async {
+    //   final DateTime? picked = await showDatePicker(
+    //     context: context,
+    //     initialDate: DateTime.now(),
+    //     firstDate: DateTime(2020),
+    //     lastDate: DateTime(2025),
+    //   );
 
-      if (picked != null) {
-        setState1(() {
-          if (isStartDate) {
-            contractStartDate = picked;
-          } else {
-            contractEndDate = picked;
-          }
-        });
-      }
-    }
+    //   if (picked != null) {
+    //     setState1(() {
+    //       if (isStartDate) {
+    //         contractStartDate = picked;
+    //       } else {
+    //         contractEndDate = picked;
+    //       }
+    //     });
+    //   }
+    // }
 
     // ;
     // final TextEditingController monthlyRentController =
@@ -416,27 +416,27 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
                           );
                         },
                       ),
-                      StatefulBuilder(
-                        builder: (BuildContext context, StateSetter setState) {
-                          return ListTile(
-                            title: const Text('Select Dealers'),
-                            subtitle: Text(
-                              selectedDealers.length.toString() +
-                                  ' dealers selected',
-                            ),
-                            onTap: () {
-                              setState(() {
-                                _showDealerSelectionDialog(() {
-                                  setState(() {
-                                    // Update the state of selectedDealers here
-                                    // print('selectedDealers: $selectedDealers');
-                                  });
-                                });
-                              });
-                            },
-                          );
-                        },
-                      ),
+                      // StatefulBuilder(
+                      //   builder: (BuildContext context, StateSetter setState) {
+                      //     return ListTile(
+                      //       title: const Text('Select Dealers'),
+                      //       subtitle: Text(
+                      //         selectedDealers.length.toString() +
+                      //             ' dealers selected',
+                      //       ),
+                      //       onTap: () {
+                      //         setState(() {
+                      //           _showDealerSelectionDialog(() {
+                      //             setState(() {
+                      //               // Update the state of selectedDealers here
+                      //               // print('selectedDealers: $selectedDealers');
+                      //             });
+                      //           });
+                      //         });
+                      //       },
+                      //     );
+                      //   },
+                      // ),
                       const SizedBox(height: 20),
                       // Visibility(
                       //   visible: landlord.dealerRef != null,
@@ -495,26 +495,26 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
                         controller: ibanController,
                         decoration: const InputDecoration(labelText: 'IBAN'),
                       ),
-                      StatefulBuilder(builder: (context, setState) {
-                        return TextButton(
-                          onPressed: () => _selectDate(true, setState),
-                          child: Text(
-                            contractStartDate != null
-                                ? 'Contract Start Date: ${contractStartDate.toString()}'
-                                : 'Select Contract Start Date',
-                          ),
-                        );
-                      }),
-                      StatefulBuilder(builder: (context, setState) {
-                        return TextButton(
-                          onPressed: () => _selectDate(false, setState),
-                          child: Text(
-                            contractEndDate != null
-                                ? 'Contract End Date: ${contractEndDate.toString()}'
-                                : 'Select Contract End Date',
-                          ),
-                        );
-                      }),
+                      // StatefulBuilder(builder: (context, setState) {
+                      //   return TextButton(
+                      //     onPressed: () => _selectDate(true, setState),
+                      //     child: Text(
+                      //       contractStartDate != null
+                      //           ? 'Contract Start Date: ${contractStartDate.toString()}'
+                      //           : 'Select Contract Start Date',
+                      //     ),
+                      //   );
+                      // }),
+                      // StatefulBuilder(builder: (context, setState) {
+                      //   return TextButton(
+                      //     onPressed: () => _selectDate(false, setState),
+                      //     child: Text(
+                      //       contractEndDate != null
+                      //           ? 'Contract End Date: ${contractEndDate.toString()}'
+                      //           : 'Select Contract End Date',
+                      //     ),
+                      //   );
+                      // }),
                       // TextFormField(
                       //   controller: monthlyRentController,
                       //   decoration:
@@ -637,7 +637,7 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
                               'propertyRef': selectedProperties,
                               'tenantRef': selectedTenants,
                               'rentpaymentRef': selectedRentPayments,
-                              'dealerRef': selectedDealers,
+                              // 'dealerRef': selectedDealers,
                               'cnic': cnicController.text.isNotEmpty
                                   ? encryptString(cnicController.text)
                                   : FieldValue.delete(),
@@ -657,12 +657,12 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
                               'address': addressController.text.isNotEmpty
                                   ? addressController.text
                                   : FieldValue.delete(),
-                              if (contractStartDate != null)
-                                'contractStartDate':
-                                    Timestamp.fromDate(contractStartDate!),
-                              if (contractEndDate != null)
-                                'contractEndDate':
-                                    Timestamp.fromDate(contractEndDate!),
+                              // if (contractStartDate != null)
+                              //   'contractStartDate':
+                              //       Timestamp.fromDate(contractStartDate!),
+                              // if (contractEndDate != null)
+                              //   'contractEndDate':
+                              //       Timestamp.fromDate(contractEndDate!),
                               // 'monthlyRent':
                               //     monthlyRentController.text.isNotEmpty
                               //         ? monthlyRentController.text ?? 0.0
@@ -734,12 +734,12 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
                               'address': addressController.text.isNotEmpty
                                   ? addressController.text
                                   : 'empty',
-                              if (contractStartDate != null)
-                                'contractStartDate':
-                                    Timestamp.fromDate(contractStartDate!),
-                              if (contractEndDate != null)
-                                'contractEndDate':
-                                    Timestamp.fromDate(contractEndDate!),
+                              // if (contractStartDate != null)
+                              //   'contractStartDate':
+                              //       Timestamp.fromDate(contractStartDate!),
+                              // if (contractEndDate != null)
+                              //   'contractEndDate':
+                              //       Timestamp.fromDate(contractEndDate!),
                               // 'monthlyRent':
                               //     monthlyRentController.text.isNotEmpty
                               //         ? monthlyRentController.text ?? 0.0
@@ -828,23 +828,23 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
                                                     .doc(landlord.tempID)
                                                     .update(package);
 
-                                                if (selectedDealers
-                                                    .isNotEmpty) {
-                                                  selectedDealers
-                                                      .forEach((element) {
-                                                    element.set({
-                                                      'landlordRef': FieldValue
-                                                          .arrayUnion([
-                                                        FirebaseFirestore
-                                                            .instance
-                                                            .collection(
-                                                                'Landlords')
-                                                            .doc(
-                                                                landlord.tempID)
-                                                      ])
-                                                    }, SetOptions(merge: true));
-                                                  });
-                                                }
+                                                // if (selectedDealers
+                                                //     .isNotEmpty) {
+                                                //   selectedDealers
+                                                //       .forEach((element) {
+                                                //     element.set({
+                                                //       'landlordRef': FieldValue
+                                                //           .arrayUnion([
+                                                //         FirebaseFirestore
+                                                //             .instance
+                                                //             .collection(
+                                                //                 'Landlords')
+                                                //             .doc(
+                                                //                 landlord.tempID)
+                                                //       ])
+                                                //     }, SetOptions(merge: true));
+                                                //   });
+                                                // }
 
                                                 if (landlord.balance >
                                                     (double.tryParse(
@@ -975,8 +975,8 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
                                                       selectedTenants;
                                                   landlord.rentpaymentRef =
                                                       selectedRentPayments;
-                                                  landlord.dealerRef =
-                                                      selectedDealers;
+                                                  // landlord.dealerRef =
+                                                  //     selectedDealers;
                                                   landlord.cnic = cnicController
                                                           .text.isNotEmpty
                                                       ? encryptString(
@@ -1014,10 +1014,17 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
                                                           ? addressController
                                                               .text
                                                           : '';
-                                                  landlord.contractStartDate =
-                                                      contractStartDate;
-                                                  landlord.contractEndDate =
-                                                      contractEndDate;
+                                                  // landlord.contractStartDate =
+                                                  //     contractStartDate;
+                                                  // landlord.contractEndDate =
+                                                  //     contractEndDate;
+                                                  landlord.description =
+                                                      descriptionController
+                                                                  .text !=
+                                                              ''
+                                                          ? descriptionController
+                                                              .text
+                                                          : '';
                                                   // landlord.monthlyRent =
                                                   //     monthlyRentController
                                                   //             .text.isNotEmpty
@@ -1433,113 +1440,113 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
     );
   }
 
-  void _showDealerSelectionDialog(void Function() onSelectionDone) {
-    TextEditingController searchController = TextEditingController();
+  // void _showDealerSelectionDialog(void Function() onSelectionDone) {
+  //   TextEditingController searchController = TextEditingController();
 
-    showDialog(
-      context: context,
-      builder: (context) {
-        return StatefulBuilder(
-          builder: (context, setState) {
-            return AlertDialog(
-              title: const Text('Select Dealers'),
-              content: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    TextFormField(
-                      controller: searchController,
-                      decoration: InputDecoration(
-                        labelText: 'Search',
-                        prefixIcon: Icon(Icons.search),
-                      ),
-                      onChanged: (value) {
-                        setState(() {}); // Refresh the UI
-                      },
-                    ),
-                    StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-                      stream: FirebaseFirestore.instance
-                          .collection('Dealers')
-                          .snapshots(),
-                      builder: (context, snapshot) {
-                        if (snapshot.hasData) {
-                          List<QueryDocumentSnapshot<Map<String, dynamic>>>
-                              dealerDocs = snapshot.data!.docs;
+  //   showDialog(
+  //     context: context,
+  //     builder: (context) {
+  //       return StatefulBuilder(
+  //         builder: (context, setState) {
+  //           return AlertDialog(
+  //             title: const Text('Select Dealers'),
+  //             content: SingleChildScrollView(
+  //               child: Column(
+  //                 children: [
+  //                   TextFormField(
+  //                     controller: searchController,
+  //                     decoration: InputDecoration(
+  //                       labelText: 'Search',
+  //                       prefixIcon: Icon(Icons.search),
+  //                     ),
+  //                     onChanged: (value) {
+  //                       setState(() {}); // Refresh the UI
+  //                     },
+  //                   ),
+  //                   StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+  //                     stream: FirebaseFirestore.instance
+  //                         .collection('Dealers')
+  //                         .snapshots(),
+  //                     builder: (context, snapshot) {
+  //                       if (snapshot.hasData) {
+  //                         List<QueryDocumentSnapshot<Map<String, dynamic>>>
+  //                             dealerDocs = snapshot.data!.docs;
 
-                          // Filter the dealerDocs list based on the search text
-                          dealerDocs = dealerDocs.where((dealerDoc) {
-                            String dealerName = dealerDoc['firstName'] +
-                                ' ' +
-                                dealerDoc['lastName'];
-                            return dealerName
-                                .toLowerCase()
-                                .contains(searchController.text.toLowerCase());
-                          }).toList();
+  //                         // Filter the dealerDocs list based on the search text
+  //                         dealerDocs = dealerDocs.where((dealerDoc) {
+  //                           String dealerName = dealerDoc['firstName'] +
+  //                               ' ' +
+  //                               dealerDoc['lastName'];
+  //                           return dealerName
+  //                               .toLowerCase()
+  //                               .contains(searchController.text.toLowerCase());
+  //                         }).toList();
 
-                          return Column(
-                            children: dealerDocs.map((dealerDoc) {
-                              String dealerName = dealerDoc['firstName'] +
-                                  ' ' +
-                                  dealerDoc['lastName'];
-                              bool isSelected =
-                                  selectedDealers.contains(dealerDoc.reference);
-                              return CheckboxListTile(
-                                title: Text(dealerName),
-                                value: isSelected,
-                                onChanged: (value) {
-                                  setState(() {
-                                    if (value == true) {
-                                      if (!selectedDealers
-                                          .contains(dealerDoc.reference)) {
-                                        selectedDealers
-                                            .add(dealerDoc.reference);
-                                      }
-                                    } else {
-                                      selectedDealers
-                                          .remove(dealerDoc.reference);
-                                    }
-                                  });
-                                },
-                              );
-                            }).toList(),
-                          );
-                        } else {
-                          return Container(
-                            padding: EdgeInsets.only(left: 150.0),
-                            child: SpinKitFadingCube(
-                              color: Color.fromARGB(255, 30, 197, 83),
-                            ),
-                          );
-                        }
-                      },
-                    ),
-                  ],
-                ),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.pop(context); // Close the dialog
-                  },
-                  child: const Text('Cancel'),
-                ),
-                TextButton(
-                  onPressed: () {
-                    onSelectionDone();
+  //                         return Column(
+  //                           children: dealerDocs.map((dealerDoc) {
+  //                             String dealerName = dealerDoc['firstName'] +
+  //                                 ' ' +
+  //                                 dealerDoc['lastName'];
+  //                             bool isSelected =
+  //                                 selectedDealers.contains(dealerDoc.reference);
+  //                             return CheckboxListTile(
+  //                               title: Text(dealerName),
+  //                               value: isSelected,
+  //                               onChanged: (value) {
+  //                                 setState(() {
+  //                                   if (value == true) {
+  //                                     if (!selectedDealers
+  //                                         .contains(dealerDoc.reference)) {
+  //                                       selectedDealers
+  //                                           .add(dealerDoc.reference);
+  //                                     }
+  //                                   } else {
+  //                                     selectedDealers
+  //                                         .remove(dealerDoc.reference);
+  //                                   }
+  //                                 });
+  //                               },
+  //                             );
+  //                           }).toList(),
+  //                         );
+  //                       } else {
+  //                         return Container(
+  //                           padding: EdgeInsets.only(left: 150.0),
+  //                           child: SpinKitFadingCube(
+  //                             color: Color.fromARGB(255, 30, 197, 83),
+  //                           ),
+  //                         );
+  //                       }
+  //                     },
+  //                   ),
+  //                 ],
+  //               ),
+  //             ),
+  //             actions: [
+  //               TextButton(
+  //                 onPressed: () {
+  //                   Navigator.pop(context); // Close the dialog
+  //                 },
+  //                 child: const Text('Cancel'),
+  //               ),
+  //               TextButton(
+  //                 onPressed: () {
+  //                   onSelectionDone();
 
-                    Navigator.pop(
-                      context,
-                      List.from(selectedDealers),
-                    ); // Pass selected dealers back to the caller
-                  },
-                  child: const Text('Done'),
-                ),
-              ],
-            );
-          },
-        );
-      },
-    );
-  }
+  //                   Navigator.pop(
+  //                     context,
+  //                     List.from(selectedDealers),
+  //                   ); // Pass selected dealers back to the caller
+  //                 },
+  //                 child: const Text('Done'),
+  //               ),
+  //             ],
+  //           );
+  //         },
+  //       );
+  //     },
+  //   );
+  // }
 
   @override
   Widget build(BuildContext context) {

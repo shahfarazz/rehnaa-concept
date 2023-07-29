@@ -10,6 +10,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:rehnaa/backend/models/landlordmodel.dart';
+import 'package:rehnaa/backend/services/helperfunctions.dart';
 import 'package:rehnaa/frontend/helper/Landlorddashboard_pages/landlordinvoice.dart';
 import 'package:responsive_framework/responsive_scaled_box.dart';
 import '../../../backend/models/propertymodel.dart';
@@ -40,7 +41,9 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
     with AutomaticKeepAliveClientMixin<LandlordDashboardContent> {
   // late Future<Landlord> _landlordFuture;
   late Stream<DocumentSnapshot<Map<String, dynamic>>> _landlordStream;
+  final TextEditingController _controller = TextEditingController();
 
+  @override
   @override
   bool get wantKeepAlive => true;
   bool isWithdraw = false;
@@ -56,6 +59,32 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
         .collection('Landlords')
         .doc(widget.uid)
         .snapshots();
+
+    // import 'package:intl/intl.dart';
+
+    final formatter = NumberFormat("#,###");
+
+    _controller.addListener(() {
+      final text = _controller.text;
+      double? number = double.tryParse(text.replaceAll(',', ''));
+
+      if (number != null) {
+        final formattedText = formatter.format(number);
+
+        if (text != formattedText) {
+          int offset = (formattedText.length - text.length);
+
+          int newStart = _controller.selection.start + offset;
+          int newEnd = _controller.selection.end + offset;
+
+          _controller.text = formattedText;
+          _controller.selection = TextSelection(
+            baseOffset: newStart.clamp(0, _controller.text.length),
+            extentOffset: newEnd.clamp(0, _controller.text.length),
+          );
+        }
+      }
+    });
   }
 
   Future<Landlord> getLandlordFromFirestore(String uid) async {
@@ -223,6 +252,7 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
                         context: context,
                         builder: (BuildContext context) {
                           double withdrawalAmount = 0.0;
+                          _controller.clear();
 
                           return AlertDialog(
                             title: Text(
@@ -236,9 +266,15 @@ class _LandlordDashboardContentState extends State<LandlordDashboardContent>
                             ),
                             content: TextField(
                               keyboardType: TextInputType.number,
+                              controller: _controller,
                               onChanged: (value) {
+                                print('value is $value');
+                                String valueWithoutCommas =
+                                    value.replaceAll(',', '');
+                                print(
+                                    'value without commas is $valueWithoutCommas');
                                 withdrawalAmount =
-                                    double.tryParse(value) ?? 0.0;
+                                    double.tryParse(valueWithoutCommas) ?? 0.0;
                               },
                               decoration: InputDecoration(
                                 focusedBorder: UnderlineInputBorder(
