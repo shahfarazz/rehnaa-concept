@@ -220,7 +220,7 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
     final TextEditingController lastNameController =
         TextEditingController(text: landlord.lastName);
     final TextEditingController balanceController =
-        TextEditingController(text: landlord.balance.toString());
+        TextEditingController(text: landlord.balance.ceil().toString());
     selectedProperties = List.from(landlord.propertyRef ?? []);
     selectedTenants = List.from(landlord.tenantRef ?? []);
     selectedRentPayments = List.from(landlord.rentpaymentRef ?? []);
@@ -1607,7 +1607,7 @@ class _AdminLandlordInputPageState extends State<AdminLandlordInputPage> {
                         return ListTile(
                           title: Text(
                               '${landlord.firstName} ${landlord.lastName}'),
-                          subtitle: Text(landlord.balance.toString()),
+                          subtitle: Text(landlord.balance.ceil().toString()),
                           leading: const Icon(Icons.person),
                           trailing:
                               landlord.isGhost != null && landlord.isGhost!

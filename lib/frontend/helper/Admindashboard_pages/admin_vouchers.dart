@@ -38,7 +38,7 @@ class _AdminVouchersPageState extends State<AdminVouchersPage> {
   void initState() {
     super.initState();
     fetchVouchers();
-    reloadVouchers();
+    // reloadVouchers();
   }
 
   Future<void> addVoucher() async {
@@ -80,7 +80,7 @@ class _AdminVouchersPageState extends State<AdminVouchersPage> {
                   content: TextField(
                     onChanged: (value) {
                       setState(() {
-                        nameval = value;
+                        value != '' ? nameval = value : nameval = 'Voucher';
                       });
                     },
                   ),

@@ -31,7 +31,30 @@ class _TenantCardWidgetState extends State<TenantCardWidget> {
   final TextEditingController emailOrPhoneController = TextEditingController();
   final TextEditingController propertyDetailsController =
       TextEditingController();
+  final TextEditingController creditPointsController = TextEditingController();
+  final TextEditingController cnicNumberController = TextEditingController();
+  final TextEditingController familyMembersController = TextEditingController();
+  final TextEditingController addressController = TextEditingController();
 
+  //phoneNumber
+  final TextEditingController phoneNumberController = TextEditingController();
+  //pastLandlordTestimonial
+  final TextEditingController pastLandlordTestimonialController =
+      TextEditingController();
+
+  // // monthlyRent
+  // final TextEditingController monthlyRentController =
+  //     TextEditingController(text: tenant.monthlyRent.toString());
+
+  //securityDeposit
+  final TextEditingController securityDepositController =
+      TextEditingController();
+
+  //creditScore
+  final TextEditingController creditScoreController = TextEditingController();
+
+  //otherInfo
+  final TextEditingController otherInfoController = TextEditingController();
   @override
   void initState() {
     super.initState();
@@ -95,12 +118,20 @@ class _TenantCardWidgetState extends State<TenantCardWidget> {
       'rating': rating,
       'balance': rent,
       'pathToImage': pathToImage,
-      'creditPoints': 0,
-      'cnicNumber': cnicController.text,
+      // 'creditPoints': 0,
+      // 'cnicNumber': cnicController.text,
       'emailOrPhone': emailOrPhoneController.text,
-      'familyMembers': 0,
+      // 'familyMembers': 0,
       'landlordRef': null,
       'isGhost': true,
+      // 'phoneNumber': phoneNumberController.text,
+      'pastLandlordTestimonial': pastLandlordTestimonialController.text,
+      'securityDeposit': securityDepositController.text,
+      'creditScore': creditScoreController.text,
+      'otherInfo': otherInfoController.text,
+      'address': addressController.text,
+      'familyMembers': familyMembersController.text,
+      'creditPoints': creditPointsController.text,
     });
 
     setState(() {
@@ -226,6 +257,41 @@ class _TenantCardWidgetState extends State<TenantCardWidget> {
                         rent = int.tryParse(value) ?? 0;
                       });
                     },
+                  ),
+                  TextField(
+                    decoration: const InputDecoration(labelText: 'Address'),
+                    controller: addressController,
+                  ),
+                  TextField(
+                    decoration:
+                        const InputDecoration(labelText: 'Family Members'),
+                    keyboardType: TextInputType.number,
+                    controller: familyMembersController,
+                  ),
+                  TextField(
+                    decoration:
+                        const InputDecoration(labelText: 'Credit Points'),
+                    keyboardType: TextInputType.number,
+                    controller: creditPointsController,
+                  ),
+                  TextField(
+                    decoration: const InputDecoration(
+                        labelText: 'Past Landlord Testimonial'),
+                    controller: pastLandlordTestimonialController,
+                  ),
+                  TextField(
+                    decoration:
+                        const InputDecoration(labelText: 'Security Deposit'),
+                    controller: securityDepositController,
+                  ),
+                  TextField(
+                    decoration:
+                        const InputDecoration(labelText: 'Credit Score'),
+                    controller: creditScoreController,
+                  ),
+                  TextField(
+                    decoration: const InputDecoration(labelText: 'Other Info'),
+                    controller: otherInfoController,
                   ),
                   const SizedBox(height: 20),
                   ElevatedButton(

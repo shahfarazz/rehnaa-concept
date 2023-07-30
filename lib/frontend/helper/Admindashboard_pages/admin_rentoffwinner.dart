@@ -303,7 +303,7 @@ class _AdminRentOffWinnerPageState extends State<AdminRentOffWinnerPage> {
                             );
                           },
                         );
-                        if (discount != null && discount != 0) {
+                        if (discount != null) {
                           // Apply the discount to the tenant's rent
                           print('discount is $discount');
                           print('newTotal is $newTotal');
@@ -320,48 +320,51 @@ class _AdminRentOffWinnerPageState extends State<AdminRentOffWinnerPage> {
                           });
 
                           //send notification to the tenant
-                          await FirebaseFirestore.instance
-                              .collection('Notifications')
-                              .doc(tenant.tempID)
-                              .set({
-                            'notifications': FieldValue.arrayUnion([
-                              {
-                                // 'amount': data.requestedAmount,
-                                'title':
-                                    "Congratulations! You are the deserving winner of this month's ${discount}% Rent Off jackpot! 🎉🌟",
-                              }
-                            ])
-                          }, SetOptions(merge: true));
+                          if (discount != 0) {
+                            await FirebaseFirestore.instance
+                                .collection('Notifications')
+                                .doc(tenant.tempID)
+                                .set({
+                              'notifications': FieldValue.arrayUnion([
+                                {
+                                  // 'amount': data.requestedAmount,
+                                  'title':
+                                      "Congratulations! You are the deserving winner of this month's ${discount}% Rent Off jackpot! 🎉🌟",
+                                }
+                              ])
+                            }, SetOptions(merge: true));
 
-                          //also send a notification to all the other tenants
-                          // use batch writes to update all the tenants
-                          WriteBatch batch = FirebaseFirestore.instance.batch();
-                          await FirebaseFirestore.instance
-                              .collection('Tenants')
-                              .get()
-                              .then((snapshot) {
-                            snapshot.docs.forEach((doc) {
-                              if (doc.id != tenant.tempID) {
-                                // update notifications in the Notifications collection on the doc.id
-                                batch.set(
-                                  FirebaseFirestore.instance
-                                      .collection('Notifications')
-                                      .doc(doc.id),
-                                  {
-                                    'notifications': FieldValue.arrayUnion([
-                                      {
-                                        // 'amount': data.requestedAmount,
-                                        'title':
-                                            "Congratulations! Discover the New Monthly Rent OFF Winners! 🏆🌟",
-                                      }
-                                    ])
-                                  },
-                                  SetOptions(merge: true),
-                                );
-                              }
+                            //also send a notification to all the other tenants
+                            // use batch writes to update all the tenants
+                            WriteBatch batch =
+                                FirebaseFirestore.instance.batch();
+                            await FirebaseFirestore.instance
+                                .collection('Tenants')
+                                .get()
+                                .then((snapshot) {
+                              snapshot.docs.forEach((doc) {
+                                if (doc.id != tenant.tempID) {
+                                  // update notifications in the Notifications collection on the doc.id
+                                  batch.set(
+                                    FirebaseFirestore.instance
+                                        .collection('Notifications')
+                                        .doc(doc.id),
+                                    {
+                                      'notifications': FieldValue.arrayUnion([
+                                        {
+                                          // 'amount': data.requestedAmount,
+                                          'title':
+                                              "Congratulations! Discover the New Monthly Rent OFF Winners! 🏆🌟",
+                                        }
+                                      ])
+                                    },
+                                    SetOptions(merge: true),
+                                  );
+                                }
+                              });
+                              return batch.commit();
                             });
-                            return batch.commit();
-                          });
+                          }
                         }
 
                         // Refresh the list of tenants

@@ -173,7 +173,7 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
     final TextEditingController descriptionController =
         TextEditingController(text: tenant.description);
     final TextEditingController rentController =
-        TextEditingController(text: tenant.balance.toString());
+        TextEditingController(text: tenant.balance.ceil().toString());
     final TextEditingController creditPointsController =
         TextEditingController(text: tenant.creditPoints.toString());
     final TextEditingController cnicNumberController =
@@ -1029,7 +1029,7 @@ class _AdminTenantsInputPageState extends State<AdminTenantsInputPage> {
 
                         return ListTile(
                           title: Text('${tenant.firstName} ${tenant.lastName}'),
-                          subtitle: Text(tenant.balance.toString()),
+                          subtitle: Text(tenant.balance.ceil().toString()),
                           leading: const Icon(Icons.person),
                           trailing: tenant.isGhost != null && tenant.isGhost!
                               ? const Text('Ghost User')

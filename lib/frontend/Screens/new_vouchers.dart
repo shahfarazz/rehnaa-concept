@@ -160,7 +160,7 @@ class _NewVouchersPageState extends State<NewVouchersPage> {
                         itemCount: images.length,
                         itemBuilder: (context, index) {
                           int reversedIndex = images.length - 1 - index;
-                          String imageName = imageNames[reversedIndex];
+                          String imageName = imageNames[reversedIndex] ?? '';
 
                           if (searchQuery != null &&
                               imageName.toLowerCase().contains(searchQuery!)) {

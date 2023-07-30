@@ -818,7 +818,7 @@ class _PropertyCardWidgetState extends State<PropertyCardWidget> {
         typeError = null;
       });
     }
-    if ((area ?? 0) <= 0) {
+    if ((area ?? 0) < 0) {
       setState(() {
         areaError = 'Area is less than 0 or empty.';
         isValid = false;
@@ -829,9 +829,9 @@ class _PropertyCardWidgetState extends State<PropertyCardWidget> {
       });
     }
 
-    if (beds <= 0) {
+    if (beds < 0) {
       setState(() {
-        bedsError = 'Beds must be greater than zero.';
+        bedsError = 'Beds must be greater than or equal to zero.';
         isValid = false;
       });
     } else {
@@ -840,9 +840,9 @@ class _PropertyCardWidgetState extends State<PropertyCardWidget> {
       });
     }
 
-    if (baths <= 0) {
+    if (baths < 0) {
       setState(() {
-        bathsError = 'Baths must be greater than zero.';
+        bathsError = 'Baths must be greater than or equal to zero.';
         isValid = false;
       });
     } else {
@@ -851,9 +851,9 @@ class _PropertyCardWidgetState extends State<PropertyCardWidget> {
       });
     }
 
-    if (living <= 0) {
+    if (living < 0) {
       setState(() {
-        livingError = 'Living must be greater than zero.';
+        livingError = 'Living must be greater than or equal to zero.';
         isValid = false;
       });
     } else {
@@ -862,9 +862,9 @@ class _PropertyCardWidgetState extends State<PropertyCardWidget> {
       });
     }
 
-    if (floors <= 0) {
+    if (floors < 0) {
       setState(() {
-        floorsError = 'Floors must be greater than zero.';
+        floorsError = 'Floors must be greater than or equal to zero.';
         isValid = false;
       });
     } else {
@@ -873,9 +873,9 @@ class _PropertyCardWidgetState extends State<PropertyCardWidget> {
       });
     }
 
-    if (carspace <= 0) {
+    if (carspace < 0) {
       setState(() {
-        carspaceError = 'Carspace must be greater than zero.';
+        carspaceError = 'Carspace must be greater than or equal to zero.';
         isValid = false;
       });
     } else {
@@ -927,9 +927,9 @@ class _PropertyCardWidgetState extends State<PropertyCardWidget> {
       });
     }
 
-    if (price <= 0) {
+    if (price < 0) {
       setState(() {
-        priceError = 'Rent Demand must be greater than zero.';
+        priceError = 'Rent Demand must be greater than or equal to zero.';
         isValid = false;
       });
     } else {
